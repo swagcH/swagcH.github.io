@@ -24,13 +24,13 @@
 
   <meta name="description" content="JUC并发编程 写在前面  基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="juc并发编程的一些理解">
+<meta property="og:title" content="JUC并发编程知识点梳理">
 <meta property="og:url" content="http://example.com/2024/05/02/juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3/index.html">
 <meta property="og:site_name" content="杰尼龟的笔记">
 <meta property="og:description" content="JUC并发编程 写在前面  基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-02T01:29:50.000Z">
-<meta property="article:modified_time" content="2024-05-02T07:20:04.436Z">
+<meta property="article:modified_time" content="2024-05-02T14:44:36.364Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="并发编程">
 <meta property="article:tag" content="Java">
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>juc并发编程的一些理解 | 杰尼龟的笔记</title>
+  <title>JUC并发编程知识点梳理 | 杰尼龟的笔记</title>
   
 
 
@@ -182,7 +182,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          juc并发编程的一些理解
+          JUC并发编程知识点梳理
         </h1>
 
         <div class="post-meta">
@@ -193,7 +193,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-05-02 09:29:50 / 修改时间：15:20:04" itemprop="dateCreated datePublished" datetime="2024-05-02T09:29:50+08:00">2024-05-02</time>
+              <time title="创建时间：2024-05-02 09:29:50 / 修改时间：22:44:36" itemprop="dateCreated datePublished" datetime="2024-05-02T09:29:50+08:00">2024-05-02</time>
             </span>
 
           
@@ -542,6 +542,100 @@
 <h2 id="14-异步调用"><a href="#14-异步调用" class="headerlink" title="14.异步调用"></a>14.异步调用</h2><p>异步调用是一种编程模型，用于处理需要等待较长时间的操作，例如网络请求、文件读写、数据库查询等。在传统的同步调用中，调用者会等待操作完成后才能继续执行后续代码，而在异步调用中，调用者可以继续执行后续代码，而不必等待操作完成。</p>
 <p>在异步调用中，通常会通过回调函数、Future&#x2F;Promise 对象或者异步方法来处理操作完成后的结果。这样可以提高程序的响应性和并发性，避免阻塞主线程。异步调用常用于需要处理大量并发请求或者需要等待外部资源响应的场景，能够更有效地利用系统资源。</p>
 <p>在 Java 中，可以使用 CompletableFuture、FutureTask、Callback 等机制来实现异步调用。在 JavaScript 中，可以使用 Promise、async&#x2F;await 等机制来实现异步调用。异步调用在现代编程中非常常见，能够提高程序的性能和用户体验。</p>
+<h2 id="15-JMM"><a href="#15-JMM" class="headerlink" title="15.JMM"></a>15.JMM</h2><blockquote>
+<p>什么是JMM</p>
+</blockquote>
+<p>JMM 是 Java 内存模型（Java Memory Model）的缩写，是 Java 虚拟机规范中定义的一种抽象的计算机内存模型，用于屏蔽不同硬件和操作系统的内存访问差异，确保在不同平台上对 Java 程序的并发访问都能得到一致的结果。</p>
+<p>Java 内存模型规定了所有线程之间共享的主内存以及每个线程私有的工作内存之间的关系，主要包括以下几个方面的内容：</p>
+<ol>
+<li><p><strong>原子性（Atomicity）</strong>：对基本数据类型的读取和赋值操作具有原子性，即这些操作不会被中断。</p>
+</li>
+<li><p><strong>可见性（Visibility）</strong>：一个线程修改的变量对其他线程是可见的，即一个线程修改的共享变量的值在其他线程中是可以看到的。</p>
+</li>
+<li><p><strong>有序性（Ordering）</strong>：在单个线程内，程序的执行顺序按照代码的顺序执行。在多线程情况下，由于指令重排序的存在，可能会导致不同线程观察到的执行顺序不同。Java 内存模型通过 happens-before 原则来规定多线程之间操作的执行顺序。</p>
+</li>
+</ol>
+<p><strong>关于JMM的一些同步约定</strong></p>
+<ol>
+<li>线程解锁前，必须将共享变量立刻刷新回主存。</li>
+<li>进程加锁前，必须读取主存的最新值到工作内存中</li>
+<li>加锁解锁都必须是同一把锁。</li>
+</ol>
+<h2 id="16-Volatile"><a href="#16-Volatile" class="headerlink" title="16. Volatile"></a>16. Volatile</h2><ol>
+<li><strong>可见性</strong>：被 <code>volatile</code> 修饰的变量在一个线程中被修改后，会立即更新到主内存中，其他线程读取该变量时会直接从主内存中获取最新值，保证了变量的可见性。</li>
+<li><strong>禁止重排序</strong>：<code>volatile</code> 修饰的变量禁止了指令重排序，保证了变量的修改顺序与代码中的顺序一致。</li>
+<li><strong>不保证原子性</strong>：<code>volatile</code> 修饰的变量对于单次读&#x2F;写操作是原子的，但是对于多次操作（比如 i++）并不能保证原子性，如果需要保证原子性，可以使用 <code>synchronized</code> 关键字或者 <code>java.util.concurrent.atomic</code> 包中的原子类</li>
+</ol>
+<blockquote>
+<p>如果不使用lock和synchronized，如何保证原子性？</p>
+</blockquote>
+<p>使用原子类 Atomic，底层直接根操作系统挂钩，在内存中修改值。</p>
+<blockquote>
+<p>指令重排</p>
+</blockquote>
+<p>代处理器为了提高执行效率而进行的一种优化手段。处理器在执行指令时，并不一定会按照代码中的顺序依次执行，而是可能会重新排列指令的执行顺序，以尽量减少指令之间的相关性，提高并行度和性能。</p>
+<blockquote>
+<p>volatile如何避免指令重排</p>
+</blockquote>
+<p><code>volatile</code>关键字实现禁止指令重排的机制是通过在编译器层面和运行时层面进行限制的。在编译器层面，编译器会禁止对<code>volatile</code>变量进行重排序优化，保证在执行顺序上不会将后面的操作排在前面。在运行时层面，JVM会在每次对<code>volatile</code>变量进行读写操作时，插入内存屏障指令（Memory Barrier），确保变量的写操作先于后续的读操作，从而保证了操作的顺序性。</p>
+<h2 id="17-单例模式"><a href="#17-单例模式" class="headerlink" title="17.单例模式"></a>17.单例模式</h2><h3 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h3><p>直接创建对象，会浪费内存空间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test1</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Test1</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Test1</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Test1</span><span class="params">()</span> &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Test1 <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h3><p>在使用时才会创建，会出现并发问题</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton instance;<span class="comment">//使用volatile，保证可见性</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 私有化构造函数，避免外部实例化</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (Singleton.class) &#123;</span><br><span class="line">                <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">                    instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Singleton is doing something.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>反射可以破坏单例模式</p>
+</blockquote>
+<p><strong>最好的单例模式，是枚举，无法被破坏</strong></p>
+<h2 id="18-CAS相关"><a href="#18-CAS相关" class="headerlink" title="18.CAS相关"></a>18.CAS相关</h2><blockquote>
+<p>什么是CAS</p>
+</blockquote>
+<p>CAS（Compare and Swap，比较并交换）是一种用于实现多线程同步的原子操作。在CAS操作中，系统会先比较内存中某个位置的值与预期值是否相等，如果相等，则将该位置的值更新为新的值；如果不相等，则操作失败。整个操作是原子的，即在同一时刻只有一个线程能够成功执行该操作。</p>
+<p>CAS操作通常用于实现非阻塞算法和并发数据结构，例如Java中的<code>AtomicInteger</code>、<code>AtomicLong</code>等类就是基于CAS操作实现的。CAS操作的优势在于它避免了传统的加锁操作所带来的性能损耗，因为它是基于硬件级别的原子操作，不需要像锁一样在用户态和内核态之间切换。</p>
+<p>在Java中，CAS操作由<code>java.util.concurrent.atomic</code>包提供支持，通常使用<code>compareAndSet()</code>方法来实现。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">AtomicInteger</span> <span class="variable">atomicInteger</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AtomicInteger</span>(<span class="number">0</span>);</span><br><span class="line"><span class="type">int</span> <span class="variable">expectedValue</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">newValue</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> (!atomicInteger.compareAndSet(expectedValue, newValue)) &#123;</span><br><span class="line">    expectedValue = atomicInteger.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码中，<code>compareAndSet()</code>方法会比较<code>atomicInteger</code>的当前值是否等于<code>expectedValue</code>，如果相等，则将其更新为<code>newValue</code>，否则操作失败。通过循环不断尝试，直到操作成功为止。</p>
+<blockquote>
+<p>unsafe类</p>
+</blockquote>
+<p>Java是无法直接操作内存的，c++可以，CAS就是通过直接操作内存来实现的。</p>
+<p>CAS ： 比较当前工作内存中的值和主内存中的值，如果这个值是期望的，那么则执行操作！如果不是就 一直循环！ </p>
+<p>缺点</p>
+<p> 1、 循环会耗时</p>
+<p> 2、一次性只能保证一个共享变量的原子性 </p>
+<p>3、ABA问题</p>
+<h3 id="ABA问题（狸猫换太子）"><a href="#ABA问题（狸猫换太子）" class="headerlink" title="ABA问题（狸猫换太子）"></a>ABA问题（狸猫换太子）</h3><p>一个线程读取了值之后，另外一个线程修改了这个值两次，最终改为了原来的值，第一个线程发现值没有变化，则不会发现其他线程修改过。</p>
+<h2 id="19-原子引用"><a href="#19-原子引用" class="headerlink" title="19.原子引用"></a>19.原子引用</h2><blockquote>
+<p>解决ABA问题，引入原子引用，对应的是乐观锁思想</p>
+</blockquote>
+<p>解决ABA问题的常见方法是使用带有版本号的原子引用，例如<code>AtomicStampedReference</code>类。这个类在比较时除了比较值外，还会比较一个版本号（stamp），只有当值和版本号都匹配时才进行修改。这样一来，即使值在过程中发生了变化，只要版本号不同，就能够避免误判。</p>
+<h2 id="20-各种锁的理解"><a href="#20-各种锁的理解" class="headerlink" title="20.各种锁的理解"></a>20.各种锁的理解</h2><h3 id="1-公平锁，非公平锁"><a href="#1-公平锁，非公平锁" class="headerlink" title="1.公平锁，非公平锁"></a>1.公平锁，非公平锁</h3><p>公平锁：先来后到。</p>
+<p>非公平锁：可以插队（默认）</p>
+<h3 id="2-可重入锁"><a href="#2-可重入锁" class="headerlink" title="2. 可重入锁"></a>2. 可重入锁</h3><p>可重入锁（Reentrant Lock）是一种支持在同一个线程中多次获取同一把锁的锁机制。这意味着线程可以在持有锁的情况下再次获取该锁，而不会造成死锁。可重入锁是一种比较常见的锁实现方式，在Java中通过<code>synchronized</code>关键字和<code>ReentrantLock</code>类来实现。</p>
+<p>在使用可重入锁时，同一个线程可以多次获取锁而不会被阻塞。线程每次成功获取锁后，需要在最后释放相同次数的锁。这样可以确保锁的所有权不会被其他线程所获取，从而避免了死锁的发生。</p>
+<p>可重入锁的一个典型应用场景是递归函数。如果一个函数是递归的，并且这个函数需要获取锁来访问临界区资源，那么使用可重入锁可以确保同一线程在递归调用过程中可以多次获取锁而不会产生死锁。</p>
+<p>总的来说，可重入锁是一种非常实用的锁机制，能够简化并发编程中的锁管理，并提高程序的可靠性和性能。</p>
+<h3 id="3-自旋锁（底层是CAS）"><a href="#3-自旋锁（底层是CAS）" class="headerlink" title="3.自旋锁（底层是CAS）"></a>3.自旋锁（底层是CAS）</h3><p>自旋锁是一种基于忙等待的锁机制，在尝试获取锁时，线程不会立即进入阻塞状态，而是循环检测锁的状态，直到获取到锁为止。自旋锁适用于锁被持有时间较短的情况，因为长时间的自旋会消耗CPU资源。</p>
+<p>在Java中，<code>AtomicInteger</code>等原子类的<code>compareAndSet()</code>方法就是使用自旋锁实现的。当多个线程同时尝试修改同一个<code>AtomicInteger</code>的值时，如果没有竞争，<code>compareAndSet()</code>会立即成功；如果有竞争，线程会不断尝试，直到成功为止。</p>
+<p>自旋锁的优点是避免了线程切换的开销，缺点是会消耗CPU资源，并且在高并发情况下可能会导致性能下降。因此，使用自旋锁时需要根据实际情况权衡。</p>
+<h3 id="4-死锁"><a href="#4-死锁" class="headerlink" title="4.死锁"></a>4.死锁</h3><p>死锁是指两个或多个线程（或进程）在执行过程中，因争夺资源而造成的一种互相等待的现象，导致它们都无法继续执行下去。简单来说，就是多个线程在互相等待对方释放资源，导致它们都无法继续执行下去。</p>
+<p>死锁发生的必要条件包括：</p>
+<ol>
+<li>互斥条件（资源只能被一个线程占用）、</li>
+<li>请求与保持条件（一个线程持有了至少一个资源，并且正在请求另一个资源，但该资源被其他线程持有）、</li>
+<li>不剥夺条件（线程不能强制占有其他线程的资源，只能自己释放）</li>
+<li>循环等待条件（若干线程之间形成一种头尾相接的循环等待资源关系）。</li>
+</ol>
+<p>死锁在多线程编程中是一个比较常见的问题，因为线程在获取资源时可能会发生竞争，如果不合理地使用锁或资源分配策略，就容易造成死锁。预防死锁的方法包括使用适当的锁策略、避免循环等待、按照固定的顺序获取锁等。</p>
+<blockquote>
+<p>如何排查死锁</p>
+</blockquote>
+<ol>
+<li>使用jps -l定位进程号</li>
+<li>使用jstack进程号，找到思索问题</li>
+</ol>
 
     </div>
 
@@ -630,7 +724,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JUC%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">JUC并发编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFJUC"><span class="nav-number">1.1.</span> <span class="nav-text">1.什么是JUC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">2.进程和线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Lock%E9%94%81%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">3.Lock锁（重点）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">4.生产者消费者问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%9B%86%E5%90%88%E7%B1%BB%E4%B8%8D%E5%AE%89%E5%85%A8"><span class="nav-number">1.5.</span> <span class="nav-text">5.集合类不安全</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#List%E4%B8%8B%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.1.</span> <span class="nav-text">List下的解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Set%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.2.</span> <span class="nav-text">Set的解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Map%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.3.</span> <span class="nav-text">Map的解决方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Callable"><span class="nav-number">1.6.</span> <span class="nav-text">6.Callable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%B8%B8%E7%94%A8%E7%9A%84%E8%BE%85%E5%8A%A9%E7%B1%BB"><span class="nav-number">1.7.</span> <span class="nav-text">7.常用的辅助类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-CountDownLatch-%E5%87%8F%E6%B3%95%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">1.7.1.</span> <span class="nav-text">8.1 CountDownLatch-减法计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-CyclicBarrier-%E5%8A%A0%E6%B3%95%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">1.7.2.</span> <span class="nav-text">8.2 CyclicBarrier-加法计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-Semaphore%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="nav-number">1.7.3.</span> <span class="nav-text">8.3 Semaphore信号量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">1.8.</span> <span class="nav-text">8. 读写锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97"><span class="nav-number">1.9.</span> <span class="nav-text">9.阻塞队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%88%E4%B8%89%E5%A4%A7%E6%96%B9%E6%B3%95%EF%BC%8C%E4%B8%83%E5%A4%A7%E5%8F%82%E6%95%B0%EF%BC%8C%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5%EF%BC%89"><span class="nav-number">1.10.</span> <span class="nav-text">10.线程池（三大方法，七大参数，四种拒绝策略）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E5%A4%A7%E6%96%B9%E6%B3%95"><span class="nav-number">1.10.1.</span> <span class="nav-text">三大方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E5%A4%A7%E5%8F%82%E6%95%B0"><span class="nav-number">1.10.2.</span> <span class="nav-text">七大参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5"><span class="nav-number">1.10.3.</span> <span class="nav-text">四种拒绝策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8E%BB%E8%AE%BE%E7%BD%AE%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">1.10.4.</span> <span class="nav-text">如何去设置线程池的大小</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-%E5%9B%9B%E5%A4%A7%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.11.</span> <span class="nav-text">11.四大函数式接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Function%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3-%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.1.</span> <span class="nav-text">1. Function函数式接口:有输入，有返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%96%AD%E5%AE%9A%E5%9E%8B%E6%8E%A5%E5%8F%A3%EF%BC%9A%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0%EF%BC%8C%E8%BF%94%E5%9B%9E%E5%80%BC%E5%BF%85%E9%A1%BB%E6%98%AF%E5%B8%83%E5%B0%94%E5%80%BC"><span class="nav-number">1.11.2.</span> <span class="nav-text">2. 断定型接口：只有一个输入参数，返回值必须是布尔值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%B6%88%E8%B4%B9%E5%9E%8B%E6%8E%A5%E5%8F%A3%EF%BC%9A%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.3.</span> <span class="nav-text">3. 消费型接口：有输入，有返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Supper%EF%BC%9A%E4%BE%9B%E7%BB%99%E5%9E%8B%E6%8E%A5%E5%8F%A3-%E6%B2%A1%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E5%8F%AA%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.4.</span> <span class="nav-text">4.Supper：供给型接口:没有输入，只有返回</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-Stream%E6%B5%81%E5%BC%8F%E8%BF%90%E7%AE%97"><span class="nav-number">1.12.</span> <span class="nav-text">12.Stream流式运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-ForkJoin"><span class="nav-number">1.13.</span> <span class="nav-text">13.ForkJoin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E5%BC%82%E6%AD%A5%E8%B0%83%E7%94%A8"><span class="nav-number">1.14.</span> <span class="nav-text">14.异步调用</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JUC%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">JUC并发编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFJUC"><span class="nav-number">1.1.</span> <span class="nav-text">1.什么是JUC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">2.进程和线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Lock%E9%94%81%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">3.Lock锁（重点）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">4.生产者消费者问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%9B%86%E5%90%88%E7%B1%BB%E4%B8%8D%E5%AE%89%E5%85%A8"><span class="nav-number">1.5.</span> <span class="nav-text">5.集合类不安全</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#List%E4%B8%8B%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.1.</span> <span class="nav-text">List下的解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Set%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.2.</span> <span class="nav-text">Set的解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Map%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.0.3.</span> <span class="nav-text">Map的解决方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Callable"><span class="nav-number">1.6.</span> <span class="nav-text">6.Callable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%B8%B8%E7%94%A8%E7%9A%84%E8%BE%85%E5%8A%A9%E7%B1%BB"><span class="nav-number">1.7.</span> <span class="nav-text">7.常用的辅助类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-CountDownLatch-%E5%87%8F%E6%B3%95%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">1.7.1.</span> <span class="nav-text">8.1 CountDownLatch-减法计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-CyclicBarrier-%E5%8A%A0%E6%B3%95%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="nav-number">1.7.2.</span> <span class="nav-text">8.2 CyclicBarrier-加法计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-Semaphore%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="nav-number">1.7.3.</span> <span class="nav-text">8.3 Semaphore信号量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">1.8.</span> <span class="nav-text">8. 读写锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97"><span class="nav-number">1.9.</span> <span class="nav-text">9.阻塞队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%88%E4%B8%89%E5%A4%A7%E6%96%B9%E6%B3%95%EF%BC%8C%E4%B8%83%E5%A4%A7%E5%8F%82%E6%95%B0%EF%BC%8C%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5%EF%BC%89"><span class="nav-number">1.10.</span> <span class="nav-text">10.线程池（三大方法，七大参数，四种拒绝策略）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E5%A4%A7%E6%96%B9%E6%B3%95"><span class="nav-number">1.10.1.</span> <span class="nav-text">三大方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E5%A4%A7%E5%8F%82%E6%95%B0"><span class="nav-number">1.10.2.</span> <span class="nav-text">七大参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5"><span class="nav-number">1.10.3.</span> <span class="nav-text">四种拒绝策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%8E%BB%E8%AE%BE%E7%BD%AE%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%A4%A7%E5%B0%8F"><span class="nav-number">1.10.4.</span> <span class="nav-text">如何去设置线程池的大小</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-%E5%9B%9B%E5%A4%A7%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.11.</span> <span class="nav-text">11.四大函数式接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Function%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3-%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.1.</span> <span class="nav-text">1. Function函数式接口:有输入，有返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%96%AD%E5%AE%9A%E5%9E%8B%E6%8E%A5%E5%8F%A3%EF%BC%9A%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0%EF%BC%8C%E8%BF%94%E5%9B%9E%E5%80%BC%E5%BF%85%E9%A1%BB%E6%98%AF%E5%B8%83%E5%B0%94%E5%80%BC"><span class="nav-number">1.11.2.</span> <span class="nav-text">2. 断定型接口：只有一个输入参数，返回值必须是布尔值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%B6%88%E8%B4%B9%E5%9E%8B%E6%8E%A5%E5%8F%A3%EF%BC%9A%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.3.</span> <span class="nav-text">3. 消费型接口：有输入，有返回</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Supper%EF%BC%9A%E4%BE%9B%E7%BB%99%E5%9E%8B%E6%8E%A5%E5%8F%A3-%E6%B2%A1%E6%9C%89%E8%BE%93%E5%85%A5%EF%BC%8C%E5%8F%AA%E6%9C%89%E8%BF%94%E5%9B%9E"><span class="nav-number">1.11.4.</span> <span class="nav-text">4.Supper：供给型接口:没有输入，只有返回</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-Stream%E6%B5%81%E5%BC%8F%E8%BF%90%E7%AE%97"><span class="nav-number">1.12.</span> <span class="nav-text">12.Stream流式运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-ForkJoin"><span class="nav-number">1.13.</span> <span class="nav-text">13.ForkJoin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E5%BC%82%E6%AD%A5%E8%B0%83%E7%94%A8"><span class="nav-number">1.14.</span> <span class="nav-text">14.异步调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-JMM"><span class="nav-number">1.15.</span> <span class="nav-text">15.JMM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-Volatile"><span class="nav-number">1.16.</span> <span class="nav-text">16. Volatile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#17-%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.17.</span> <span class="nav-text">17.单例模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A5%BF%E6%B1%89%E5%BC%8F"><span class="nav-number">1.17.1.</span> <span class="nav-text">饿汉式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%87%92%E6%B1%89%E5%BC%8F"><span class="nav-number">1.17.2.</span> <span class="nav-text">懒汉式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#18-CAS%E7%9B%B8%E5%85%B3"><span class="nav-number">1.18.</span> <span class="nav-text">18.CAS相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ABA%E9%97%AE%E9%A2%98%EF%BC%88%E7%8B%B8%E7%8C%AB%E6%8D%A2%E5%A4%AA%E5%AD%90%EF%BC%89"><span class="nav-number">1.18.1.</span> <span class="nav-text">ABA问题（狸猫换太子）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#19-%E5%8E%9F%E5%AD%90%E5%BC%95%E7%94%A8"><span class="nav-number">1.19.</span> <span class="nav-text">19.原子引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#20-%E5%90%84%E7%A7%8D%E9%94%81%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">1.20.</span> <span class="nav-text">20.各种锁的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%85%AC%E5%B9%B3%E9%94%81%EF%BC%8C%E9%9D%9E%E5%85%AC%E5%B9%B3%E9%94%81"><span class="nav-number">1.20.1.</span> <span class="nav-text">1.公平锁，非公平锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%AF%E9%87%8D%E5%85%A5%E9%94%81"><span class="nav-number">1.20.2.</span> <span class="nav-text">2. 可重入锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%87%AA%E6%97%8B%E9%94%81%EF%BC%88%E5%BA%95%E5%B1%82%E6%98%AFCAS%EF%BC%89"><span class="nav-number">1.20.3.</span> <span class="nav-text">3.自旋锁（底层是CAS）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%AD%BB%E9%94%81"><span class="nav-number">1.20.4.</span> <span class="nav-text">4.死锁</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -784,7 +878,7 @@
   var disqus_config = function() {
     this.page.url = "http://example.com/2024/05/02/juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3/";
     this.page.identifier = "2024/05/02/juc并发编程的一些理解/";
-    this.page.title = "juc并发编程的一些理解";
+    this.page.title = "JUC并发编程知识点梳理";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
