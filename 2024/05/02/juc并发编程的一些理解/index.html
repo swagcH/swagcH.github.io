@@ -22,13 +22,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
+  <meta name="description" content="JUC并发编程 写在前面  基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="juc并发编程的一些理解">
 <meta property="og:url" content="http://example.com/2024/05/02/juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3/index.html">
 <meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="JUC并发编程 写在前面  基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-02T01:29:50.000Z">
-<meta property="article:modified_time" content="2024-05-02T01:33:02.219Z">
+<meta property="article:modified_time" content="2024-05-02T03:56:00.914Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="并发编程">
 <meta property="article:tag" content="Java">
@@ -191,7 +193,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-05-02 09:29:50 / 修改时间：09:33:02" itemprop="dateCreated datePublished" datetime="2024-05-02T09:29:50+08:00">2024-05-02</time>
+              <time title="创建时间：2024-05-02 09:29:50 / 修改时间：11:56:00" itemprop="dateCreated datePublished" datetime="2024-05-02T09:29:50+08:00">2024-05-02</time>
             </span>
 
           
@@ -226,7 +228,60 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h1 id="JUC并发编程"><a href="#JUC并发编程" class="headerlink" title="JUC并发编程"></a>JUC并发编程</h1><blockquote>
+<p>写在前面</p>
+</blockquote>
+<p>基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。</p>
+<span id="more"></span>
+
+<h2 id="1-什么是JUC"><a href="#1-什么是JUC" class="headerlink" title="1.什么是JUC"></a>1.什么是JUC</h2><p>JUC（Java Util Concurrency）是Java工具类库中的一部分，提供了在多线程环境下编写并发程序所需的工具和框架。JUC包含了一些并发编程的核心概念和工具，使得开发人员能够更轻松地编写高效、线程安全的并发程序。</p>
+<h2 id="2-进程和线程"><a href="#2-进程和线程" class="headerlink" title="2.进程和线程"></a>2.进程和线程</h2><ol>
+<li><p>进程：一个程序的集合。称为进程。</p>
+</li>
+<li><p>一个程序可以包含多个线程，至少包含一个线程！</p>
+</li>
+<li><p>Java默认包含两个线程，main ，GC</p>
+</li>
+<li><p>Java开启线程的方式，Thread，Runnable，Callable</p>
+</li>
+<li><p><strong>Java是无法自己开启线程的</strong>，本质上Java是通过操作c来开启线程</p>
+<blockquote>
+<p>​	并发，并行</p>
+</blockquote>
+<p>并发：多个线程操作同一个资源</p>
+<ul>
+<li>cpu单核，模拟出多个线程，不停切换</li>
+</ul>
+<p>并行： 多个线程同时操作多个资源</p>
+<ul>
+<li>​	多核cpu，多个线程同时执行</li>
+</ul>
+<p>并发编程的本质：充分利用cpu的资源</p>
+<blockquote>
+<p>线程状态</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">State</span> &#123;</span><br><span class="line"><span class="comment">//新生</span></span><br><span class="line">NEW,</span><br><span class="line">  <span class="comment">// 运行</span></span><br><span class="line">RUNNABLE,</span><br><span class="line"><span class="comment">// 阻塞</span></span><br><span class="line">BLOCKED,</span><br><span class="line"><span class="comment">// 等待，死死地等</span></span><br><span class="line">WAITING,</span><br><span class="line"><span class="comment">// 超时等待</span></span><br><span class="line">TIMED_WAITING,</span><br><span class="line"><span class="comment">// 终止</span></span><br><span class="line">TERMINATED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>​	wait&#x2F;sleep的区别</p>
+</blockquote>
+<ol>
+<li><p>来自不同的类</p>
+<p>Wait &#x3D;&gt;object,sleep &#x3D;&gt;Thread</p>
+</li>
+<li><p>锁的释放</p>
+<p>wait会释放锁，sleep 不会释放锁！</p>
+</li>
+<li><p>使用的范围不同</p>
+<p>wait：必须在同步代码块中。sleep没有限制</p>
+</li>
+<li><p>唤醒方式</p>
+<p>wait：需要调用notify或者notifyAll唤醒，sleep自动唤醒，或者调用interrupt（）方法唤醒</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="3-Lock锁（重点）"><a href="#3-Lock锁（重点）" class="headerlink" title="3.Lock锁（重点）"></a>3.Lock锁（重点）</h2>
     </div>
 
     
@@ -314,6 +369,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JUC%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">JUC并发编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFJUC"><span class="nav-number">1.1.</span> <span class="nav-text">1.什么是JUC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">2.进程和线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Lock%E9%94%81%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">3.Lock锁（重点）</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -329,7 +385,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
