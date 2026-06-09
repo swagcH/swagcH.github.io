@@ -40,6 +40,316 @@
   </entry>
   
   <entry>
+    <title>年度故障案例总结</title>
+    <link href="https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/"/>
+    <id>https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/</id>
+    <published>2021-12-26T15:41:09.000Z</published>
+    <updated>2026-06-09T09:14:15.170Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/incident-review-2021-cover.svg" alt="年度故障案例总结技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>年度故障总结的重点不是罗列事故，而是把重复问题转成规范和工具。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2021 故障分类：</span><br><span class="line">- 慢 SQL：3 起</span><br><span class="line">- 缓存问题：2 起</span><br><span class="line">- 部署配置：2 起</span><br><span class="line">- 并发问题：2 起</span><br><span class="line">- 消息可靠性：1 起</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">复盘模板：</span><br><span class="line">1. 故障时间线</span><br><span class="line">2. 影响范围</span><br><span class="line">3. 直接原因</span><br><span class="line">4. 根本原因</span><br><span class="line">5. 恢复动作</span><br><span class="line">6. 后续改进</span><br><span class="line">7. 责任人和截止时间</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">沉淀项：</span><br><span class="line">- 慢查询巡检脚本</span><br><span class="line">- Redis key 过期时间规范</span><br><span class="line">- 线程池监控指标</span><br><span class="line">- 发布前配置检查清单</span><br><span class="line">- MQ 可靠投递模板</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/incident-review-2021-cover.svg&quot; alt=&quot;年度故障案例总结技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背</summary>
+      
+    
+    
+    
+    <category term="随笔" scheme="https://swagch.github.io/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+    <category term="年度总结" scheme="https://swagch.github.io/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
+    
+    <category term="故障复盘" scheme="https://swagch.github.io/tags/%E6%95%85%E9%9A%9C%E5%A4%8D%E7%9B%98/"/>
+    
+    <category term="稳定性" scheme="https://swagch.github.io/tags/%E7%A8%B3%E5%AE%9A%E6%80%A7/"/>
+    
+    <category term="经验沉淀" scheme="https://swagch.github.io/tags/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ消息丢失排查</title>
+    <link href="https://swagch.github.io/2021/10/24/2021-10-24-RabbitMQ%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E6%8E%92%E6%9F%A5/"/>
+    <id>https://swagch.github.io/2021/10/24/2021-10-24-RabbitMQ%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E6%8E%92%E6%9F%A5/</id>
+    <published>2021-10-24T09:33:46.000Z</published>
+    <updated>2026-06-09T09:14:15.170Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/rabbitmq-message-loss-cover.svg" alt="RabbitMQ消息丢失排查技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>消息丢失要按生产、交换机、队列、消费确认四段链路排查。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">订单已支付，但积分未到账</span><br><span class="line">producer log: message sent</span><br><span class="line">consumer log: no message received</span><br><span class="line">queue ready=0 unacked=0</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rabbitmqctl list_queues name durable messages_ready messages_unacknowledged</span><br><span class="line">rabbitmqctl list_exchanges name <span class="built_in">type</span> durable</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">排查链路：</span><br><span class="line">producer confirm -&gt; exchange durable -&gt; queue durable -&gt; binding key -&gt; consumer ack -&gt; retry/dlx</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.convertAndSend(<span class="string">&quot;point.exchange&quot;</span>, <span class="string">&quot;point.add&quot;</span>, message);</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (!ack) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;message publish failed, id=&#123;&#125;, cause=&#123;&#125;&quot;</span>, correlationData.getId(), cause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">publisher-confirm-type:</span> <span class="string">correlated</span></span><br><span class="line">    <span class="attr">publisher-returns:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">listener:</span></span><br><span class="line">      <span class="attr">simple:</span></span><br><span class="line">        <span class="attr">acknowledge-mode:</span> <span class="string">manual</span></span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/rabbitmq-message-loss-cover.svg&quot; alt=&quot;RabbitMQ消息丢失排查技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; t</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="RabbitMQ" scheme="https://swagch.github.io/tags/RabbitMQ/"/>
+    
+    <category term="消息队列" scheme="https://swagch.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/"/>
+    
+    <category term="消息丢失" scheme="https://swagch.github.io/tags/%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1/"/>
+    
+    <category term="可靠性" scheme="https://swagch.github.io/tags/%E5%8F%AF%E9%9D%A0%E6%80%A7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>死锁问题定位过程</title>
+    <link href="https://swagch.github.io/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/"/>
+    <id>https://swagch.github.io/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/</id>
+    <published>2021-09-19T12:42:53.000Z</published>
+    <updated>2026-06-09T09:14:15.170Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/deadlock-debug-cover.svg" alt="死锁问题定位过程技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>死锁定位需要保存现场，优先抓取线程 dump，而不是盲目重启。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">接口无响应，CPU 正常，部分请求一直 pending</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jps -l</span><br><span class="line">jstack $(pgrep java) &gt; /tmp/deadlock.jstack</span><br><span class="line">grep -n <span class="string">&quot;deadlock&quot;</span> /tmp/deadlock.jstack</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Found one Java-level deadlock:</span><br><span class="line">&quot;thread-a&quot; waiting to lock monitor 0x001</span><br><span class="line">&quot;thread-b&quot; waiting to lock monitor 0x002</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> (orderLock) &#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (stockLock) &#123;</span><br><span class="line">        <span class="comment">// update order and stock</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">lockKey</span> <span class="operator">=</span> orderId.compareTo(stockId) &lt; <span class="number">0</span></span><br><span class="line">    ? orderId + <span class="string">&quot;:&quot;</span> + stockId</span><br><span class="line">    : stockId + <span class="string">&quot;:&quot;</span> + orderId;</span><br><span class="line"></span><br><span class="line"><span class="keyword">synchronized</span> (lockKey.intern()) &#123;</span><br><span class="line">    updateOrder();</span><br><span class="line">    updateStock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">原则：统一加锁顺序、缩小锁范围、避免锁内远程调用</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/deadlock-debug-cover.svg&quot; alt=&quot;死锁问题定位过程技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Java" scheme="https://swagch.github.io/tags/Java/"/>
+    
+    <category term="死锁" scheme="https://swagch.github.io/tags/%E6%AD%BB%E9%94%81/"/>
+    
+    <category term="线程 dump" scheme="https://swagch.github.io/tags/%E7%BA%BF%E7%A8%8B-dump/"/>
+    
+    <category term="并发问题" scheme="https://swagch.github.io/tags/%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>线程池使用踩坑记录</title>
+    <link href="https://swagch.github.io/2021/08/15/2021-08-15-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%BD%BF%E7%94%A8%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
+    <id>https://swagch.github.io/2021/08/15/2021-08-15-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%BD%BF%E7%94%A8%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/</id>
+    <published>2021-08-15T15:09:21.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>线程池问题往往不是线程不够，而是队列、任务耗时和拒绝策略设计不合理。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">active=32 poolSize=32 queueSize=10000 completed=1200</span><br><span class="line">接口响应时间从 200ms 上升到 6s</span><br><span class="line">CPU 不高，任务堆积明显</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Executors.newFixedThreadPool(<span class="number">32</span>);</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">问题：</span><br><span class="line">1. 队列过大，流量尖峰时延迟被隐藏</span><br><span class="line">2. 无拒绝策略监控</span><br><span class="line">3. 任务内部还有远程调用</span><br><span class="line">4. 线程池参数没有按业务隔离</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ThreadPoolExecutor</span> <span class="variable">executor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">    <span class="number">16</span>,</span><br><span class="line">    <span class="number">32</span>,</span><br><span class="line">    <span class="number">60</span>,</span><br><span class="line">    TimeUnit.SECONDS,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">500</span>),</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.CallerRunsPolicy()</span><br><span class="line">);</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">监控指标：activeCount、queueSize、completedTaskCount、rejectCount</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;线程池问题往往不是线程不够，而是队列、任务耗时和拒绝策略设计不合理。&lt;/p&gt;
+&lt;figure class=&quot;highlight text&quot;&gt;</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Java" scheme="https://swagch.github.io/tags/Java/"/>
+    
+    <category term="线程池" scheme="https://swagch.github.io/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
+    
+    <category term="并发" scheme="https://swagch.github.io/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+    <category term="性能问题" scheme="https://swagch.github.io/tags/%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux磁盘爆满处理</title>
+    <link href="https://swagch.github.io/2021/06/20/2021-06-20-Linux%E7%A3%81%E7%9B%98%E7%88%86%E6%BB%A1%E5%A4%84%E7%90%86/"/>
+    <id>https://swagch.github.io/2021/06/20/2021-06-20-Linux%E7%A3%81%E7%9B%98%E7%88%86%E6%BB%A1%E5%A4%84%E7%90%86/</id>
+    <published>2021-06-20T11:18:37.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>磁盘爆满处理要先恢复服务写入能力，再定位增长来源。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -h</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1        40G   40G     0 100% /</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">应用报错：No space left on device</span><br><span class="line">MySQL 写入失败</span><br><span class="line">日志无法继续滚动</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -h --max-depth=1 / | <span class="built_in">sort</span> -hr | <span class="built_in">head</span></span><br><span class="line"><span class="built_in">du</span> -h --max-depth=1 /var/log | <span class="built_in">sort</span> -hr | <span class="built_in">head</span></span><br><span class="line">lsof | grep deleted | <span class="built_in">head</span></span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /var/log -name <span class="string">&quot;*.log&quot;</span> -mtime +7 -<span class="built_in">type</span> f -delete</span><br><span class="line">journalctl --vacuum-time=7d</span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理已删除但仍被进程占用的文件</span></span><br><span class="line">lsof | grep deleted</span><br><span class="line">systemctl restart app</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;磁盘爆满处理要先恢复服务写入能力，再定位增长来源。&lt;/p&gt;
+&lt;figure class=&quot;highlight text&quot;&gt;&lt;table&gt;&lt;t</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Linux" scheme="https://swagch.github.io/tags/Linux/"/>
+    
+    <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
+    
+    <category term="磁盘空间" scheme="https://swagch.github.io/tags/%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4/"/>
+    
+    <category term="日志清理" scheme="https://swagch.github.io/tags/%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Nginx反向代理问题</title>
+    <link href="https://swagch.github.io/2021/05/23/2021-05-23-Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%97%AE%E9%A2%98/"/>
+    <id>https://swagch.github.io/2021/05/23/2021-05-23-Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%97%AE%E9%A2%98/</id>
+    <published>2021-05-23T07:55:12.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/nginx-proxy-cover.svg" alt="Nginx反向代理问题技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>反向代理问题需要同时看 Nginx、上游服务和网络连通性。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">upstream timed out (110: Connection timed out) while reading response header from upstream</span><br><span class="line">client: 10.0.1.24, server: api.demo.com, request: &quot;POST /api/upload HTTP/1.1&quot;</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tail</span> -f /var/log/nginx/error.log</span><br><span class="line">curl -I https://api.demo.com/api/health</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://backend;</span><br><span class="line">    <span class="attribute">proxy_connect_timeout</span> <span class="number">3s</span>;</span><br><span class="line">    <span class="attribute">proxy_read_timeout</span> <span class="number">3s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx -t</span><br><span class="line">curl http://127.0.0.1:8080/api/health</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> backend &#123;</span><br><span class="line">    <span class="attribute">server</span> <span class="number">127.0.0.1:8080</span> max_fails=<span class="number">3</span> fail_timeout=<span class="number">30s</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://backend;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> Host <span class="variable">$host</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">    <span class="attribute">proxy_connect_timeout</span> <span class="number">2s</span>;</span><br><span class="line">    <span class="attribute">proxy_read_timeout</span> <span class="number">30s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/nginx-proxy-cover.svg&quot; alt=&quot;Nginx反向代理问题技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="部署" scheme="https://swagch.github.io/tags/%E9%83%A8%E7%BD%B2/"/>
+    
+    <category term="Nginx" scheme="https://swagch.github.io/tags/Nginx/"/>
+    
+    <category term="反向代理" scheme="https://swagch.github.io/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/"/>
+    
+    <category term="网关" scheme="https://swagch.github.io/tags/%E7%BD%91%E5%85%B3/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis缓存雪崩实践</title>
+    <link href="https://swagch.github.io/2021/04/18/2021-04-18-Redis%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E5%AE%9E%E8%B7%B5/"/>
+    <id>https://swagch.github.io/2021/04/18/2021-04-18-Redis%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E5%AE%9E%E8%B7%B5/</id>
+    <published>2021-04-18T13:27:44.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>缓存雪崩通常不是单个 key 的问题，而是一批 key 在同一时间失效。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10:00:00 Redis key expire batch</span><br><span class="line">10:00:03 DB connection pool exhausted</span><br><span class="line">10:00:05 order-api error rate 23%</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-cli info keyspace</span><br><span class="line">redis-cli --scan --pattern <span class="string">&#x27;home:*&#x27;</span> | <span class="built_in">head</span></span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">风险点：</span><br><span class="line">1. 大量 key 使用同一过期时间</span><br><span class="line">2. 热点数据没有预热</span><br><span class="line">3. Redis 故障时没有降级策略</span><br><span class="line">4. 后端 DB 无保护</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">baseSeconds</span> <span class="operator">=</span> <span class="number">30</span> * <span class="number">60</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">randomSeconds</span> <span class="operator">=</span> ThreadLocalRandom.current().nextInt(<span class="number">0</span>, <span class="number">10</span> * <span class="number">60</span>);</span><br><span class="line">redisTemplate.opsForValue().set(key, value, baseSeconds + randomSeconds, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">处理：过期时间随机化、热点预热、限流降级、多级缓存</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;缓存雪崩通常不是单个 key 的问题，而是一批 key 在同一时间失效。&lt;/p&gt;
+&lt;figure class=&quot;highlight text</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Redis" scheme="https://swagch.github.io/tags/Redis/"/>
+    
+    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="缓存雪崩" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/"/>
+    
+    <category term="高可用" scheme="https://swagch.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis缓存穿透解决方案</title>
+    <link href="https://swagch.github.io/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/"/>
+    <id>https://swagch.github.io/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</id>
+    <published>2021-03-14T12:36:29.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/redis-penetration-cover.svg" alt="Redis缓存穿透解决方案技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>缓存穿透的典型特征是缓存未命中后大量请求直接打到数据库。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Redis miss rate: 78%</span><br><span class="line">DB QPS: 2400 -&gt; 9600</span><br><span class="line">hot key pattern: product:not-exist:*</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --bigkeys</span><br><span class="line">redis-cli monitor | grep product</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line"><span class="keyword">if</span> (product == <span class="literal">null</span>) &#123;</span><br><span class="line">    product = productMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (product != <span class="literal">null</span>) &#123;</span><br><span class="line">        redis.set(key, product, <span class="number">30</span>, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + id;</span><br><span class="line"><span class="type">Product</span> <span class="variable">cached</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line"><span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> cached == EMPTY_PRODUCT ? <span class="literal">null</span> : cached;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Product</span> <span class="variable">db</span> <span class="operator">=</span> productMapper.selectById(id);</span><br><span class="line">redis.set(key, db == <span class="literal">null</span> ? EMPTY_PRODUCT : db, db == <span class="literal">null</span> ? <span class="number">60</span> : <span class="number">1800</span>, TimeUnit.SECONDS);</span><br><span class="line"><span class="keyword">return</span> db;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">方案：缓存空值 + 参数校验 + 布隆过滤器</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/redis-penetration-cover.svg&quot; alt=&quot;Redis缓存穿透解决方案技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Redis" scheme="https://swagch.github.io/tags/Redis/"/>
+    
+    <category term="缓存穿透" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/"/>
+    
+    <category term="布隆过滤器" scheme="https://swagch.github.io/tags/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/"/>
+    
+    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MySQL慢查询分析</title>
+    <link href="https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/"/>
+    <id>https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/</id>
+    <published>2021-02-21T08:48:05.000Z</published>
+    <updated>2026-06-09T09:14:15.169Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>慢查询不能只看 SQL 文本，需要结合执行计划、索引、扫描行数和返回字段。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> slow_query_log <span class="operator">=</span> <span class="string">&#x27;ON&#x27;</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> long_query_time <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Time: 2021-02-21T14:22:19</span><br><span class="line"># Query_time: 6.834 Lock_time: 0.001 Rows_sent: 20 Rows_examined: 581239</span><br><span class="line">select * from order_info where user_id = 1001 order by created_at desc limit 20;</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: ALL</span><br><span class="line">possible_keys: idx_user_id</span><br><span class="line">key: NULL</span><br><span class="line">rows: 581239</span><br><span class="line">Extra: Using where; Using filesort</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter table</span> order_info</span><br><span class="line"><span class="keyword">add</span> index idx_user_created(user_id, created_at);</span><br><span class="line"></span><br><span class="line">explain <span class="keyword">select</span> id, order_no, order_status, created_at</span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/mysql-slow-query-cover.svg&quot; alt=&quot;MySQL慢查询分析技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="MySQL" scheme="https://swagch.github.io/tags/MySQL/"/>
+    
+    <category term="索引" scheme="https://swagch.github.io/tags/%E7%B4%A2%E5%BC%95/"/>
+    
+    <category term="慢查询" scheme="https://swagch.github.io/tags/%E6%85%A2%E6%9F%A5%E8%AF%A2/"/>
+    
+    <category term="SQL优化" scheme="https://swagch.github.io/tags/SQL%E4%BC%98%E5%8C%96/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一次接口超时问题排查</title>
+    <link href="https://swagch.github.io/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/"/>
+    <id>https://swagch.github.io/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</id>
+    <published>2021-01-17T14:14:38.000Z</published>
+    <updated>2026-06-09T09:14:15.168Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/posts/2021/api-timeout-cover.svg" alt="一次接口超时问题排查技术图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口超时的排查重点是确认耗时发生在入口、数据库、缓存还是下游服务。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2021-01-17 20:18:42 WARN  order-api request timeout</span><br><span class="line">path=/api/orders/submit</span><br><span class="line">cost=8123ms</span><br><span class="line">traceId=adf9c0a2b1</span><br><span class="line">upstream=payment-service</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -w <span class="string">&quot;dns:%&#123;time_namelookup&#125; connect:%&#123;time_connect&#125; start:%&#123;time_starttransfer&#125; total:%&#123;time_total&#125;</span></span><br><span class="line"><span class="string">&quot;</span>   -o /dev/null -s http://localhost:8080/api/orders/submit</span><br></pre></td></tr></table></figure><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;adf9c0a2b1&quot;</span> app.log</span><br><span class="line"><span class="built_in">cat</span> app.log | grep <span class="string">&quot;payment-service&quot;</span> | <span class="built_in">tail</span> -100</span><br><span class="line">jstack $(pgrep java) &gt; /tmp/order-api.jstack</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">排查顺序：</span><br><span class="line">1. 确认是单接口还是全站超时</span><br><span class="line">2. 对比接口入口耗时和下游调用耗时</span><br><span class="line">3. 查看线程是否阻塞在外部 HTTP 调用</span><br><span class="line">4. 检查连接池、超时参数、重试次数</span><br></pre></td></tr></table></figure><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">payment:</span></span><br><span class="line">  <span class="attr">connect-timeout-ms:</span> <span class="number">1000</span></span><br><span class="line">  <span class="attr">read-timeout-ms:</span> <span class="number">2000</span></span><br><span class="line">  <span class="attr">max-retry:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RequestConfig</span> <span class="variable">config</span> <span class="operator">=</span> RequestConfig.custom()</span><br><span class="line">    .setConnectTimeout(<span class="number">1000</span>)</span><br><span class="line">    .setSocketTimeout(<span class="number">2000</span>)</span><br><span class="line">    .setConnectionRequestTimeout(<span class="number">500</span>)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2021/api-timeout-cover.svg&quot; alt=&quot;一次接口超时问题排查技术图&quot;&gt;&lt;/p&gt;
+&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;</summary>
+      
+    
+    
+    
+    <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    
+    <category term="Spring Boot" scheme="https://swagch.github.io/tags/Spring-Boot/"/>
+    
+    <category term="故障排查" scheme="https://swagch.github.io/tags/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
+    
+    <category term="接口超时" scheme="https://swagch.github.io/tags/%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6/"/>
+    
+    <category term="性能分析" scheme="https://swagch.github.io/tags/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/"/>
+    
+  </entry>
+  
+  <entry>
     <title>工作第一年总结</title>
     <link href="https://swagch.github.io/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/"/>
     <id>https://swagch.github.io/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/</id>
@@ -315,316 +625,6 @@
     <category term="协作流程" scheme="https://swagch.github.io/tags/%E5%8D%8F%E4%BD%9C%E6%B5%81%E7%A8%8B/"/>
     
     <category term="代码合并" scheme="https://swagch.github.io/tags/%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何阅读遗留代码</title>
-    <link href="https://swagch.github.io/2020/06/20/2020-06-20-%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB%E9%81%97%E7%95%99%E4%BB%A3%E7%A0%81/"/>
-    <id>https://swagch.github.io/2020/06/20/2020-06-20-%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB%E9%81%97%E7%95%99%E4%BB%A3%E7%A0%81/</id>
-    <published>2020-06-20T11:44:36.000Z</published>
-    <updated>2026-06-09T09:01:45.269Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/legacy-code-cover.svg" alt="如何阅读遗留代码封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>读遗留代码不能一上来就想重写，第一目标应该是建立事实，而不是表达审美。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>一上来就想重构，忽略现有逻辑背后的业务原因</li><li>没有调用链和数据链路视角</li><li>改动范围评估不充分</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>遗留代码通常是历史约束下的结果。先尊重事实，再谈优化，是降低维护风险的前提。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找入口</span></span><br><span class="line">grep -R <span class="string">&quot;OrderController&quot;</span> src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 看最近修改</span></span><br><span class="line">git <span class="built_in">log</span> --oneline -- src/main/java/com/demo/order</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查调用关系</span></span><br><span class="line"> grep -R <span class="string">&quot;createOrder&quot;</span> src/main/java</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">阅读顺序：</span><br><span class="line">入口接口 -&gt; Service 主流程 -&gt; 数据库表 -&gt; 外部依赖 -&gt; 异常分支 -&gt; 历史提交</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>如何阅读遗留代码</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/legacy-code-cover.svg&quot; alt=&quot;如何阅读遗留代码封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景</summary>
-      
-    
-    
-    
-    <category term="经验沉淀" scheme="https://swagch.github.io/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/"/>
-    
-    
-    <category term="遗留代码" scheme="https://swagch.github.io/tags/%E9%81%97%E7%95%99%E4%BB%A3%E7%A0%81/"/>
-    
-    <category term="代码阅读" scheme="https://swagch.github.io/tags/%E4%BB%A3%E7%A0%81%E9%98%85%E8%AF%BB/"/>
-    
-    <category term="重构" scheme="https://swagch.github.io/tags/%E9%87%8D%E6%9E%84/"/>
-    
-    <category term="维护" scheme="https://swagch.github.io/tags/%E7%BB%B4%E6%8A%A4/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>需求评审中的常见问题</title>
-    <link href="https://swagch.github.io/2020/05/10/2020-05-10-%E9%9C%80%E6%B1%82%E8%AF%84%E5%AE%A1%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/"/>
-    <id>https://swagch.github.io/2020/05/10/2020-05-10-%E9%9C%80%E6%B1%82%E8%AF%84%E5%AE%A1%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</id>
-    <published>2020-05-10T07:28:41.000Z</published>
-    <updated>2026-06-09T09:01:45.269Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>很多开发问题并不是写代码时产生的，而是在需求评审阶段就已经埋下了。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>只评估开发量，没有识别边界条件</li><li>异常流程和权限规则讨论不足</li><li>需求变更没有留下版本记录</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>需求评审不是确认“做不做”，而是确认“做什么、不做什么、异常情况怎么办、验收标准是什么”。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">需求评审问题清单：</span><br><span class="line">1. 目标用户是谁？</span><br><span class="line">2. 正常流程是什么？</span><br><span class="line">3. 异常流程有哪些？</span><br><span class="line">4. 权限边界是什么？</span><br><span class="line">5. 数据是否需要迁移？</span><br><span class="line">6. 验收标准如何定义？</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">结论记录格式：</span><br><span class="line">- 已确认：</span><br><span class="line">- 待产品补充：</span><br><span class="line">- 技术风险：</span><br><span class="line">- 不在本期范围：</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>需求评审中的常见问题</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;很多开发问题并不是写代码时产生的，而是在需求评审阶段就已经埋下了。&lt;/p&gt;
-&lt;p&gt;如果说 2019 年的重点是把项目做出来，那么 2020 </summary>
-      
-    
-    
-    
-    <category term="项目协作" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/"/>
-    
-    
-    <category term="需求评审" scheme="https://swagch.github.io/tags/%E9%9C%80%E6%B1%82%E8%AF%84%E5%AE%A1/"/>
-    
-    <category term="产品协作" scheme="https://swagch.github.io/tags/%E4%BA%A7%E5%93%81%E5%8D%8F%E4%BD%9C/"/>
-    
-    <category term="项目管理" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/"/>
-    
-    <category term="沟通" scheme="https://swagch.github.io/tags/%E6%B2%9F%E9%80%9A/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>接口文档管理实践</title>
-    <link href="https://swagch.github.io/2020/04/19/2020-04-19-%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/"/>
-    <id>https://swagch.github.io/2020/04/19/2020-04-19-%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/</id>
-    <published>2020-04-19T14:06:17.000Z</published>
-    <updated>2026-06-09T09:01:45.268Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/api-docs-cover.svg" alt="接口文档管理实践封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口文档不是附属品，而是前后端协作、测试验证和后续维护的共同契约。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>接口实现和文档长期不一致</li><li>错误码、字段含义、示例数据缺失</li><li>前后端联调时大量时间浪费在口头确认</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>接口文档是协作契约，只有和代码、测试用例、版本变更绑定在一起，才不会沦为过期说明。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">GET</span> <span class="string">/api/orders/&#123;orderNo&#125;</span></span><br><span class="line"><span class="attr">response:</span></span><br><span class="line">  <span class="attr">code:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">message:</span> <span class="string">success</span></span><br><span class="line">  <span class="attr">data:</span></span><br><span class="line">    <span class="attr">orderNo:</span> <span class="string">&quot;202004190001&quot;</span></span><br><span class="line">    <span class="attr">status:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">totalAmount:</span> <span class="number">199.00</span></span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">接口文档必须包含：</span><br><span class="line">- 请求方式和路径</span><br><span class="line">- 参数说明</span><br><span class="line">- 响应字段</span><br><span class="line">- 错误码</span><br><span class="line">- 示例数据</span><br><span class="line">- 变更记录</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>接口文档管理实践</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/api-docs-cover.svg&quot; alt=&quot;接口文档管理实践封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h</summary>
-      
-    
-    
-    
-    <category term="接口设计" scheme="https://swagch.github.io/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/"/>
-    
-    
-    <category term="接口文档" scheme="https://swagch.github.io/tags/%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3/"/>
-    
-    <category term="API" scheme="https://swagch.github.io/tags/API/"/>
-    
-    <category term="协作" scheme="https://swagch.github.io/tags/%E5%8D%8F%E4%BD%9C/"/>
-    
-    <category term="Swagger" scheme="https://swagch.github.io/tags/Swagger/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>数据库设计经验总结</title>
-    <link href="https://swagch.github.io/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/"/>
-    <id>https://swagch.github.io/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/</id>
-    <published>2020-03-14T12:31:55.000Z</published>
-    <updated>2026-06-09T09:01:45.268Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>数据库设计一旦进入线上环境，修改成本会远高于代码，因此前期设计需要更谨慎。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>字段先随手加，后续统计和查询非常痛苦</li><li>索引建得过早或过多，反而增加维护成本</li><li>表关系没有边界，业务变更时牵一发动全身</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>数据库结构承载的是业务事实，表、字段、索引和约束都应该围绕业务长期演进来设计。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> order_info (</span><br><span class="line">  id <span class="type">bigint</span> <span class="keyword">primary key</span>,</span><br><span class="line">  order_no <span class="type">varchar</span>(<span class="number">64</span>) <span class="keyword">not null</span>,</span><br><span class="line">  user_id <span class="type">bigint</span> <span class="keyword">not null</span>,</span><br><span class="line">  order_status tinyint <span class="keyword">not null</span>,</span><br><span class="line">  total_amount <span class="type">decimal</span>(<span class="number">12</span>,<span class="number">2</span>) <span class="keyword">not null</span>,</span><br><span class="line">  created_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  updated_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  <span class="keyword">unique</span> key uk_order_no(order_no),</span><br><span class="line">  key idx_user_status(user_id, order_status)</span><br><span class="line">);</span><br></pre></td></tr></table></figure><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> order_info <span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span> <span class="keyword">and</span> order_status <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>数据库设计经验总结</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/db-design-cover.svg&quot; alt=&quot;数据库设计经验总结封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;</summary>
-      
-    
-    
-    
-    <category term="数据库" scheme="https://swagch.github.io/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
-    
-    
-    <category term="MySQL" scheme="https://swagch.github.io/tags/MySQL/"/>
-    
-    <category term="索引" scheme="https://swagch.github.io/tags/%E7%B4%A2%E5%BC%95/"/>
-    
-    <category term="数据库设计" scheme="https://swagch.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/"/>
-    
-    <category term="表结构" scheme="https://swagch.github.io/tags/%E8%A1%A8%E7%BB%93%E6%9E%84/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>代码规范的重要性</title>
-    <link href="https://swagch.github.io/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/"/>
-    <id>https://swagch.github.io/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/</id>
-    <published>2020-02-16T08:42:09.000Z</published>
-    <updated>2026-06-09T09:01:45.268Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/code-style-cover.svg" alt="代码规范的重要性封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>代码规范不是为了追求形式统一，而是为了降低团队沟通成本和长期维护成本。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>同一类逻辑在不同人手里写法差异很大</li><li>命名随意导致 Review 成本上升</li><li>没有统一异常、日志、返回值规范</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>规范的本质是降低差异。代码会被多人阅读和长期维护，统一风格能让团队把注意力放在业务逻辑，而不是表达方式。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐：命名表达业务含义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeUserAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    validateFreezeReason(reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;user account frozen, userId=&#123;&#125;, reason=&#123;&#125;&quot;</span>, userId, reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Review 关注点：</span><br><span class="line">- 命名是否清晰</span><br><span class="line">- 异常是否有上下文</span><br><span class="line">- 日志是否能支撑排查</span><br><span class="line">- 方法是否过长</span><br><span class="line">- 是否存在重复逻辑</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>代码规范的重要性</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/code-style-cover.svg&quot; alt=&quot;代码规范的重要性封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;</summary>
-      
-    
-    
-    
-    <category term="工程规范" scheme="https://swagch.github.io/categories/%E5%B7%A5%E7%A8%8B%E8%A7%84%E8%8C%83/"/>
-    
-    
-    <category term="代码规范" scheme="https://swagch.github.io/tags/%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/"/>
-    
-    <category term="Code Review" scheme="https://swagch.github.io/tags/Code-Review/"/>
-    
-    <category term="可维护性" scheme="https://swagch.github.io/tags/%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7/"/>
-    
-    <category term="团队协作" scheme="https://swagch.github.io/tags/%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>新人如何快速熟悉项目</title>
-    <link href="https://swagch.github.io/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/"/>
-    <id>https://swagch.github.io/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/</id>
-    <published>2020-01-11T13:10:28.000Z</published>
-    <updated>2026-06-09T09:01:45.268Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/onboarding-project-cover.svg" alt="新人如何快速熟悉项目封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从“能把项目跑起来”到“能独立改需求”，中间隔着对业务、代码结构和协作方式的系统理解。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>只关注代码入口，忽略业务流程和数据流</li><li>本地环境搭建耗时过长，影响进入真实需求</li><li>遇到问题只问结论，没有沉淀排查路径</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>熟悉项目的关键不是把每一行代码都看懂，而是先建立业务地图、系统边界、核心链路和本地调试能力。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目熟悉清单：</span><br><span class="line">1. 本地启动方式</span><br><span class="line">2. 核心业务流程</span><br><span class="line">3. 数据库核心表</span><br><span class="line">4. 主要外部依赖</span><br><span class="line">5. 最近三个月变更记录</span><br><span class="line">6. 常见问题排查文档</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 熟悉项目时常用命令</span></span><br><span class="line">git <span class="built_in">log</span> --oneline --decorate -20</span><br><span class="line">grep -R <span class="string">&quot;@RequestMapping\|@GetMapping\|@PostMapping&quot;</span> src/main/java</span><br><span class="line">mvn clean <span class="built_in">test</span></span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>新人如何快速熟悉项目</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/onboarding-project-cover.svg&quot; alt=&quot;新人如何快速熟悉项目封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背</summary>
-      
-    
-    
-    
-    <category term="经验沉淀" scheme="https://swagch.github.io/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/"/>
-    
-    
-    <category term="团队协作" scheme="https://swagch.github.io/tags/%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C/"/>
-    
-    <category term="新人上手" scheme="https://swagch.github.io/tags/%E6%96%B0%E4%BA%BA%E4%B8%8A%E6%89%8B/"/>
-    
-    <category term="项目熟悉" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E7%86%9F%E6%82%89/"/>
-    
-    <category term="工程实践" scheme="https://swagch.github.io/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>第一个完整项目复盘</title>
-    <link href="https://swagch.github.io/2019/12/29/2019-12-29-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98/"/>
-    <id>https://swagch.github.io/2019/12/29/2019-12-29-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98/</id>
-    <published>2019-12-29T15:18:25.000Z</published>
-    <updated>2026-06-09T09:01:45.267Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2019/first-project-review-cover.svg" alt="第一个完整项目复盘封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2019 年的最后，我把第一个完整项目从需求、开发、部署到复盘重新梳理了一遍。</p><p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p><p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>第一个完整项目复盘</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p><ol><li>需求边写边改导致返工</li><li>代码分层不清晰</li><li>部署和文档总是拖到最后</li></ol><p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>项目复盘的价值是把“能跑”背后的过程问题暴露出来，包括需求、设计、开发、测试和部署。</p><p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure><p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">项目名称：学生管理系统</span><br><span class="line">技术栈：Servlet + JSP + Spring + MyBatis + MySQL</span><br><span class="line">模块：登录、学生管理、课程管理、成绩管理、权限控制</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘维度：</span><br><span class="line">1. 需求是否清晰</span><br><span class="line">2. 数据库设计是否合理</span><br><span class="line">3. 代码分层是否清楚</span><br><span class="line">4. 异常处理是否完善</span><br><span class="line">5. 部署文档是否完整</span><br></pre></td></tr></table></figure><p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p><p>对 第一个完整项目复盘 的理解，我最后沉淀成几条经验：</p><ul><li>先理解它解决什么问题，再记具体用法；</li><li>先跑通最小 Demo，再接入完整项目；</li><li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li><li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li><li>每次踩坑最好留下记录，后面会节省大量时间。</li></ul><p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2019/first-project-review-cover.svg&quot; alt=&quot;第一个完整项目复盘封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;</summary>
-      
-    
-    
-    
-    <category term="随笔" scheme="https://swagch.github.io/categories/%E9%9A%8F%E7%AC%94/"/>
-    
-    
-    <category term="Java Web" scheme="https://swagch.github.io/tags/Java-Web/"/>
-    
-    <category term="Spring" scheme="https://swagch.github.io/tags/Spring/"/>
-    
-    <category term="项目复盘" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98/"/>
-    
-    <category term="成长总结" scheme="https://swagch.github.io/tags/%E6%88%90%E9%95%BF%E6%80%BB%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>项目上线前检查清单</title>
-    <link href="https://swagch.github.io/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/"/>
-    <id>https://swagch.github.io/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/</id>
-    <published>2019-12-08T06:23:36.000Z</published>
-    <updated>2026-06-09T09:01:45.267Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2019/release-checklist-cover.svg" alt="项目上线前检查清单封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>第一次准备上线项目时，我才发现代码写完并不等于项目完成。</p><p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p><p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>项目上线前检查清单</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p><ol><li>本地能跑不代表线上能跑</li><li>配置文件里还有本地路径和测试密码</li><li>日志、备份、回滚方案没有提前准备</li></ol><p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>上线是一组工程动作，包括配置检查、构建检查、数据库检查、日志监控、备份和回滚。</p><p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure><p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建检查</span></span><br><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置检查</span></span><br><span class="line">grep -R <span class="string">&quot;localhost\|127.0.0.1\|root&quot;</span> src/main/resources</span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志检查</span></span><br><span class="line"><span class="built_in">tail</span> -f logs/app.log</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">上线前检查：</span><br><span class="line">1. 数据库脚本是否备份</span><br><span class="line">2. 配置是否切换到生产环境</span><br><span class="line">3. 日志目录是否存在</span><br><span class="line">4. 端口是否开放</span><br><span class="line">5. 是否有回滚包</span><br></pre></td></tr></table></figure><p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p><p>对 项目上线前检查清单 的理解，我最后沉淀成几条经验：</p><ul><li>先理解它解决什么问题，再记具体用法；</li><li>先跑通最小 Demo，再接入完整项目；</li><li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li><li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li><li>每次踩坑最好留下记录，后面会节省大量时间。</li></ul><p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2019/release-checklist-cover.svg&quot; alt=&quot;项目上线前检查清单封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;</summary>
-      
-    
-    
-    
-    <category term="项目实践" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-    <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
-    
-    <category term="测试" scheme="https://swagch.github.io/tags/%E6%B5%8B%E8%AF%95/"/>
-    
-    <category term="项目上线" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF/"/>
-    
-    <category term="部署检查" scheme="https://swagch.github.io/tags/%E9%83%A8%E7%BD%B2%E6%A3%80%E6%9F%A5/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>权限管理模块设计</title>
-    <link href="https://swagch.github.io/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/"/>
-    <id>https://swagch.github.io/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/</id>
-    <published>2019-11-16T13:44:52.000Z</published>
-    <updated>2026-06-09T09:01:45.266Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2019/permission-design-cover.svg" alt="权限管理模块设计封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>权限管理是第一个让我明显感受到“业务建模”重要性的模块。</p><p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p><p>这篇文章记录的是我在 2019-11 前后学习和实践 <strong>权限管理模块设计</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p><ol><li>用户、角色、权限三者关系不清楚</li><li>菜单权限和按钮权限混在一起</li><li>SQL 查询权限列表效率不高</li></ol><p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>RBAC 把权限直接分配给角色，再把角色分配给用户，可以降低用户和权限之间的复杂度。</p><p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure><p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> sys_user(id <span class="type">bigint</span> <span class="keyword">primary key</span>, username <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_role(id <span class="type">bigint</span> <span class="keyword">primary key</span>, role_name <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_permission(id <span class="type">bigint</span> <span class="keyword">primary key</span>, permission_code <span class="type">varchar</span>(<span class="number">128</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_user_role(user_id <span class="type">bigint</span>, role_id <span class="type">bigint</span>);</span><br><span class="line"><span class="keyword">create table</span> sys_role_permission(role_id <span class="type">bigint</span>, permission_id <span class="type">bigint</span>);</span><br></pre></td></tr></table></figure><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> p.permission_code</span><br><span class="line"><span class="keyword">from</span> sys_user u</span><br><span class="line"><span class="keyword">join</span> sys_user_role ur <span class="keyword">on</span> u.id <span class="operator">=</span> ur.user_id</span><br><span class="line"><span class="keyword">join</span> sys_role_permission rp <span class="keyword">on</span> ur.role_id <span class="operator">=</span> rp.role_id</span><br><span class="line"><span class="keyword">join</span> sys_permission p <span class="keyword">on</span> rp.permission_id <span class="operator">=</span> p.id</span><br><span class="line"><span class="keyword">where</span> u.id <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure><p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p><p>对 权限管理模块设计 的理解，我最后沉淀成几条经验：</p><ul><li>先理解它解决什么问题，再记具体用法；</li><li>先跑通最小 Demo，再接入完整项目；</li><li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li><li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li><li>每次踩坑最好留下记录，后面会节省大量时间。</li></ul><p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2019/permission-design-cover.svg&quot; alt=&quot;权限管理模块设计封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;</summary>
-      
-    
-    
-    
-    <category term="项目实践" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-    <category term="权限管理" scheme="https://swagch.github.io/tags/%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/"/>
-    
-    <category term="RBAC" scheme="https://swagch.github.io/tags/RBAC/"/>
-    
-    <category term="角色权限" scheme="https://swagch.github.io/tags/%E8%A7%92%E8%89%B2%E6%9D%83%E9%99%90/"/>
-    
-    <category term="系统设计" scheme="https://swagch.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>登录功能实现案例</title>
-    <link href="https://swagch.github.io/2019/10/20/2019-10-20-%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%E6%A1%88%E4%BE%8B/"/>
-    <id>https://swagch.github.io/2019/10/20/2019-10-20-%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%E6%A1%88%E4%BE%8B/</id>
-    <published>2019-10-20T08:58:07.000Z</published>
-    <updated>2026-06-09T09:01:45.266Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2019/login-case-cover.svg" alt="登录功能实现案例封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>登录功能看起来简单，但真正实现时会遇到密码校验、Session、拦截器和安全问题。</p><p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p><p>这篇文章记录的是我在 2019-10 前后学习和实践 <strong>登录功能实现案例</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p><ol><li>密码明文存储不安全</li><li>Session 什么时候创建什么时候失效不清楚</li><li>未登录用户也能访问后台页面</li></ol><p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>登录不是简单查一次数据库，而是身份认证、会话维护、访问控制和安全策略的组合。</p><p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure><p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">login</span><span class="params">(String username, String password, HttpSession session)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.findByUsername(username);</span><br><span class="line">    <span class="keyword">if</span> (user == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!DigestUtils.md5DigestAsHex(password.getBytes()).equals(user.getPassword())) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    session.setAttribute(<span class="string">&quot;loginUser&quot;</span>, user);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="keyword">if</span> (request.getSession().getAttribute(<span class="string">&quot;loginUser&quot;</span>) == <span class="literal">null</span>) &#123;</span><br><span class="line">        response.sendRedirect(<span class="string">&quot;/login&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p><p>对 登录功能实现案例 的理解，我最后沉淀成几条经验：</p><ul><li>先理解它解决什么问题，再记具体用法；</li><li>先跑通最小 Demo，再接入完整项目；</li><li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li><li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li><li>每次踩坑最好留下记录，后面会节省大量时间。</li></ul><p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2019/login-case-cover.svg&quot; alt=&quot;登录功能实现案例封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;</summary>
-      
-    
-    
-    
-    <category term="项目实践" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-    <category term="Java Web" scheme="https://swagch.github.io/tags/Java-Web/"/>
-    
-    <category term="登录功能" scheme="https://swagch.github.io/tags/%E7%99%BB%E5%BD%95%E5%8A%9F%E8%83%BD/"/>
-    
-    <category term="Session" scheme="https://swagch.github.io/tags/Session/"/>
-    
-    <category term="Cookie" scheme="https://swagch.github.io/tags/Cookie/"/>
     
   </entry>
   

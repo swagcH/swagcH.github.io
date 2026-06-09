@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<rect width="1280" height="720" fill="#111111"/>
+<rect x="72" y="64" width="1136" height="592" rx="18" fill="#1f2937" stroke="#4b5563"/>
+<text x="112" y="128" fill="#ef4444" font-family="Menlo,Consolas,monospace" font-size="22">incident-debug / 2021</text>
+<text x="112" y="210" fill="#f9fafb" font-family="Menlo,Consolas,monospace" font-size="52" font-weight="700">Linux磁盘爆满处理</text>
+<rect x="112" y="282" width="300" height="120" rx="12" fill="#111111" stroke="#4b5563"/>
+<rect x="490" y="282" width="300" height="120" rx="12" fill="#111111" stroke="#4b5563"/>
+<rect x="868" y="282" width="260" height="120" rx="12" fill="#111111" stroke="#4b5563"/>
+<path d="M412 342H490M790 342H868" stroke="#ef4444" stroke-width="3" opacity="0.8"/>
+<text x="142" y="332" fill="#ef4444" font-family="Menlo,Consolas,monospace" font-size="20">symptom</text>
+<text x="520" y="332" fill="#ef4444" font-family="Menlo,Consolas,monospace" font-size="20">evidence</text>
+<text x="898" y="332" fill="#ef4444" font-family="Menlo,Consolas,monospace" font-size="20">fix</text>
+<rect x="112" y="472" width="1016" height="92" rx="12" fill="#111111" stroke="#4b5563"/>
+<text x="142" y="526" fill="#f9fafb" opacity="0.72" font-family="Menlo,Consolas,monospace" font-size="22">logs → metrics → thread dump → sql → config → rollback</text>
+</svg>
