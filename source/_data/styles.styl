@@ -1,27 +1,33 @@
 :root
-  --jng-bg #f6f2ea
-  --jng-bg-soft rgba(255, 252, 246, .74)
-  --jng-card rgba(255, 255, 255, .72)
-  --jng-card-strong rgba(255, 255, 255, .88)
-  --jng-text #2a2723
-  --jng-muted #827970
-  --jng-line rgba(86, 74, 58, .12)
-  --jng-accent #e87538
-  --jng-accent-2 #f2b66d
-  --jng-shadow 0 24px 80px rgba(84, 66, 45, .14)
-  --jng-shadow-soft 0 16px 44px rgba(84, 66, 45, .10)
-  --jng-radius 30px
-  --jng-radius-sm 18px
-  --jng-blur saturate(150%) blur(22px)
+  --geek-bg #f3f4f6
+  --geek-bg-2 #e5e7eb
+  --geek-panel rgba(255, 255, 255, .86)
+  --geek-panel-solid #ffffff
+  --geek-text #111827
+  --geek-muted #6b7280
+  --geek-subtle #9ca3af
+  --geek-line rgba(17, 24, 39, .12)
+  --geek-line-strong rgba(17, 24, 39, .24)
+  --geek-accent #111827
+  --geek-signal #22c55e
+  --geek-code #0f172a
+  --geek-code-text #d1d5db
+  --geek-shadow 0 22px 60px rgba(17, 24, 39, .08)
+  --geek-shadow-soft 0 12px 32px rgba(17, 24, 39, .06)
+  --geek-radius 18px
+  --geek-radius-sm 10px
+  --geek-font Menlo, Monaco, Consolas, 'SFMono-Regular', 'Liberation Mono', 'PingFang SC', monospace
+  --geek-blur saturate(120%) blur(14px)
 
 html
   scroll-behavior smooth
 
 body
-  color var(--jng-text)
-  background radial-gradient(circle at 10% -10%, rgba(242, 182, 109, .42), transparent 34%), radial-gradient(circle at 92% 8%, rgba(232, 117, 56, .24), transparent 30%), linear-gradient(135deg, #fbf7ef 0%, #f4eee4 45%, #ebe5dc 100%) !important
+  color var(--geek-text)
   min-height 100vh
-  letter-spacing .01em
+  background linear-gradient(180deg, #f8fafc 0%, var(--geek-bg) 48%, #e5e7eb 100%) !important
+  font-family var(--geek-font)
+  letter-spacing -.015em
 
 body::before
   content ''
@@ -29,9 +35,9 @@ body::before
   inset 0
   z-index -2
   pointer-events none
-  background-image linear-gradient(rgba(60, 48, 36, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(60, 48, 36, .035) 1px, transparent 1px)
-  background-size 42px 42px
-  mask-image linear-gradient(to bottom, rgba(0, 0, 0, .8), transparent 82%)
+  background-image linear-gradient(rgba(17, 24, 39, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(17, 24, 39, .055) 1px, transparent 1px)
+  background-size 32px 32px
+  mask-image linear-gradient(to bottom, rgba(0, 0, 0, .92), transparent 78%)
 
 body::after
   content ''
@@ -39,28 +45,39 @@ body::after
   inset 0
   z-index -1
   pointer-events none
-  opacity .42
-  background-image radial-gradient(circle at 1px 1px, rgba(72, 58, 43, .18) 1px, transparent 0)
-  background-size 18px 18px
-  mix-blend-mode multiply
+  opacity .55
+  background linear-gradient(rgba(255, 255, 255, .2) 50%, rgba(0, 0, 0, .025) 50%)
+  background-size 100% 4px
 
 body.darkmode
-  --jng-bg #12100e
-  --jng-bg-soft rgba(28, 25, 22, .76)
-  --jng-card rgba(34, 31, 27, .72)
-  --jng-card-strong rgba(39, 35, 31, .88)
-  --jng-text #f4ecdf
-  --jng-muted #b5a89a
-  --jng-line rgba(255, 236, 212, .14)
-  --jng-accent #f2a365
-  --jng-accent-2 #ffd08a
-  --jng-shadow 0 26px 90px rgba(0, 0, 0, .34)
-  --jng-shadow-soft 0 18px 54px rgba(0, 0, 0, .26)
-  background radial-gradient(circle at 10% -10%, rgba(242, 163, 101, .22), transparent 34%), radial-gradient(circle at 92% 8%, rgba(232, 117, 56, .14), transparent 30%), linear-gradient(135deg, #15120f 0%, #1e1a16 48%, #141210 100%) !important
+  --geek-bg #0d1117
+  --geek-bg-2 #010409
+  --geek-panel rgba(22, 27, 34, .86)
+  --geek-panel-solid #161b22
+  --geek-text #e6edf3
+  --geek-muted #8b949e
+  --geek-subtle #6e7681
+  --geek-line rgba(240, 246, 252, .10)
+  --geek-line-strong rgba(240, 246, 252, .20)
+  --geek-accent #e6edf3
+  --geek-signal #3fb950
+  --geek-code #010409
+  --geek-code-text #c9d1d9
+  --geek-shadow 0 26px 70px rgba(0, 0, 0, .34)
+  --geek-shadow-soft 0 16px 38px rgba(0, 0, 0, .28)
+  background radial-gradient(circle at 70% -10%, rgba(139, 148, 158, .12), transparent 34%), linear-gradient(180deg, #0d1117 0%, #080b10 48%, #010409 100%) !important
+
+body.darkmode::before
+  background-image linear-gradient(rgba(240, 246, 252, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(240, 246, 252, .055) 1px, transparent 1px)
+
+body.darkmode::after
+  opacity .28
+  background linear-gradient(rgba(255, 255, 255, .025) 50%, rgba(0, 0, 0, .08) 50%)
+  background-size 100% 4px
 
 ::selection
-  color #fff8ed
-  background var(--jng-accent)
+  color #010409
+  background var(--geek-signal)
 
 .container
   background transparent
@@ -80,128 +97,168 @@ body.darkmode
 .site-brand-container
   overflow hidden
   position relative
-  border 1px solid var(--jng-line)
-  border-radius 0 0 var(--jng-radius) var(--jng-radius)
-  background linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(255, 244, 228, .58))
-  box-shadow var(--jng-shadow-soft)
-  backdrop-filter var(--jng-blur)
+  border 1px solid var(--geek-line)
+  border-radius 0 0 var(--geek-radius) var(--geek-radius)
+  background var(--geek-panel)
+  box-shadow var(--geek-shadow-soft)
+  backdrop-filter var(--geek-blur)
 
 .site-brand-container::before
+  content '$ whoami'
+  position absolute
+  left 22px
+  top 18px
+  color var(--geek-signal)
+  font-size .72em
+  letter-spacing .02em
+
+.site-brand-container::after
   content ''
   position absolute
-  width 220px
-  height 220px
-  right -92px
-  top -108px
+  right 20px
+  top 20px
+  width 9px
+  height 9px
   border-radius 50%
-  background radial-gradient(circle, rgba(232, 117, 56, .36), transparent 68%)
+  background var(--geek-signal)
+  box-shadow 16px 0 0 var(--geek-subtle), 32px 0 0 var(--geek-line-strong)
 
 .site-title
-  color var(--jng-text)
-  font-size 2.05em
-  font-weight 700
-  letter-spacing .08em
+  color var(--geek-text)
+  margin-top 22px
+  font-size 1.72em
+  font-family var(--geek-font)
+  font-weight 800
+  letter-spacing -.04em
   line-height 1.2
   text-shadow none
 
+.site-title::before
+  content './'
+  color var(--geek-muted)
+  font-weight 500
+
 .site-title::after
-  content 'TECH NOTES'
-  display block
-  margin-top 10px
-  color var(--jng-accent)
-  font-family Optima, 'PingFang SC', sans-serif
-  font-size .36em
-  font-weight 600
-  letter-spacing .32em
+  content '_'
+  display inline-block
+  margin-left 4px
+  color var(--geek-signal)
+  animation geek-caret 1.1s steps(1, end) infinite
 
 .site-subtitle
-  color var(--jng-muted)
-  font-size .92em
-  letter-spacing .08em
+  color var(--geek-muted)
+  font-size .86em
+  letter-spacing -.02em
 
 .menu
   margin-top 18px
-  padding 12px
-  border 1px solid var(--jng-line)
-  border-radius 999px
-  background var(--jng-bg-soft)
-  box-shadow var(--jng-shadow-soft)
-  backdrop-filter var(--jng-blur)
+  padding 8px
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius)
+  background var(--geek-panel)
+  box-shadow var(--geek-shadow-soft)
+  backdrop-filter var(--geek-blur)
 
 .menu .menu-item
-  margin 0 4px
+  margin 3px
 
 .menu .menu-item a
-  border-radius 999px
-  color var(--jng-muted)
-  font-weight 600
-  letter-spacing .02em
-  transition transform .28s ease, color .28s ease, background .28s ease, box-shadow .28s ease
+  border 1px solid transparent
+  border-radius var(--geek-radius-sm)
+  color var(--geek-muted)
+  font-family var(--geek-font)
+  font-size .92em
+  font-weight 700
+  letter-spacing -.03em
+  transition transform .2s ease, color .2s ease, background .2s ease, border-color .2s ease
 
 .menu .menu-item a:hover,
 .menu .menu-item-active a
-  color #fff8ed
-  background linear-gradient(135deg, var(--jng-accent), var(--jng-accent-2))
-  box-shadow 0 10px 26px rgba(232, 117, 56, .25)
-  transform translateY(-2px)
+  color var(--geek-text)
+  background rgba(17, 24, 39, .06)
+  border-color var(--geek-line-strong)
+  transform translateY(-1px)
+
+body.darkmode .menu .menu-item a:hover,
+body.darkmode .menu .menu-item-active a
+  background rgba(240, 246, 252, .07)
 
 .sidebar
   background transparent
 
 .sidebar-inner
   overflow hidden
-  border 1px solid var(--jng-line)
-  border-radius var(--jng-radius)
-  background var(--jng-card)
-  box-shadow var(--jng-shadow)
-  backdrop-filter var(--jng-blur)
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius)
+  background var(--geek-panel)
+  box-shadow var(--geek-shadow)
+  backdrop-filter var(--geek-blur)
 
 .sidebar-inner::before
   content ''
   display block
-  height 7px
-  background linear-gradient(90deg, var(--jng-accent), var(--jng-accent-2), transparent)
+  height 36px
+  border-bottom 1px solid var(--geek-line)
+  background linear-gradient(90deg, var(--geek-panel-solid), rgba(156, 163, 175, .12))
+
+.sidebar-inner::after
+  content 'status: online'
+  position absolute
+  top 10px
+  left 18px
+  color var(--geek-muted)
+  font-size .76em
 
 .site-author-image
-  padding 4px
-  border 1px solid rgba(232, 117, 56, .32)
-  box-shadow 0 18px 42px rgba(232, 117, 56, .16)
+  padding 3px
+  border 1px solid var(--geek-line-strong)
+  border-radius 12px
+  background var(--geek-bg)
+  box-shadow none
+  filter grayscale(1) contrast(1.05)
 
 .site-author-name
-  color var(--jng-text)
-  font-size 1.08em
-  letter-spacing .06em
+  color var(--geek-text)
+  font-size 1em
+  font-family var(--geek-font)
+  letter-spacing -.03em
+
+.site-author-name::before
+  content 'dev@blog:~$ '
+  color var(--geek-signal)
+  font-weight 500
 
 .site-description
-  color var(--jng-muted)
-  line-height 1.8
+  color var(--geek-muted)
+  line-height 1.75
+  font-size .86em
 
 .site-state-item
-  border-color var(--jng-line)
+  border-color var(--geek-line)
 
 .site-state-item-count
-  color var(--jng-accent)
-  font-family Georgia, serif
-  font-weight 700
+  color var(--geek-text)
+  font-family var(--geek-font)
+  font-weight 800
 
 .site-state-item-name
-  color var(--jng-muted)
+  color var(--geek-muted)
 
 .links-of-author a,
 .links-of-blogroll a
-  border-radius 999px
-  color var(--jng-muted)
-  transition color .25s ease, background .25s ease, transform .25s ease
+  border-radius var(--geek-radius-sm)
+  color var(--geek-muted)
+  transition color .2s ease, background .2s ease, transform .2s ease
 
 .links-of-author a:hover,
 .links-of-blogroll a:hover
-  color var(--jng-accent)
-  background rgba(232, 117, 56, .08)
+  color var(--geek-text)
+  background rgba(139, 148, 158, .12)
   transform translateX(3px)
 
 .sidebar-nav .sidebar-nav-active
-  color var(--jng-accent)
-  border-bottom-color var(--jng-accent)
+  color var(--geek-text)
+  border-bottom-color var(--geek-signal)
 
 .post-block,
 .pagination,
@@ -211,207 +268,262 @@ body.darkmode
 .main-inner > .comments,
 .comment-position .comments
   overflow hidden
-  border 1px solid var(--jng-line) !important
-  border-radius var(--jng-radius) !important
-  background var(--jng-card) !important
-  box-shadow var(--jng-shadow) !important
-  backdrop-filter var(--jng-blur)
+  border 1px solid var(--geek-line) !important
+  border-radius var(--geek-radius) !important
+  background var(--geek-panel) !important
+  box-shadow var(--geek-shadow) !important
+  backdrop-filter var(--geek-blur)
 
 .post-block
   position relative
-  margin-bottom 28px
-  padding 42px 48px !important
-  transition transform .35s ease, box-shadow .35s ease, border-color .35s ease
+  margin-bottom 26px
+  padding 40px 46px !important
+  transition transform .24s ease, box-shadow .24s ease, border-color .24s ease
 
 .post-block::before
-  content ''
+  content 'commit --amend'
   position absolute
-  inset 0 0 auto 0
-  height 6px
-  background linear-gradient(90deg, var(--jng-accent), var(--jng-accent-2), rgba(255, 255, 255, 0))
+  left 0
+  right 0
+  top 0
+  height 34px
+  padding 9px 18px 0
+  box-sizing border-box
+  border-bottom 1px solid var(--geek-line)
+  color var(--geek-muted)
+  background linear-gradient(90deg, rgba(17, 24, 39, .045), transparent)
+  font-size .72em
+
+body.darkmode .post-block::before
+  background linear-gradient(90deg, rgba(240, 246, 252, .045), transparent)
 
 .post-block::after
   content ''
   position absolute
-  width 180px
-  height 180px
-  right -88px
-  top -90px
+  right 18px
+  top 13px
+  width 7px
+  height 7px
   border-radius 50%
-  background radial-gradient(circle, rgba(242, 182, 109, .22), transparent 68%)
+  background var(--geek-signal)
+  box-shadow 13px 0 0 var(--geek-subtle), 26px 0 0 var(--geek-line-strong)
   pointer-events none
 
 .post-block:hover
-  border-color rgba(232, 117, 56, .28) !important
-  box-shadow 0 30px 90px rgba(84, 66, 45, .18) !important
-  transform translateY(-4px)
+  border-color var(--geek-line-strong) !important
+  box-shadow 0 26px 74px rgba(17, 24, 39, .12) !important
+  transform translateY(-2px)
 
 .posts-expand .post-title
-  margin-bottom 18px
-  font-family Georgia, 'Times New Roman', 'PingFang SC', serif
-  font-size 2.12em
-  line-height 1.25
-  letter-spacing .02em
+  margin 18px 0 16px
+  font-family var(--geek-font)
+  font-size 1.82em
+  line-height 1.32
+  letter-spacing -.06em
 
 .posts-expand .post-title-link
-  color var(--jng-text)
+  color var(--geek-text)
   border-bottom none
-  background linear-gradient(var(--jng-accent), var(--jng-accent)) left 94% / 0 2px no-repeat
-  transition color .25s ease, background-size .32s ease
+  background linear-gradient(var(--geek-line-strong), var(--geek-line-strong)) left 96% / 0 1px no-repeat
+  transition color .2s ease, background-size .24s ease
+
+.posts-expand .post-title-link::before
+  content 'fn '
+  color var(--geek-signal)
+  font-weight 500
 
 .posts-expand .post-title-link:hover
-  color var(--jng-accent)
-  background-size 100% 2px
+  color var(--geek-text)
+  background-size 100% 1px
 
 .posts-expand .post-meta
   display inline-flex
   flex-wrap wrap
-  gap 8px 14px
+  gap 8px 12px
   margin 0 0 24px
-  padding 8px 14px
-  border 1px solid var(--jng-line)
-  border-radius 999px
-  color var(--jng-muted)
-  background rgba(255, 255, 255, .34)
-  font-size .86em
+  padding 7px 12px
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius-sm)
+  color var(--geek-muted)
+  background rgba(139, 148, 158, .08)
+  font-size .78em
+  letter-spacing -.03em
 
 .post-body
-  color var(--jng-text)
-  font-size 1.02em
-  line-height 2.05
+  color var(--geek-text)
+  font-size .98em
+  line-height 1.9
 
 .post-body h1,
 .post-body h2,
 .post-body h3,
 .post-body h4
-  color var(--jng-text)
-  font-family Georgia, 'Times New Roman', 'PingFang SC', serif
-  letter-spacing .02em
+  color var(--geek-text)
+  font-family var(--geek-font)
+  letter-spacing -.055em
 
 .post-body h2
   position relative
-  margin-top 2.2em
+  margin-top 2.15em
   padding-left 18px
 
 .post-body h2::before
-  content ''
+  content '#'
   position absolute
   left 0
-  top .32em
-  width 5px
-  height 1.05em
-  border-radius 999px
-  background linear-gradient(var(--jng-accent), var(--jng-accent-2))
+  top 0
+  color var(--geek-signal)
+  font-weight 500
 
 .post-body a
-  color var(--jng-accent)
-  border-bottom 1px solid rgba(232, 117, 56, .32)
+  color var(--geek-text)
+  border-bottom 1px dashed var(--geek-line-strong)
+
+.post-body a:hover
+  color var(--geek-signal)
+  border-bottom-color var(--geek-signal)
 
 .post-body blockquote
   margin 28px 0
-  padding 20px 24px
-  border-left 4px solid var(--jng-accent)
-  border-radius 0 var(--jng-radius-sm) var(--jng-radius-sm) 0
-  color var(--jng-muted)
-  background rgba(232, 117, 56, .08)
+  padding 18px 22px
+  border-left 3px solid var(--geek-line-strong)
+  border-radius 0 var(--geek-radius-sm) var(--geek-radius-sm) 0
+  color var(--geek-muted)
+  background rgba(139, 148, 158, .10)
+
+.post-body blockquote::before
+  color var(--geek-subtle)
 
 .post-body img
-  border-radius 24px
-  box-shadow var(--jng-shadow-soft)
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius-sm)
+  box-shadow var(--geek-shadow-soft)
+  filter grayscale(.16)
 
 .post-tags a
-  border 1px solid rgba(232, 117, 56, .28)
-  border-radius 999px
-  color var(--jng-accent)
-  background rgba(232, 117, 56, .08)
-  transition background .25s ease, color .25s ease, transform .25s ease
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius-sm)
+  color var(--geek-muted)
+  background rgba(139, 148, 158, .09)
+  transition background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease
+
+.post-tags a::before
+  content '#'
+  color var(--geek-signal)
 
 .post-tags a:hover
-  color #fff8ed
-  background var(--jng-accent)
-  transform translateY(-2px)
+  color var(--geek-text)
+  border-color var(--geek-line-strong)
+  background rgba(139, 148, 158, .16)
+  transform translateY(-1px)
 
 .btn,
 .post-button .btn
-  border 1px solid rgba(232, 117, 56, .34)
-  border-radius 999px
-  color #fff8ed
-  background linear-gradient(135deg, var(--jng-accent), var(--jng-accent-2))
-  box-shadow 0 12px 30px rgba(232, 117, 56, .22)
-  transition transform .25s ease, box-shadow .25s ease
+  border 1px solid var(--geek-line-strong)
+  border-radius var(--geek-radius-sm)
+  color var(--geek-text)
+  background transparent
+  box-shadow none
+  font-family var(--geek-font)
+  transition transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease
+
+.btn::before,
+.post-button .btn::before
+  content '> '
+  color var(--geek-signal)
 
 .btn:hover,
 .post-button .btn:hover
-  color #fff8ed
-  transform translateY(-2px)
-  box-shadow 0 16px 36px rgba(232, 117, 56, .30)
+  color var(--geek-text)
+  background rgba(139, 148, 158, .14)
+  border-color var(--geek-text)
+  transform translateY(-1px)
 
 .highlight,
 pre,
 code
-  border-radius var(--jng-radius-sm)
+  border-radius var(--geek-radius-sm)
+  font-family var(--geek-font)
 
 .highlight
   overflow hidden
-  border 1px solid var(--jng-line)
-  box-shadow var(--jng-shadow-soft)
+  border 1px solid var(--geek-line-strong)
+  background var(--geek-code) !important
+  box-shadow var(--geek-shadow-soft)
+
+.highlight::before
+  content 'terminal'
+  display block
+  height 28px
+  padding 7px 12px 0
+  box-sizing border-box
+  border-bottom 1px solid rgba(240, 246, 252, .10)
+  color #8b949e
+  background #0d1117
+  font-size .72em
 
 code
-  color #c15d2c
-  background rgba(232, 117, 56, .10)
+  color var(--geek-text)
+  background rgba(139, 148, 158, .14)
+  border 1px solid var(--geek-line)
 
 .table-container table,
 table
   overflow hidden
-  border-radius var(--jng-radius-sm)
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius-sm)
+
+th
+  background rgba(139, 148, 158, .12)
 
 .pagination
-  padding 16px !important
+  padding 14px !important
 
 .pagination .page-number,
 .pagination .extend
-  border-radius 999px
-  transition color .25s ease, background .25s ease, transform .25s ease
+  border-radius var(--geek-radius-sm)
+  transition color .2s ease, background .2s ease, transform .2s ease
 
 .pagination .page-number.current,
 .pagination .page-number:hover,
 .pagination .extend:hover
-  color #fff8ed
-  background var(--jng-accent)
-  transform translateY(-2px)
+  color var(--geek-text)
+  background rgba(139, 148, 158, .16)
+  transform translateY(-1px)
 
 .back-to-top
   right 28px
   bottom 28px
-  border 1px solid var(--jng-line)
-  border-radius 999px
-  color var(--jng-accent)
-  background var(--jng-card-strong)
-  box-shadow var(--jng-shadow-soft)
-  backdrop-filter var(--jng-blur)
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius-sm)
+  color var(--geek-text)
+  background var(--geek-panel)
+  box-shadow var(--geek-shadow-soft)
+  backdrop-filter var(--geek-blur)
 
 .footer
-  color var(--jng-muted)
+  color var(--geek-muted)
+  font-family var(--geek-font)
 
 .footer-inner
   padding 28px 0
 
 .search-pop-overlay
-  background rgba(24, 20, 16, .28)
-  backdrop-filter blur(12px)
+  background rgba(1, 4, 9, .42)
+  backdrop-filter blur(10px)
 
 .search-popup
-  border 1px solid var(--jng-line)
-  border-radius var(--jng-radius)
-  background var(--jng-card-strong)
-  box-shadow var(--jng-shadow)
-  backdrop-filter var(--jng-blur)
+  border 1px solid var(--geek-line)
+  border-radius var(--geek-radius)
+  background var(--geek-panel-solid)
+  box-shadow var(--geek-shadow)
 
 .search-input-container
-  border-bottom-color var(--jng-line)
+  border-bottom-color var(--geek-line)
 
 .search-input
-  color var(--jng-text)
+  color var(--geek-text)
+  font-family var(--geek-font)
 
 .use-motion
   opacity 1 !important
@@ -444,41 +556,47 @@ table
     opacity 1 !important
     visibility visible !important
 
+@keyframes geek-caret
+  0%, 48%
+    opacity 1
+  49%, 100%
+    opacity 0
+
 @media (max-width: 991px)
   .main-inner
     padding 14px
 
   .menu
-    border-radius 24px
+    border-radius 14px
 
   .post-block
-    padding 32px 24px !important
+    padding 34px 24px !important
 
   .posts-expand .post-title
-    font-size 1.72em
+    font-size 1.52em
 
 @media (max-width: 767px)
   body::before
-    background-size 30px 30px
+    background-size 24px 24px
 
   .site-brand-container
-    border-radius 0 0 24px 24px
+    border-radius 0 0 14px 14px
 
   .site-title
-    font-size 1.62em
+    font-size 1.38em
 
   .post-block,
   .sidebar-inner,
   .pagination,
   .comments
-    border-radius 24px !important
+    border-radius 14px !important
 
   .post-block
-    padding 28px 20px !important
+    padding 34px 18px 24px !important
 
   .posts-expand .post-meta
-    border-radius 18px
+    border-radius 10px
 
   .post-body
-    font-size 1em
-    line-height 1.92
+    font-size .96em
+    line-height 1.82

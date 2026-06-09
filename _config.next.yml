@@ -6,9 +6,9 @@ scheme: Gemini
 darkmode: true
 
 menu:
-  home: / || fa fa-home
+  home: / || fa fa-terminal
   about: /about/ || fa fa-user-astronaut
-  tags: /tags/ || fa fa-tags
+  tags: /tags/ || fa fa-code-branch
   categories: /categories/ || fa fa-layer-group
   archives: /archives/ || fa fa-clock-rotate-left
   sitemap: /sitemap.xml || fa fa-sitemap
@@ -57,37 +57,37 @@ toc:
 footer:
   since: 2024
   icon:
-    name: fa fa-heart
+    name: fa fa-code
     animated: false
-    color: '#e87538'
+    color: '#8b949e'
   copyright: 无敌杰尼龟
   powered: true
 
 theme_color:
-  light: '#e87538'
-  dark: '#f2a365'
+  light: '#111111'
+  dark: '#e6edf3'
 
 font:
   enable: true
   host:
   global:
     external: false
-    family: Optima
-    size: 1
+    family: Menlo
+    size: .98
   title:
     external: false
-    family: Georgia
+    family: Menlo
     size:
   headings:
     external: false
-    family: Georgia
+    family: Menlo
     size:
   posts:
     external: false
     family:
   codes:
     external: false
-    family:
+    family: Menlo
 
 post_meta:
   item_text: true
@@ -122,12 +122,12 @@ back2top:
 
 reading_progress:
   enable: true
-  color: '#e87538'
-  height: 4px
+  color: '#8b949e'
+  height: 3px
 
 bookmark:
   enable: true
-  color: '#e87538'
+  color: '#8b949e'
   save: auto
 
 github_banner:
