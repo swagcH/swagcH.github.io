@@ -19,18 +19,16 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="配图说明：权限管理模块设计的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。 背景权限管理是第一个让我明显感受到“业务建模”重要性的模块。 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。 这篇文章记录的是我在 2019-11">
+    <meta name="description" content="背景权限管理是第一个让我明显感受到“业务建模”重要性的模块。 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。 这篇文章记录的是我在 2019-11 前后学习和实践 权限管理模块设计 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当">
 <meta property="og:type" content="article">
 <meta property="og:title" content="权限管理模块设计">
 <meta property="og:url" content="https://swagch.github.io/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="配图说明：权限管理模块设计的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。 背景权限管理是第一个让我明显感受到“业务建模”重要性的模块。 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。 这篇文章记录的是我在 2019-11">
+<meta property="og:description" content="背景权限管理是第一个让我明显感受到“业务建模”重要性的模块。 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。 这篇文章记录的是我在 2019-11 前后学习和实践 权限管理模块设计 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2019/permission-design-cover.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2019/permission-design-1.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2019/permission-design-2.svg">
 <meta property="article:published_time" content="2019-11-16T13:44:52.000Z">
-<meta property="article:modified_time" content="2026-06-09T08:42:27.387Z">
+<meta property="article:modified_time" content="2026-06-09T09:01:45.266Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="权限管理">
 <meta property="article:tag" content="RBAC">
@@ -260,7 +258,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -288,11 +286,10 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2019/permission-design-cover.svg" alt="权限管理模块设计封面图"><br><em>配图说明：权限管理模块设计的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2019/permission-design-cover.svg" alt="权限管理模块设计封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>权限管理是第一个让我明显感受到“业务建模”重要性的模块。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-11 前后学习和实践 <strong>权限管理模块设计</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/permission-design-1.svg" alt="权限管理模块设计流程图"><br><em>配图说明：权限管理模块设计相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>用户、角色、权限三者关系不清楚</li>
@@ -305,7 +302,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/permission-design-2.svg" alt="权限管理模块设计排查思路图"><br><em>配图说明：围绕 权限管理模块设计 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> sys_user(id <span class="type">bigint</span> <span class="keyword">primary key</span>, username <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_role(id <span class="type">bigint</span> <span class="keyword">primary key</span>, role_name <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_permission(id <span class="type">bigint</span> <span class="keyword">primary key</span>, permission_code <span class="type">varchar</span>(<span class="number">128</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_user_role(user_id <span class="type">bigint</span>, role_id <span class="type">bigint</span>);</span><br><span class="line"><span class="keyword">create table</span> sys_role_permission(role_id <span class="type">bigint</span>, permission_id <span class="type">bigint</span>);</span><br></pre></td></tr></table></figure>
 

@@ -253,7 +253,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -275,11 +275,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/postman-debug-cover.svg" alt="Postman接口调试记录封面图"><br><em>配图说明：Postman接口调试记录的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Postman 帮我把接口调试从浏览器地址栏里解放出来，也让我开始重视请求参数和响应结构。</p>
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Postman 帮我把接口调试从浏览器地址栏里解放出来，也让我开始重视请求参数和响应结构。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-09 前后学习和实践 <strong>Postman接口调试记录</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/postman-debug-1.svg" alt="Postman接口调试记录流程图"><br><em>配图说明：Postman接口调试记录相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>浏览器无法方便测试 POST&#x2F;PUT&#x2F;DELETE</li>
@@ -292,7 +290,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/postman-debug-2.svg" alt="Postman接口调试记录排查思路图"><br><em>配图说明：围绕 Postman接口调试记录 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST http://localhost:8080/api/login   -H <span class="string">&quot;Content-Type: application/json&quot;</span>   -d <span class="string">&#x27;&#123;&quot;username&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;123456&quot;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
 
@@ -371,7 +368,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -393,11 +390,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/restful-api-cover.svg" alt="RESTful接口设计封面图"><br><em>配图说明：RESTful接口设计的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>写接口不只是能返回 JSON，还要考虑 URL、方法、状态码和语义。</p>
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>写接口不只是能返回 JSON，还要考虑 URL、方法、状态码和语义。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-09 前后学习和实践 <strong>RESTful接口设计</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/restful-api-1.svg" alt="RESTful接口设计流程图"><br><em>配图说明：RESTful接口设计相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>URL 里到底该不该出现动词</li>
@@ -410,7 +405,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/restful-api-2.svg" alt="RESTful接口设计排查思路图"><br><em>配图说明：围绕 RESTful接口设计 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GET    /api/users        查询用户列表</span><br><span class="line">GET    /api/users/&#123;id&#125;   查询用户详情</span><br><span class="line">POST   /api/users        新增用户</span><br><span class="line">PUT    /api/users/&#123;id&#125;   修改用户</span><br><span class="line">DELETE /api/users/&#123;id&#125;   删除用户</span><br></pre></td></tr></table></figure>
 
@@ -489,7 +483,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -511,11 +505,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/mybatis-summary-cover.svg" alt="MyBatis使用总结封面图"><br><em>配图说明：MyBatis使用总结的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从 JDBC 到 MyBatis，代码量少了很多，但也需要理解 Mapper、SqlSession 和动态 SQL。</p>
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从 JDBC 到 MyBatis，代码量少了很多，但也需要理解 Mapper、SqlSession 和动态 SQL。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-08 前后学习和实践 <strong>MyBatis使用总结</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/mybatis-summary-1.svg" alt="MyBatis使用总结流程图"><br><em>配图说明：MyBatis使用总结相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>Mapper XML 路径写错导致绑定失败</li>
@@ -528,7 +520,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/mybatis-summary-2.svg" alt="MyBatis使用总结排查思路图"><br><em>配图说明：围绕 MyBatis使用总结 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findById&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;com.demo.entity.User&quot;</span>&gt;</span></span><br><span class="line">  select id, username, password, create_time</span><br><span class="line">  from t_user</span><br><span class="line">  where id = #&#123;id&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;insert&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;com.demo.entity.User&quot;</span>&gt;</span></span><br><span class="line">  insert into t_user(username, password)</span><br><span class="line">  values(#&#123;username&#125;, #&#123;password&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -607,7 +598,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -629,11 +620,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/spring-aop-cover.svg" alt="Spring AOP初探封面图"><br><em>配图说明：Spring AOP初探的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+          <p><img src="/images/posts/2019/spring-aop-cover.svg" alt="Spring AOP初探封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>AOP 是我接触到的第一个比较“绕”的框架思想，尤其是切点和通知，一开始很容易混。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-07 前后学习和实践 <strong>Spring AOP初探</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/spring-aop-1.svg" alt="Spring AOP初探流程图"><br><em>配图说明：Spring AOP初探相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>切点表达式不会写</li>
@@ -646,7 +636,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/spring-aop-2.svg" alt="Spring AOP初探排查思路图"><br><em>配图说明：围绕 Spring AOP初探 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LogAspect</span> &#123;</span><br><span class="line">    <span class="meta">@Pointcut(&quot;execution(* com.demo.service..*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">serviceMethods</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;serviceMethods()&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">logCost</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> joinPoint.proceed();</span><br><span class="line">        System.out.println(joinPoint.getSignature() + <span class="string">&quot; cost &quot;</span> + (System.currentTimeMillis() - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -723,7 +712,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -745,11 +734,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/spring-mvc-flow-cover.svg" alt="Spring MVC请求流程理解封面图"><br><em>配图说明：Spring MVC请求流程理解的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在能写 Controller 之后，我开始追问一个问题：请求到底是怎么一步步进入方法里的。</p>
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在能写 Controller 之后，我开始追问一个问题：请求到底是怎么一步步进入方法里的。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring MVC请求流程理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/spring-mvc-flow-1.svg" alt="Spring MVC请求流程理解流程图"><br><em>配图说明：Spring MVC请求流程理解相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>Controller 方法为什么能接到参数</li>
@@ -762,7 +749,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/spring-mvc-flow-2.svg" alt="Spring MVC请求流程理解排查思路图"><br><em>配图说明：围绕 Spring MVC请求流程理解 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserController</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;id&#125;&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="keyword">public</span> UserVO <span class="title function_">detail</span><span class="params">(<span class="meta">@PathVariable</span> Long id)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> userService.findById(id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -841,7 +827,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -863,11 +849,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/spring-ioc-cover.svg" alt="Spring IOC理解封面图"><br><em>配图说明：Spring IOC理解的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+          <p><img src="/images/posts/2019/spring-ioc-cover.svg" alt="Spring IOC理解封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学习 Spring 的第一道坎就是 IOC，刚开始觉得抽象，后来才明白它是在帮我们管理对象。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring IOC理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/spring-ioc-1.svg" alt="Spring IOC理解流程图"><br><em>配图说明：Spring IOC理解相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>为什么对象不自己 new 了</li>
@@ -880,7 +865,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/spring-ioc-2.svg" alt="Spring IOC理解排查思路图"><br><em>配图说明：围绕 Spring IOC理解 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.repository.UserRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.service.UserService&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -959,7 +943,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -981,11 +965,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/tomcat-deploy-cover.svg" alt="Tomcat部署项目封面图"><br><em>配图说明：Tomcat部署项目的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>把项目从本地 IDE 跑到 Tomcat 服务器上，是我第一次真正感受到部署这件事。</p>
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>把项目从本地 IDE 跑到 Tomcat 服务器上，是我第一次真正感受到部署这件事。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-05 前后学习和实践 <strong>Tomcat部署项目</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/tomcat-deploy-1.svg" alt="Tomcat部署项目流程图"><br><em>配图说明：Tomcat部署项目相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>IDE 能跑，部署到 Tomcat 就 404</li>
@@ -998,7 +980,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/tomcat-deploy-2.svg" alt="Tomcat部署项目排查思路图"><br><em>配图说明：围绕 Tomcat部署项目 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package</span><br><span class="line"><span class="built_in">cp</span> target/student-system.war /usr/local/tomcat/webapps/</span><br><span class="line"><span class="built_in">cd</span> /usr/local/tomcat/bin</span><br><span class="line">./startup.sh</span><br></pre></td></tr></table></figure>
 
@@ -1077,7 +1058,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1099,11 +1080,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/jsp-notes-cover.svg" alt="JSP开发笔记封面图"><br><em>配图说明：JSP开发笔记的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+          <p><img src="/images/posts/2019/jsp-notes-cover.svg" alt="JSP开发笔记封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>JSP 让我第一次把 Java 代码和页面展示联系起来，但也暴露了前后端混写的问题。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-04 前后学习和实践 <strong>JSP开发笔记</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/jsp-notes-1.svg" alt="JSP开发笔记流程图"><br><em>配图说明：JSP开发笔记相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>JSP 里 Java 代码越写越乱</li>
@@ -1116,7 +1096,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/jsp-notes-2.svg" alt="JSP开发笔记排查思路图"><br><em>配图说明：围绕 JSP开发笔记 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;h2&gt;学生列表&lt;/h2&gt;</span><br><span class="line">  &lt;p&gt;当前用户：$&#123;sessionScope.user.username&#125;&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
 
@@ -1195,7 +1174,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1217,11 +1196,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/http-notes-cover.svg" alt="HTTP请求与响应学习笔记封面图"><br><em>配图说明：HTTP请求与响应学习笔记的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+          <p><img src="/images/posts/2019/http-notes-cover.svg" alt="HTTP请求与响应学习笔记封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>真正写接口之前，我发现自己必须先补上 HTTP 请求与响应这门基础课。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-03 前后学习和实践 <strong>HTTP请求与响应学习笔记</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/http-notes-1.svg" alt="HTTP请求与响应学习笔记流程图"><br><em>配图说明：HTTP请求与响应学习笔记相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>GET 和 POST 只会从表面区分</li>
@@ -1234,7 +1212,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/http-notes-2.svg" alt="HTTP请求与响应学习笔记排查思路图"><br><em>配图说明：围绕 HTTP请求与响应学习笔记 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/users/1</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>localhost:8080</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>application/json</span><br></pre></td></tr></table></figure>
 
@@ -1315,7 +1292,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1337,11 +1314,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/servlet-principle-cover.svg" alt="Servlet工作原理封面图"><br><em>配图说明：Servlet工作原理的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+          <p><img src="/images/posts/2019/servlet-principle-cover.svg" alt="Servlet工作原理封面图"></p>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Servlet 是我理解 Java Web 的第一个入口，也是后面学习 Spring MVC 的基础。</p>
 <p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
 <p>这篇文章记录的是我在 2019-03 前后学习和实践 <strong>Servlet工作原理</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<p><img src="/images/posts/2019/servlet-principle-1.svg" alt="Servlet工作原理流程图"><br><em>配图说明：Servlet工作原理相关流程与项目实践位置示意图。</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
 <ol>
 <li>不知道请求是怎么进入 doGet&#x2F;doPost 的</li>
@@ -1354,7 +1330,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
 <p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<p><img src="/images/posts/2019/servlet-principle-2.svg" alt="Servlet工作原理排查思路图"><br><em>配图说明：围绕 Servlet工作原理 的常见问题排查路径。</em></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloServlet</span> <span class="keyword">extends</span> <span class="title class_">HttpServlet</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doGet</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        response.setContentType(<span class="string">&quot;text/html;charset=UTF-8&quot;</span>);</span><br><span class="line">        response.getWriter().write(<span class="string">&quot;Hello Servlet&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doPost</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        doGet(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 

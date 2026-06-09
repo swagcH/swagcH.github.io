@@ -27,9 +27,8 @@
 <meta property="og:description" content="背景2018年双十一刚过，项目终于要部署上线了。公司买了两台阿里云ECS服务器，操作系统是CentOS 7.4。作为一个从大学到现在一直在Windows环境下写代码的.NET程序员，听到”部署到Linux服务器”这几个字时，内心是拒绝的。 之前对Linux的印象停留在”黑乎乎的命令行窗口，一堆看不懂的英文字母”。但项目不等人，硬着头皮上吧。花了大概两周时间边查边练，把日常运维常用的Linux命令过">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2018/linux-cli-1.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/linux-cli-2.svg">
 <meta property="article:published_time" content="2018-11-18T07:52:31.000Z">
-<meta property="article:modified_time" content="2026-06-09T08:28:43.477Z">
+<meta property="article:modified_time" content="2026-06-09T09:01:45.261Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="Shell">
@@ -260,7 +259,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 17:01:45" itemprop="dateModified" datetime="2026-06-09T17:01:45+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -390,7 +389,7 @@
 <h3 id="十、组合命令与管道"><a href="#十、组合命令与管道" class="headerlink" title="十、组合命令与管道"></a>十、组合命令与管道</h3><p>管道 <code>|</code> 是 Linux 命令的精髓，它把前一个命令的输出作为后一个命令的输入，像流水线一样：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 管道的基本使用</span></span><br><span class="line">ps -ef | grep java              <span class="comment"># 在进程列表中搜索Java进程</span></span><br><span class="line">netstat -tlnp | grep 80         <span class="comment"># 在网络连接中搜索80端口</span></span><br><span class="line"><span class="built_in">cat</span> app.log | grep ERROR | <span class="built_in">head</span> -20    <span class="comment"># 在日志中找错误，只看前20条</span></span><br><span class="line"><span class="built_in">ls</span> -l | grep <span class="string">&quot;^d&quot;</span>               <span class="comment"># 只列出目录（行首为d的是目录）</span></span><br><span class="line"><span class="built_in">ls</span> -l | awk <span class="string">&#x27;&#123;print $5, $NF&#125;&#x27;</span>   <span class="comment"># 只显示文件大小和名称</span></span><br><span class="line"><span class="built_in">ls</span> -l | <span class="built_in">sort</span> -k5 -rn | <span class="built_in">head</span> -5  <span class="comment"># 列出当前目录最大的5个文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出重定向</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello&quot;</span> &gt; README.md        <span class="comment"># 覆盖写入文件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;World&quot;</span> &gt;&gt; README.md       <span class="comment"># 追加写入文件</span></span><br><span class="line"><span class="built_in">ls</span> /nonexist 2&gt; error.log       <span class="comment"># 将错误信息重定向到文件</span></span><br><span class="line">java -jar app.jar &gt; app.log 2&gt;&amp;1 &amp;    <span class="comment"># 标准输出和错误都输出到日志文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 实际运维组合命令示例</span></span><br><span class="line"><span class="comment"># 找出占用CPU最高的进程</span></span><br><span class="line">top -bn1 | <span class="built_in">head</span> -20</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计日志中各IP的访问次数</span></span><br><span class="line"><span class="built_in">cat</span> access.log | awk <span class="string">&#x27;&#123;print $1&#125;&#x27;</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -rn | <span class="built_in">head</span> -10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量替换配置文件中的IP</span></span><br><span class="line">find /app/config/ -name <span class="string">&quot;*.properties&quot;</span> | xargs sed -i <span class="string">&#x27;s/192.168.1.100/192.168.2.100/g&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 压缩30天前的日志</span></span><br><span class="line">find /var/log/myapp/ -name <span class="string">&quot;*.log&quot;</span> -mtime +30 | xargs gzip</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/posts/2018/linux-cli-2.svg" alt="Linux命令管道工作流程"></p>
+
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>两周的密集使用下来，从最初在终端面前手足无措，到能比较顺畅地完成日常运维操作，有一些心得想分享给和我一样从 Windows 转 Linux 的同学：</p>
 <p><strong>1. Linux 命令不需要死记硬背</strong></p>
 <p>命令太多了，没有人能记住所有命令的所有参数。关键是要知道<strong>解决某个问题可以用什么命令</strong>，具体的参数用法用 <code>man</code> 或 <code>--help</code> 现查就行：</p>
