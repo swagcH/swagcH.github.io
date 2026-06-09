@@ -60,9 +60,9 @@
     <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
     
     
-    <category term="系统设计" scheme="https://swagch.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
-    
     <category term="年度总结" scheme="https://swagch.github.io/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
+    
+    <category term="系统设计" scheme="https://swagch.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
     
     <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
     
@@ -217,11 +217,11 @@
     
     <category term="RabbitMQ" scheme="https://swagch.github.io/tags/RabbitMQ/"/>
     
-    <category term="架构设计" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
-    
     <category term="消息可靠性" scheme="https://swagch.github.io/tags/%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%80%A7/"/>
     
     <category term="异步解耦" scheme="https://swagch.github.io/tags/%E5%BC%82%E6%AD%A5%E8%A7%A3%E8%80%A6/"/>
+    
+    <category term="架构设计" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
     
   </entry>
   
@@ -246,13 +246,13 @@
     <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
     
     
-    <category term="Spring Cloud" scheme="https://swagch.github.io/tags/Spring-Cloud/"/>
-    
     <category term="Nacos" scheme="https://swagch.github.io/tags/Nacos/"/>
     
     <category term="Gateway" scheme="https://swagch.github.io/tags/Gateway/"/>
     
     <category term="OpenFeign" scheme="https://swagch.github.io/tags/OpenFeign/"/>
+    
+    <category term="Spring Cloud" scheme="https://swagch.github.io/tags/Spring-Cloud/"/>
     
   </entry>
   
@@ -279,9 +279,9 @@
     
     <category term="配置管理" scheme="https://swagch.github.io/tags/%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
     
-    <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
-    
     <category term="Spring Cloud" scheme="https://swagch.github.io/tags/Spring-Cloud/"/>
+    
+    <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
     
     <category term="注册中心" scheme="https://swagch.github.io/tags/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/"/>
     
@@ -463,9 +463,9 @@
     <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
     
     
-    <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
-    
     <category term="Linux" scheme="https://swagch.github.io/tags/Linux/"/>
+    
+    <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
     
     <category term="磁盘空间" scheme="https://swagch.github.io/tags/%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4/"/>
     
@@ -527,11 +527,11 @@
     
     <category term="Redis" scheme="https://swagch.github.io/tags/Redis/"/>
     
-    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
-    
     <category term="缓存雪崩" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/"/>
     
     <category term="高可用" scheme="https://swagch.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
+    
+    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
     
   </entry>
   
@@ -558,11 +558,11 @@
     
     <category term="Redis" scheme="https://swagch.github.io/tags/Redis/"/>
     
+    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
+    
     <category term="缓存穿透" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/"/>
     
     <category term="布隆过滤器" scheme="https://swagch.github.io/tags/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/"/>
-    
-    <category term="缓存设计" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/"/>
     
   </entry>
   
