@@ -8,7 +8,6 @@ cover: /images/posts/2020/spring-boot-setup-cover.svg
 ---
 
 ![Spring Boot项目搭建封面图](/images/posts/2020/spring-boot-setup-cover.svg)
-*配图说明：Spring Boot项目搭建的工程经验主题封面，采用更成熟的深蓝灰架构线框风格。*
 
 # 背景
 
@@ -18,8 +17,6 @@ Spring Boot 降低了项目启动门槛，但也要求我们理解默认配置�
 
 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。
 
-![Spring Boot项目搭建流程图](/images/posts/2020/spring-boot-setup-1.svg)
-*配图说明：围绕 Spring Boot项目搭建 的工程流程与关键决策点。*
 
 # 问题
 
@@ -37,8 +34,6 @@ Spring Boot 把大量工程默认值封装起来，成熟使用方式不是只�
 
 我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。
 
-![Spring Boot项目搭建分析图](/images/posts/2020/spring-boot-setup-2.svg)
-*配图说明：Spring Boot项目搭建中需要关注的上下游关系、风险点和沉淀方式。*
 
 # 解决方案
 

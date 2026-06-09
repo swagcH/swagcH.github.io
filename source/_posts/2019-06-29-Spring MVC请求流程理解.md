@@ -7,8 +7,6 @@ keywords: Spring MVC请求流程, DispatcherServlet, HandlerMapping, Controller,
 cover: /images/posts/2019/spring-mvc-flow-cover.svg
 ---
 
-![Spring MVC请求流程理解封面图](/images/posts/2019/spring-mvc-flow-cover.svg)
-*配图说明：Spring MVC请求流程理解的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。*
 
 # 背景
 
@@ -18,8 +16,6 @@ cover: /images/posts/2019/spring-mvc-flow-cover.svg
 
 这篇文章记录的是我在 2019-06 前后学习和实践 **Spring MVC请求流程理解** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
 
-![Spring MVC请求流程理解流程图](/images/posts/2019/spring-mvc-flow-1.svg)
-*配图说明：Spring MVC请求流程理解相关流程与项目实践位置示意图。*
 
 # 问题
 
@@ -43,8 +39,6 @@ Spring MVC 是围绕 DispatcherServlet 展开的请求分发体系，它负责�
 
 只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。
 
-![Spring MVC请求流程理解排查思路图](/images/posts/2019/spring-mvc-flow-2.svg)
-*配图说明：围绕 Spring MVC请求流程理解 的常见问题排查路径。*
 
 # 解决方案
 

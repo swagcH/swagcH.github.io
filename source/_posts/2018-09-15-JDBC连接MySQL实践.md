@@ -90,7 +90,6 @@ JDBC 里最容易忽略的一点是资源释放。`Connection`、`Statement`、`
 
 把这些问题拆开看，其实它们都对应 JDBC 的几个基础机制。
 
-![JDBC 常见问题定位示意图](/images/posts/2018/jdbc-mysql-2.svg)
 
 ## 1. 驱动必须加入 classpath
 
@@ -638,7 +637,6 @@ public User findUserByUsername(String username) {
 
 实际项目中，不应该每次操作数据库都创建一个新的物理连接。连接池会提前维护一批连接，程序需要时从池中取，用完后归还给连接池。
 
-![Druid 连接池工作方式示意图](/images/posts/2018/jdbc-mysql-3.svg)
 
 Druid 是阿里开源的数据库连接池，在国内 Java 项目里很常见。Maven 依赖示例：
 

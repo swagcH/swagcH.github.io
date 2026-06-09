@@ -13,7 +13,6 @@ cover: /images/posts/2018/list-compare-cover.svg
 
 当时做课程作业，随手就 `new ArrayList<>()`，也没多想。直到有一次写一个模拟队列的功能，频繁在头部插入元素，程序跑得巨慢，我才意识到：**选错 List 实现，性能差距可以差到几十倍**。
 
-![ArrayList与LinkedList底层数据结构对比](/images/posts/2018/list-compare-1.svg)
 
 # 问题
 
@@ -195,7 +194,6 @@ final void checkForComodification() {
 
 所以用 for-each 遍历时调用 `list.remove()`，集合自己的 `modCount` 变了，但迭代器里的 `expectedModCount` 没有同步更新，就会触发 fail-fast 机制，抛出 `ConcurrentModificationException`。
 
-![fail-fast机制与ConcurrentModificationException原理](/images/posts/2018/list-compare-2.svg)
 
 # 解决方案
 
@@ -420,7 +418,6 @@ public class RemoveIfDemo {
 }
 ```
 
-![ArrayList与LinkedList场景选择决策图](/images/posts/2018/list-compare-3.svg)
 
 # 总结
 

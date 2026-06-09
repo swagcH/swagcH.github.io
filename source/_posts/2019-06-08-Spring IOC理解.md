@@ -8,7 +8,6 @@ cover: /images/posts/2019/spring-ioc-cover.svg
 ---
 
 ![Spring IOC理解封面图](/images/posts/2019/spring-ioc-cover.svg)
-*配图说明：Spring IOC理解的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。*
 
 # 背景
 
@@ -18,8 +17,6 @@ cover: /images/posts/2019/spring-ioc-cover.svg
 
 这篇文章记录的是我在 2019-06 前后学习和实践 **Spring IOC理解** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
 
-![Spring IOC理解流程图](/images/posts/2019/spring-ioc-1.svg)
-*配图说明：Spring IOC理解相关流程与项目实践位置示意图。*
 
 # 问题
 
@@ -43,8 +40,6 @@ IOC 的重点是对象创建权从业务代码转移到了 Spring 容器，DI �
 
 只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。
 
-![Spring IOC理解排查思路图](/images/posts/2019/spring-ioc-2.svg)
-*配图说明：围绕 Spring IOC理解 的常见问题排查路径。*
 
 # 解决方案
 

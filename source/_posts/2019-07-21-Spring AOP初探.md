@@ -8,7 +8,6 @@ cover: /images/posts/2019/spring-aop-cover.svg
 ---
 
 ![Spring AOP初探封面图](/images/posts/2019/spring-aop-cover.svg)
-*配图说明：Spring AOP初探的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。*
 
 # 背景
 
@@ -18,8 +17,6 @@ AOP 是我接触到的第一个比较“绕”的框架思想，尤其是切点�
 
 这篇文章记录的是我在 2019-07 前后学习和实践 **Spring AOP初探** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
 
-![Spring AOP初探流程图](/images/posts/2019/spring-aop-1.svg)
-*配图说明：Spring AOP初探相关流程与项目实践位置示意图。*
 
 # 问题
 
@@ -43,8 +40,6 @@ AOP 适合处理横切关注点，例如日志、权限、事务。它不是替�
 
 只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。
 
-![Spring AOP初探排查思路图](/images/posts/2019/spring-aop-2.svg)
-*配图说明：围绕 Spring AOP初探 的常见问题排查路径。*
 
 # 解决方案
 
