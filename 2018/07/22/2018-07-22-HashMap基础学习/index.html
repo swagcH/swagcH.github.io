@@ -26,11 +26,11 @@
 <meta property="og:site_name" content="杰尼龟的笔记">
 <meta property="og:description" content="背景2018 年 7 月，最近把 List 相关的内容过了一遍，接下来开始学习 Map。和 List 按顺序存储元素不同，Map 更像是一张“键值对表”，通过 key 可以快速找到对应的 value。 在 Java 集合框架里，HashMap 应该是工作中最常用的数据结构之一。比如根据用户 id 查用户信息、根据配置名查配置值、统计某个字段出现次数等，都很容易想到用 HashMap。  刚开始看">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-1.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-2.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-3.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/hashmap-1.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/hashmap-2.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/hashmap-3.svg">
 <meta property="article:published_time" content="2018-07-22T06:18:39.000Z">
-<meta property="article:modified_time" content="2026-06-09T08:18:58.114Z">
+<meta property="article:modified_time" content="2026-06-09T08:28:43.474Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="集合框架">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="哈希表">
 <meta property="article:tag" content="Map">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-1.svg">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/hashmap-1.svg">
 
 
 <link rel="canonical" href="https://swagch.github.io/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">
@@ -261,7 +261,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:18:58" itemprop="dateModified" datetime="2026-06-09T16:18:58+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 7 月，最近把 <code>List</code> 相关的内容过了一遍，接下来开始学习 <code>Map</code>。和 <code>List</code> 按顺序存储元素不同，<code>Map</code> 更像是一张“键值对表”，通过 <code>key</code> 可以快速找到对应的 <code>value</code>。</p>
 <p>在 Java 集合框架里，<code>HashMap</code> 应该是工作中最常用的数据结构之一。比如根据用户 id 查用户信息、根据配置名查配置值、统计某个字段出现次数等，都很容易想到用 <code>HashMap</code>。</p>
-<p><img src="/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-1.svg" alt="HashMap桶数组与链表结构"></p>
+<p><img src="/images/posts/2018/hashmap-1.svg" alt="HashMap桶数组与链表结构"></p>
 <p>刚开始看 <code>HashMap</code> 的时候，我觉得它只是“根据 key 存取 value”的工具类。但继续往下学才发现，里面涉及哈希算法、数组、链表、扩容、线程安全、<code>hashCode</code> 和 <code>equals</code> 等一系列知识点。也难怪它经常出现在面试题里。</p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>学习过程中，我主要遇到了下面几个疑问：</p>
 <ol>
@@ -318,7 +318,7 @@
 <h2 id="3-hashCode-相同怎么办？"><a href="#3-hashCode-相同怎么办？" class="headerlink" title="3. hashCode 相同怎么办？"></a>3. hashCode 相同怎么办？</h2><p><code>HashMap</code> 根据 key 的哈希值计算数组下标。不同的 key 可能被计算到同一个数组位置，这种情况叫哈希冲突。</p>
 <p>JDK7 中，哈希冲突主要通过“数组 + 链表”解决：多个元素落到同一个桶时，会挂在同一条链表上。</p>
 <p>JDK8 中，底层结构变成“数组 + 链表 + 红黑树”。当链表长度达到一定阈值，并且数组容量也达到要求后，链表会转成红黑树，减少极端情况下的查询时间。</p>
-<p><img src="/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-2.svg" alt="HashMap哈希冲突处理"></p>
+<p><img src="/images/posts/2018/hashmap-2.svg" alt="HashMap哈希冲突处理"></p>
 <p>因此，两个 key 的 <code>hashCode</code> 相同，并不代表一定会互相覆盖。<code>HashMap</code> 还会继续通过 <code>equals</code> 判断 key 是否真正相等。</p>
 <h2 id="4-遍历方式应该选哪个？"><a href="#4-遍历方式应该选哪个？" class="headerlink" title="4. 遍历方式应该选哪个？"></a>4. 遍历方式应该选哪个？</h2><p><code>HashMap</code> 的遍历方式很多，比如遍历 <code>keySet</code>、遍历 <code>entrySet</code>、只遍历 value，或者使用 <code>Iterator</code>。</p>
 <p>日常开发里，如果同时需要 key 和 value，我更推荐使用 <code>entrySet</code>。因为 <code>entrySet</code> 可以一次拿到 key 和 value，避免通过 key 再执行一次 <code>get</code> 查询。</p>
@@ -437,7 +437,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">capacity</span> <span class="operator">=</span> calculateHashMapCapacity(<span class="number">500</span>);</span><br><span class="line">Map&lt;Integer, String&gt; userMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;Integer, String&gt;(capacity);</span><br><span class="line"></span><br><span class="line">userMap.put(<span class="number">1</span>, <span class="string">&quot;用户A&quot;</span>);</span><br><span class="line">userMap.put(<span class="number">2</span>, <span class="string">&quot;用户B&quot;</span>);</span><br></pre></td></tr></table></figure>
 
 <p>这里的思路不是追求绝对精确，而是尽量避免明知道要放很多数据，却还使用默认容量导致频繁扩容。</p>
-<p><img src="/images/posts/2018/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0-image-3.svg" alt="HashMap扩容机制"></p>
+<p><img src="/images/posts/2018/hashmap-3.svg" alt="HashMap扩容机制"></p>
 <h2 id="5-多线程场景使用-ConcurrentHashMap"><a href="#5-多线程场景使用-ConcurrentHashMap" class="headerlink" title="5. 多线程场景使用 ConcurrentHashMap"></a>5. 多线程场景使用 ConcurrentHashMap</h2><p>如果多个线程会同时读写 Map，可以考虑使用 <code>ConcurrentHashMap</code>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; countMap = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;String, Integer&gt;();</span><br><span class="line"></span><br><span class="line">countMap.put(<span class="string">&quot;Java&quot;</span>, <span class="number">1</span>);</span><br><span class="line">countMap.put(<span class="string">&quot;HashMap&quot;</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> <span class="variable">count</span> <span class="operator">=</span> countMap.get(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;Java出现次数：&quot;</span> + count);</span><br></pre></td></tr></table></figure>
 

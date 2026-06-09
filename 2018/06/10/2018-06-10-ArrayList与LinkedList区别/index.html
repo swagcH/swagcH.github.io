@@ -26,11 +26,11 @@
 <meta property="og:site_name" content="杰尼龟的笔记">
 <meta property="og:description" content="背景学完 Java 面向对象之后，终于进入了集合框架这一章。说实话，刚接触 List 接口的时候我是懵的——ArrayList 和 LinkedList 都实现了 List，方法几乎一模一样，那到底该用哪个？ 当时做课程作业，随手就 new ArrayList&lt;&gt;()，也没多想。直到有一次写一个模拟队列的功能，频繁在头部插入元素，程序跑得巨慢，我才意识到：选错 List 实现，性能差距">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-1.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-2.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-3.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/list-compare-1.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/list-compare-2.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/list-compare-3.svg">
 <meta property="article:published_time" content="2018-06-10T08:42:55.000Z">
-<meta property="article:modified_time" content="2026-06-09T08:18:58.113Z">
+<meta property="article:modified_time" content="2026-06-09T08:28:43.473Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="集合框架">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="LinkedList">
 <meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-1.svg">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/list-compare-1.svg">
 
 
 <link rel="canonical" href="https://swagch.github.io/2018/06/10/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB/">
@@ -261,7 +261,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:18:58" itemprop="dateModified" datetime="2026-06-09T16:18:58+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
     
     <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完 Java 面向对象之后，终于进入了集合框架这一章。说实话，刚接触 <code>List</code> 接口的时候我是懵的——<code>ArrayList</code> 和 <code>LinkedList</code> 都实现了 <code>List</code>，方法几乎一模一样，那到底该用哪个？</p>
 <p>当时做课程作业，随手就 <code>new ArrayList&lt;&gt;()</code>，也没多想。直到有一次写一个模拟队列的功能，频繁在头部插入元素，程序跑得巨慢，我才意识到：<strong>选错 List 实现，性能差距可以差到几十倍</strong>。</p>
-<p><img src="/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-1.svg" alt="ArrayList与LinkedList底层数据结构对比"></p>
+<p><img src="/images/posts/2018/list-compare-1.svg" alt="ArrayList与LinkedList底层数据结构对比"></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>踩坑过程中，我遇到了三个核心问题：</p>
 <p><strong>1. 随机访问和头插性能差异巨大</strong></p>
 <p>同样的 10 万次操作，<code>ArrayList</code> 随机访问几乎瞬间完成，但头部插入慢到怀疑人生；而 <code>LinkedList</code> 头部插入飞快，随机访问却慢得离谱。我当时完全不理解为什么。</p>
@@ -341,7 +341,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">checkForComodification</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConcurrentModificationException</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>所以用 for-each 遍历时调用 <code>list.remove()</code>，集合自己的 <code>modCount</code> 变了，但迭代器里的 <code>expectedModCount</code> 没有同步更新，就会触发 fail-fast 机制，抛出 <code>ConcurrentModificationException</code>。</p>
-<p><img src="/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-2.svg" alt="fail-fast机制与ConcurrentModificationException原理"></p>
+<p><img src="/images/posts/2018/list-compare-2.svg" alt="fail-fast机制与ConcurrentModificationException原理"></p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="完整对比表格"><a href="#完整对比表格" class="headerlink" title="完整对比表格"></a>完整对比表格</h2><table>
 <thead>
 <tr>
@@ -422,7 +422,7 @@
 <p><strong>方式三：JDK 8 的 removeIf，最简洁</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RemoveIfDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        list.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line"></span><br><span class="line">        list.removeIf(<span class="string">&quot;deleteMe&quot;</span>::equals);</span><br><span class="line">        System.out.println(<span class="string">&quot;删除后: &quot;</span> + list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/posts/2018/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB-image-3.svg" alt="ArrayList与LinkedList场景选择决策图"></p>
+<p><img src="/images/posts/2018/list-compare-3.svg" alt="ArrayList与LinkedList场景选择决策图"></p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经过这次踩坑，我总结出三条实用原则：</p>
 <p><strong>1. 90% 的场景用 ArrayList 就对了</strong></p>
 <p>日常开发里，大部分场景都是读多写少、随机访问、尾部追加。<code>ArrayList</code> 底层数组内存连续，访问速度快，CPU 缓存命中率也更友好，所以它应该作为默认选择。</p>

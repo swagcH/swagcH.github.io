@@ -26,10 +26,10 @@
 <meta property="og:site_name" content="杰尼龟的笔记">
 <meta property="og:description" content="背景学完第一个 Hello World 之后，我开始系统学习 Java 的基础语法。刚开始觉得数据类型应该不难，因为之前学 C 语言的时候也接触过 int、char、float 这些类型。 但是真正写 Java 代码时，我发现 Java 的类型系统比 C 语言更严格。变量必须先声明类型，类型之间不能随便混用，很多转换都需要明确写出来。 这几天练习的时候，我还遇到了两个很容易忽略的问题：一个是 in">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-image-1.svg">
-<meta property="og:image" content="https://swagch.github.io/images/posts/2018/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-image-2.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/java-types-1.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2018/java-types-2.svg">
 <meta property="article:published_time" content="2018-04-08T12:15:33.000Z">
-<meta property="article:modified_time" content="2026-06-09T08:18:58.111Z">
+<meta property="article:modified_time" content="2026-06-09T08:28:43.471Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="数据类型">
@@ -37,7 +37,7 @@
 <meta property="article:tag" content="引用类型">
 <meta property="article:tag" content="类型转换">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-image-1.svg">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2018/java-types-1.svg">
 
 
 <link rel="canonical" href="https://swagch.github.io/2018/04/08/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
@@ -260,7 +260,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:18:58" itemprop="dateModified" datetime="2026-06-09T16:18:58+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -304,7 +304,7 @@
 <p>另外，<code>int</code> 是基本类型，而 <code>Integer</code> 是包装类。基本类型保存的是具体的数值，包装类是对象。Java 5 以后支持自动装箱和自动拆箱，所以平时写代码时它们看起来可以互相转换，但本质上不是一回事。</p>
 <p>类型转换的规则可以简单理解为：小类型自动转大类型，大类型转小类型需要强制转换，而且可能丢失精度。</p>
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="8种基本类型的完整表格"><a href="#8种基本类型的完整表格" class="headerlink" title="8种基本类型的完整表格"></a>8种基本类型的完整表格</h2><p>Java 一共有 8 种基本类型，可以分成整数、浮点数、字符和布尔四类。</p>
-<p><img src="/images/posts/2018/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-image-1.svg" alt="Java数据类型分类"><br><em>配图说明：Java数据类型分类体系</em></p>
+<p><img src="/images/posts/2018/java-types-1.svg" alt="Java数据类型分类"><br><em>配图说明：Java数据类型分类体系</em></p>
 <table>
 <thead>
 <tr>
@@ -429,7 +429,7 @@
 <h2 id="自动类型转换规则图示"><a href="#自动类型转换规则图示" class="headerlink" title="自动类型转换规则图示"></a>自动类型转换规则图示</h2><p>Java 中常见的自动类型转换顺序可以记成下面这样：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">byte -&gt; short -&gt; int -&gt; long -&gt; float -&gt; double</span><br><span class="line">char -&gt; int -&gt; long -&gt; float -&gt; double</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/posts/2018/2018-04-08-Java%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-image-2.svg" alt="Java自动类型转换规则"><br><em>配图说明：Java数值类型自动转换方向</em></p>
+<p><img src="/images/posts/2018/java-types-2.svg" alt="Java自动类型转换规则"><br><em>配图说明：Java数值类型自动转换方向</em></p>
 <p>小范围类型赋值给大范围类型时，可以自动转换：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AutoConvertDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">byte</span> <span class="variable">byteValue</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">intValue</span> <span class="operator">=</span> byteValue;</span><br><span class="line">        <span class="type">long</span> <span class="variable">longValue</span> <span class="operator">=</span> intValue;</span><br><span class="line">        <span class="type">double</span> <span class="variable">doubleValue</span> <span class="operator">=</span> longValue;</span><br><span class="line"></span><br><span class="line">        <span class="type">char</span> <span class="variable">charValue</span> <span class="operator">=</span> <span class="string">&#x27;A&#x27;</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">charCode</span> <span class="operator">=</span> charValue;</span><br><span class="line"></span><br><span class="line">        System.out.println(doubleValue);</span><br><span class="line">        System.out.println(charCode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
