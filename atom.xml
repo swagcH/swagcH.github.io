@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>杰尼龟的笔记</title>
+  
+  
+  <link href="https://swagch.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://swagch.github.io/"/>
+  <updated>2026-06-09T06:22:08.822Z</updated>
+  <id>https://swagch.github.io/</id>
+  
+  <author>
+    <name>无敌杰尼龟</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>博客重新出发</title>
+    <link href="https://swagch.github.io/2026/06/09/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/"/>
+    <id>https://swagch.github.io/2026/06/09/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</id>
+    <published>2026-06-08T16:00:00.000Z</published>
+    <updated>2026-06-09T06:22:08.822Z</updated>
+    
+    <content type="html"><![CDATA[<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p><span id="more"></span><h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p><h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul><li>Hexo：静态博客生成器</li><li>NexT：Hexo 主题</li><li>GitHub Pages：静态站点托管</li><li>GitHub Actions：后续可用于自动构建和部署</li></ul><h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol><li>整理 Java 后端开发笔记</li><li>梳理并发编程和 JVM 相关知识</li><li>记录 Linux、Nginx、部署排查经验</li><li>逐步完善博客的搜索、订阅和 SEO 配置</li></ol>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="随笔" scheme="https://swagch.github.io/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+    <category term="Hexo" scheme="https://swagch.github.io/tags/Hexo/"/>
+    
+    <category term="GitHub Pages" scheme="https://swagch.github.io/tags/GitHub-Pages/"/>
+    
+  </entry>
+  
+</feed>
