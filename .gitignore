@@ -2,5 +2,6 @@ node_modules/
 public/
 .deploy_git/
 db.json
+.tmp-images.py
 .DS_Store
 *.log

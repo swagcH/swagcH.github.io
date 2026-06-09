@@ -4,7 +4,7 @@ date: 2018-09-15 10:27:44
 tags: [Java, JDBC, MySQL, 数据库连接, CRUD]
 categories: 数据库
 keywords: Java JDBC连接MySQL, JDBC CRUD操作, PreparedStatement用法, JDBC连接池, 数据库连接最佳实践
-cover: https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20JDBC%20connection%20to%20MySQL%20database%20architecture%20diagram%2C%20technical%20illustration%20with%20connection%20flow&image_size=landscape_16_9
+cover: /images/posts/2018/2018-09-15-JDBC连接MySQL实践-cover.svg
 ---
 
 # 背景
@@ -15,7 +15,7 @@ cover: https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20JD
 
 JDBC，全称是 Java Database Connectivity，它是 Java 提供的一套数据库访问规范。简单理解，JDBC 就像 Java 程序和数据库之间的一座桥：Java 代码通过 JDBC API 发送 SQL，数据库执行后再把结果返回给 Java 程序。
 
-![Java 程序通过 JDBC 连接 MySQL 的流程图](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20program%20connects%20to%20MySQL%20through%20JDBC%20driver%2C%20flow%20diagram%20with%20Java%20Application%2C%20JDBC%20API%2C%20MySQL%20Connector%20J%2C%20MySQL%20Database%2C%20clean%20technical%20illustration&image_size=landscape_16_9)
+![Java 程序通过 JDBC 连接 MySQL 的流程图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-1.svg)
 
 我当时的目标很明确：
 
@@ -90,7 +90,7 @@ JDBC 里最容易忽略的一点是资源释放。`Connection`、`Statement`、`
 
 把这些问题拆开看，其实它们都对应 JDBC 的几个基础机制。
 
-![JDBC 常见问题定位示意图](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=JDBC%20debugging%20checklist%20diagram%2C%20driver%20classpath%2C%20JDBC%20URL%2C%20PreparedStatement%2C%20ResultSet%20cursor%2C%20resource%20close%2C%20UTF-8%20encoding%2C%20technical%20blog%20illustration&image_size=landscape_16_9)
+![JDBC 常见问题定位示意图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-2.svg)
 
 ## 1. 驱动必须加入 classpath
 
@@ -638,7 +638,7 @@ public User findUserByUsername(String username) {
 
 实际项目中，不应该每次操作数据库都创建一个新的物理连接。连接池会提前维护一批连接，程序需要时从池中取，用完后归还给连接池。
 
-![Druid 连接池工作方式示意图](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Druid%20database%20connection%20pool%20architecture%2C%20Java%20application%20borrows%20and%20returns%20connections%20to%20pool%2C%20MySQL%20database%2C%20clean%20technical%20illustration&image_size=landscape_16_9)
+![Druid 连接池工作方式示意图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-3.svg)
 
 Druid 是阿里开源的数据库连接池，在国内 Java 项目里很常见。Maven 依赖示例：
 

@@ -4,7 +4,7 @@ date: 2018-06-10 16:42:55
 tags: [Java, 集合框架, ArrayList, LinkedList, 数据结构]
 categories: Java集合
 keywords: ArrayList LinkedList区别, Java集合框架, ArrayList底层原理, LinkedList底层原理, Java List选择, 数组链表对比
-cover: https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ArrayList%20vs%20LinkedList%20comparison%20diagram%20showing%20array%20and%20linked%20list%20data%20structure%2C%20clean%20technical%20infographic&image_size=landscape_16_9
+cover: /images/posts/2018/2018-06-10-ArrayList与LinkedList区别-cover.svg
 ---
 
 # 背景
@@ -13,7 +13,7 @@ cover: https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ArrayList
 
 当时做课程作业，随手就 `new ArrayList<>()`，也没多想。直到有一次写一个模拟队列的功能，频繁在头部插入元素，程序跑得巨慢，我才意识到：**选错 List 实现，性能差距可以差到几十倍**。
 
-![ArrayList与LinkedList底层数据结构对比](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ArrayList%20array%20based%20data%20structure%20vs%20LinkedList%20doubly%20linked%20list%20structure%2C%20side%20by%20side%20comparison%2C%20memory%20layout%20diagram%2C%20technical%20illustration&image_size=landscape_4_3)
+![ArrayList与LinkedList底层数据结构对比](/images/posts/2018/2018-06-10-ArrayList与LinkedList区别-image-1.svg)
 
 # 问题
 
@@ -195,7 +195,7 @@ final void checkForComodification() {
 
 所以用 for-each 遍历时调用 `list.remove()`，集合自己的 `modCount` 变了，但迭代器里的 `expectedModCount` 没有同步更新，就会触发 fail-fast 机制，抛出 `ConcurrentModificationException`。
 
-![fail-fast机制与ConcurrentModificationException原理](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20fail-fast%20mechanism%20diagram%2C%20modCount%20expectedModCount%20comparison%2C%20ConcurrentModificationException%20flow%20chart%2C%20technical%20illustration&image_size=landscape_4_3)
+![fail-fast机制与ConcurrentModificationException原理](/images/posts/2018/2018-06-10-ArrayList与LinkedList区别-image-2.svg)
 
 # 解决方案
 
@@ -420,7 +420,7 @@ public class RemoveIfDemo {
 }
 ```
 
-![ArrayList与LinkedList场景选择决策图](https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ArrayList%20vs%20LinkedList%20decision%20tree%20flowchart%2C%20when%20to%20use%20which%20Java%20List%20implementation%2C%20scenario%20based%20selection%2C%20clean%20technical%20diagram&image_size=landscape_4_3)
+![ArrayList与LinkedList场景选择决策图](/images/posts/2018/2018-06-10-ArrayList与LinkedList区别-image-3.svg)
 
 # 总结
 
