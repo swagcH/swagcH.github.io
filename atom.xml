@@ -40,6 +40,285 @@
   </entry>
   
   <entry>
+    <title>从单体到微服务总结</title>
+    <link href="https://swagch.github.io/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/"/>
+    <id>https://swagch.github.io/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/</id>
+    <published>2022-12-25T15:31:18.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>回看 2022 年，从单体应用到微服务架构，我最大的变化不是学会了更多组件，而是开始理解架构演进的代价。单体并不落后，微服务也不天然先进。架构选择必须服务于团队规模、业务复杂度、交付频率和稳定性要求。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>这一年遇到的典型问题包括：服务拆分后调用链变长，排查问题更困难；配置项分散，环境差异变大；消息队列、缓存、注册中心都引入了新的故障点；原来一个事务能保证的逻辑，现在要考虑最终一致性。微服务解决了一部分单体问题，同时也引入了新的复杂度。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">单体优势：</span><br><span class="line">- 部署简单</span><br><span class="line">- 本地调试方便</span><br><span class="line">- 事务边界清晰</span><br><span class="line">- 小团队效率高</span><br><span class="line"></span><br><span class="line">微服务优势：</span><br><span class="line">- 服务边界清晰</span><br><span class="line">- 可独立部署</span><br><span class="line">- 故障隔离更好</span><br><span class="line">- 团队协作更灵活</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">架构演进路径：</span><br><span class="line">单体应用</span><br><span class="line">  -&gt; 模块化单体</span><br><span class="line">  -&gt; 拆分边界服务</span><br><span class="line">  -&gt; 引入注册发现</span><br><span class="line">  -&gt; 引入网关和配置中心</span><br><span class="line">  -&gt; 补齐日志、监控、链路追踪</span><br></pre></td></tr></table></figure><p>如果基础设施没有跟上，微服务会把复杂度直接暴露给业务开发。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">落地建议：</span><br><span class="line">1. 先做模块化治理，再拆服务</span><br><span class="line">2. 优先拆边界清晰、风险较低的模块</span><br><span class="line">3. 服务之间禁止共享数据库</span><br><span class="line">4. 所有接口必须有文档和错误码</span><br><span class="line">5. 日志必须带 traceId</span><br><span class="line">6. 核心链路必须有监控和告警</span><br><span class="line">7. 异步消息必须设计幂等和补偿</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">基础设施清单：</span><br><span class="line">- 注册中心</span><br><span class="line">- 配置中心</span><br><span class="line">- API 网关</span><br><span class="line">- 统一日志</span><br><span class="line">- 指标监控</span><br><span class="line">- 链路追踪</span><br><span class="line">- 自动化部署</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>从单体到微服务，本质上是从代码架构走向工程体系。服务拆分只是表象，真正重要的是边界治理、稳定性建设、自动化部署和可观测性。我的经验是：不要为了微服务而微服务，当单体还能支撑业务时，先做好模块化和工程规范；当协作、发布和稳定性成为瓶颈时，再逐步演进。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;回看 2022 年，从单体应用到微服务架构，我最大的变化不是学会了更多组件，而是开始理解架构演进的代价。</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="系统设计" scheme="https://swagch.github.io/tags/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="年度总结" scheme="https://swagch.github.io/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
+    
+    <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    <category term="架构演进" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Prometheus监控部署</title>
+    <link href="https://swagch.github.io/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/"/>
+    <id>https://swagch.github.io/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/</id>
+    <published>2022-11-20T12:29:47.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>日志能回答“发生了什么”，但不能很好回答“系统现在是否健康”。为了补齐监控能力，我开始研究 Prometheus。相比传统监控，Prometheus 更适合以指标为中心观察服务状态，比如 QPS、响应耗时、错误率、线程池队列、JVM 内存等。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>刚开始部署时，最容易忽略的是指标设计。Prometheus 能抓到很多默认指标，但如果没有业务指标，排查时仍然不够。比如接口错误率升高，只知道 HTTP 500 变多，却不知道是哪个业务动作失败。另一个问题是标签设计不当，label 维度过多会导致时间序列爆炸。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">监控链路：</span><br><span class="line">Spring Boot Actuator</span><br><span class="line">  -&gt; Prometheus scrape</span><br><span class="line">  -&gt; PromQL query</span><br><span class="line">  -&gt; Grafana dashboard</span><br><span class="line">  -&gt; Alertmanager</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">prometheus,health,metrics</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="attr">tags:</span></span><br><span class="line">      <span class="attr">application:</span> <span class="string">order-service</span></span><br></pre></td></tr></table></figure><p>监控指标需要分层：基础资源、JVM、接口、数据库连接池、业务指标。只看 CPU 和内存，无法支撑复杂业务排查。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&quot;order-service&quot;</span></span><br><span class="line">    <span class="attr">metrics_path:</span> <span class="string">&quot;/actuator/prometheus&quot;</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&quot;order-service:8080&quot;</span>]</span><br></pre></td></tr></table></figure><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rate(http_server_requests_seconds_count[1m])</span><br><span class="line"></span><br><span class="line">histogram_quantile(</span><br><span class="line">  0.95,</span><br><span class="line">  rate(http_server_requests_seconds_bucket[5m])</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">sum(rate(http_server_requests_seconds_count&#123;status=~&quot;5..&quot;&#125;[1m]))</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">告警建议：</span><br><span class="line">- 5xx 错误率持续升高</span><br><span class="line">- P95 响应时间超过阈值</span><br><span class="line">- JVM Old 区使用率过高</span><br><span class="line">- 线程池队列持续堆积</span><br><span class="line">- 数据库连接池耗尽</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>Prometheus 的价值不只是画图，而是建立系统健康度指标。好的监控应该能提前暴露趋势，而不是等用户反馈后才看。日志、指标、告警和复盘结合起来，才算完整的可观测性建设。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;日志能回答“发生了什么”，但不能很好回答“系统现在是否健康”。为了补齐监控能力，我开始研究 Promet</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="可观测性" scheme="https://swagch.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/"/>
+    
+    <category term="Prometheus" scheme="https://swagch.github.io/tags/Prometheus/"/>
+    
+    <category term="监控" scheme="https://swagch.github.io/tags/%E7%9B%91%E6%8E%A7/"/>
+    
+    <category term="Grafana" scheme="https://swagch.github.io/tags/Grafana/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ELK日志平台搭建</title>
+    <link href="https://swagch.github.io/2022/10/23/2022-10-23-ELK%E6%97%A5%E5%BF%97%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/"/>
+    <id>https://swagch.github.io/2022/10/23/2022-10-23-ELK%E6%97%A5%E5%BF%97%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/</id>
+    <published>2022-10-23T13:55:04.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>服务数量增加后，登录服务器看日志的方式开始变得低效。一次请求可能经过网关、订单服务、库存服务和消息消费者，如果每个服务都登录机器 grep 日志，排查效率会很低。因此我开始搭建 ELK 日志平台，把分散日志集中采集、存储和检索。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>搭建过程中主要遇到三个问题：日志格式不统一，导致字段无法检索；Logstash 解析规则写得太随意，数据进 Elasticsearch 后结构混乱；日志量上来后磁盘增长很快，如果不设置索引生命周期，很容易把机器打满。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">日志链路：</span><br><span class="line">app.log</span><br><span class="line">  -&gt; Filebeat</span><br><span class="line">  -&gt; Logstash</span><br><span class="line">  -&gt; Elasticsearch</span><br><span class="line">  -&gt; Kibana</span><br></pre></td></tr></table></figure><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2022-10-23T21:00:00&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;traceId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;create order failed&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure><p>日志平台不是简单收集文本，而是要让日志结构化。只有字段固定，才能按 traceId、service、level、bizId 快速过滤。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat.inputs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">log</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/data/logs/*.log</span></span><br><span class="line">    <span class="attr">fields:</span></span><br><span class="line">      <span class="attr">service:</span> <span class="string">order-service</span></span><br></pre></td></tr></table></figure><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">filter &#123;</span><br><span class="line">  json &#123;</span><br><span class="line">    source =&gt; &quot;message&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts =&gt; [&quot;http://elasticsearch:9200&quot;]</span><br><span class="line">    index =&gt; &quot;app-log-%&#123;+YYYY.MM.dd&#125;&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">落地规则：</span><br><span class="line">1. 应用统一 JSON 日志格式</span><br><span class="line">2. 必须打印 traceId</span><br><span class="line">3. ERROR 日志必须有异常栈</span><br><span class="line">4. 索引按天切分</span><br><span class="line">5. 保留周期按业务价值设置</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>ELK 的核心价值是让日志可检索、可关联、可追溯。平台搭起来只是第一步，更重要的是日志规范。没有 traceId、业务 id 和统一字段，ELK 也只能变成一个更大的文本搜索框。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;服务数量增加后，登录服务器看日志的方式开始变得低效。一次请求可能经过网关、订单服务、库存服务和消息消费者</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="ELK" scheme="https://swagch.github.io/tags/ELK/"/>
+    
+    <category term="日志平台" scheme="https://swagch.github.io/tags/%E6%97%A5%E5%BF%97%E5%B9%B3%E5%8F%B0/"/>
+    
+    <category term="Elasticsearch" scheme="https://swagch.github.io/tags/Elasticsearch/"/>
+    
+    <category term="Logstash" scheme="https://swagch.github.io/tags/Logstash/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker基础部署，Docker Compose实践</title>
+    <link href="https://swagch.github.io/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/"/>
+    <id>https://swagch.github.io/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/</id>
+    <published>2022-08-14T09:42:26.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>在多服务项目越来越多之后，本地环境和测试环境的差异变得明显。以前部署一个 Java 应用只需要 JDK、配置文件和启动脚本，现在还要依赖 MySQL、Redis、RabbitMQ、Nginx 等组件。为了减少环境搭建成本，我开始研究 Docker 和 Docker Compose。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>最开始遇到的问题是容器能启动，但服务之间连不上。比如应用容器访问 localhost:3306，结果连接的是容器内部而不是宿主机；数据卷没有挂载，容器删除后数据也没了；端口映射冲突，导致服务无法启动。这些问题说明，Docker 部署不能只记命令，要理解镜像、容器、网络、数据卷之间的关系。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Docker 关键概念：</span><br><span class="line">image     静态模板</span><br><span class="line">container 运行实例</span><br><span class="line">volume    数据持久化</span><br><span class="line">network   容器通信</span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br><span class="line">docker logs app</span><br><span class="line">docker <span class="built_in">exec</span> -it app sh</span><br><span class="line">docker network <span class="built_in">ls</span></span><br><span class="line">docker volume <span class="built_in">ls</span></span><br></pre></td></tr></table></figure><p>Docker Compose 的价值在于把多个容器的启动方式写成声明式配置，避免每次手写一堆 docker run 命令。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.8&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mysql:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;3306:3306&quot;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-data:/var/lib/mysql</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:6.2</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;6379:6379&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">demo-app:1.0</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">mysql-data:</span></span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker compose up -d</span><br><span class="line">docker compose logs -f app</span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>Docker 带来的最大收益是环境一致性。Docker Compose 则进一步把多组件依赖固化下来。我的经验是：开发环境可以用 Compose 提效，但生产环境还需要考虑镜像版本、日志收集、健康检查、资源限制和安全配置。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;在多服务项目越来越多之后，本地环境和测试环境的差异变得明显。以前部署一个 Java 应用只需要 JDK、</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="部署" scheme="https://swagch.github.io/tags/%E9%83%A8%E7%BD%B2/"/>
+    
+    <category term="Docker" scheme="https://swagch.github.io/tags/Docker/"/>
+    
+    <category term="Docker Compose" scheme="https://swagch.github.io/tags/Docker-Compose/"/>
+    
+    <category term="容器化" scheme="https://swagch.github.io/tags/%E5%AE%B9%E5%99%A8%E5%8C%96/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis高可用架构</title>
+    <link href="https://swagch.github.io/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/"/>
+    <id>https://swagch.github.io/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</id>
+    <published>2022-07-24T11:35:52.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>Redis 从单机缓存进入核心链路后，高可用就必须认真考虑。最初使用 Redis 只是为了缓存热点数据，服务挂了最多回源数据库。但随着登录态、限流、库存预扣等场景进入 Redis，单点故障的影响范围明显扩大，所以需要研究 Redis 高可用架构。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>单机 Redis 最大的问题是故障恢复依赖人工。Redis 进程挂掉、机器重启、内存打满都会导致业务抖动。如果没有主从、哨兵或集群方案，应用只能等待人工处理。另一个问题是，很多人以为主从复制就等于高可用，但主节点故障后如果不能自动切换，仍然无法支撑线上稳定性。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Sentinel 架构：</span><br><span class="line"></span><br><span class="line">app</span><br><span class="line"> ↓</span><br><span class="line">sentinel-1 sentinel-2 sentinel-3</span><br><span class="line"> ↓</span><br><span class="line">redis-master</span><br><span class="line"> ↓</span><br><span class="line">redis-slave-1</span><br><span class="line">redis-slave-2</span><br></pre></td></tr></table></figure><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sentinel monitor mymaster 127.0.0.1 6379 2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel failover-timeout mymaster 60000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br></pre></td></tr></table></figure><p>排查高可用时，重点看三个问题：主从复制是否正常，Sentinel 是否能判断主观下线，故障转移后客户端是否能感知新主节点。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">sentinel:</span></span><br><span class="line">      <span class="attr">master:</span> <span class="string">mymaster</span></span><br><span class="line">      <span class="attr">nodes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26379</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26380</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26381</span></span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -p 26379 sentinel masters</span><br><span class="line">redis-cli -p 26379 sentinel slaves mymaster</span><br><span class="line">redis-cli -p 26379 sentinel failover mymaster</span><br></pre></td></tr></table></figure><p>对于缓存场景，我会同时配合过期时间随机化、本地缓存和降级策略，避免 Redis 故障时所有流量瞬间压到数据库。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>Redis 高可用不能只看 Redis 本身，还要看客户端、业务降级和数据库保护。Sentinel 解决主从切换问题，但不解决缓存击穿、雪崩和热点 key 问题。真正可靠的缓存架构，需要高可用、限流、降级和监控一起设计。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;Redis 从单机缓存进入核心链路后，高可用就必须认真考虑。最初使用 Redis 只是为了缓存热点数据，</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="Redis" scheme="https://swagch.github.io/tags/Redis/"/>
+    
+    <category term="高可用" scheme="https://swagch.github.io/tags/%E9%AB%98%E5%8F%AF%E7%94%A8/"/>
+    
+    <category term="缓存架构" scheme="https://swagch.github.io/tags/%E7%BC%93%E5%AD%98%E6%9E%B6%E6%9E%84/"/>
+    
+    <category term="哨兵模式" scheme="https://swagch.github.io/tags/%E5%93%A8%E5%85%B5%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ可靠性设计</title>
+    <link href="https://swagch.github.io/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/"/>
+    <id>https://swagch.github.io/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/</id>
+    <published>2022-06-19T15:12:09.000Z</published>
+    <updated>2026-06-09T09:38:08.208Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>随着系统拆分，很多原本同步完成的操作开始改成异步。比如订单创建后发积分、发通知、写操作日志，这些逻辑不应该阻塞主流程，于是 RabbitMQ 就进入了架构设计范围。研究可靠性设计，是因为消息队列一旦使用不当，很容易出现“主流程成功了，但后续动作丢了”的问题。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>最典型的问题是消息丢失和重复消费。生产者以为消息发出去了，但交换机没有正确接收；队列没有持久化，服务重启后消息消失；消费者处理成功但 ack 失败，导致消息重复投递。如果没有可靠性设计，问题往往发生在线上，而且不容易第一时间发现。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">可靠投递链路：</span><br><span class="line">Producer</span><br><span class="line">  -&gt; Exchange</span><br><span class="line">  -&gt; Queue</span><br><span class="line">  -&gt; Consumer</span><br><span class="line">  -&gt; Ack</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">publisher-confirm-type:</span> <span class="string">correlated</span></span><br><span class="line">    <span class="attr">publisher-returns:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">listener:</span></span><br><span class="line">      <span class="attr">simple:</span></span><br><span class="line">        <span class="attr">acknowledge-mode:</span> <span class="string">manual</span></span><br></pre></td></tr></table></figure><p>排查消息可靠性时，我会把链路拆成四段：生产确认、路由确认、队列持久化、消费确认。任何一段缺失，都可能导致数据不一致。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (!ack) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;message send failed, id=&#123;&#125;, cause=&#123;&#125;&quot;</span>, correlationData.getId(), cause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RabbitListener(queues = &quot;order.point.queue&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(Message message, Channel channel)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">tag</span> <span class="operator">=</span> message.getMessageProperties().getDeliveryTag();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        handle(message);</span><br><span class="line">        channel.basicAck(tag, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        channel.basicNack(tag, <span class="literal">false</span>, <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">设计补充：</span><br><span class="line">- 业务表增加 message_id 去重</span><br><span class="line">- 失败消息进入死信队列</span><br><span class="line">- 消费失败次数需要监控</span><br><span class="line">- 关键消息保留发送记录</span><br></pre></td></tr></table></figure><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>RabbitMQ 可靠性不是一个配置能解决的，而是一组机制共同保证。生产确认保证消息发出去，持久化保证消息不因重启丢失，手动 ack 保证消费结果可控，幂等设计保证重复投递不会破坏数据。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;随着系统拆分，很多原本同步完成的操作开始改成异步。比如订单创建后发积分、发通知、写操作日志，这些逻辑不应</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="RabbitMQ" scheme="https://swagch.github.io/tags/RabbitMQ/"/>
+    
+    <category term="架构设计" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="消息可靠性" scheme="https://swagch.github.io/tags/%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%80%A7/"/>
+    
+    <category term="异步解耦" scheme="https://swagch.github.io/tags/%E5%BC%82%E6%AD%A5%E8%A7%A3%E8%80%A6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Nacos,Gateway,OpenFeign实操</title>
+    <link href="https://swagch.github.io/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/"/>
+    <id>https://swagch.github.io/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/</id>
+    <published>2022-03-27T12:46:18.000Z</published>
+    <updated>2026-06-09T09:38:08.207Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>在 Spring Cloud 的基础概念跑通之后，我把重点放到 Nacos、Gateway 和 OpenFeign 三个组件上。原因很简单：它们覆盖了微服务最基础的一条链路——服务注册、统一入口和服务间调用。只要这三块稳定，至少能搭出一个可运行的微服务骨架。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>实操中遇到的问题主要集中在配置和路径上。服务已经启动，但 Nacos 控制台看不到实例；Gateway 能访问，但路由匹配不到目标服务；OpenFeign 调用时出现 404 或超时。很多问题不是代码逻辑错，而是服务名、路径前缀、配置层级和依赖版本不一致导致的。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">请求链路：</span><br><span class="line">Browser/Postman</span><br><span class="line">  ↓ /api/order/create</span><br><span class="line">Gateway</span><br><span class="line">  ↓ lb://order-service/order/create</span><br><span class="line">order-service</span><br><span class="line">  ↓ Feign: stock-service</span><br><span class="line">stock-service</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure><p>如果 <code>StripPrefix</code> 配错，请求到后端服务的路径就会变化。排查时要同时看 Gateway 日志和后端 Controller 的映射。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/order&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderController</span> &#123;</span><br><span class="line">    <span class="meta">@PostMapping(&quot;/create&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">create</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(&quot;stock-service&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockFeignClient</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/stock/check&quot;)</span></span><br><span class="line">    Boolean <span class="title function_">checkStock</span><span class="params">(<span class="meta">@RequestParam</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">检查清单：</span><br><span class="line">1. spring.application.name 是否和 Feign 名称一致</span><br><span class="line">2. Nacos 控制台是否有实例</span><br><span class="line">3. Gateway 路由 Path 是否匹配</span><br><span class="line">4. StripPrefix 是否符合后端路径</span><br><span class="line">5. Feign 超时时间是否合理</span><br></pre></td></tr></table></figure><p>通过清单逐项排查，比直接看异常堆栈更稳定。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>Nacos、Gateway、OpenFeign 组合起来并不复杂，复杂的是路径、服务名和配置之间的细节一致性。我的经验是：每新增一个服务，先验证注册，再验证网关，再验证 Feign，不要一次性把所有配置都写完再排查。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;在 Spring Cloud 的基础概念跑通之后，我把重点放到 Nacos、Gateway 和 Open</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="Spring Cloud" scheme="https://swagch.github.io/tags/Spring-Cloud/"/>
+    
+    <category term="Nacos" scheme="https://swagch.github.io/tags/Nacos/"/>
+    
+    <category term="Gateway" scheme="https://swagch.github.io/tags/Gateway/"/>
+    
+    <category term="OpenFeign" scheme="https://swagch.github.io/tags/OpenFeign/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring Cloud学习笔记</title>
+    <link href="https://swagch.github.io/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
+    <id>https://swagch.github.io/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</id>
+    <published>2022-02-20T13:07:33.000Z</published>
+    <updated>2026-06-09T09:38:08.207Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Boot 应用，Spring Cloud 更像是一组微服务治理工具箱，覆盖注册发现、配置管理、网关路由、服务调用、熔断限流等能力。研究它的原因也很明确：当服务数量超过两三个之后，手写服务地址、手动维护配置、靠人肉检查调用链会变得非常不可靠。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>刚开始学习时，最大的问题是概念很多但边界不清。注册中心、配置中心、网关、Feign、负载均衡这些组件看起来都能跑 Demo，但真正放到项目里，会发现不知道每个组件负责什么。比如服务调用失败到底是注册中心没发现服务，还是网关路由错了，还是 Feign 超时时间太短。组件之间的关系如果没有先画清楚，排查问题时会非常被动。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Spring Cloud 常见组件关系：</span><br><span class="line"></span><br><span class="line">client</span><br><span class="line">  ↓</span><br><span class="line">Gateway</span><br><span class="line">  ↓</span><br><span class="line">service-a  --Feign--&gt; service-b</span><br><span class="line">  ↓              ↓</span><br><span class="line">Nacos Registry / Config</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure><p>排查时我会先确认服务是否注册，再确认配置是否加载，最后确认调用链是否正常。顺序不能乱，否则容易被表面异常误导。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">学习顺序：</span><br><span class="line">1. Spring Boot 单服务启动</span><br><span class="line">2. 接入 Nacos 注册中心</span><br><span class="line">3. 通过 OpenFeign 完成服务调用</span><br><span class="line">4. 增加 Gateway 统一入口</span><br><span class="line">5. 再考虑配置中心、熔断限流、链路追踪</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/stock/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>我把每个组件都拆成最小可运行样例，再逐步组合。这样做虽然慢一点，但能清楚知道问题出现在哪一层。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>Spring Cloud 的学习重点不是背组件名，而是理解服务治理的分层。注册中心解决服务在哪里，配置中心解决配置怎么统一，网关解决入口怎么收口，Feign 解决服务之间怎么调用。只有把这些问题放回真实架构场景里，组件才有意义。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Bo</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="配置管理" scheme="https://swagch.github.io/tags/%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
+    
+    <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    <category term="Spring Cloud" scheme="https://swagch.github.io/tags/Spring-Cloud/"/>
+    
+    <category term="注册中心" scheme="https://swagch.github.io/tags/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>微服务架构初体验</title>
+    <link href="https://swagch.github.io/2022/01/16/2022-01-16-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%88%9D%E4%BD%93%E9%AA%8C/"/>
+    <id>https://swagch.github.io/2022/01/16/2022-01-16-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%88%9D%E4%BD%93%E9%AA%8C/</id>
+    <published>2022-01-16T14:18:41.000Z</published>
+    <updated>2026-06-09T09:38:08.207Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p><p>2022 年开始接触微服务时，我最直接的感受是：它不是把一个系统拆成多个服务那么简单。过去做单体应用，所有模块在一个进程里，调用方式直接、事务边界清楚、部署也简单。但当业务模块逐渐增多，订单、用户、库存、支付之间的代码耦合越来越明显，每次改一个功能都要回归一大片逻辑，发布窗口也越来越长。正是在这种背景下，我开始研究微服务架构。最初的目标并不是追求架构先进，而是想弄清楚系统拆分之后，团队协作、独立部署、故障隔离到底能解决哪些真实问题。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p><p>第一次拆服务时遇到的情况比较典型：模块拆出去了，但调用关系反而更复杂；原来一次本地方法调用，现在变成了网络请求；原来一个数据库事务能覆盖的流程，现在要考虑分布式事务或最终一致性。尤其是订单创建这个流程，涉及用户校验、库存扣减、优惠计算和支付记录，拆开之后每一步都可能失败。如果只按代码包结构拆服务，很容易变成“物理拆分、逻辑仍然耦合”。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">单体结构：</span><br><span class="line">app</span><br><span class="line">├── user</span><br><span class="line">├── order</span><br><span class="line">├── stock</span><br><span class="line">└── payment</span><br><span class="line"></span><br><span class="line">初步拆分：</span><br><span class="line">user-service  -&gt; user_db</span><br><span class="line">order-service -&gt; order_db</span><br><span class="line">stock-service -&gt; stock_db</span><br><span class="line">pay-service   -&gt; pay_db</span><br></pre></td></tr></table></figure><p>排查拆分边界时，我主要看三个维度：数据归属、业务闭环、变更频率。用户资料和订单生命周期明显不是同一类数据；库存服务变更频率不高，但对一致性要求高；支付服务外部依赖多，需要单独隔离。由此可以判断，服务拆分应该围绕业务能力，而不是围绕代码目录。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">拆分原则：</span><br><span class="line">1. 先按业务能力拆，而不是按技术层拆</span><br><span class="line">2. 每个服务尽量拥有自己的数据表</span><br><span class="line">3. 服务之间通过接口通信，不共享数据库</span><br><span class="line">4. 核心链路先少拆，边界稳定后再细化</span><br><span class="line">5. 引入服务治理前先把日志和调用链补齐</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">deduct</span><span class="params">(Long skuId, Integer count)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>实际落地时，我没有一次性把所有模块拆开，而是先从边界相对清晰的库存查询、用户信息查询开始。这样即使出现问题，也不会直接影响订单主流程。等到接口、日志、异常处理逐渐稳定后，再考虑更核心的链路。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p><p>微服务带来的不是天然简单，而是把原来隐藏在进程内部的问题显性化。网络延迟、接口契约、数据一致性、服务监控都会成为必须面对的工程问题。我的经验是：如果团队还没有稳定的部署流程、日志规范和接口文档，过早拆微服务只会放大混乱。微服务不是目标，降低复杂度、提升交付效率和故障隔离能力才是目标。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;为什么会研究这个问题&lt;/p&gt;
+&lt;p&gt;2022 年开始接触微服务时，我最直接的感受是：它不是把一个系统拆成多个服务那么简单。过去做单体应用，所</summary>
+      
+    
+    
+    
+    <category term="架构成长" scheme="https://swagch.github.io/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/"/>
+    
+    
+    <category term="微服务" scheme="https://swagch.github.io/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+    <category term="架构设计" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="系统拆分" scheme="https://swagch.github.io/tags/%E7%B3%BB%E7%BB%9F%E6%8B%86%E5%88%86/"/>
+    
+    <category term="后端架构" scheme="https://swagch.github.io/tags/%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84/"/>
+    
+  </entry>
+  
+  <entry>
     <title>年度故障案例总结</title>
     <link href="https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/"/>
     <id>https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/</id>
@@ -184,9 +463,9 @@
     <category term="故障排查" scheme="https://swagch.github.io/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
     
     
-    <category term="Linux" scheme="https://swagch.github.io/tags/Linux/"/>
-    
     <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
+    
+    <category term="Linux" scheme="https://swagch.github.io/tags/Linux/"/>
     
     <category term="磁盘空间" scheme="https://swagch.github.io/tags/%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4/"/>
     
@@ -346,285 +625,6 @@
     <category term="接口超时" scheme="https://swagch.github.io/tags/%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6/"/>
     
     <category term="性能分析" scheme="https://swagch.github.io/tags/%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>工作第一年总结</title>
-    <link href="https://swagch.github.io/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/"/>
-    <id>https://swagch.github.io/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/</id>
-    <published>2020-12-27T15:26:18.000Z</published>
-    <updated>2026-06-09T09:01:45.271Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/first-year-review-cover.svg" alt="工作第一年总结封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>工作第一年的成长，不只是学会更多框架，而是开始理解工程、业务和协作之间的关系。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>只关注完成需求，没有主动理解业务价值</li><li>遇到问题时容易陷入局部技术细节</li><li>对协作、沟通、质量的理解不够系统</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>第一年的成长是从“把功能做完”转向“把事情做稳”，开始关注可维护性、协作效率和交付质量。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">第一年关键词：</span><br><span class="line">- 从学习框架到理解工程</span><br><span class="line">- 从完成任务到关注质量</span><br><span class="line">- 从单点开发到团队协作</span><br><span class="line">- 从解决问题到沉淀方法</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">下一年目标：系统设计、性能优化、稳定性建设、持续输出</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>工作第一年总结</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/first-year-review-cover.svg&quot; alt=&quot;工作第一年总结封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;</summary>
-      
-    
-    
-    
-    <category term="随笔" scheme="https://swagch.github.io/categories/%E9%9A%8F%E7%AC%94/"/>
-    
-    
-    <category term="年度总结" scheme="https://swagch.github.io/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
-    
-    <category term="成长总结" scheme="https://swagch.github.io/tags/%E6%88%90%E9%95%BF%E6%80%BB%E7%BB%93/"/>
-    
-    <category term="工作复盘" scheme="https://swagch.github.io/tags/%E5%B7%A5%E4%BD%9C%E5%A4%8D%E7%9B%98/"/>
-    
-    <category term="工程经验" scheme="https://swagch.github.io/tags/%E5%B7%A5%E7%A8%8B%E7%BB%8F%E9%AA%8C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>技术债治理思考</title>
-    <link href="https://swagch.github.io/2020/11/28/2020-11-28-%E6%8A%80%E6%9C%AF%E5%80%BA%E6%B2%BB%E7%90%86%E6%80%9D%E8%80%83/"/>
-    <id>https://swagch.github.io/2020/11/28/2020-11-28-%E6%8A%80%E6%9C%AF%E5%80%BA%E6%B2%BB%E7%90%86%E6%80%9D%E8%80%83/</id>
-    <published>2020-11-28T12:58:33.000Z</published>
-    <updated>2026-06-09T09:01:45.271Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>技术债不是脏代码的代名词，它更多是业务速度、资源投入和长期维护之间的取舍结果。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>所有历史问题都想一次性解决</li><li>重构没有业务收益说明，很难获得排期</li><li>技术债长期无人维护，最终变成系统风险</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>技术债治理不是情绪化重写，而是识别风险、评估收益、拆分阶段并结合业务节奏逐步偿还。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">技术债评估维度：</span><br><span class="line">1. 是否频繁影响需求交付</span><br><span class="line">2. 是否增加线上风险</span><br><span class="line">3. 是否阻碍新人理解</span><br><span class="line">4. 是否有明确替代方案</span><br><span class="line">5. 是否能分阶段治理</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">治理方式：局部重构、补测试、补文档、统一规范、灰度替换</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>技术债治理思考</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;技术债不是脏代码的代名词，它更多是业务速度、资源投入和长期维护之间的取舍结果。&lt;/p&gt;
-&lt;p&gt;如果说 2019 年的重点是把项目做出来，那么</summary>
-      
-    
-    
-    
-    <category term="经验沉淀" scheme="https://swagch.github.io/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/"/>
-    
-    
-    <category term="可维护性" scheme="https://swagch.github.io/tags/%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7/"/>
-    
-    <category term="重构" scheme="https://swagch.github.io/tags/%E9%87%8D%E6%9E%84/"/>
-    
-    <category term="技术债" scheme="https://swagch.github.io/tags/%E6%8A%80%E6%9C%AF%E5%80%BA/"/>
-    
-    <category term="架构治理" scheme="https://swagch.github.io/tags/%E6%9E%B6%E6%9E%84%E6%B2%BB%E7%90%86/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>开发与测试协作经验</title>
-    <link href="https://swagch.github.io/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/"/>
-    <id>https://swagch.github.io/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/</id>
-    <published>2020-11-15T08:37:20.000Z</published>
-    <updated>2026-06-09T09:01:45.270Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/dev-test-collaboration-cover.svg" alt="开发与测试协作经验封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>开发和测试不是对立关系，真正的目标是用更低成本把问题挡在上线之前。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>Bug 描述缺少复现步骤</li><li>开发自测不足，低级问题进入测试阶段</li><li>测试关注结果，开发关注实现，沟通语言不一致</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>开发和测试对质量负责的角度不同，但目标一致。好的协作应该让问题更早暴露、更清晰流转。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Bug 单必要信息：</span><br><span class="line">- 环境</span><br><span class="line">- 账号</span><br><span class="line">- 操作步骤</span><br><span class="line">- 期望结果</span><br><span class="line">- 实际结果</span><br><span class="line">- 截图/日志</span><br><span class="line">- 接口请求参数</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">提测前自检：主流程、异常参数、权限边界、兼容旧数据、日志是否充分</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>开发与测试协作经验</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/dev-test-collaboration-cover.svg&quot; alt=&quot;开发与测试协作经验封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title</summary>
-      
-    
-    
-    
-    <category term="项目协作" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/"/>
-    
-    
-    <category term="测试协作" scheme="https://swagch.github.io/tags/%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C/"/>
-    
-    <category term="Bug管理" scheme="https://swagch.github.io/tags/Bug%E7%AE%A1%E7%90%86/"/>
-    
-    <category term="质量保障" scheme="https://swagch.github.io/tags/%E8%B4%A8%E9%87%8F%E4%BF%9D%E9%9A%9C/"/>
-    
-    <category term="项目协作" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>线上问题排查记录</title>
-    <link href="https://swagch.github.io/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/"/>
-    <id>https://swagch.github.io/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</id>
-    <published>2020-10-31T14:49:12.000Z</published>
-    <updated>2026-06-09T09:01:45.270Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>线上问题最考验的不是技术点本身，而是排查顺序、信息完整度和沟通节奏。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>报警出现后先猜原因，缺少证据链</li><li>日志、监控、数据库信息没有按顺序收集</li><li>修复后没有复盘，问题容易重复出现</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>线上排查要避免凭经验跳结论，应该按现象、影响范围、变更记录、日志证据和恢复手段逐步推进。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看错误日志</span></span><br><span class="line">grep -n <span class="string">&quot;ERROR&quot;</span> app.log | <span class="built_in">tail</span> -50</span><br><span class="line"></span><br><span class="line"><span class="comment"># 按 requestId 追踪</span></span><br><span class="line">grep <span class="string">&quot;req-20201031001&quot;</span> app.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程资源</span></span><br><span class="line">top -Hp $(pgrep java)</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">排查顺序：现象 -&gt; 影响范围 -&gt; 最近变更 -&gt; 日志证据 -&gt; 临时恢复 -&gt; 根因复盘</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>线上问题排查记录</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/prod-debug-cover.svg&quot; alt=&quot;线上问题排查记录封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;</summary>
-      
-    
-    
-    
-    <category term="问题排查" scheme="https://swagch.github.io/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/"/>
-    
-    
-    <category term="线上问题" scheme="https://swagch.github.io/tags/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/"/>
-    
-    <category term="故障排查" scheme="https://swagch.github.io/tags/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/"/>
-    
-    <category term="日志" scheme="https://swagch.github.io/tags/%E6%97%A5%E5%BF%97/"/>
-    
-    <category term="复盘" scheme="https://swagch.github.io/tags/%E5%A4%8D%E7%9B%98/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>项目部署标准化流程</title>
-    <link href="https://swagch.github.io/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/"/>
-    <id>https://swagch.github.io/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/</id>
-    <published>2020-10-18T09:58:45.000Z</published>
-    <updated>2026-06-09T09:01:45.270Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>部署标准化的价值，是让上线从一次“手工冒险”变成一套可重复执行的工程动作。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>上线步骤依赖个人经验，缺少清单</li><li>部署后没有验证项</li><li>出现问题时没有回滚方案</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>标准化部署把个人经验转化为团队流程，让每次上线都能被复盘、复用和持续改进。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line">scp target/app.jar deploy@server:/data/app/</span><br><span class="line">ssh deploy@server <span class="string">&quot;systemctl restart app&quot;</span></span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">部署步骤：构建 -&gt; 备份 -&gt; 上传 -&gt; 停服 -&gt; 替换 -&gt; 启动 -&gt; 验证 -&gt; 观察日志</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>项目部署标准化流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/deploy-standard-cover.svg&quot; alt=&quot;项目部署标准化流程封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;</summary>
-      
-    
-    
-    
-    <category term="项目部署" scheme="https://swagch.github.io/categories/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/"/>
-    
-    
-    <category term="运维" scheme="https://swagch.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
-    
-    <category term="项目部署" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/"/>
-    
-    <category term="标准化流程" scheme="https://swagch.github.io/tags/%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/"/>
-    
-    <category term="发布" scheme="https://swagch.github.io/tags/%E5%8F%91%E5%B8%83/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>配置管理经验</title>
-    <link href="https://swagch.github.io/2020/09/29/2020-09-29-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E7%BB%8F%E9%AA%8C/"/>
-    <id>https://swagch.github.io/2020/09/29/2020-09-29-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E7%BB%8F%E9%AA%8C/</id>
-    <published>2020-09-29T15:05:26.000Z</published>
-    <updated>2026-06-09T09:01:45.270Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/config-management-cover.svg" alt="配置管理经验封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>配置管理的目标不是把配置集中放起来，而是让不同环境的行为可预期、可追踪、可回滚。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>测试环境和生产环境配置混用</li><li>配置变更没有记录，问题难以回溯</li><li>敏感配置散落在代码仓库中</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>配置管理关乎环境一致性。配置应该可区分、可审计、可回滚，并避免把敏感信息写入代码。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span></span><br><span class="line"></span><br><span class="line"><span class="attr">app:</span></span><br><span class="line">  <span class="attr">upload-dir:</span> <span class="string">/data/app/uploads</span></span><br><span class="line">  <span class="attr">timeout-ms:</span> <span class="number">3000</span></span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">配置原则：</span><br><span class="line">- 环境配置分离</span><br><span class="line">- 密码不进仓库</span><br><span class="line">- 修改要有记录</span><br><span class="line">- 默认值要保守</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>配置管理经验</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/config-management-cover.svg&quot; alt=&quot;配置管理经验封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/</summary>
-      
-    
-    
-    
-    <category term="工程实践" scheme="https://swagch.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-    <category term="部署" scheme="https://swagch.github.io/tags/%E9%83%A8%E7%BD%B2/"/>
-    
-    <category term="Spring Boot" scheme="https://swagch.github.io/tags/Spring-Boot/"/>
-    
-    <category term="配置管理" scheme="https://swagch.github.io/tags/%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/"/>
-    
-    <category term="环境隔离" scheme="https://swagch.github.io/tags/%E7%8E%AF%E5%A2%83%E9%9A%94%E7%A6%BB/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring Boot项目搭建</title>
-    <link href="https://swagch.github.io/2020/09/13/2020-09-13-Spring%20Boot%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA/"/>
-    <id>https://swagch.github.io/2020/09/13/2020-09-13-Spring%20Boot%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA/</id>
-    <published>2020-09-13T12:17:04.000Z</published>
-    <updated>2026-06-09T09:01:45.269Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/spring-boot-setup-cover.svg" alt="Spring Boot项目搭建封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Spring Boot 降低了项目启动门槛，但也要求我们理解默认配置背后的约定。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>依赖引入很快，但默认配置理解不足</li><li>配置文件拆分不清晰</li><li>项目结构没有统一约定</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Spring Boot 把大量工程默认值封装起来，成熟使用方式不是只会启动，而是知道默认值如何被覆盖。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DemoApplication</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(DemoApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn spring-boot:run</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>Spring Boot项目搭建</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/spring-boot-setup-cover.svg&quot; alt=&quot;Spring Boot项目搭建封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; titl</summary>
-      
-    
-    
-    
-    <category term="Spring Boot" scheme="https://swagch.github.io/categories/Spring-Boot/"/>
-    
-    
-    <category term="后端开发" scheme="https://swagch.github.io/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/"/>
-    
-    <category term="Spring Boot" scheme="https://swagch.github.io/tags/Spring-Boot/"/>
-    
-    <category term="项目搭建" scheme="https://swagch.github.io/tags/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA/"/>
-    
-    <category term="自动配置" scheme="https://swagch.github.io/tags/%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>日志设计实践</title>
-    <link href="https://swagch.github.io/2020/08/23/2020-08-23-%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1%E5%AE%9E%E8%B7%B5/"/>
-    <id>https://swagch.github.io/2020/08/23/2020-08-23-%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1%E5%AE%9E%E8%B7%B5/</id>
-    <published>2020-08-23T13:33:18.000Z</published>
-    <updated>2026-06-09T09:01:45.269Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/images/posts/2020/logging-practice-cover.svg" alt="日志设计实践封面图"></p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>好的日志不是越多越好，而是在出问题时能准确回答“发生了什么、影响了谁、下一步查哪里”。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>出问题时日志里只有“失败了”，没有上下文</li><li>日志级别混乱，INFO 和 ERROR 随意使用</li><li>敏感信息被直接打印到日志</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>日志设计要面向排查场景，能串起请求、用户、业务对象、异常堆栈和关键状态变化。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;create order start, requestId=&#123;&#125;, userId=&#123;&#125;, skuId=&#123;&#125;&quot;</span>, requestId, userId, skuId);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;create order failed, requestId=&#123;&#125;, userId=&#123;&#125;, command=&#123;&#125;&quot;</span>, requestId, userId, command, e);</span><br><span class="line">    <span class="keyword">throw</span> e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">日志字段建议：requestId、userId、bizId、action、result、cost、errorCode</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>日志设计实践</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/posts/2020/logging-practice-cover.svg&quot; alt=&quot;日志设计实践封面图&quot;&gt;&lt;/p&gt;
-&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a</summary>
-      
-    
-    
-    
-    <category term="工程实践" scheme="https://swagch.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-    
-    
-    <category term="日志设计" scheme="https://swagch.github.io/tags/%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1/"/>
-    
-    <category term="排查问题" scheme="https://swagch.github.io/tags/%E6%8E%92%E6%9F%A5%E9%97%AE%E9%A2%98/"/>
-    
-    <category term="可观测性" scheme="https://swagch.github.io/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/"/>
-    
-    <category term="Spring Boot" scheme="https://swagch.github.io/tags/Spring-Boot/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Git协作开发流程</title>
-    <link href="https://swagch.github.io/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/"/>
-    <id>https://swagch.github.io/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/</id>
-    <published>2020-07-12T10:20:53.000Z</published>
-    <updated>2026-06-09T09:01:45.269Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。</p><p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p><p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p><ol><li>多人同时改同一模块导致冲突频繁</li><li>分支长期不合并，最终集成风险很高</li><li>提交信息无法说明改动目的</li></ol><p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p><h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>协作流程的重点不在命令本身，而在分支边界、提交粒度、合并节奏和问题回滚。</p><p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p><h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout develop</span><br><span class="line">git pull origin develop</span><br><span class="line">git checkout -b feature/order-export</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;feat: add order export&quot;</span></span><br><span class="line">git push origin feature/order-export</span><br></pre></td></tr></table></figure><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">分支规则：</span><br><span class="line">feature/*  功能开发</span><br><span class="line">bugfix/*   缺陷修复</span><br><span class="line">release/*  发布准备</span><br><span class="line">hotfix/*   线上修复</span><br></pre></td></tr></table></figure><p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>Git协作开发流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p><p>这篇文章可以沉淀为几条原则：</p><ul><li>先明确问题边界，再讨论技术方案；</li><li>能形成清单的事情，不要只靠记忆；</li><li>能通过规范减少沟通的地方，就不要反复口头确认；</li><li>重要结论要留痕，方便后续追溯；</li><li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li></ul><p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;背景&quot;&gt;&lt;a href=&quot;#背景&quot; class=&quot;headerlink&quot; title=&quot;背景&quot;&gt;&lt;/a&gt;背景&lt;/h1&gt;&lt;p&gt;个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。&lt;/p&gt;
-&lt;p&gt;如果说 2019 年的重点是把项目做出来</summary>
-      
-    
-    
-    
-    <category term="工程规范" scheme="https://swagch.github.io/categories/%E5%B7%A5%E7%A8%8B%E8%A7%84%E8%8C%83/"/>
-    
-    
-    <category term="Git" scheme="https://swagch.github.io/tags/Git/"/>
-    
-    <category term="分支管理" scheme="https://swagch.github.io/tags/%E5%88%86%E6%94%AF%E7%AE%A1%E7%90%86/"/>
-    
-    <category term="协作流程" scheme="https://swagch.github.io/tags/%E5%8D%8F%E4%BD%9C%E6%B5%81%E7%A8%8B/"/>
-    
-    <category term="代码合并" scheme="https://swagch.github.io/tags/%E4%BB%A3%E7%A0%81%E5%90%88%E5%B9%B6/"/>
     
   </entry>
   

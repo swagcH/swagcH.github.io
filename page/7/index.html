@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="一个 Java 后端开发的技术笔记博客">
+<meta property="og:type" content="website">
+<meta property="og:title" content="杰尼龟的笔记">
+<meta property="og:url" content="https://swagch.github.io/page/7/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="一个 Java 后端开发的技术笔记博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JUC">
+<meta property="article:tag" content="并发编程">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://swagch.github.io/page/7/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"page/7/index.html","title":""}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">杰尼龟的笔记</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">191</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">第一个Hello World程序详解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-02-25 15:22:08" itemprop="dateCreated datePublished" datetime="2018-02-25T15:22:08+08:00">2018-02-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>今天把 JDK 和开发工具都装好以后，终于开始写第一个 Java 程序了。虽然只是最简单的 <code>Hello World</code>，但是实际动手以后发现，这里面并不是只有一行输出语句那么简单。</p>
+<p>我之前学 C 语言的时候，也是从 <code>Hello World</code> 开始的。当时大概知道写完 <code>.c</code> 文件以后，用编译器编译，再运行生成的可执行文件就可以了。所以刚开始学 Java 的时候，我也下意识以为流程差不多：写代码、编译、运行。</p>
+<p>但是 Java 这里多了一个 <code>.class</code> 文件，还要用 <code>javac</code> 和 <code>java</code> 两个命令分别处理，一开始确实有点懵。于是我想把 Java 程序从编写到运行的完整过程搞清楚，至少以后再遇到编译错误、运行错误时，知道问题大概出在哪里。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>第一次写 Java 的 <code>Hello World</code>，我主要遇到了下面几个问题。</p>
+<h2 id="文件名和类名不一致导致编译报错"><a href="#文件名和类名不一致导致编译报错" class="headerlink" title="文件名和类名不一致导致编译报错"></a>文件名和类名不一致导致编译报错</h2><p>我一开始把文件保存成了 <code>hello.java</code>，里面写的是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac hello.java</span><br></pre></td></tr></table></figure>
+
+<p>结果编译器报错，大概意思是公共类 <code>HelloWorld</code> 应该放在 <code>HelloWorld.java</code> 文件中。这个错误很典型，因为 Java 对 <code>public class</code> 的类名和文件名要求非常严格。</p>
+<h2 id="缺少main方法不知道程序入口在哪"><a href="#缺少main方法不知道程序入口在哪" class="headerlink" title="缺少main方法不知道程序入口在哪"></a>缺少main方法不知道程序入口在哪</h2><p>我还尝试过只写一个普通方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sayHello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码能编译通过，但是运行时会提示找不到 <code>main</code> 方法。也就是说，Java 程序不是只要有类就能直接运行，JVM 需要知道从哪里开始执行。</p>
+<h2 id="不理解为什么javac编译后生成-class文件"><a href="#不理解为什么javac编译后生成-class文件" class="headerlink" title="不理解为什么javac编译后生成.class文件"></a>不理解为什么javac编译后生成.class文件</h2><p>执行 <code>javac HelloWorld.java</code> 后，目录里生成了 <code>HelloWorld.class</code>。我一开始以为编译后应该生成类似 Windows 下的 <code>.exe</code> 文件，但是 Java 生成的是字节码文件，这和 C 语言直接编译成机器码不同。</p>
+<h2 id="中文输出乱码问题"><a href="#中文输出乱码问题" class="headerlink" title="中文输出乱码问题"></a>中文输出乱码问题</h2><p>我在程序里输出中文时，也遇到过乱码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;你好，Java&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>有时编译没问题，但是运行后控制台显示的中文不正常。后来才知道，这和源文件编码、命令行窗口编码、<code>javac</code> 读取源码时使用的编码都有关系。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="public类的类名必须和文件名完全一致"><a href="#public类的类名必须和文件名完全一致" class="headerlink" title="public类的类名必须和文件名完全一致"></a>public类的类名必须和文件名完全一致</h2><p>Java 要求一个 <code>.java</code> 文件中，如果存在 <code>public</code> 修饰的类，那么这个 <code>public</code> 类的类名必须和文件名完全一致，包括大小写。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>文件名就必须是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java</span><br></pre></td></tr></table></figure>
+
+<p>不能写成 <code>helloworld.java</code>、<code>hello.java</code> 或 <code>Hello.java</code>。虽然 Windows 文件名大小写不敏感，但 Java 编译器对类名是区分大小写的，初学的时候最好严格保持一致。</p>
+<h2 id="JVM执行时寻找main方法作为程序入口"><a href="#JVM执行时寻找main方法作为程序入口" class="headerlink" title="JVM执行时寻找main方法作为程序入口"></a>JVM执行时寻找main方法作为程序入口</h2><p>Java 程序运行时，JVM 会寻找固定格式的 <code>main</code> 方法作为入口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的几个关键点是：</p>
+<ul>
+<li><code>public</code>：表示 JVM 可以从类外部访问这个方法</li>
+<li><code>static</code>：表示不需要创建对象，就可以直接调用这个方法</li>
+<li><code>void</code>：表示这个方法没有返回值</li>
+<li><code>main</code>：固定的方法名，是程序入口</li>
+<li><code>String[] args</code>：命令行参数，运行程序时可以从外部传入字符串数组</li>
+</ul>
+<p>如果少写了 <code>static</code>，或者把 <code>main</code> 写成 <code>Main</code>，都可能导致 JVM 找不到程序入口。</p>
+<h2 id="Java先编译成字节码再由JVM执行"><a href="#Java先编译成字节码再由JVM执行" class="headerlink" title="Java先编译成字节码再由JVM执行"></a>Java先编译成字节码再由JVM执行</h2><p>Java 的执行流程大致是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java  --javac编译--&gt;  HelloWorld.class  --JVM执行--&gt;  程序输出结果</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>.class</code> 文件不是普通文本文件，而是 Java 字节码文件。JVM 可以读取字节码，然后在不同操作系统上解释执行或即时编译执行。</p>
+<p>这也是 Java 经常说的“一次编译，到处运行”的基础：只要目标机器安装了合适的 JVM，同一份 <code>.class</code> 字节码理论上就可以在不同平台运行。</p>
+<h2 id="Windows默认GBK编码可能导致中文乱码"><a href="#Windows默认GBK编码可能导致中文乱码" class="headerlink" title="Windows默认GBK编码可能导致中文乱码"></a>Windows默认GBK编码可能导致中文乱码</h2><p>我现在主要在 Windows 环境下学习 Java。Windows 命令行默认编码经常是 GBK，而很多编辑器保存源码时默认是 UTF-8。</p>
+<p>如果源文件实际是 UTF-8，但 <code>javac</code> 按系统默认编码去读取，或者控制台用另一种编码显示，就可能出现中文乱码。最稳妥的方式是明确告诉 <code>javac</code> 源文件编码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
+
+<p>这样至少编译阶段不会因为编码识别错误导致中文出问题。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="完整的HelloWorld-java代码及逐行解释"><a href="#完整的HelloWorld-java代码及逐行解释" class="headerlink" title="完整的HelloWorld.java代码及逐行解释"></a>完整的HelloWorld.java代码及逐行解释</h2><p>下面是我整理后的第一个 Java 程序，文件名必须保存为 <code>HelloWorld.java</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义一个公共类，类名必须和文件名 HelloWorld.java 完全一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// Java程序入口，JVM运行程序时会从这个方法开始执行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 向控制台输出一行文本，输出结束后自动换行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;你好，Java&quot;</span>); <span class="comment">// 输出中文内容，用来测试当前编码是否正常</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>逐行理解：</p>
+<ol>
+<li><code>public class HelloWorld</code>：声明一个公共类，类名是 <code>HelloWorld</code>。</li>
+<li><code>&#123;</code> 和 <code>&#125;</code>：表示代码块的开始和结束，类和方法都需要用大括号包起来。</li>
+<li><code>public static void main(String[] args)</code>：固定格式的主方法，是 Java 程序入口。</li>
+<li><code>System.out.println(&quot;Hello World&quot;)</code>：在控制台打印 <code>Hello World</code>。</li>
+<li>每条语句末尾的分号不能省略，这是 Java 的语法要求。</li>
+</ol>
+<h2 id="javac编译和java运行的完整命令"><a href="#javac编译和java运行的完整命令" class="headerlink" title="javac编译和java运行的完整命令"></a>javac编译和java运行的完整命令</h2><p>假设当前目录下有 <code>HelloWorld.java</code> 文件，先打开命令行进入这个目录。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> D:\java-study</span><br></pre></td></tr></table></figure>
+
+<p>编译 Java 源文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac HelloWorld.java</span><br></pre></td></tr></table></figure>
+
+<p>如果编译成功，命令行通常不会输出任何内容，但是目录里会多出一个文件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.class</span><br></pre></td></tr></table></figure>
+
+<p>然后运行程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>注意这里运行时写的是类名 <code>HelloWorld</code>，不要写成 <code>HelloWorld.class</code>，也不要写成 <code>HelloWorld.java</code>。</p>
+<p>正常输出如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
+
+<p>如果担心中文编码问题，可以这样编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>对应输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="带命令行参数的版本"><a href="#带命令行参数的版本" class="headerlink" title="带命令行参数的版本"></a>带命令行参数的版本</h2><p><code>main</code> 方法里的 <code>String[] args</code> 可以接收命令行参数。为了理解它，我又写了一个版本：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义HelloWorld类，文件名仍然必须是HelloWorld.java</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// args用于接收运行程序时传入的命令行参数</span></span><br><span class="line">        <span class="keyword">if</span> (args.length == <span class="number">0</span>) &#123; <span class="comment">// 判断是否没有传入任何参数，避免直接访问数组导致异常</span></span><br><span class="line">            System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 没有参数时输出默认内容</span></span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">// 提前结束main方法，让后面的参数输出逻辑不再执行</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;收到的第一个参数是：&quot;</span> + args[<span class="number">0</span>]); <span class="comment">// 输出命令行传入的第一个参数</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
+
+<p>不带参数运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br></pre></td></tr></table></figure>
+
+<p>带参数运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld Java入门</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">收到的第一个参数是：Java入门</span><br></pre></td></tr></table></figure>
+
+<p>如果传入多个参数，<code>args[0]</code> 是第一个，<code>args[1]</code> 是第二个。这个地方让我想到 C 语言里的 <code>argc</code> 和 <code>argv</code>，只是 Java 把参数封装成了字符串数组。</p>
+<h2 id="使用Eclipse创建Java项目的步骤"><a href="#使用Eclipse创建Java项目的步骤" class="headerlink" title="使用Eclipse创建Java项目的步骤"></a>使用Eclipse创建Java项目的步骤</h2><p>手动编译运行理解清楚以后，也可以用 Eclipse 创建项目。Eclipse 会自动帮我们调用编译器，很多目录结构和 classpath 细节也会帮忙处理。</p>
+<p>大致步骤如下：</p>
+<ol>
+<li>打开 Eclipse。</li>
+<li>选择 <code>File</code> -&gt; <code>New</code> -&gt; <code>Java Project</code>。</li>
+<li>在 <code>Project name</code> 中输入项目名，例如 <code>HelloWorldDemo</code>。</li>
+<li>选择已经安装好的 JDK，初学阶段默认配置即可。</li>
+<li>点击 <code>Finish</code> 创建项目。</li>
+<li>在 <code>src</code> 目录上右键，选择 <code>New</code> -&gt; <code>Class</code>。</li>
+<li>在 <code>Name</code> 中输入 <code>HelloWorld</code>。</li>
+<li>勾选 <code>public static void main(String[] args)</code>，让 Eclipse 自动生成主方法。</li>
+<li>在 <code>main</code> 方法中写入输出语句。</li>
+<li>右键代码区域，选择 <code>Run As</code> -&gt; <code>Java Application</code> 运行程序。</li>
+</ol>
+<p>Eclipse 里生成的代码大概是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// Eclipse创建的公共类，类名和文件名保持一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// 勾选主方法选项后，Eclipse会自动生成程序入口</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 在控制台输出Hello World</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="classpath的概念"><a href="#classpath的概念" class="headerlink" title="classpath的概念"></a>classpath的概念</h2><p><code>classpath</code> 可以简单理解为 JVM 查找 <code>.class</code> 文件的路径。</p>
+<p>我们执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>JVM 会根据 classpath 去找 <code>HelloWorld.class</code>。如果当前目录不在 classpath 中，就可能出现找不到类的错误。</p>
+<p>在简单练习时，可以在 <code>.class</code> 文件所在目录执行命令，或者显式指定 classpath：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -classpath . HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>.</code> 表示当前目录。也可以写成简写形式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> . HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>如果 class 文件放在 <code>bin</code> 目录下，可以这样运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> bin HelloWorld</span><br></pre></td></tr></table></figure>
+
+<p>初学阶段我觉得没必要一开始就背很多 classpath 的复杂规则，但至少要知道：运行 Java 程序时，JVM 必须能在 classpath 指定的位置找到对应的 <code>.class</code> 文件。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天这个 <code>Hello World</code> 程序虽然很小，但实际把 Java 的几个基础概念都串起来了。</p>
+<p>首先，Java 的编译运行机制和 C 语言有本质区别。C 语言通常直接编译成本机平台的机器码，而 Java 是先通过 <code>javac</code> 编译成 <code>.class</code> 字节码，再交给 JVM 运行。</p>
+<p>其次，写 Java 程序时要注意文件名、类名、编码的一致性。尤其是 <code>public class HelloWorld</code> 必须放在 <code>HelloWorld.java</code> 中，中文源码最好统一使用 UTF-8，并在命令行编译时加上：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
+
+<p>再次，<code>main</code> 方法是 Java 程序入口，签名最好先按固定格式记住：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
+
+<p>最后，我对“一次编译，到处运行”有了更具体的理解。它不是说 Java 源文件可以直接在任何地方运行，而是说 Java 源文件编译成字节码后，可以交给不同平台上的 JVM 执行。</p>
+<p>IDE 确实能帮我们屏蔽很多细节，比如自动编译、自动设置 classpath、自动生成 main 方法。但是我觉得初学者还是应该先用命令行手动编译运行几次。这样以后 Eclipse 或其他工具报错时，不至于完全不知道底层发生了什么。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/02/13/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/02/13/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">Java开发环境搭建记录</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-02-13 21:36:12" itemprop="dateCreated datePublished" datetime="2018-02-13T21:36:12+08:00">2018-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年春节回来，我下定决心从 C 语言转向 Java 后端开发。上学时学过一点 C 语言，顶多写过一些控制台排序算法，对”企业级开发”完全没概念。周围同学有搞 PHP 的，有搞 Python 的，选 Java 主要是看中了它的就业面广、生态成熟。</p>
+<p>当时手头参考资料主要是两样：<strong>廖雪峰的 Java 教程</strong>（在线版）和 <strong>《Head First Java》</strong> 这本经典入门书。廖雪峰的教程偏实战，直接讲 Eclipse 怎么配、Maven 怎么用，而 Head First 用大量插图讲面向对象思想，两本搭配着看效果不错。</p>
+<p>因为之前只用过 Code::Blocks 写 C 语言，对 JDK、JRE、IDE 这些概念完全分不清，所以第一步搭建环境就折腾了好几天。</p>
+<p><img src="/images/posts/2018/java-setup-1.svg" alt="JDK下载页面"><br><em>Oracle 官网 JDK 8 下载页面</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><h3 id="1-JDK-版本选择困难"><a href="#1-JDK-版本选择困难" class="headerlink" title="1. JDK 版本选择困难"></a>1. JDK 版本选择困难</h3><p>当时 Oracle 在 2017 年 9 月刚发布了 JDK 9，官网上最显眼的位置就是 JDK 9 的下载链接。JDK 8 要往下翻半天才能找到。作为新手真的纠结了很久——装新不装旧？但是网上搜了一圈，几乎所有教程都在说 JDK 8 是 LTS（长期支持版本），更稳定，企业里用的最多。廖雪峰的教程里也明确写了建议用 JDK 8。最后还是选了 JDK 8u161。</p>
+<h3 id="2-环境变量配置后还是找不到-java-命令"><a href="#2-环境变量配置后还是找不到-java-命令" class="headerlink" title="2. 环境变量配置后还是找不到 java 命令"></a>2. 环境变量配置后还是找不到 java 命令</h3><p>这是我踩的第一个坑。按照教程配置了 <code>JAVA_HOME</code>、<code>Path</code>、<code>CLASSPATH</code>，打开新命令行窗口输入 <code>java -version</code>，结果报：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;java&#x27; 不是内部或外部命令，也不是可运行的程序或批处理文件。</span><br></pre></td></tr></table></figure>
+
+<p>当时心态有点崩，明明按照步骤一步一步来的啊。来来回回检查了好几遍才发现问题。</p>
+<h3 id="3-Eclipse-启动报错"><a href="#3-Eclipse-启动报错" class="headerlink" title="3. Eclipse 启动报错"></a>3. Eclipse 启动报错</h3><p>装好 JDK 后下载了 Eclipse Oxygen（当时的最新版），结果双击启动图标直接弹出一个错误对话框：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Failed to create the Java Virtual Machine</span><br></pre></td></tr></table></figure>
+
+<p>一脸懵，刚装好的环境怎么就起不来？</p>
+<p><em>Eclipse 启动时提示 JVM 创建失败</em></p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>回过头来分析这几个问题，其实都不复杂，但对新手来说每个都是拦路虎。</p>
+<h3 id="JDK-版本"><a href="#JDK-版本" class="headerlink" title="JDK 版本"></a>JDK 版本</h3><p>JDK 9 引入了模块化系统（Jigsaw），算是一次比较大的架构变动。虽然新特性很吸引人，但 LTS 版本更稳妥这个道理现在懂了。JDK 8 一直到 2018 年初都还是绝对的主流，公司项目基本都在用，遇到问题网上也更容易找到解决方案。</p>
+<h3 id="环境变量问题"><a href="#环境变量问题" class="headerlink" title="环境变量问题"></a>环境变量问题</h3><p>仔细排查后发现是犯了两个低级错误：</p>
+<ol>
+<li><p><strong>路径多了尾部斜杠</strong>：配置 <code>JAVA_HOME</code> 时写成了 <code>C:\Program Files\Java\jdk1.8.0_161\</code>（多了反斜杠），导致 <code>%JAVA_HOME%\bin</code> 解析出来变成了 <code>C:\Program Files\Java\jdk1.8.0_161\\bin</code>，双斜杠导致路径无效。</p>
+</li>
+<li><p><strong>配置后没重新打开命令行</strong>：环境变量改了之后，已经打开的命令行窗口不会自动刷新，需要关掉重新打开。</p>
+</li>
+</ol>
+<h3 id="Eclipse-JVM-参数"><a href="#Eclipse-JVM-参数" class="headerlink" title="Eclipse JVM 参数"></a>Eclipse JVM 参数</h3><p>打开 Eclipse 安装目录下的 <code>eclipse.ini</code> 看了下，默认配置是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx1024m</span><br></pre></td></tr></table></figure>
+
+<p>我的笔记本当时只有 4GB 内存，系统和其他软件占掉一大半，Eclipse 默认的 <code>-Xmx1024m</code>（最大堆内存 1024MB）对这台机器来说太大了，JVM 启动时分配不到足够的连续内存空间，所以直接崩了。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h3 id="第一步：安装-JDK-8u161"><a href="#第一步：安装-JDK-8u161" class="headerlink" title="第一步：安装 JDK 8u161"></a>第一步：安装 JDK 8u161</h3><p>从 Oracle 官网下载了 <code>jdk-8u161-windows-x64.exe</code>，双击安装，安装路径选择默认的 <code>C:\Program Files\Java\jdk1.8.0_161</code>。安装过程中会同时安装 JRE，一路下一步就好。</p>
+<h3 id="第二步：配置环境变量"><a href="#第二步：配置环境变量" class="headerlink" title="第二步：配置环境变量"></a>第二步：配置环境变量</h3><p>在 Windows 10 中按 <code>Win + R</code> 输入 <code>sysdm.cpl</code>，在”高级”选项卡里点击”环境变量”，分别配置以下三个变量：</p>
+<h4 id="新建系统变量：JAVA-HOME"><a href="#新建系统变量：JAVA-HOME" class="headerlink" title="新建系统变量：JAVA_HOME"></a>新建系统变量：JAVA_HOME</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">变量名：JAVA_HOME</span><br><span class="line">变量值：C:\Program Files\Java\jdk1.8.0_161</span><br></pre></td></tr></table></figure>
+
+<h4 id="编辑系统变量：Path"><a href="#编辑系统变量：Path" class="headerlink" title="编辑系统变量：Path"></a>编辑系统变量：Path</h4><p>在 Path 变量的值末尾追加（注意分号分隔）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%JAVA_HOME%\bin</span><br></pre></td></tr></table></figure>
+
+<h4 id="新建系统变量：CLASSPATH（可选）"><a href="#新建系统变量：CLASSPATH（可选）" class="headerlink" title="新建系统变量：CLASSPATH（可选）"></a>新建系统变量：CLASSPATH（可选）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">变量名：CLASSPATH</span><br><span class="line">变量值：.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意前面那个点号 <code>.</code> 代表当前目录，必须要加。</p>
+</blockquote>
+<p><em>Windows 10 环境变量配置窗口</em></p>
+<h3 id="第三步：验证安装"><a href="#第三步：验证安装" class="headerlink" title="第三步：验证安装"></a>第三步：验证安装</h3><p>配置完成后，重新打开一个命令行窗口，依次输入以下命令验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\chenzixin&gt; java -version</span><br><span class="line">java version <span class="string">&quot;1.8.0_161&quot;</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_161-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)</span><br><span class="line"></span><br><span class="line">C:\Users\chenzixin&gt; javac -version</span><br><span class="line">javac 1.8.0_161</span><br></pre></td></tr></table></figure>
+
+<p>看到这个输出时心里踏实了不少，说明 JDK 安装和环境变量都生效了。</p>
+<h3 id="第四步：编写第一个-Java-程序"><a href="#第四步：编写第一个-Java-程序" class="headerlink" title="第四步：编写第一个 Java 程序"></a>第四步：编写第一个 Java 程序</h3><p>在 <code>D:\JavaWorkspace</code> 目录下新建 <code>Test.java</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello Java! 环境搭建成功！&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;JDK 版本: &quot;</span> + System.getProperty(<span class="string">&quot;java.version&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在命令行中编译和运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">D:\JavaWorkspace&gt; javac Test.java</span><br><span class="line"></span><br><span class="line">D:\JavaWorkspace&gt; java Test</span><br><span class="line">Hello Java! 环境搭建成功！</span><br><span class="line">JDK 版本: 1.8.0_161</span><br></pre></td></tr></table></figure>
+
+<p>第一个 Java 程序跑起来的那一刻，感觉之前折腾的这几天的辛苦都值了。</p>
+<h3 id="第五步：安装-Eclipse-并调整-JVM-参数"><a href="#第五步：安装-Eclipse-并调整-JVM-参数" class="headerlink" title="第五步：安装 Eclipse 并调整 JVM 参数"></a>第五步：安装 Eclipse 并调整 JVM 参数</h3><p>下载 Eclipse IDE for Java Developers（Oxygen 版本），解压到 <code>D:\eclipse</code>。</p>
+<p>打开 <code>D:\eclipse\eclipse.ini</code>，找到 JVM 参数相关配置，修改前：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx1024m</span><br></pre></td></tr></table></figure>
+
+<p>修改后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx512m</span><br></pre></td></tr></table></figure>
+
+<p>只改了一处——把 <code>-Xmx</code> 从 <code>1024m</code> 降到了 <code>512m</code>。改完后重启 Eclipse，顺利启动成功。</p>
+<p><em>Eclipse Oxygen 启动后的欢迎界面</em></p>
+<h3 id="第六步：配置-Eclipse-的-Workspace"><a href="#第六步：配置-Eclipse-的-Workspace" class="headerlink" title="第六步：配置 Eclipse 的 Workspace"></a>第六步：配置 Eclipse 的 Workspace</h3><p>我选择了 <code>D:\JavaWorkspace</code> 作为工作空间目录，然后在 Eclipse 中配置已安装的 JDK：</p>
+<ol>
+<li>点击菜单 <code>Window</code> -&gt; <code>Preferences</code></li>
+<li>展开 <code>Java</code> -&gt; <code>Installed JREs</code></li>
+<li>确保指向的是 <code>C:\Program Files\Java\jdk1.8.0_161</code></li>
+</ol>
+<p>这样配置后，Eclipse 就自动识别了 JDK 的类库和编译选项，可以在 IDE 里直接创建和运行 Java 项目了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次搭建环境的经历让我这个 Java 新手学到了不少东西：</p>
+<ol>
+<li><p><strong>JDK 选择 LTS 版本最稳妥</strong>。JDK 9 虽然新，但 JDK 8 作为 LTS 版本在企业中广泛使用，遇到问题更容易找到解决方案。对于初学者来说，稳定压倒一切。</p>
+</li>
+<li><p><strong>环境变量配置要仔细检查路径</strong>。多一个斜杠、少一个分号都可能导致配置不生效。配置完一定要重新打开命令行窗口再测试，这个坑后来再也没踩过。</p>
+</li>
+<li><p><strong>IDE 的 JVM 参数要根据机器配置调整</strong>。Eclipse 默认的 JVM 参数是为配置较高的机器准备的，2018 年主流笔记本还是 4GB~8GB 内存，默认的 1024m 对低配机器来说偏大。<code>eclipse.ini</code> 里的 <code>-Xmx</code> 参数控制最大堆内存，根据自己电脑的内存大小酌情调整就好。后来的 IntelliJ IDEA 也有类似问题，<code>idea64.exe.vmoptions</code> 里面的参数同样需要根据机器配置手动调整。</p>
+</li>
+<li><p><strong>建议新手先熟悉命令行编译运行再依赖 IDE</strong>。虽然 Eclipse 很方便，但用命令行编译运行能让人更好理解 Java 的编译原理——Java 源代码通过 <code>javac</code> 编译成字节码（<code>.class</code> 文件），再由 JVM 解释执行。理解了这套流程，后面学 Maven、Gradle 这些构建工具也会轻松很多。</p>
+</li>
+</ol>
+<p>最后的最后，记录一下当时的主要软件版本，方便以后回顾：</p>
+<table>
+<thead>
+<tr>
+<th>软件</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JDK</td>
+<td>1.8.0_161 (build 1.8.0_161-b12)</td>
+</tr>
+<tr>
+<td>Eclipse</td>
+<td>Oxygen (4.7)</td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>Windows 10 专业版 64位</td>
+</tr>
+<tr>
+<td>笔记本内存</td>
+<td>4GB</td>
+</tr>
+</tbody></table>
+<p>到现在我写这篇博客时，已经能用 Java 写一些简单的 Web 应用了。回头看看搭建环境这件事，其实没那么难，只是对一个新领域的未知让人感到畏惧而已。动手去做，遇到问题就查、就问、就试，总能解决。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/6/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span>
+  </nav>
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
