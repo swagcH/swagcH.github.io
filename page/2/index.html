@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-count">92</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -217,7 +217,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -235,7 +235,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">第一个Hello World程序详解</a>
+          <a href="/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/" class="post-title-link" itemprop="url">Spring IOC理解</a>
         </h2>
 
         <div class="post-meta-container">
@@ -246,14 +246,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2018-02-25 15:22:08" itemprop="dateCreated datePublished" datetime="2018-02-25T15:22:08+08:00">2018-02-25</time>
+      <time title="创建时间：2019-06-08 21:05:49" itemprop="dateCreated datePublished" datetime="2019-06-08T21:05:49+08:00">2019-06-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -261,7 +261,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+          <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
         </span>
     </span>
 
@@ -275,155 +275,40 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>今天把 JDK 和开发工具都装好以后，终于开始写第一个 Java 程序了。虽然只是最简单的 <code>Hello World</code>，但是实际动手以后发现，这里面并不是只有一行输出语句那么简单。</p>
-<p>我之前学 C 语言的时候，也是从 <code>Hello World</code> 开始的。当时大概知道写完 <code>.c</code> 文件以后，用编译器编译，再运行生成的可执行文件就可以了。所以刚开始学 Java 的时候，我也下意识以为流程差不多：写代码、编译、运行。</p>
-<p>但是 Java 这里多了一个 <code>.class</code> 文件，还要用 <code>javac</code> 和 <code>java</code> 两个命令分别处理，一开始确实有点懵。于是我想把 Java 程序从编写到运行的完整过程搞清楚，至少以后再遇到编译错误、运行错误时，知道问题大概出在哪里。</p>
-<p><img src="/images/posts/2018/hello-world-1.svg" alt="Java编译运行流程"><br><em>配图说明：Java程序编译运行流程</em></p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>第一次写 Java 的 <code>Hello World</code>，我主要遇到了下面几个问题。</p>
-<h2 id="文件名和类名不一致导致编译报错"><a href="#文件名和类名不一致导致编译报错" class="headerlink" title="文件名和类名不一致导致编译报错"></a>文件名和类名不一致导致编译报错</h2><p>我一开始把文件保存成了 <code>hello.java</code>，里面写的是：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <p><img src="/images/posts/2019/spring-ioc-cover.svg" alt="Spring IOC理解封面图"><br><em>配图说明：Spring IOC理解的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学习 Spring 的第一道坎就是 IOC，刚开始觉得抽象，后来才明白它是在帮我们管理对象。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring IOC理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/spring-ioc-1.svg" alt="Spring IOC理解流程图"><br><em>配图说明：Spring IOC理解相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>为什么对象不自己 new 了</li>
+<li>XML 配置 Bean 很容易写错</li>
+<li>依赖注入和控制反转概念抽象</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>IOC 的重点是对象创建权从业务代码转移到了 Spring 容器，DI 是容器把依赖关系装配进去的过程。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
 
-<p>然后执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac hello.java</span><br></pre></td></tr></table></figure>
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/spring-ioc-2.svg" alt="Spring IOC理解排查思路图"><br><em>配图说明：围绕 Spring IOC理解 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.repository.UserRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.service.UserService&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>结果编译器报错，大概意思是公共类 <code>HelloWorld</code> 应该放在 <code>HelloWorld.java</code> 文件中。这个错误很典型，因为 Java 对 <code>public class</code> 的类名和文件名要求非常严格。</p>
-<h2 id="缺少main方法不知道程序入口在哪"><a href="#缺少main方法不知道程序入口在哪" class="headerlink" title="缺少main方法不知道程序入口在哪"></a>缺少main方法不知道程序入口在哪</h2><p>我还尝试过只写一个普通方法：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sayHello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> UserRepository userRepository;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUserRepository</span><span class="params">(UserRepository userRepository)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.userRepository = userRepository;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>这段代码能编译通过，但是运行时会提示找不到 <code>main</code> 方法。也就是说，Java 程序不是只要有类就能直接运行，JVM 需要知道从哪里开始执行。</p>
-<h2 id="不理解为什么javac编译后生成-class文件"><a href="#不理解为什么javac编译后生成-class文件" class="headerlink" title="不理解为什么javac编译后生成.class文件"></a>不理解为什么javac编译后生成.class文件</h2><p>执行 <code>javac HelloWorld.java</code> 后，目录里生成了 <code>HelloWorld.class</code>。我一开始以为编译后应该生成类似 Windows 下的 <code>.exe</code> 文件，但是 Java 生成的是字节码文件，这和 C 语言直接编译成机器码不同。</p>
-<h2 id="中文输出乱码问题"><a href="#中文输出乱码问题" class="headerlink" title="中文输出乱码问题"></a>中文输出乱码问题</h2><p>我在程序里输出中文时，也遇到过乱码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;你好，Java&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>有时编译没问题，但是运行后控制台显示的中文不正常。后来才知道，这和源文件编码、命令行窗口编码、<code>javac</code> 读取源码时使用的编码都有关系。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="public类的类名必须和文件名完全一致"><a href="#public类的类名必须和文件名完全一致" class="headerlink" title="public类的类名必须和文件名完全一致"></a>public类的类名必须和文件名完全一致</h2><p>Java 要求一个 <code>.java</code> 文件中，如果存在 <code>public</code> 修饰的类，那么这个 <code>public</code> 类的类名必须和文件名完全一致，包括大小写。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>文件名就必须是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>不能写成 <code>helloworld.java</code>、<code>hello.java</code> 或 <code>Hello.java</code>。虽然 Windows 文件名大小写不敏感，但 Java 编译器对类名是区分大小写的，初学的时候最好严格保持一致。</p>
-<h2 id="JVM执行时寻找main方法作为程序入口"><a href="#JVM执行时寻找main方法作为程序入口" class="headerlink" title="JVM执行时寻找main方法作为程序入口"></a>JVM执行时寻找main方法作为程序入口</h2><p>Java 程序运行时，JVM 会寻找固定格式的 <code>main</code> 方法作为入口：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
-
-<p>这里的几个关键点是：</p>
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Spring IOC理解 的理解，我最后沉淀成几条经验：</p>
 <ul>
-<li><code>public</code>：表示 JVM 可以从类外部访问这个方法</li>
-<li><code>static</code>：表示不需要创建对象，就可以直接调用这个方法</li>
-<li><code>void</code>：表示这个方法没有返回值</li>
-<li><code>main</code>：固定的方法名，是程序入口</li>
-<li><code>String[] args</code>：命令行参数，运行程序时可以从外部传入字符串数组</li>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
 </ul>
-<p>如果少写了 <code>static</code>，或者把 <code>main</code> 写成 <code>Main</code>，都可能导致 JVM 找不到程序入口。</p>
-<h2 id="Java先编译成字节码再由JVM执行"><a href="#Java先编译成字节码再由JVM执行" class="headerlink" title="Java先编译成字节码再由JVM执行"></a>Java先编译成字节码再由JVM执行</h2><p>Java 的执行流程大致是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java  --javac编译--&gt;  HelloWorld.class  --JVM执行--&gt;  程序输出结果</span><br></pre></td></tr></table></figure>
-
-<p>这里的 <code>.class</code> 文件不是普通文本文件，而是 Java 字节码文件。JVM 可以读取字节码，然后在不同操作系统上解释执行或即时编译执行。</p>
-<p>这也是 Java 经常说的“一次编译，到处运行”的基础：只要目标机器安装了合适的 JVM，同一份 <code>.class</code> 字节码理论上就可以在不同平台运行。</p>
-<p><img src="/images/posts/2018/hello-world-2.svg" alt="class文件和JVM关系"><br><em>配图说明：class字节码文件通过JVM在不同平台运行</em></p>
-<h2 id="Windows默认GBK编码可能导致中文乱码"><a href="#Windows默认GBK编码可能导致中文乱码" class="headerlink" title="Windows默认GBK编码可能导致中文乱码"></a>Windows默认GBK编码可能导致中文乱码</h2><p>我现在主要在 Windows 环境下学习 Java。Windows 命令行默认编码经常是 GBK，而很多编辑器保存源码时默认是 UTF-8。</p>
-<p>如果源文件实际是 UTF-8，但 <code>javac</code> 按系统默认编码去读取，或者控制台用另一种编码显示，就可能出现中文乱码。最稳妥的方式是明确告诉 <code>javac</code> 源文件编码：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>这样至少编译阶段不会因为编码识别错误导致中文出问题。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="完整的HelloWorld-java代码及逐行解释"><a href="#完整的HelloWorld-java代码及逐行解释" class="headerlink" title="完整的HelloWorld.java代码及逐行解释"></a>完整的HelloWorld.java代码及逐行解释</h2><p>下面是我整理后的第一个 Java 程序，文件名必须保存为 <code>HelloWorld.java</code>。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义一个公共类，类名必须和文件名 HelloWorld.java 完全一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// Java程序入口，JVM运行程序时会从这个方法开始执行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 向控制台输出一行文本，输出结束后自动换行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;你好，Java&quot;</span>); <span class="comment">// 输出中文内容，用来测试当前编码是否正常</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>逐行理解：</p>
-<ol>
-<li><code>public class HelloWorld</code>：声明一个公共类，类名是 <code>HelloWorld</code>。</li>
-<li><code>&#123;</code> 和 <code>&#125;</code>：表示代码块的开始和结束，类和方法都需要用大括号包起来。</li>
-<li><code>public static void main(String[] args)</code>：固定格式的主方法，是 Java 程序入口。</li>
-<li><code>System.out.println(&quot;Hello World&quot;)</code>：在控制台打印 <code>Hello World</code>。</li>
-<li>每条语句末尾的分号不能省略，这是 Java 的语法要求。</li>
-</ol>
-<h2 id="javac编译和java运行的完整命令"><a href="#javac编译和java运行的完整命令" class="headerlink" title="javac编译和java运行的完整命令"></a>javac编译和java运行的完整命令</h2><p>假设当前目录下有 <code>HelloWorld.java</code> 文件，先打开命令行进入这个目录。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> D:\java-study</span><br></pre></td></tr></table></figure>
-
-<p>编译 Java 源文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>如果编译成功，命令行通常不会输出任何内容，但是目录里会多出一个文件：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.class</span><br></pre></td></tr></table></figure>
-
-<p>然后运行程序：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>注意这里运行时写的是类名 <code>HelloWorld</code>，不要写成 <code>HelloWorld.class</code>，也不要写成 <code>HelloWorld.java</code>。</p>
-<p>正常输出如下：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
-
-<p>如果担心中文编码问题，可以这样编译：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>对应输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/posts/2018/hello-world-3.svg" alt="命令行编译运行HelloWorld"><br><em>配图说明：在命令行中编译并运行HelloWorld程序</em></p>
-<h2 id="带命令行参数的版本"><a href="#带命令行参数的版本" class="headerlink" title="带命令行参数的版本"></a>带命令行参数的版本</h2><p><code>main</code> 方法里的 <code>String[] args</code> 可以接收命令行参数。为了理解它，我又写了一个版本：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义HelloWorld类，文件名仍然必须是HelloWorld.java</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// args用于接收运行程序时传入的命令行参数</span></span><br><span class="line">        <span class="keyword">if</span> (args.length == <span class="number">0</span>) &#123; <span class="comment">// 判断是否没有传入任何参数，避免直接访问数组导致异常</span></span><br><span class="line">            System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 没有参数时输出默认内容</span></span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">// 提前结束main方法，让后面的参数输出逻辑不再执行</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;收到的第一个参数是：&quot;</span> + args[<span class="number">0</span>]); <span class="comment">// 输出命令行传入的第一个参数</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>不带参数运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br></pre></td></tr></table></figure>
-
-<p>带参数运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld Java入门</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">收到的第一个参数是：Java入门</span><br></pre></td></tr></table></figure>
-
-<p>如果传入多个参数，<code>args[0]</code> 是第一个，<code>args[1]</code> 是第二个。这个地方让我想到 C 语言里的 <code>argc</code> 和 <code>argv</code>，只是 Java 把参数封装成了字符串数组。</p>
-<h2 id="使用Eclipse创建Java项目的步骤"><a href="#使用Eclipse创建Java项目的步骤" class="headerlink" title="使用Eclipse创建Java项目的步骤"></a>使用Eclipse创建Java项目的步骤</h2><p>手动编译运行理解清楚以后，也可以用 Eclipse 创建项目。Eclipse 会自动帮我们调用编译器，很多目录结构和 classpath 细节也会帮忙处理。</p>
-<p>大致步骤如下：</p>
-<ol>
-<li>打开 Eclipse。</li>
-<li>选择 <code>File</code> -&gt; <code>New</code> -&gt; <code>Java Project</code>。</li>
-<li>在 <code>Project name</code> 中输入项目名，例如 <code>HelloWorldDemo</code>。</li>
-<li>选择已经安装好的 JDK，初学阶段默认配置即可。</li>
-<li>点击 <code>Finish</code> 创建项目。</li>
-<li>在 <code>src</code> 目录上右键，选择 <code>New</code> -&gt; <code>Class</code>。</li>
-<li>在 <code>Name</code> 中输入 <code>HelloWorld</code>。</li>
-<li>勾选 <code>public static void main(String[] args)</code>，让 Eclipse 自动生成主方法。</li>
-<li>在 <code>main</code> 方法中写入输出语句。</li>
-<li>右键代码区域，选择 <code>Run As</code> -&gt; <code>Java Application</code> 运行程序。</li>
-</ol>
-<p>Eclipse 里生成的代码大概是：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// Eclipse创建的公共类，类名和文件名保持一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// 勾选主方法选项后，Eclipse会自动生成程序入口</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 在控制台输出Hello World</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/posts/2018/hello-world-4.svg" alt="Eclipse创建Java项目"><br><em>配图说明：使用Eclipse创建并运行Java项目</em></p>
-<h2 id="classpath的概念"><a href="#classpath的概念" class="headerlink" title="classpath的概念"></a>classpath的概念</h2><p><code>classpath</code> 可以简单理解为 JVM 查找 <code>.class</code> 文件的路径。</p>
-<p>我们执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>JVM 会根据 classpath 去找 <code>HelloWorld.class</code>。如果当前目录不在 classpath 中，就可能出现找不到类的错误。</p>
-<p>在简单练习时，可以在 <code>.class</code> 文件所在目录执行命令，或者显式指定 classpath：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -classpath . HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>这里的 <code>.</code> 表示当前目录。也可以写成简写形式：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> . HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>如果 class 文件放在 <code>bin</code> 目录下，可以这样运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> bin HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>初学阶段我觉得没必要一开始就背很多 classpath 的复杂规则，但至少要知道：运行 Java 程序时，JVM 必须能在 classpath 指定的位置找到对应的 <code>.class</code> 文件。</p>
-<p><img src="/images/posts/2018/hello-world-5.svg" alt="classpath查找class文件"><br><em>配图说明：JVM根据classpath查找class文件</em></p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天这个 <code>Hello World</code> 程序虽然很小，但实际把 Java 的几个基础概念都串起来了。</p>
-<p>首先，Java 的编译运行机制和 C 语言有本质区别。C 语言通常直接编译成本机平台的机器码，而 Java 是先通过 <code>javac</code> 编译成 <code>.class</code> 字节码，再交给 JVM 运行。</p>
-<p>其次，写 Java 程序时要注意文件名、类名、编码的一致性。尤其是 <code>public class HelloWorld</code> 必须放在 <code>HelloWorld.java</code> 中，中文源码最好统一使用 UTF-8，并在命令行编译时加上：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>再次，<code>main</code> 方法是 Java 程序入口，签名最好先按固定格式记住：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
-
-<p>最后，我对“一次编译，到处运行”有了更具体的理解。它不是说 Java 源文件可以直接在任何地方运行，而是说 Java 源文件编译成字节码后，可以交给不同平台上的 JVM 执行。</p>
-<p>IDE 确实能帮我们屏蔽很多细节，比如自动编译、自动设置 classpath、自动生成 main 方法。但是我觉得初学者还是应该先用命令行手动编译运行几次。这样以后 Eclipse 或其他工具报错时，不至于完全不知道底层发生了什么。</p>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
 
       
     </div>
@@ -450,7 +335,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/02/13/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95/">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/05/19/2019-05-19-Tomcat%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -468,7 +353,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/02/13/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">Java开发环境搭建记录</a>
+          <a href="/2019/05/19/2019-05-19-Tomcat%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE/" class="post-title-link" itemprop="url">Tomcat部署项目</a>
         </h2>
 
         <div class="post-meta-container">
@@ -479,7 +364,719 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2018-02-13 21:36:12" itemprop="dateCreated datePublished" datetime="2018-02-13T21:36:12+08:00">2018-02-13</time>
+      <time title="创建时间：2019-05-19 15:47:28" itemprop="dateCreated datePublished" datetime="2019-05-19T15:47:28+08:00">2019-05-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">项目实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/tomcat-deploy-cover.svg" alt="Tomcat部署项目封面图"><br><em>配图说明：Tomcat部署项目的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>把项目从本地 IDE 跑到 Tomcat 服务器上，是我第一次真正感受到部署这件事。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-05 前后学习和实践 <strong>Tomcat部署项目</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/tomcat-deploy-1.svg" alt="Tomcat部署项目流程图"><br><em>配图说明：Tomcat部署项目相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>IDE 能跑，部署到 Tomcat 就 404</li>
+<li>war 包路径和 context path 搞混</li>
+<li>端口 8080 被占用</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>部署失败多数不是代码问题，而是路径、端口、依赖、配置和运行环境不一致。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/tomcat-deploy-2.svg" alt="Tomcat部署项目排查思路图"><br><em>配图说明：围绕 Tomcat部署项目 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package</span><br><span class="line"><span class="built_in">cp</span> target/student-system.war /usr/local/tomcat/webapps/</span><br><span class="line"><span class="built_in">cd</span> /usr/local/tomcat/bin</span><br><span class="line">./startup.sh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看端口占用</span></span><br><span class="line">lsof -i:8080</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看启动日志</span></span><br><span class="line"><span class="built_in">tail</span> -f /usr/local/tomcat/logs/catalina.out</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Tomcat部署项目 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/04/14/2019-04-14-JSP%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/04/14/2019-04-14-JSP%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">JSP开发笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-14 19:52:09" itemprop="dateCreated datePublished" datetime="2019-04-14T19:52:09+08:00">2019-04-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java-Web/" itemprop="url" rel="index"><span itemprop="name">Java Web</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/jsp-notes-cover.svg" alt="JSP开发笔记封面图"><br><em>配图说明：JSP开发笔记的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>JSP 让我第一次把 Java 代码和页面展示联系起来，但也暴露了前后端混写的问题。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-04 前后学习和实践 <strong>JSP开发笔记</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/jsp-notes-1.svg" alt="JSP开发笔记流程图"><br><em>配图说明：JSP开发笔记相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>JSP 里 Java 代码越写越乱</li>
+<li>九大内置对象记不住</li>
+<li>页面跳转 forward 和 redirect 混淆</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>JSP 最终会被翻译成 Servlet，所以它本质上不是纯页面技术，而是服务端动态页面模板。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/jsp-notes-2.svg" alt="JSP开发笔记排查思路图"><br><em>配图说明：围绕 JSP开发笔记 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ page contentType=<span class="string">&quot;text/html;charset=UTF-8&quot;</span> language=<span class="string">&quot;java&quot;</span> %&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;h2&gt;学生列表&lt;/h2&gt;</span><br><span class="line">  &lt;p&gt;当前用户：$&#123;sessionScope.user.username&#125;&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">request.setAttribute(<span class="string">&quot;studentList&quot;</span>, studentService.list());</span><br><span class="line">request.getRequestDispatcher(<span class="string">&quot;/WEB-INF/views/student.jsp&quot;</span>).forward(request, response);</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 JSP开发笔记 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/03/27/2019-03-27-HTTP%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%93%8D%E5%BA%94%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/27/2019-03-27-HTTP%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%93%8D%E5%BA%94%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">HTTP请求与响应学习笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-27 22:11:37" itemprop="dateCreated datePublished" datetime="2019-03-27T22:11:37+08:00">2019-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java-Web/" itemprop="url" rel="index"><span itemprop="name">Java Web</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/http-notes-cover.svg" alt="HTTP请求与响应学习笔记封面图"><br><em>配图说明：HTTP请求与响应学习笔记的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>真正写接口之前，我发现自己必须先补上 HTTP 请求与响应这门基础课。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-03 前后学习和实践 <strong>HTTP请求与响应学习笔记</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/http-notes-1.svg" alt="HTTP请求与响应学习笔记流程图"><br><em>配图说明：HTTP请求与响应学习笔记相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>GET 和 POST 只会从表面区分</li>
+<li>状态码只认识 404 和 500</li>
+<li>请求头、响应头看不懂</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>HTTP 是浏览器和服务器之间的文本协议，方法、URL、Header、Body、状态码共同描述了一次完整交互。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/http-notes-2.svg" alt="HTTP请求与响应学习笔记排查思路图"><br><em>配图说明：围绕 HTTP请求与响应学习笔记 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/users/1</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>localhost:8080</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>application/json</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">HTTP/1.1</span> <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/json;charset=UTF-8</span><br><span class="line"></span><br><span class="line"><span class="language-json"><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Tom&quot;</span><span class="punctuation">&#125;</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST http://localhost:8080/users   -H <span class="string">&quot;Content-Type: application/json&quot;</span>   -d <span class="string">&#x27;&#123;&quot;name&quot;:&quot;Tom&quot;,&quot;age&quot;:18&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 HTTP请求与响应学习笔记 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/03/09/2019-03-09-Servlet%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/09/2019-03-09-Servlet%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">Servlet工作原理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-09 20:24:15" itemprop="dateCreated datePublished" datetime="2019-03-09T20:24:15+08:00">2019-03-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java-Web/" itemprop="url" rel="index"><span itemprop="name">Java Web</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/servlet-principle-cover.svg" alt="Servlet工作原理封面图"><br><em>配图说明：Servlet工作原理的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Servlet 是我理解 Java Web 的第一个入口，也是后面学习 Spring MVC 的基础。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-03 前后学习和实践 <strong>Servlet工作原理</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/servlet-principle-1.svg" alt="Servlet工作原理流程图"><br><em>配图说明：Servlet工作原理相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>不知道请求是怎么进入 doGet&#x2F;doPost 的</li>
+<li>Servlet 生命周期理解不清</li>
+<li>request 和 response 经常混着用</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Tomcat 接收到 HTTP 请求后，会根据 URL 映射找到对应 Servlet，再调用 service 方法，由 service 分发到 doGet 或 doPost。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/servlet-principle-2.svg" alt="Servlet工作原理排查思路图"><br><em>配图说明：围绕 Servlet工作原理 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloServlet</span> <span class="keyword">extends</span> <span class="title class_">HttpServlet</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doGet</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        response.setContentType(<span class="string">&quot;text/html;charset=UTF-8&quot;</span>);</span><br><span class="line">        response.getWriter().write(<span class="string">&quot;Hello Servlet&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doPost</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        doGet(request, response);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>helloServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>com.demo.web.HelloServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>helloServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/hello<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Servlet工作原理 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/02/17/2019-02-17-Maven%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/02/17/2019-02-17-Maven%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">Maven项目管理实践</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-02-17 16:36:21" itemprop="dateCreated datePublished" datetime="2019-02-17T16:36:21+08:00">2019-02-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">项目实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/maven-practice-cover.svg" alt="Maven项目管理实践封面图"><br><em>配图说明：Maven项目管理实践的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Maven 让我第一次感受到 Java 项目不只是写代码，还包括依赖、构建和目录约定。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-02 前后学习和实践 <strong>Maven项目管理实践</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/maven-practice-1.svg" alt="Maven项目管理实践流程图"><br><em>配图说明：Maven项目管理实践相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>jar 包版本冲突导致项目启动失败</li>
+<li>pom.xml 里 dependency 和 plugin 分不清</li>
+<li>不知道 clean、package、install 的区别</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Maven 的核心价值不是下载 jar 包，而是用约定统一项目结构、依赖关系和构建流程。pom.xml 是项目构建说明书。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/maven-practice-2.svg" alt="Maven项目管理实践排查思路图"><br><em>配图说明：围绕 Maven项目管理实践 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.demo<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>student-system<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mvn clean</span><br><span class="line">mvn compile</span><br><span class="line">mvn <span class="built_in">test</span></span><br><span class="line">mvn package</span><br><span class="line">mvn install</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Maven项目管理实践 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/" class="post-title-link" itemprop="url">Git版本控制入门</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-12 21:18:43" itemprop="dateCreated datePublished" datetime="2019-01-12T21:18:43+08:00">2019-01-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:42:27" itemprop="dateModified" datetime="2026-06-09T16:42:27+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">开发工具</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/git-intro-cover.svg" alt="Git版本控制入门封面图"><br><em>配图说明：Git版本控制入门的技术主题封面，采用本地 SVG 静态资源，避免外部图片加载失败。</em></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从手动复制代码到使用 Git 管理版本，是我在 2019 年开始项目实践时迈出的第一步。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-01 前后学习和实践 <strong>Git版本控制入门</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<p><img src="/images/posts/2019/git-intro-1.svg" alt="Git版本控制入门流程图"><br><em>配图说明：Git版本控制入门相关流程与项目实践位置示意图。</em></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>不知道 add、commit、push 分别做了什么</li>
+<li>误把 target 和 .class 文件提交到了仓库</li>
+<li>合并代码时出现冲突，不敢随便改</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Git 本质上是在本地维护一个对象数据库，工作区、暂存区、本地仓库、远程仓库是四个不同层次。理解这几层之后，很多命令就不再是死记硬背。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<p><img src="/images/posts/2019/git-intro-2.svg" alt="Git版本控制入门排查思路图"><br><em>配图说明：围绕 Git版本控制入门 的常见问题排查路径。</em></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初始化仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看状态</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加到暂存区</span></span><br><span class="line">git add src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库</span></span><br><span class="line">git commit -m <span class="string">&quot;feat: add user module&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关联远程仓库并推送</span></span><br><span class="line">git remote add origin https://github.com/example/demo.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">target/</span><br><span class="line">*.class</span><br><span class="line">*.log</span><br><span class="line">.idea/</span><br><span class="line">*.iml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 解决冲突后的常见流程</span></span><br><span class="line">git pull origin master</span><br><span class="line"><span class="comment"># 手动编辑冲突文件</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;fix: resolve merge conflict&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Git版本控制入门 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">2018年度学习总结</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-30 23:47:08" itemprop="dateCreated datePublished" datetime="2018-12-30T23:47:08+08:00">2018-12-30</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -494,7 +1091,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
         </span>
     </span>
 
@@ -508,110 +1105,523 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年春节回来，我下定决心从 C 语言转向 Java 后端开发。上学时学过一点 C 语言，顶多写过一些控制台排序算法，对”企业级开发”完全没概念。周围同学有搞 PHP 的，有搞 Python 的，选 Java 主要是看中了它的就业面广、生态成熟。</p>
-<p>当时手头参考资料主要是两样：<strong>廖雪峰的 Java 教程</strong>（在线版）和 <strong>《Head First Java》</strong> 这本经典入门书。廖雪峰的教程偏实战，直接讲 Eclipse 怎么配、Maven 怎么用，而 Head First 用大量插图讲面向对象思想，两本搭配着看效果不错。</p>
-<p>因为之前只用过 Code::Blocks 写 C 语言，对 JDK、JRE、IDE 这些概念完全分不清，所以第一步搭建环境就折腾了好几天。</p>
-<p><img src="/images/posts/2018/java-setup-1.svg" alt="JDK下载页面"><br><em>Oracle 官网 JDK 8 下载页面</em></p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><h3 id="1-JDK-版本选择困难"><a href="#1-JDK-版本选择困难" class="headerlink" title="1. JDK 版本选择困难"></a>1. JDK 版本选择困难</h3><p>当时 Oracle 在 2017 年 9 月刚发布了 JDK 9，官网上最显眼的位置就是 JDK 9 的下载链接。JDK 8 要往下翻半天才能找到。作为新手真的纠结了很久——装新不装旧？但是网上搜了一圈，几乎所有教程都在说 JDK 8 是 LTS（长期支持版本），更稳定，企业里用的最多。廖雪峰的教程里也明确写了建议用 JDK 8。最后还是选了 JDK 8u161。</p>
-<h3 id="2-环境变量配置后还是找不到-java-命令"><a href="#2-环境变量配置后还是找不到-java-命令" class="headerlink" title="2. 环境变量配置后还是找不到 java 命令"></a>2. 环境变量配置后还是找不到 java 命令</h3><p>这是我踩的第一个坑。按照教程配置了 <code>JAVA_HOME</code>、<code>Path</code>、<code>CLASSPATH</code>，打开新命令行窗口输入 <code>java -version</code>，结果报：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;java&#x27; 不是内部或外部命令，也不是可运行的程序或批处理文件。</span><br></pre></td></tr></table></figure>
+          <p>现在是 2018 年 12 月 30 日深夜，窗外很安静，桌面上摊着几本书、一杯凉掉的咖啡、开着 IDE 的屏幕。刚刚跑通了一个 Spring 的小 Demo，不算什么了不起的东西，但我盯着控制台里那几行日志，愣是坐了好一会儿。</p>
+<p>总觉得该写点什么，为这一年。</p>
+<p>回头看，2018 年是我真正踏进编程世界的第一年。从连编辑器都不会配，到能用 Java 写点能跑的东西，这三百多天走得七拐八拐，中间有好几次差点放弃。趁着跨年前这个安静的夜晚，把这一年的路好好捋一捋。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 1 月，我坐在电脑前打开了一本 C 语言的电子书，那是我和编程的第一次正式见面。</p>
+<p>在此之前，我对编程的全部认知大概就是——很酷、很复杂、不适合我。高考报志愿时阴差阳错进了计算机相关专业，大一上学期懵懵懂懂地过了，真正开始认真对待，就是从 2018 年开始的。</p>
+<p>最开始学的是 C 语言，指针、内存管理、结构体——说实话，学得挺痛苦的。尤其是指针，绕来绕去，debug 的时候经常对着一个段错误发呆半小时。但也正因为 C 的硬核，让我对内存、对程序的底层运行有了一点感觉。</p>
+<p>到了三四月份，我开始纠结一个问题：C 语言当然好，但它适合作为长期深耕的方向吗？当时打听了不少学长，也刷了很多帖子，结论是——Java 在后端领域生态成熟、岗位多、学习路径清晰。于是我做了一个重要的决定：转学 Java。</p>
+<p>这个决定，基本定义了我整个 2018 年剩下的路。</p>
+<p><img src="/images/posts/2018/year-review-1.svg" alt="2018 年 Java 后端学习路线图"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>目标定下来之后，真正走起来才发现，问题一个接一个。</p>
+<h2 id="1-学习路线不清晰，走了不少弯路"><a href="#1-学习路线不清晰，走了不少弯路" class="headerlink" title="1. 学习路线不清晰，走了不少弯路"></a>1. 学习路线不清晰，走了不少弯路</h2><p>网上关于 Java 学习的资料和路线图很多，但信息多到让人不知道该信谁。今天看到一个博客说先学 Java SE，明天又有人说直接上手 Spring Boot。我是那种喜欢把”所有前置知识”都学完再做事情的人，结果就是在基础语法阶段兜兜转转了太久。</p>
+<h2 id="2-光看不练，眼高手低"><a href="#2-光看不练，眼高手低" class="headerlink" title="2. 光看不练，眼高手低"></a>2. 光看不练，眼高手低</h2><p>这是我这一年最大的毛病。</p>
+<p>看书的时候觉得自己都懂了——不就是面向对象吗，不就是集合框架吗，有什么难的。但是合上书，打开 IDE，写一个简单的增删改查都要查半天 API。印象最深的是学完 HashMap 原理之后，自己试着实现一个简化版本，写到一半发现根本不知道从哪里下手。这才意识到，”看懂”和”会写”之间隔着十万行代码的距离。</p>
+<h2 id="3-遇到问题不敢问"><a href="#3-遇到问题不敢问" class="headerlink" title="3. 遇到问题不敢问"></a>3. 遇到问题不敢问</h2><p>当时加了一些技术群，也在论坛上潜水。遇到问题第一反应不是去问，而是反复怀疑自己是不是太笨了——这么基础的东西都不懂。于是经常一个人卡在一个小 bug 上几个小时，浪费大量时间。后来才明白，每个经历过自学的人都是从这些坑里爬出来的，问问题不是丢人的事。</p>
+<h2 id="4-博客看得多，写得少"><a href="#4-博客看得多，写得少" class="headerlink" title="4. 博客看得多，写得少"></a>4. 博客看得多，写得少</h2><p>我的浏览器书签里收藏了上百篇文章，从 HashMap 源码分析到 JVM 内存模型，应有尽有。每天刷好几篇，刷完觉得充实。但一个月后回头看，脑子里能留下的印象很模糊。因为光看不写，知识的留存率太低了。</p>
+<h2 id="5-时间管理不好，经常拖延"><a href="#5-时间管理不好，经常拖延" class="headerlink" title="5. 时间管理不好，经常拖延"></a>5. 时间管理不好，经常拖延</h2><p>“今天太累了，明天再看吧”——这句话几乎是我上半年的口头禅。没有固定的学习时间，没有计划，全凭热情驱动。热情高的时候一天学八个小时，没状态的时候一周都不碰代码。这种节奏非常低效。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>后来我慢慢想明白了这些问题的根因，也在下半年做了一些调整。</p>
+<h2 id="学习规划的重要性"><a href="#学习规划的重要性" class="headerlink" title="学习规划的重要性"></a>学习规划的重要性</h2><p>没有规划的学习就像没有地图的旅行。知识海洋是无限的，但个人的时间和精力是有限的。后来我给自己定了一条原则：选定一个方向，找到一条被验证过的路线，先踏踏实实走完，不要中途反复切换赛道。</p>
+<h2 id="编程是手艺活"><a href="#编程是手艺活" class="headerlink" title="编程是手艺活"></a>编程是手艺活</h2><p>我越来越理解一个道理：编程像学游泳，你看再多教学视频，不下水就永远学不会。代码必须亲手敲，bug 必须亲自查，项目必须亲手做。任何一个你”觉得”懂了但写不出来的知识点，都说明你还没真正掌握它。</p>
+<p>后来我强迫自己每学一个新知识点，就写一段代码验证它，哪怕只是一个十行的小 demo。</p>
+<h2 id="社区和交流的价值"><a href="#社区和交流的价值" class="headerlink" title="社区和交流的价值"></a>社区和交流的价值</h2><p>下半年我开始尝试在群里发言，偶尔回答一些别人提的问题。我发现教是最好的学——为了回答一个问题，你往往需要把那个知识点重新梳理一遍，这个过程本身就是一次高质量复习。而且当你发现别人也会犯和你一样的错误时，那种”只有我不行”的焦虑感会少很多。</p>
+<h2 id="写作是深度学习的加速器"><a href="#写作是深度学习的加速器" class="headerlink" title="写作是深度学习的加速器"></a>写作是深度学习的加速器</h2><p>十月份开始写博客之后，我明显感觉到自己对知识的理解深了一层。因为要把一个东西讲清楚，你必须先把它真正搞懂。写作强迫你梳理逻辑、查漏补缺、用自己的语言重新表达。这个过程比单纯地读十篇文章都有效。</p>
+<h2 id="固定学习节奏"><a href="#固定学习节奏" class="headerlink" title="固定学习节奏"></a>固定学习节奏</h2><p>下半年我开始用番茄工作法，每 25 分钟专注学习，然后休息 5 分钟。同时给自己定了规矩：每天晚上 8 点到 10 点是固定学习时间，雷打不动。效果比”等我有时间了再学”好太多。</p>
+<p><img src="/images/posts/2018/year-review-2.svg" alt="时间管理与学习方法示意图"></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>说是解决方案，其实没有那么多方法论。就是一个普通人在跌跌撞撞中，按季度一步步走过来的真实记录。</p>
+<h2 id="Q1（1-3-月）：C-语言入门，决定转-Java"><a href="#Q1（1-3-月）：C-语言入门，决定转-Java" class="headerlink" title="Q1（1-3 月）：C 语言入门，决定转 Java"></a>Q1（1-3 月）：C 语言入门，决定转 Java</h2><p>年初从 C 语言开始，把指针、数组、结构体这些基础概念过了一遍。过程中有过一点小小的成就感——当第一个指针程序运行正确的时候，那种感觉确实很奇妙。但也逐渐意识到，C 语言在应用层面的天花板比较低，对我来说更适合作为理解计算机底层的基础，而不是长期主攻方向。</p>
+<p>三月份做了全年最重要的决定：转向 Java。</p>
+<p>这个决定不是一时冲动。当时花了一周时间调研，看了很多自学路线帖和招聘要求，确认 Java 在服务端开发中的地位和前景。确定了方向之后，整个人的心态反而安定下来了——不再东张西望，就朝这一个方向走。</p>
+<p>接着就是搭环境。JDK 安装、环境变量配置、第一个 IDE（Eclipse）的安装和使用。这些现在看来基础得不能再基础的操作，当时每一步都可能卡住。JDK 版本选哪个？环境变量配不对怎么办？Eclipse 为什么打不开？每一个问题都要查好久。</p>
+<p>当 Hello World 终于出现在控制台的时候，我截图发了个朋友圈。虽然现在想来有点好笑，但那一刻真的觉得——这个大门，我算是挤进来了。</p>
+<h2 id="Q2（4-6-月）：Java-语法基础"><a href="#Q2（4-6-月）：Java-语法基础" class="headerlink" title="Q2（4-6 月）：Java 语法基础"></a>Q2（4-6 月）：Java 语法基础</h2><p>第二季度是大量输入基础知识的时候。</p>
+<p>从基本数据类型、运算符、流程控制开始，然后是面向对象三大特性——封装、继承、多态。这些东西第一次接触时确实觉得抽象，尤其是多态，学完之后做题会做，但问自己”多态在实际项目中有什么用”就答不上来。后来才明白，有些东西的理解是分阶段的——先记住，然后在使用中慢慢感受。</p>
+<p>五月份学到集合框架。ArrayList、LinkedList、HashSet、HashMap——每个实现类都过了一遍，大概理解了接口和实现分离的设计思想。</p>
+<p>这三个月基本是靠看书 + 看视频 + 敲 demo 过来的。节奏不算快，但比较扎实。每学完一个章节，就把书上的代码亲手敲一遍，改一改，看输出有什么变化。</p>
+<h2 id="Q3（7-9-月）：深入-Java，完成第一个小项目"><a href="#Q3（7-9-月）：深入-Java，完成第一个小项目" class="headerlink" title="Q3（7-9 月）：深入 Java，完成第一个小项目"></a>Q3（7-9 月）：深入 Java，完成第一个小项目</h2><p>暑假是全年学习效率最高的一段时间。</p>
+<p>七月啃 HashMap。那时候看了好几篇源码分析的文章，自己也把源码拉下来断点跟踪。虽然当时对红黑树的理解还很浅，但至少搞清楚了哈希冲突怎么解决、扩容机制是怎么回事。也在这个月第一次写博客——<a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/07/22/HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">HashMap 基础学习</a>，写得很浅，但迈出了第一步。</p>
+<p>八月学异常处理机制，写了 <a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/08/19/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">Java 异常处理机制</a>。然后开始学 JDBC，这是第一次把 Java 和数据库联系起来，写了篇文章 <a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/09/15/JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/">JDBC 连接 MySQL 实践</a>。</p>
+<p>九月最重要的事情是完成了第一个完整的 Java 小项目——学生管理系统。</p>
+<p>说是系统，其实就是一个控制台程序：从 MySQL 里读取学生数据，展示在控制台上，支持增删改查。技术上没什么难度，但对我来说意义很大——我第一次经历了”从零开始分析需求、设计数据结构、写代码、调试、最终跑通”的完整流程。也正是在这个项目里，我初次感受到了写代码的快感。</p>
+<h2 id="Q4（10-12-月）：数据库、Linux、Spring-入门"><a href="#Q4（10-12-月）：数据库、Linux、Spring-入门" class="headerlink" title="Q4（10-12 月）：数据库、Linux、Spring 入门"></a>Q4（10-12 月）：数据库、Linux、Spring 入门</h2><p>第四季度开始进一步拓展广度。</p>
+<p>MySQL 部分不再满足于基本的 CRUD，开始深入学习表设计、索引、事务隔离级别。也正是在这个过程中，我才理解了为什么三范式、为什么加索引、什么时候用 InnoDB 什么时候用 MyISAM。</p>
+<p>十一月开始接触 Linux。装了一个虚拟机，装 CentOS，学着用命令行操作文件、配置网络、装软件。一开始觉得没有图形界面很不习惯，但后来慢慢体会到了命令行的高效。这期间也学会了搭 Nginx 和部署简单项目。</p>
+<p>十二月的关键词是 Spring。终于在年底正式接触到了这个如雷贯耳的框架。从 IoC（控制反转）和 DI（依赖注入）的概念开始，慢慢理解为什么 Spring 能让代码变得松耦合。十二月中旬跑通了第一个 Spring 项目，虽然只是配置了几个 Bean，做了最简单的依赖注入，但那种”原来框架是这样工作的”的感觉让我兴奋了好几天。</p>
+<h2 id="2019-年计划"><a href="#2019-年计划" class="headerlink" title="2019 年计划"></a>2019 年计划</h2><p>坐在 2018 年的尾巴上，对明年有一些想法：</p>
+<ul>
+<li><strong>框架学习</strong>：把 SSM（Spring + SpringMVC + MyBatis）这个组合啃下来，搭建一个完整的 Web 项目</li>
+<li><strong>Redis</strong>：学习缓存，理解 NoSQL 的适用场景</li>
+<li><strong>项目实战</strong>：不再满足于 demo 和小工具，至少做一个拿得出手的完整项目</li>
+<li><strong>坚持写博客</strong>：把学到的东西沉淀下来，不管写得好不好，先写</li>
+<li><strong>更多交流</strong>：尝试去回答别人提出的问题，在社区中参与讨论</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>2018 年结束了。</p>
+<p>这一年走过的路，用代码来表达大概是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class Year2018 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int totalDays = 365;</span><br><span class="line">        int learningDays = 250;     // 翻书 + 看视频</span><br><span class="line">        int codingDays = 150;       // 亲手写代码</span><br><span class="line">        int projectCount = 1;       // 第一个完整项目</span><br><span class="line">        int blogCount = 5;          // 这一年写的博客</span><br><span class="line">        int debugErrors = 999;      // 记不清的错误次数，上不封顶</span><br><span class="line"></span><br><span class="line">        String result = (codingDays &gt; 0 &amp;&amp; projectCount &gt; 0)</span><br><span class="line">            ? &quot;入门成功&quot; : &quot;仍需努力&quot;;</span><br><span class="line">        System.out.println(&quot;2018年结果：&quot; + result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>当时心态有点崩，明明按照步骤一步一步来的啊。来来回回检查了好几遍才发现问题。</p>
-<h3 id="3-Eclipse-启动报错"><a href="#3-Eclipse-启动报错" class="headerlink" title="3. Eclipse 启动报错"></a>3. Eclipse 启动报错</h3><p>装好 JDK 后下载了 Eclipse Oxygen（当时的最新版），结果双击启动图标直接弹出一个错误对话框：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Failed to create the Java Virtual Machine</span><br></pre></td></tr></table></figure>
-
-<p>一脸懵，刚装好的环境怎么就起不来？</p>
-<p><img src="/images/posts/2018/java-setup-2.svg" alt="Eclipse JVM 错误弹窗"><br><em>Eclipse 启动时提示 JVM 创建失败</em></p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>回过头来分析这几个问题，其实都不复杂，但对新手来说每个都是拦路虎。</p>
-<h3 id="JDK-版本"><a href="#JDK-版本" class="headerlink" title="JDK 版本"></a>JDK 版本</h3><p>JDK 9 引入了模块化系统（Jigsaw），算是一次比较大的架构变动。虽然新特性很吸引人，但 LTS 版本更稳妥这个道理现在懂了。JDK 8 一直到 2018 年初都还是绝对的主流，公司项目基本都在用，遇到问题网上也更容易找到解决方案。</p>
-<h3 id="环境变量问题"><a href="#环境变量问题" class="headerlink" title="环境变量问题"></a>环境变量问题</h3><p>仔细排查后发现是犯了两个低级错误：</p>
-<ol>
-<li><p><strong>路径多了尾部斜杠</strong>：配置 <code>JAVA_HOME</code> 时写成了 <code>C:\Program Files\Java\jdk1.8.0_161\</code>（多了反斜杠），导致 <code>%JAVA_HOME%\bin</code> 解析出来变成了 <code>C:\Program Files\Java\jdk1.8.0_161\\bin</code>，双斜杠导致路径无效。</p>
-</li>
-<li><p><strong>配置后没重新打开命令行</strong>：环境变量改了之后，已经打开的命令行窗口不会自动刷新，需要关掉重新打开。</p>
-</li>
-</ol>
-<h3 id="Eclipse-JVM-参数"><a href="#Eclipse-JVM-参数" class="headerlink" title="Eclipse JVM 参数"></a>Eclipse JVM 参数</h3><p>打开 Eclipse 安装目录下的 <code>eclipse.ini</code> 看了下，默认配置是这样的：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx1024m</span><br></pre></td></tr></table></figure>
-
-<p>我的笔记本当时只有 4GB 内存，系统和其他软件占掉一大半，Eclipse 默认的 <code>-Xmx1024m</code>（最大堆内存 1024MB）对这台机器来说太大了，JVM 启动时分配不到足够的连续内存空间，所以直接崩了。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h3 id="第一步：安装-JDK-8u161"><a href="#第一步：安装-JDK-8u161" class="headerlink" title="第一步：安装 JDK 8u161"></a>第一步：安装 JDK 8u161</h3><p>从 Oracle 官网下载了 <code>jdk-8u161-windows-x64.exe</code>，双击安装，安装路径选择默认的 <code>C:\Program Files\Java\jdk1.8.0_161</code>。安装过程中会同时安装 JRE，一路下一步就好。</p>
-<h3 id="第二步：配置环境变量"><a href="#第二步：配置环境变量" class="headerlink" title="第二步：配置环境变量"></a>第二步：配置环境变量</h3><p>在 Windows 10 中按 <code>Win + R</code> 输入 <code>sysdm.cpl</code>，在”高级”选项卡里点击”环境变量”，分别配置以下三个变量：</p>
-<h4 id="新建系统变量：JAVA-HOME"><a href="#新建系统变量：JAVA-HOME" class="headerlink" title="新建系统变量：JAVA_HOME"></a>新建系统变量：JAVA_HOME</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">变量名：JAVA_HOME</span><br><span class="line">变量值：C:\Program Files\Java\jdk1.8.0_161</span><br></pre></td></tr></table></figure>
-
-<h4 id="编辑系统变量：Path"><a href="#编辑系统变量：Path" class="headerlink" title="编辑系统变量：Path"></a>编辑系统变量：Path</h4><p>在 Path 变量的值末尾追加（注意分号分隔）：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%JAVA_HOME%\bin</span><br></pre></td></tr></table></figure>
-
-<h4 id="新建系统变量：CLASSPATH（可选）"><a href="#新建系统变量：CLASSPATH（可选）" class="headerlink" title="新建系统变量：CLASSPATH（可选）"></a>新建系统变量：CLASSPATH（可选）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">变量名：CLASSPATH</span><br><span class="line">变量值：.;%JAVA_HOME%\lib\dt.jar;%JAVA_HOME%\lib\tools.jar</span><br></pre></td></tr></table></figure>
-
+<p>代码不会骗人。这一年的输入和输出清清楚楚地写在上面。</p>
+<p>关于心态的变化可能比知识的增长更重要。年初的时候我总觉得编程是一件需要天赋的事情，那些写框架的人、做开源项目的人，一定天生就比普通人聪明。现在我不这么认为了。我看到的所有”厉害的人”，不过是在你看不到的地方，花了你想象不到的时间。</p>
+<p>编程是一种技能，技能是可以靠持续练习获得的。这一年教会我最大的道理就是：<strong>不要高估一天能学到的东西，不要低估一年能积累的东西。</strong></p>
+<p>当然也有遗憾。有些知识点学得不够深入，很多 bug 挡了一下就绕过去了，没有彻底搞清楚根源。有些计划中的书没看完，有些想写的博客没来得及写。</p>
+<p>但没关系。2019 年还会继续。</p>
+<p>最后的最后，用一句话总结这个深夜的感慨吧：</p>
 <blockquote>
-<p>注意前面那个点号 <code>.</code> 代表当前目录，必须要加。</p>
+<p>这一年，从 Hello World 写到了 Spring 容器；从对着控制台发呆，到享受 Debug 通过那一刻的畅快。路还很长，但至少，我开始享受写代码这件事了。</p>
 </blockquote>
-<p><img src="/images/posts/2018/java-setup-3.svg" alt="环境变量配置界面"><br><em>Windows 10 环境变量配置窗口</em></p>
-<h3 id="第三步：验证安装"><a href="#第三步：验证安装" class="headerlink" title="第三步：验证安装"></a>第三步：验证安装</h3><p>配置完成后，重新打开一个命令行窗口，依次输入以下命令验证：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\chenzixin&gt; java -version</span><br><span class="line">java version <span class="string">&quot;1.8.0_161&quot;</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_161-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)</span><br><span class="line"></span><br><span class="line">C:\Users\chenzixin&gt; javac -version</span><br><span class="line">javac 1.8.0_161</span><br></pre></td></tr></table></figure>
+<p>2019，继续写下去。</p>
 
-<p>看到这个输出时心里踏实了不少，说明 JDK 安装和环境变量都生效了。</p>
-<h3 id="第四步：编写第一个-Java-程序"><a href="#第四步：编写第一个-Java-程序" class="headerlink" title="第四步：编写第一个 Java 程序"></a>第四步：编写第一个 Java 程序</h3><p>在 <code>D:\JavaWorkspace</code> 目录下新建 <code>Test.java</code>：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello Java! 环境搭建成功！&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;JDK 版本: &quot;</span> + System.getProperty(<span class="string">&quot;java.version&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
 
-<p>在命令行中编译和运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">D:\JavaWorkspace&gt; javac Test.java</span><br><span class="line"></span><br><span class="line">D:\JavaWorkspace&gt; java Test</span><br><span class="line">Hello Java! 环境搭建成功！</span><br><span class="line">JDK 版本: 1.8.0_161</span><br></pre></td></tr></table></figure>
+    
+    
+    
 
-<p>第一个 Java 程序跑起来的那一刻，感觉之前折腾的这几天的辛苦都值了。</p>
-<h3 id="第五步：安装-Eclipse-并调整-JVM-参数"><a href="#第五步：安装-Eclipse-并调整-JVM-参数" class="headerlink" title="第五步：安装 Eclipse 并调整 JVM 参数"></a>第五步：安装 Eclipse 并调整 JVM 参数</h3><p>下载 Eclipse IDE for Java Developers（Oxygen 版本），解压到 <code>D:\eclipse</code>。</p>
-<p>打开 <code>D:\eclipse\eclipse.ini</code>，找到 JVM 参数相关配置，修改前：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx1024m</span><br></pre></td></tr></table></figure>
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
 
-<p>修改后：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx512m</span><br></pre></td></tr></table></figure>
 
-<p>只改了一处——把 <code>-Xmx</code> 从 <code>1024m</code> 降到了 <code>512m</code>。改完后重启 Eclipse，顺利启动成功。</p>
-<p><img src="/images/posts/2018/java-setup-4.svg" alt="Eclipse Oxygen 工作台界面"><br><em>Eclipse Oxygen 启动后的欢迎界面</em></p>
-<h3 id="第六步：配置-Eclipse-的-Workspace"><a href="#第六步：配置-Eclipse-的-Workspace" class="headerlink" title="第六步：配置 Eclipse 的 Workspace"></a>第六步：配置 Eclipse 的 Workspace</h3><p>我选择了 <code>D:\JavaWorkspace</code> 作为工作空间目录，然后在 Eclipse 中配置已安装的 JDK：</p>
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/" class="post-title-link" itemprop="url">Linux常用命令整理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-18 15:52:31" itemprop="dateCreated datePublished" datetime="2018-11-18T15:52:31+08:00">2018-11-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index"><span itemprop="name">Linux运维</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018年双十一刚过，项目终于要部署上线了。公司买了两台阿里云ECS服务器，操作系统是CentOS 7.4。作为一个从大学到现在一直在Windows环境下写代码的.NET程序员，听到”部署到Linux服务器”这几个字时，内心是拒绝的。</p>
+<p>之前对Linux的印象停留在”黑乎乎的命令行窗口，一堆看不懂的英文字母”。但项目不等人，硬着头皮上吧。花了大概两周时间边查边练，把日常运维常用的Linux命令过了一遍，这篇文章就是这段时间的学习笔记。</p>
+<p><img src="/images/posts/2018/linux-cli-1.svg" alt="Linux终端界面"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚接手Linux服务器时，遇到了一堆”小白问题”，说来有点丢人但确实很真实：</p>
+<p><strong>1. 文件权限看不懂</strong></p>
+<p><code>ls -l</code> 输出了一堆 <code>drwxr-xr-x</code> 这样的东西，完全不知道什么意思。想给文件加执行权限，百度了半天才找到 <code>chmod 777</code>，但到底什么是”777”也说不清楚。</p>
+<p><strong>2. vim编辑器不会用</strong></p>
+<p>用 <code>vi</code> 打开文件后，发现打不了字，想退出却退不出来，最后直接关了终端。后来才知道 vim 有三种模式，退出要用 <code>:q</code>。</p>
+<p><strong>3. 进程查不到</strong></p>
+<p>程序跑起来后不知道在哪看，Windows 有任务管理器，Linux 呢？程序挂了也不知道为什么挂的。</p>
+<p><strong>4. 磁盘满了不知道清哪里</strong></p>
+<p>有一天数据库写不进去了，排查半天发现是磁盘满了。但日志文件、临时文件散落在各个目录，不知道从哪里开始清理。</p>
+<p><strong>5. 日志文件太大查看困难</strong></p>
+<p>Java 应用的日志文件动辄几百兆甚至几个G，用记事本打开直接卡死。想查最新的报错信息，总不能把整个文件拖下来吧。</p>
+<p><strong>6. 端口被占用不知道怎么查</strong></p>
+<p>Tomcat 启动报错 <code>Address already in use</code>，知道是端口被占了，但不知道被哪个程序占了，也不知道怎么杀掉它。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>遇到这些问题后，我花了一些时间理解了 Linux 的几个核心概念，这些概念是后续学习命令的基础。</p>
+<h3 id="Linux-一切皆文件"><a href="#Linux-一切皆文件" class="headerlink" title="Linux 一切皆文件"></a>Linux 一切皆文件</h3><p>这是 Linux 最核心的设计哲学。普通文件是文件，目录是文件，设备是文件，甚至是进程信息、网络连接都被抽象成了文件。理解了这一点，就能理解为什么 Linux 有那么多文件操作命令了。</p>
+<h3 id="权限的-rwx-表示法"><a href="#权限的-rwx-表示法" class="headerlink" title="权限的 rwx 表示法"></a>权限的 rwx 表示法</h3><p><code>rwx</code> 分别代表：</p>
+<ul>
+<li><code>r</code>（read）：读取权限，值为 4</li>
+<li><code>w</code>（write）：写入权限，值为 2</li>
+<li><code>x</code>（execute）：执行权限，值为 1</li>
+</ul>
+<p>权限分三组，每组三个字符：<strong>所有者&#x2F;所属组&#x2F;其他人</strong>。所以 <code>rwxr-xr-x</code> 表示：所有者可读写执行，所属组可读执行，其他人可读执行。</p>
+<p>而 <code>chmod 755</code> 中的 755，就是用数字表示的权限：</p>
+<ul>
+<li>7 &#x3D; 4+2+1 &#x3D; rwx（所有者）</li>
+<li>5 &#x3D; 4+0+1 &#x3D; r-x（所属组）</li>
+<li>5 &#x3D; 4+0+1 &#x3D; r-x（其他人）</li>
+</ul>
+<h3 id="vim-的三种模式"><a href="#vim-的三种模式" class="headerlink" title="vim 的三种模式"></a>vim 的三种模式</h3><p>刚接触 vim 时觉得这编辑器反人类，理解了三种模式后就豁然开朗了：</p>
+<ul>
+<li><strong>命令模式</strong>：刚进入 vim 时的模式，可以复制粘贴删除，但<strong>不能输入文字</strong></li>
+<li><strong>插入模式</strong>：按 <code>i</code> 进入，这个模式才能正常打字</li>
+<li><strong>末行模式</strong>：按 <code>:</code> 进入，用来保存退出、搜索替换</li>
+</ul>
+<p>三种模式切换搞明白后，vim 就好用多了。</p>
+<h3 id="进程管理思路"><a href="#进程管理思路" class="headerlink" title="进程管理思路"></a>进程管理思路</h3><p>Linux 的进程管理不像 Windows 那样可视化，但命令行的方式其实更灵活：</p>
+<ul>
+<li><code>ps</code> 查看静态进程快照</li>
+<li><code>top</code> 查看动态进程信息（相当于任务管理器）</li>
+<li><code>kill</code> 发送信号给进程</li>
+</ul>
+<h3 id="磁盘查看思路"><a href="#磁盘查看思路" class="headerlink" title="磁盘查看思路"></a>磁盘查看思路</h3><ul>
+<li><code>df</code> 从宏观角度查看磁盘整体使用情况</li>
+<li><code>du</code> 从微观角度查看具体目录&#x2F;文件占用空间</li>
+</ul>
+<h3 id="日志查看三板斧"><a href="#日志查看三板斧" class="headerlink" title="日志查看三板斧"></a>日志查看三板斧</h3><p>大文件用编辑器打开是不现实的，Linux 提供了三个利器：</p>
+<ul>
+<li><code>tail</code>：从尾部看，适合看最新的日志</li>
+<li><code>grep</code>：按关键字过滤，适合搜索特定错误</li>
+<li><code>less</code>：分页查看，适合在文件中上下翻阅</li>
+</ul>
+<h3 id="端口查看思路"><a href="#端口查看思路" class="headerlink" title="端口查看思路"></a>端口查看思路</h3><ul>
+<li><code>netstat</code>：查看网络连接状态</li>
+<li><code>lsof</code>：查看打开的文件（一切皆文件，网络连接也是文件）</li>
+</ul>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>下面按场景分类整理常用命令，每个分类给出常用命令和实际运维示例。</p>
+<h3 id="一、文件目录操作"><a href="#一、文件目录操作" class="headerlink" title="一、文件目录操作"></a>一、文件目录操作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看目录内容</span></span><br><span class="line"><span class="built_in">ls</span>                    <span class="comment"># 列出当前目录文件</span></span><br><span class="line"><span class="built_in">ls</span> -l                 <span class="comment"># 详细列表（显示权限、大小、修改时间）</span></span><br><span class="line"><span class="built_in">ls</span> -a                 <span class="comment"># 显示隐藏文件（以.开头的文件）</span></span><br><span class="line"><span class="built_in">ls</span> -lh                <span class="comment"># 以人类可读方式显示大小（K、M、G）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 目录切换</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local         <span class="comment"># 进入指定目录</span></span><br><span class="line"><span class="built_in">cd</span> ~                  <span class="comment"># 进入home目录</span></span><br><span class="line"><span class="built_in">cd</span> -                  <span class="comment"># 返回上一个目录</span></span><br><span class="line"><span class="built_in">cd</span> ..                 <span class="comment"># 返回上级目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建和删除</span></span><br><span class="line"><span class="built_in">mkdir</span> myapp           <span class="comment"># 创建目录</span></span><br><span class="line"><span class="built_in">mkdir</span> -p a/b/c        <span class="comment"># 递归创建多级目录</span></span><br><span class="line"><span class="built_in">touch</span> README.md       <span class="comment"># 创建空文件</span></span><br><span class="line"><span class="built_in">cp</span> app.conf app.conf.bak    <span class="comment"># 复制文件</span></span><br><span class="line"><span class="built_in">cp</span> -r webapp/ webapp_bak/   <span class="comment"># 递归复制目录</span></span><br><span class="line"><span class="built_in">mv</span> app.conf /tmp/     <span class="comment"># 移动文件</span></span><br><span class="line"><span class="built_in">mv</span> oldname newname    <span class="comment"># 重命名文件</span></span><br><span class="line"><span class="built_in">rm</span> temp.txt           <span class="comment"># 删除文件（不会进回收站，直接删）</span></span><br><span class="line"><span class="built_in">rm</span> -rf logs/          <span class="comment"># 递归强制删除目录（慎用！）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查找文件</span></span><br><span class="line">find / -name <span class="string">&quot;*.log&quot;</span>                   <span class="comment"># 从根目录找所有.log文件</span></span><br><span class="line">find /var/log -mtime -7                <span class="comment"># 查找7天内修改过的文件</span></span><br><span class="line">find . -size +100M                     <span class="comment"># 查找当前目录下大于100M的文件</span></span><br><span class="line">find . -name <span class="string">&quot;*.tmp&quot;</span> -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;    <span class="comment"># 查找并删除临时文件</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：查找并清理大文件</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找根目录下大于500M的文件，按大小排序</span></span><br><span class="line">find / -<span class="built_in">type</span> f -size +500M -<span class="built_in">exec</span> <span class="built_in">ls</span> -lh &#123;&#125; \; 2&gt;/dev/null | awk <span class="string">&#x27;&#123;print $5, $NF&#125;&#x27;</span> | <span class="built_in">sort</span> -rh</span><br><span class="line"></span><br><span class="line"><span class="comment"># 清理7天前的日志文件</span></span><br><span class="line">find /var/log/myapp/ -name <span class="string">&quot;*.log&quot;</span> -mtime +7 -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、文件查看与搜索"><a href="#二、文件查看与搜索" class="headerlink" title="二、文件查看与搜索"></a>二、文件查看与搜索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看文件内容</span></span><br><span class="line"><span class="built_in">cat</span> README.md               <span class="comment"># 显示整个文件（适合小文件）</span></span><br><span class="line"><span class="built_in">cat</span> -n app.log              <span class="comment"># 显示行号</span></span><br><span class="line">less app.log                <span class="comment"># 分页查看（按空格翻页，按q退出）</span></span><br><span class="line"><span class="built_in">head</span> -20 app.log            <span class="comment"># 查看前20行</span></span><br><span class="line"><span class="built_in">tail</span> -100 app.log           <span class="comment"># 查看后100行</span></span><br><span class="line"><span class="built_in">tail</span> -f app.log             <span class="comment"># 实时跟踪文件新增内容（看日志神器！）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 搜索文件内容</span></span><br><span class="line">grep <span class="string">&quot;ERROR&quot;</span> app.log                      <span class="comment"># 在文件中搜索关键字</span></span><br><span class="line">grep -i <span class="string">&quot;error&quot;</span> app.log                   <span class="comment"># 忽略大小写搜索</span></span><br><span class="line">grep -r <span class="string">&quot;NullPointerException&quot;</span> /logs/     <span class="comment"># 递归搜索目录下所有文件</span></span><br><span class="line">grep -n <span class="string">&quot;ERROR&quot;</span> app.log                   <span class="comment"># 显示匹配行及其行号</span></span><br><span class="line">grep -c <span class="string">&quot;ERROR&quot;</span> app.log                   <span class="comment"># 统计匹配行数</span></span><br><span class="line">grep -A5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其后5行</span></span><br><span class="line">grep -B5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其前5行</span></span><br><span class="line">grep -C5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其前后各5行</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：查看日志中的错误信息</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看今天出现的所有ERROR及上下文</span></span><br><span class="line"><span class="built_in">tail</span> -10000 app.log | grep -C5 <span class="string">&quot;ERROR&quot;</span> | less</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计各错误类型出现次数</span></span><br><span class="line">grep -o <span class="string">&quot;ERROR \[.*\]&quot;</span> app.log | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -rn</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看某个时间段内的日志</span></span><br><span class="line">grep <span class="string">&quot;2018-11-18 10:&quot;</span> app.log | less</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、权限管理"><a href="#三、权限管理" class="headerlink" title="三、权限管理"></a>三、权限管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改权限</span></span><br><span class="line"><span class="built_in">chmod</span> 755 script.sh          <span class="comment"># 设置权限为rwxr-xr-x</span></span><br><span class="line"><span class="built_in">chmod</span> +x script.sh           <span class="comment"># 给文件加执行权限</span></span><br><span class="line"><span class="built_in">chmod</span> -R 644 html/           <span class="comment"># 递归设置目录下所有文件权限</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改所有者</span></span><br><span class="line"><span class="built_in">chown</span> admin app.log          <span class="comment"># 修改文件所有者为admin</span></span><br><span class="line"><span class="built_in">chown</span> admin:admin app.log    <span class="comment"># 同时修改所有者和所属组</span></span><br><span class="line"><span class="built_in">chown</span> -R admin:admin /app/   <span class="comment"># 递归修改目录下所有文件所有者</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看文件权限</span></span><br><span class="line"><span class="built_in">ls</span> -l                        <span class="comment"># 查看文件的权限信息</span></span><br><span class="line"><span class="built_in">stat</span> app.conf                <span class="comment"># 查看文件的详细状态（包括权限）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：部署项目后修复权限</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 项目部署后的权限设置</span></span><br><span class="line"><span class="built_in">chown</span> -R www:www /var/www/myapp/          <span class="comment"># 设置为www用户</span></span><br><span class="line">find /var/www/myapp/ -<span class="built_in">type</span> f -<span class="built_in">exec</span> <span class="built_in">chmod</span> 644 &#123;&#125; \;   <span class="comment"># 文件设置为644</span></span><br><span class="line">find /var/www/myapp/ -<span class="built_in">type</span> d -<span class="built_in">exec</span> <span class="built_in">chmod</span> 755 &#123;&#125; \;   <span class="comment"># 目录设置为755</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="四、用户管理"><a href="#四、用户管理" class="headerlink" title="四、用户管理"></a>四、用户管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建用户</span></span><br><span class="line">useradd tom                    <span class="comment"># 创建用户tom</span></span><br><span class="line">passwd tom                     <span class="comment"># 设置用户tom的密码</span></span><br><span class="line">useradd -m -g www dev          <span class="comment"># 创建用户dev，加入www组并创建home目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看用户</span></span><br><span class="line"><span class="built_in">who</span>                            <span class="comment"># 查看当前登录用户</span></span><br><span class="line">w                              <span class="comment"># 查看更详细的登录信息</span></span><br><span class="line"><span class="built_in">id</span> tom                         <span class="comment"># 查看用户tom的UID和GID</span></span><br><span class="line"><span class="built_in">groups</span>                         <span class="comment"># 查看当前用户所属组</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换用户</span></span><br><span class="line">su - tom                       <span class="comment"># 切换到tom用户</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">command</span>                   <span class="comment"># 以root身份执行命令</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="五、进程管理"><a href="#五、进程管理" class="headerlink" title="五、进程管理"></a>五、进程管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">ps -ef                         <span class="comment"># 查看所有进程的详细信息</span></span><br><span class="line">ps aux                         <span class="comment"># 查看所有进程（CPU/内存占用）</span></span><br><span class="line">ps -ef | grep java             <span class="comment"># 查看Java相关进程</span></span><br><span class="line">top                            <span class="comment"># 实时查看进程状态（按q退出）</span></span><br><span class="line">top -bn1                       <span class="comment"># 一次性输出top结果（适合脚本采集）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 终止进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345                     <span class="comment"># 优雅终止PID为12345的进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 12345                  <span class="comment"># 强制杀掉PID为12345的进程</span></span><br><span class="line">killall java                   <span class="comment"># 杀掉所有Java进程</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 后台运行</span></span><br><span class="line"><span class="built_in">nohup</span> java -jar app.jar &amp;      <span class="comment"># 后台运行Java应用，退出终端不停止</span></span><br><span class="line"><span class="built_in">jobs</span>                           <span class="comment"># 查看后台运行的任务列表</span></span><br><span class="line"><span class="built_in">fg</span> %1                          <span class="comment"># 将后台任务1调回前台</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：重启 Java 应用</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 完整的应用重启流程</span></span><br><span class="line">ps -ef | grep app.jar | grep -v grep  <span class="comment"># 先找到进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345                             <span class="comment"># 优雅停止</span></span><br><span class="line"><span class="built_in">sleep</span> 3                                <span class="comment"># 等待3秒</span></span><br><span class="line"><span class="built_in">nohup</span> java -jar app.jar &gt; app.log 2&gt;&amp;1 &amp;   <span class="comment"># 后台启动，日志重定向</span></span><br><span class="line"><span class="built_in">tail</span> -f app.log                       <span class="comment"># 实时查看启动日志</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="六、磁盘管理"><a href="#六、磁盘管理" class="headerlink" title="六、磁盘管理"></a>六、磁盘管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看磁盘整体情况</span></span><br><span class="line"><span class="built_in">df</span> -h                          <span class="comment"># 以人类可读格式查看磁盘使用情况</span></span><br><span class="line"><span class="built_in">df</span> -h /dev/sda1                <span class="comment"># 查看指定分区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/log/               <span class="comment"># 查看目录总大小</span></span><br><span class="line"><span class="built_in">du</span> -sh *                       <span class="comment"># 查看当前目录下每个子目录的大小</span></span><br><span class="line"><span class="built_in">du</span> -h --max-depth=1 /home/     <span class="comment"># 只看一层目录的大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /* | <span class="built_in">sort</span> -rh           <span class="comment"># 查看根目录下各目录大小并排序</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 磁盘空间排查</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/log/               <span class="comment"># 检查日志目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /tmp/                   <span class="comment"># 检查临时目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /opt/                   <span class="comment"># 检查应用目录大小</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：磁盘告警排查</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第一步：查看整体使用情况</span></span><br><span class="line"><span class="built_in">df</span> -h</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二步：找到最大的目录</span></span><br><span class="line"><span class="built_in">du</span> -sh /* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第三步：逐层深入找到大文件</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -5</span><br><span class="line"><span class="built_in">du</span> -sh /var/log/* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第四步：清理日志</span></span><br><span class="line">find /var/log/ -name <span class="string">&quot;*.log&quot;</span> -mtime +30 -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<h3 id="七、网络管理"><a href="#七、网络管理" class="headerlink" title="七、网络管理"></a>七、网络管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看端口</span></span><br><span class="line">netstat -tlnp                  <span class="comment"># 查看所有TCP监听端口及对应进程</span></span><br><span class="line">netstat -tlnp | grep 8080      <span class="comment"># 查看8080端口被谁占用</span></span><br><span class="line">netstat -an | grep ESTABLISHED <span class="comment"># 查看已建立的连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lsof 查看端口（更直观）</span></span><br><span class="line">lsof -i :8080                  <span class="comment"># 查看8080端口被哪个进程占用</span></span><br><span class="line">lsof -i tcp                    <span class="comment"># 查看所有TCP连接</span></span><br><span class="line">lsof -p 12345                  <span class="comment"># 查看进程12345打开了哪些文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 网络连通性</span></span><br><span class="line">ping -c 4 baidu.com            <span class="comment"># 测试网络连通性，发4个包</span></span><br><span class="line">curl -I http://localhost:8080   <span class="comment"># 查看HTTP响应头</span></span><br><span class="line">telnet 192.168.1.1 3306        <span class="comment"># 测试端口是否可达</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># DNS相关</span></span><br><span class="line">nslookup www.baidu.com         <span class="comment"># 域名解析查询</span></span><br><span class="line">host www.baidu.com             <span class="comment"># 简化的域名查询</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：端口被占用了怎么办</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 场景：Tomcat启动报错 Address already in use</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 步骤1：查看端口被谁占了</span></span><br><span class="line">netstat -tlnp | grep 8080</span><br><span class="line"><span class="comment"># 输出：tcp6  0  0 :::8080  :::*  LISTEN  12345/java</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 步骤2：确认是这个进程，可以选择：</span></span><br><span class="line"><span class="comment"># 方案A：杀掉占用进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方案B：或者换个端口启动，如果杀不掉的话</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="八、压缩解压"><a href="#八、压缩解压" class="headerlink" title="八、压缩解压"></a>八、压缩解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># tar 打包/解包</span></span><br><span class="line">tar -czf myapp.tar.gz /var/www/myapp/      <span class="comment"># 打包并压缩为.tar.gz</span></span><br><span class="line">tar -xzf myapp.tar.gz                      <span class="comment"># 解压.tar.gz包</span></span><br><span class="line">tar -tzf myapp.tar.gz                      <span class="comment"># 查看包内容列表（不实际解压）</span></span><br><span class="line">tar -xjf myapp.tar.bz2                     <span class="comment"># 解压.tar.bz2包</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># gzip压缩</span></span><br><span class="line">gzip app.log                               <span class="comment"># 压缩文件（生成app.log.gz）</span></span><br><span class="line">gzip -d app.log.gz                         <span class="comment"># 解压缩</span></span><br><span class="line">gunzip app.log.gz                          <span class="comment"># 同上，解压缩</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># zip（跨平台常用）</span></span><br><span class="line">zip -r myapp.zip /var/www/myapp/           <span class="comment"># 压缩目录</span></span><br><span class="line">unzip myapp.zip -d /tmp/                   <span class="comment"># 解压到指定目录</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：备份项目并压缩</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 备份项目目录，按日期命名</span></span><br><span class="line">tar -czf myapp_$(<span class="built_in">date</span> +%Y%m%d_%H%M%S).tar.gz /var/www/myapp/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解压到指定目录</span></span><br><span class="line">tar -xzf myapp_20181118.tar.gz -C /tmp/restore/</span><br></pre></td></tr></table></figure>
+
+<h3 id="九、vim-基本操作"><a href="#九、vim-基本操作" class="headerlink" title="九、vim 基本操作"></a>九、vim 基本操作</h3><p>vim 刚接触时确实让人抓狂，记住下面这些就够日常用了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 打开文件</span></span><br><span class="line">vim app.conf               <span class="comment"># 打开文件</span></span><br><span class="line">vim +100 app.conf          <span class="comment"># 打开文件并定位到第100行</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 命令模式（刚进入vim时的状态）</span></span><br><span class="line">i                          <span class="comment"># 在光标前插入（进入插入模式）</span></span><br><span class="line">a                          <span class="comment"># 在光标后插入</span></span><br><span class="line"><span class="built_in">dd</span>                         <span class="comment"># 删除当前行</span></span><br><span class="line">5dd                        <span class="comment"># 删除从当前行开始的5行</span></span><br><span class="line">yy                         <span class="comment"># 复制当前行</span></span><br><span class="line">p                          <span class="comment"># 粘贴</span></span><br><span class="line">u                          <span class="comment"># 撤销</span></span><br><span class="line">Ctrl + r                   <span class="comment"># 重做（取消撤销）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 末行模式（按:进入）</span></span><br><span class="line">:w                         <span class="comment"># 保存</span></span><br><span class="line">:q                         <span class="comment"># 退出</span></span><br><span class="line">:wq                        <span class="comment"># 保存并退出</span></span><br><span class="line">:q!                        <span class="comment"># 不保存强制退出</span></span><br><span class="line">:%s/旧文本/新文本/g        <span class="comment"># 全文替换</span></span><br><span class="line">:<span class="built_in">set</span> nu                    <span class="comment"># 显示行号</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="十、组合命令与管道"><a href="#十、组合命令与管道" class="headerlink" title="十、组合命令与管道"></a>十、组合命令与管道</h3><p>管道 <code>|</code> 是 Linux 命令的精髓，它把前一个命令的输出作为后一个命令的输入，像流水线一样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 管道的基本使用</span></span><br><span class="line">ps -ef | grep java              <span class="comment"># 在进程列表中搜索Java进程</span></span><br><span class="line">netstat -tlnp | grep 80         <span class="comment"># 在网络连接中搜索80端口</span></span><br><span class="line"><span class="built_in">cat</span> app.log | grep ERROR | <span class="built_in">head</span> -20    <span class="comment"># 在日志中找错误，只看前20条</span></span><br><span class="line"><span class="built_in">ls</span> -l | grep <span class="string">&quot;^d&quot;</span>               <span class="comment"># 只列出目录（行首为d的是目录）</span></span><br><span class="line"><span class="built_in">ls</span> -l | awk <span class="string">&#x27;&#123;print $5, $NF&#125;&#x27;</span>   <span class="comment"># 只显示文件大小和名称</span></span><br><span class="line"><span class="built_in">ls</span> -l | <span class="built_in">sort</span> -k5 -rn | <span class="built_in">head</span> -5  <span class="comment"># 列出当前目录最大的5个文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出重定向</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello&quot;</span> &gt; README.md        <span class="comment"># 覆盖写入文件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;World&quot;</span> &gt;&gt; README.md       <span class="comment"># 追加写入文件</span></span><br><span class="line"><span class="built_in">ls</span> /nonexist 2&gt; error.log       <span class="comment"># 将错误信息重定向到文件</span></span><br><span class="line">java -jar app.jar &gt; app.log 2&gt;&amp;1 &amp;    <span class="comment"># 标准输出和错误都输出到日志文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 实际运维组合命令示例</span></span><br><span class="line"><span class="comment"># 找出占用CPU最高的进程</span></span><br><span class="line">top -bn1 | <span class="built_in">head</span> -20</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计日志中各IP的访问次数</span></span><br><span class="line"><span class="built_in">cat</span> access.log | awk <span class="string">&#x27;&#123;print $1&#125;&#x27;</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -rn | <span class="built_in">head</span> -10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量替换配置文件中的IP</span></span><br><span class="line">find /app/config/ -name <span class="string">&quot;*.properties&quot;</span> | xargs sed -i <span class="string">&#x27;s/192.168.1.100/192.168.2.100/g&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 压缩30天前的日志</span></span><br><span class="line">find /var/log/myapp/ -name <span class="string">&quot;*.log&quot;</span> -mtime +30 | xargs gzip</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/posts/2018/linux-cli-2.svg" alt="Linux命令管道工作流程"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>两周的密集使用下来，从最初在终端面前手足无措，到能比较顺畅地完成日常运维操作，有一些心得想分享给和我一样从 Windows 转 Linux 的同学：</p>
+<p><strong>1. Linux 命令不需要死记硬背</strong></p>
+<p>命令太多了，没有人能记住所有命令的所有参数。关键是要知道<strong>解决某个问题可以用什么命令</strong>，具体的参数用法用 <code>man</code> 或 <code>--help</code> 现查就行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">man <span class="built_in">ls</span>                 <span class="comment"># 查看ls的完整手册（按q退出）</span></span><br><span class="line"><span class="built_in">ls</span> --<span class="built_in">help</span>              <span class="comment"># 查看ls的快速帮助（推荐，更直观）</span></span><br></pre></td></tr></table></figure>
+
+<p>我基本上每天都要查几次 <code>tar</code> 的参数——“压缩是 <code>-czf</code> 还是 <code>-xzf</code> 来着”——这很正常，查多了自然就记住了。</p>
+<p><strong>2. 管道是 Linux 的精髓</strong></p>
+<p>管道 <code>|</code> 让我真正感受到了 Linux 命令行的威力。单个命令功能有限，但组合起来能做很复杂的事情。就像搭积木一样，把一个个小命令拼起来解决问题。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 学会了管道之后，就能写出这样的命令来解决复杂问题</span></span><br><span class="line">ps -ef | grep java | grep -v grep | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | xargs <span class="built_in">kill</span> -9</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. 多用 alias 简化常用操作</strong></p>
+<p>把常用的长命令设成别名，能省不少事：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> ll=<span class="string">&#x27;ls -alh&#x27;</span></span><br><span class="line"><span class="built_in">alias</span> g=<span class="string">&#x27;grep --color=auto&#x27;</span></span><br><span class="line"><span class="built_in">alias</span> ..=<span class="string">&#x27;cd ..&#x27;</span></span><br><span class="line"><span class="comment"># 写入 .bashrc 后永久生效</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;alias ll=&#x27;ls -alh&#x27;&quot;</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p><strong>4. 小心 rm -rf</strong></p>
+<p><code>rm -rf</code> 是 Linux 上最危险的命令之一。没有回收站，没有二次确认，文件直接就没了。使用前一定要确认路径是否正确，尤其是在 root 用户下。建议养成习惯：</p>
+<ul>
+<li>执行 <code>rm</code> 前先 <code>ls</code> 确认一下</li>
+<li>重要的文件先备份</li>
+<li>用 <code>mv</code> 代替 <code>rm</code>，把文件移到 <code>/tmp/</code> 目录（系统定期会清理）</li>
+</ul>
+<p><strong>5. 多敲多练是最好的学习方式</strong></p>
+<p>读十遍这篇文章不如自己在服务器上敲一遍。我在自己的电脑上装了虚拟机，把上面的命令都练了一遍。遇到实际运维问题时，先百度&#x2F;Google，解决了就记下来，慢慢就形成了自己的命令速查手册。</p>
+<p>现在回头看，Linux 命令行没有想象的那么可怕。它只是和 Windows 不同的另一种工作方式，适应了之后甚至会喜欢上这种高效的操作。希望这篇文章对同样刚接触 Linux 的你有所帮助。</p>
+<hr>
+<p><em>这篇文章发布于 2018 年 11 月，是我刚接触 Linux 时的学习笔记。命令在不同发行版上可能略有差异，文中以 CentOS 7.4 为准。</em></p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/" class="post-title-link" itemprop="url">MySQL基础增删改查</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-10-28 21:05:16" itemprop="dateCreated datePublished" datetime="2018-10-28T21:05:16+08:00">2018-10-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:28:43" itemprop="dateModified" datetime="2026-06-09T16:28:43+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。</p>
+<p>这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，一步一步把每个知识点搞清楚。这篇文章就是我在2018年10月学习MySQL基础CRUD的完整记录。</p>
+<p><img src="/images/posts/2018/mysql-crud-1.svg" alt="MySQL基础增删改查"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在实际写SQL的过程中，我遇到了好几个一直没搞明白的问题：</p>
 <ol>
-<li>点击菜单 <code>Window</code> -&gt; <code>Preferences</code></li>
-<li>展开 <code>Java</code> -&gt; <code>Installed JREs</code></li>
-<li>确保指向的是 <code>C:\Program Files\Java\jdk1.8.0_161</code></li>
+<li><strong>DELETE和TRUNCATE到底有什么区别？</strong> 之前一直以为都是删数据，随便用哪个都行，结果有一次用TRUNCATE删完数据发现回不去了。</li>
+<li><strong>GROUP BY和HAVING总是写错</strong>，经常把过滤条件写在WHERE里，结果报错，搞不清什么时候该用WHERE、什么时候该用HAVING。</li>
+<li><strong>多表JOIN搞不清关系</strong>，INNER JOIN、LEFT JOIN、RIGHT JOIN到底返回什么数据，每次都要画图才能想明白。</li>
+<li><strong>索引加了但查询还是很慢</strong>，以为建了索引就万事大吉，结果有些查询根本没走索引。</li>
+<li><strong>不知道什么时候该建索引</strong>，哪些列该建、哪些不该建，完全没有概念。</li>
 </ol>
-<p>这样配置后，Eclipse 就自动识别了 JDK 的类库和编译选项，可以在 IDE 里直接创建和运行 Java 项目了。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次搭建环境的经历让我这个 Java 新手学到了不少东西：</p>
-<ol>
-<li><p><strong>JDK 选择 LTS 版本最稳妥</strong>。JDK 9 虽然新，但 JDK 8 作为 LTS 版本在企业中广泛使用，遇到问题更容易找到解决方案。对于初学者来说，稳定压倒一切。</p>
-</li>
-<li><p><strong>环境变量配置要仔细检查路径</strong>。多一个斜杠、少一个分号都可能导致配置不生效。配置完一定要重新打开命令行窗口再测试，这个坑后来再也没踩过。</p>
-</li>
-<li><p><strong>IDE 的 JVM 参数要根据机器配置调整</strong>。Eclipse 默认的 JVM 参数是为配置较高的机器准备的，2018 年主流笔记本还是 4GB~8GB 内存，默认的 1024m 对低配机器来说偏大。<code>eclipse.ini</code> 里的 <code>-Xmx</code> 参数控制最大堆内存，根据自己电脑的内存大小酌情调整就好。后来的 IntelliJ IDEA 也有类似问题，<code>idea64.exe.vmoptions</code> 里面的参数同样需要根据机器配置手动调整。</p>
-</li>
-<li><p><strong>建议新手先熟悉命令行编译运行再依赖 IDE</strong>。虽然 Eclipse 很方便，但用命令行编译运行能让人更好理解 Java 的编译原理——Java 源代码通过 <code>javac</code> 编译成字节码（<code>.class</code> 文件），再由 JVM 解释执行。理解了这套流程，后面学 Maven、Gradle 这些构建工具也会轻松很多。</p>
-</li>
-</ol>
-<p>最后的最后，记录一下当时的主要软件版本，方便以后回顾：</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="DELETE和TRUNCATE的区别"><a href="#DELETE和TRUNCATE的区别" class="headerlink" title="DELETE和TRUNCATE的区别"></a>DELETE和TRUNCATE的区别</h2><p>这两个看起来都是“删数据”，但底层机制完全不同：</p>
 <table>
 <thead>
 <tr>
-<th>软件</th>
-<th>版本</th>
+<th>对比点</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>JDK</td>
-<td>1.8.0_161 (build 1.8.0_161-b12)</td>
+<td>删除方式</td>
+<td>逐行删除</td>
+<td>清空并重建表结构</td>
 </tr>
 <tr>
-<td>Eclipse</td>
-<td>Oxygen (4.7)</td>
+<td>SQL类型</td>
+<td>DML</td>
+<td>DDL</td>
 </tr>
 <tr>
-<td>操作系统</td>
-<td>Windows 10 专业版 64位</td>
+<td>是否可回滚</td>
+<td>在事务中可回滚</td>
+<td>通常不可回滚</td>
 </tr>
 <tr>
-<td>笔记本内存</td>
-<td>4GB</td>
+<td>是否支持WHERE</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>自增ID</td>
+<td>一般不重置</td>
+<td>通常会重置</td>
+</tr>
+<tr>
+<td>执行速度</td>
+<td>数据量大时较慢</td>
+<td>通常更快</td>
 </tr>
 </tbody></table>
-<p>到现在我写这篇博客时，已经能用 Java 写一些简单的 Web 应用了。回头看看搭建环境这件事，其实没那么难，只是对一个新领域的未知让人感到畏惧而已。动手去做，遇到问题就查、就问、就试，总能解决。</p>
+<p>简单理解：DELETE是一行一行删，可以配合WHERE精确删除，也可以在事务中回滚；TRUNCATE更像是把表清空后重新整理，速度快，但风险也更高。</p>
+<h2 id="GROUP-BY和HAVING"><a href="#GROUP-BY和HAVING" class="headerlink" title="GROUP BY和HAVING"></a>GROUP BY和HAVING</h2><p>我之前经常把聚合条件写到WHERE里，例如想查平均分大于80的学生，却写成：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id;</span><br></pre></td></tr></table></figure>
+
+<p>这肯定是不对的，因为WHERE执行时还没有分组，自然也没有AVG(score)这个结果。正确写法应该是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+
+<p>WHERE是在分组前过滤原始行，HAVING是在分组后过滤聚合结果。</p>
+<h2 id="JOIN类型的区别"><a href="#JOIN类型的区别" class="headerlink" title="JOIN类型的区别"></a>JOIN类型的区别</h2><p>JOIN最核心的不是语法，而是先搞清楚两张表之间的关系：</p>
+<ul>
+<li><strong>INNER JOIN</strong>：只返回两边都匹配的数据。</li>
+<li><strong>LEFT JOIN</strong>：左表全部保留，右表匹配不到的地方用NULL补齐。</li>
+<li><strong>RIGHT JOIN</strong>：右表全部保留，左表匹配不到的地方用NULL补齐。</li>
+</ul>
+<p>实际开发中我感觉LEFT JOIN用得更多，因为很多时候我们会以一张主表为中心，再去关联其它明细表。</p>
+<h2 id="索引不是万能的"><a href="#索引不是万能的" class="headerlink" title="索引不是万能的"></a>索引不是万能的</h2><p>索引像书的目录，可以帮助数据库快速定位数据。但它不是万能药，加了索引并不代表一定快：</p>
+<ul>
+<li>表数据量很小时，全表扫描可能更快。</li>
+<li>查询返回的数据太多时，走索引反而不划算。</li>
+<li>在索引列上使用函数，可能导致索引失效。</li>
+<li>LIKE以<code>%</code>开头时，通常无法利用普通索引。</li>
+<li>字段发生隐式类型转换时，也可能导致索引失效。</li>
+</ul>
+<h2 id="索引应该建在什么列上"><a href="#索引应该建在什么列上" class="headerlink" title="索引应该建在什么列上"></a>索引应该建在什么列上</h2><p>比较适合建索引的列：</p>
+<ul>
+<li>区分度高的列，比如学生ID、手机号、身份证号。</li>
+<li>经常出现在WHERE条件里的列。</li>
+<li>经常用于JOIN关联的外键列。</li>
+<li>经常用于ORDER BY或GROUP BY的列。</li>
+</ul>
+<p>不太适合建索引的列：</p>
+<ul>
+<li>区分度很低的列，比如性别。</li>
+<li>经常更新的列，因为维护索引也有成本。</li>
+<li>很少参与查询条件的列。</li>
+</ul>
+<p><img src="/images/posts/2018/mysql-crud-2.svg" alt="MySQL基础增删改查"></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="准备三张表"><a href="#准备三张表" class="headerlink" title="准备三张表"></a>准备三张表</h2><p>我用学生、课程、成绩三张表来练习，关系比较清晰：一个学生可以选择多门课程，一门课程也可以被多个学生选择，成绩表负责连接学生和课程。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 学生表：保存学生基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> student (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;姓名&#x27;</span>,</span><br><span class="line">    age <span class="type">INT</span> COMMENT <span class="string">&#x27;年龄&#x27;</span>,</span><br><span class="line">    gender <span class="type">VARCHAR</span>(<span class="number">10</span>) COMMENT <span class="string">&#x27;性别&#x27;</span>,</span><br><span class="line">    major <span class="type">VARCHAR</span>(<span class="number">50</span>) COMMENT <span class="string">&#x27;专业&#x27;</span>,</span><br><span class="line">    create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;学生表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 课程表：保存课程基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> course (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程名称&#x27;</span>,</span><br><span class="line">    credit <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学分&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;课程表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 成绩表：保存学生和课程的对应关系以及成绩</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> score (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;成绩ID&#x27;</span>,</span><br><span class="line">    student_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    course_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    score <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>) COMMENT <span class="string">&#x27;成绩&#x27;</span>,</span><br><span class="line">    exam_time <span class="type">DATE</span> COMMENT <span class="string">&#x27;考试日期&#x27;</span>,</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_student <span class="keyword">FOREIGN KEY</span> (student_id) <span class="keyword">REFERENCES</span> student(id),</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_course <span class="keyword">FOREIGN KEY</span> (course_id) <span class="keyword">REFERENCES</span> course(id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;成绩表&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="INSERT：新增数据"><a href="#INSERT：新增数据" class="headerlink" title="INSERT：新增数据"></a>INSERT：新增数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 新增学生数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> student (name, age, gender, major) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;张三&#x27;</span>, <span class="number">20</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;李四&#x27;</span>, <span class="number">21</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;软件工程&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;王五&#x27;</span>, <span class="number">19</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;数据科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;赵六&#x27;</span>, <span class="number">22</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增课程数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> course (name, credit) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;数据库原理&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;数据结构&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">(<span class="string">&#x27;操作系统&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;计算机网络&#x27;</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增成绩数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> score (student_id, course_id, score, exam_time) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="number">1</span>, <span class="number">1</span>, <span class="number">92.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">88.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">1</span>, <span class="number">78.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">3</span>, <span class="number">95.00</span>, <span class="string">&#x27;2018-10-22&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">2</span>, <span class="number">66.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">4</span>, <span class="number">72.50</span>, <span class="string">&#x27;2018-10-23&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">1</span>, <span class="number">85.00</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">4</span>, <span class="number">90.00</span>, <span class="string">&#x27;2018-10-23&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="UPDATE：修改数据"><a href="#UPDATE：修改数据" class="headerlink" title="UPDATE：修改数据"></a>UPDATE：修改数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 修改张三的年龄</span></span><br><span class="line"><span class="keyword">UPDATE</span> student</span><br><span class="line"><span class="keyword">SET</span> age <span class="operator">=</span> <span class="number">21</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 修改数据库原理课程的学分</span></span><br><span class="line"><span class="keyword">UPDATE</span> course</span><br><span class="line"><span class="keyword">SET</span> credit <span class="operator">=</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给王五的所有成绩加5分</span></span><br><span class="line"><span class="keyword">UPDATE</span> score</span><br><span class="line"><span class="keyword">SET</span> score <span class="operator">=</span> score <span class="operator">+</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;王五&#x27;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="DELETE：删除数据"><a href="#DELETE：删除数据" class="headerlink" title="DELETE：删除数据"></a>DELETE：删除数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除低于60分的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> score <span class="operator">&lt;</span> <span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除某个学生的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除成绩表全部数据，可配合事务回滚</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 清空成绩表，不支持WHERE，风险更高</span></span><br><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span> score;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SELECT：基础查询"><a href="#SELECT：基础查询" class="headerlink" title="SELECT：基础查询"></a>SELECT：基础查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询所有学生</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 只查询指定列</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age, major <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 条件查询</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> major <span class="operator">=</span> <span class="string">&#x27;计算机科学&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 模糊查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 排序查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分页查询：从第0条开始取10条</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line">LIMIT <span class="number">0</span>, <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/posts/2018/mysql-crud-3.svg" alt="MySQL基础增删改查"></p>
+<h2 id="多表JOIN查询"><a href="#多表JOIN查询" class="headerlink" title="多表JOIN查询"></a>多表JOIN查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- INNER JOIN：只查询有成绩的学生和课程</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- LEFT JOIN：查询所有学生，即使学生还没有成绩也会显示</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- RIGHT JOIN：以课程表为主，查询所有课程的选课成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="聚合函数和GROUP-BY"><a href="#聚合函数和GROUP-BY" class="headerlink" title="聚合函数和GROUP BY"></a>聚合函数和GROUP BY</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询每个学生的平均成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询平均成绩大于80分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(sc.score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询每门课程的选课人数、最高分和最低分</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    <span class="built_in">COUNT</span>(sc.id) <span class="keyword">AS</span> student_count,</span><br><span class="line">    <span class="built_in">MAX</span>(sc.score) <span class="keyword">AS</span> max_score,</span><br><span class="line">    <span class="built_in">MIN</span>(sc.score) <span class="keyword">AS</span> min_score</span><br><span class="line"><span class="keyword">FROM</span> course c</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> c.id <span class="operator">=</span> sc.course_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> c.id, c.name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询成绩高于全班平均分的记录</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">WHERE</span> sc.score <span class="operator">&gt;</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="built_in">AVG</span>(score) <span class="keyword">FROM</span> score</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询选择了数据库原理课程的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> name</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> sc.student_id</span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id</span><br><span class="line">    <span class="keyword">WHERE</span> c.name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询至少有一门成绩大于90分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> s.name</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">WHERE</span> sc.student_id <span class="operator">=</span> s.id</span><br><span class="line">      <span class="keyword">AND</span> sc.score <span class="operator">&gt;</span> <span class="number">90</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="索引创建和使用建议"><a href="#索引创建和使用建议" class="headerlink" title="索引创建和使用建议"></a>索引创建和使用建议</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给成绩表的学生ID建立索引，提升按学生查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_id <span class="keyword">ON</span> score(student_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给成绩表的课程ID建立索引，提升按课程查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_course_id <span class="keyword">ON</span> score(course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给学生姓名建立索引，提升按姓名精确查询的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 联合索引：适合同时按学生和课程查询成绩的场景</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_course <span class="keyword">ON</span> score(student_id, course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX idx_student_name <span class="keyword">ON</span> student;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引要注意最左前缀原则。假设建立了<code>(student_id, course_id)</code>这个联合索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span> <span class="keyword">AND</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 通常不能完整使用这个联合索引，因为跳过了最左边的student_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPLAIN查看执行计划"><a href="#EXPLAIN查看执行计划" class="headerlink" title="EXPLAIN查看执行计划"></a>EXPLAIN查看执行计划</h2><p>EXPLAIN可以帮助我判断SQL到底有没有走索引，不能只靠感觉猜。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查看按学生ID查询成绩的执行计划</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看JOIN查询的执行计划</span></span><br><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<p>EXPLAIN里我现在重点看这几个字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>type</td>
+<td>访问类型，ALL通常表示全表扫描，ref、range一般比ALL好</td>
+</tr>
+<tr>
+<td>possible_keys</td>
+<td>可能用到的索引</td>
+</tr>
+<tr>
+<td>key</td>
+<td>实际使用的索引</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>MySQL预估要扫描的行数</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>额外信息，比如Using index、Using where、Using filesort</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 如果name没有索引，可能会全表扫描</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建立索引后，再观察key和rows的变化</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次系统整理MySQL基础增删改查之后，我最大的感受是：SQL真的是后端开发的基本功。以前写JDBC时，我只关心Java代码能不能跑通，现在才发现SQL本身才是和数据库沟通的核心。</p>
+<p>我需要牢记的几个点：</p>
+<ol>
+<li><strong>理解SQL执行顺序</strong>：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY。只有知道SQL先做什么、后做什么，才能写出正确的分组查询。</li>
+<li><strong>DELETE和TRUNCATE不能混用</strong>：DELETE适合按条件删除，也更容易配合事务；TRUNCATE适合清空整张表，但风险更高。</li>
+<li><strong>JOIN要先想清楚主表和关系</strong>：INNER JOIN看匹配，LEFT JOIN保留左表，RIGHT JOIN保留右表。</li>
+<li><strong>索引要合理使用</strong>：索引应该建在区分度高、经常查询、经常关联的列上，不是越多越好。</li>
+<li><strong>用EXPLAIN验证SQL</strong>：查询慢的时候，不要靠猜，要看执行计划。</li>
+</ol>
+<p>2018年10月的这个阶段，我觉得自己终于从“会照着写SQL”，开始慢慢变成“知道为什么这样写SQL”了。下一步准备继续学习事务、锁和隔离级别，这些应该会更接近真实项目里的数据库问题。</p>
 
       
     </div>
@@ -631,7 +1641,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
