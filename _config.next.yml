@@ -56,6 +56,7 @@ codeblock:
     style: default
   fold:
     enable: false
+    height: 500
   language: true
 
 back2top:
@@ -78,7 +79,7 @@ github_banner:
   permalink: https://github.com/swagcH
 
 motion:
-  enable: true
+  enable: false
   async: false
   duration: 200
   transition:
@@ -94,9 +95,14 @@ pace:
 
 comments:
   style: tabs
-  active:
+  active: null
   storage: true
   lazyload: false
+  nav: null
+
+post_footer:
+  disqus:
+    count: true
 
 busuanzi_count:
   enable: true
@@ -112,6 +118,62 @@ local_search:
   top_n_per_article: 1
   unescape: false
   preload: false
+
+quicklink:
+  enable: false
+  home: false
+  archive: false
+  delay: true
+  timeout: 3000
+  priority: true
+  ignores:
+
+pdf:
+  enable: false
+  height: 500px
+
+mermaid:
+  enable: false
+  theme:
+    light: default
+    dark: dark
+
+wavedrom:
+  enable: false
+
+mathjax:
+  enable: false
+
+katex:
+  enable: false
+
+disqus:
+  enable: false
+  shortname:
+  count: false
+
+google_analytics:
+  tracking_id:
+  only_pageview: false
+  measure_protocol_api_secret:
+
+matomo:
+  enable: false
+  server_url:
+  site_id:
+
+firestore:
+  enable: false
+  collection: articles
+  apiKey:
+  projectId:
+
+leancloud_visitors:
+  enable: false
+  app_id:
+  app_key:
+  server_url:
+  security: false
 
 pjax: false
 
