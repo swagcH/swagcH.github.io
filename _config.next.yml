@@ -1,0 +1,120 @@
+scheme: Muse
+
+darkmode: true
+
+menu:
+  home: / || fa fa-home
+  about: /about/ || fa fa-user
+  tags: /tags/ || fa fa-tags
+  categories: /categories/ || fa fa-th
+  archives: /archives/ || fa fa-archive
+  sitemap: /sitemap.xml || fa fa-sitemap
+
+creative_commons:
+  license: by-nc-sa
+  size: small
+  sidebar: false
+  post: false
+  language: deed.zh
+
+avatar:
+  url: /images/avatar.png
+  rounded: true
+  rotated: false
+
+social:
+  GitHub: https://github.com/swagcH || fab fa-github
+
+social_icons:
+  enable: true
+  icons_only: false
+  transition: false
+
+footer:
+  since: 2024
+  icon:
+    name: fa fa-heart
+    animated: true
+    color: '#ff0000'
+  copyright: 无敌杰尼龟
+  powered: true
+
+post_meta:
+  item_text: true
+  created_at: true
+  updated_at:
+    enable: true
+    another_day: true
+  categories: true
+
+post_edit:
+  enable: false
+
+codeblock:
+  copy_button:
+    enable: true
+    style: default
+  fold:
+    enable: false
+  language: true
+
+back2top:
+  enable: true
+  sidebar: false
+  scrollpercent: true
+
+reading_progress:
+  enable: true
+  color: '#37c6c0'
+  height: 3px
+
+bookmark:
+  enable: true
+  color: '#222'
+  save: auto
+
+github_banner:
+  enable: false
+  permalink: https://github.com/swagcH
+
+motion:
+  enable: true
+  async: false
+  duration: 200
+  transition:
+    menu_item: fadeInDown
+    post_block: fadeIn
+    post_header: fadeInDown
+    post_body: fadeInDown
+    coll_header: fadeInLeft
+    sidebar: fadeInUp
+
+pace:
+  enable: false
+
+comments:
+  style: tabs
+  active:
+  storage: true
+  lazyload: false
+
+busuanzi_count:
+  enable: true
+  total_visitors: true
+  total_visitors_icon: fa fa-user
+  total_views: true
+  total_views_icon: fa fa-eye
+  post_views: true
+  post_views_icon: far fa-eye
+
+local_search:
+  enable: true
+  top_n_per_article: 1
+  unescape: false
+  preload: false
+
+pjax: false
+
+vendors:
+  internal: local
+  plugins: jsdelivr
