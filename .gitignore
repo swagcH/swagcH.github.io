@@ -4,5 +4,6 @@ public/
 db.json
 .tmp-images.py
 .tmp-ascii-images.py
+.tmp-2019-posts.py
 .DS_Store
 *.log
