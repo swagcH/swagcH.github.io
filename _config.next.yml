@@ -1,17 +1,29 @@
 custom_file_path:
   style: source/_data/styles.styl
 
-scheme: Muse
+scheme: Gemini
 
 darkmode: true
 
 menu:
   home: / || fa fa-home
-  about: /about/ || fa fa-user
+  about: /about/ || fa fa-user-astronaut
   tags: /tags/ || fa fa-tags
-  categories: /categories/ || fa fa-th
-  archives: /archives/ || fa fa-archive
+  categories: /categories/ || fa fa-layer-group
+  archives: /archives/ || fa fa-clock-rotate-left
   sitemap: /sitemap.xml || fa fa-sitemap
+
+menu_settings:
+  icons: true
+  badges: false
+
+sidebar:
+  position: left
+  width_expanded: 320
+  width_dual_column: 280
+  display: always
+  padding: 24
+  offset: 24
 
 creative_commons:
   license: by-nc-sa
@@ -25,6 +37,8 @@ avatar:
   rounded: true
   rotated: false
 
+site_state: true
+
 social:
   GitHub: https://github.com/swagcH || fab fa-github
 
@@ -33,14 +47,47 @@ social_icons:
   icons_only: false
   transition: false
 
+toc:
+  enable: true
+  number: false
+  wrap: true
+  expand_all: false
+  max_depth: 4
+
 footer:
   since: 2024
   icon:
     name: fa fa-heart
-    animated: true
-    color: '#ff0000'
+    animated: false
+    color: '#e87538'
   copyright: 无敌杰尼龟
   powered: true
+
+theme_color:
+  light: '#e87538'
+  dark: '#f2a365'
+
+font:
+  enable: true
+  host:
+  global:
+    external: false
+    family: Optima
+    size: 1
+  title:
+    external: false
+    family: Georgia
+    size:
+  headings:
+    external: false
+    family: Georgia
+    size:
+  posts:
+    external: false
+    family:
+  codes:
+    external: false
+    family:
 
 post_meta:
   item_text: true
@@ -54,9 +101,15 @@ post_edit:
   enable: false
 
 codeblock:
+  theme:
+    light: stackoverflow-light
+    dark: stackoverflow-dark
+  prism:
+    light: prism
+    dark: prism-dark
   copy_button:
     enable: true
-    style: default
+    style: mac
   fold:
     enable: false
     height: 500
@@ -69,12 +122,12 @@ back2top:
 
 reading_progress:
   enable: true
-  color: '#37c6c0'
-  height: 3px
+  color: '#e87538'
+  height: 4px
 
 bookmark:
   enable: true
-  color: '#222'
+  color: '#e87538'
   save: auto
 
 github_banner:
