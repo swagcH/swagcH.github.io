@@ -4,7 +4,7 @@ date: 2018-09-15 10:27:44
 tags: [Java, JDBC, MySQL, 数据库连接, CRUD]
 categories: 数据库
 keywords: Java JDBC连接MySQL, JDBC CRUD操作, PreparedStatement用法, JDBC连接池, 数据库连接最佳实践
-cover: /images/posts/2018/2018-09-15-JDBC连接MySQL实践-cover.svg
+cover: /images/posts/2018/jdbc-mysql-cover.svg
 ---
 
 # 背景
@@ -15,7 +15,7 @@ cover: /images/posts/2018/2018-09-15-JDBC连接MySQL实践-cover.svg
 
 JDBC，全称是 Java Database Connectivity，它是 Java 提供的一套数据库访问规范。简单理解，JDBC 就像 Java 程序和数据库之间的一座桥：Java 代码通过 JDBC API 发送 SQL，数据库执行后再把结果返回给 Java 程序。
 
-![Java 程序通过 JDBC 连接 MySQL 的流程图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-1.svg)
+![Java 程序通过 JDBC 连接 MySQL 的流程图](/images/posts/2018/jdbc-mysql-1.svg)
 
 我当时的目标很明确：
 
@@ -90,7 +90,7 @@ JDBC 里最容易忽略的一点是资源释放。`Connection`、`Statement`、`
 
 把这些问题拆开看，其实它们都对应 JDBC 的几个基础机制。
 
-![JDBC 常见问题定位示意图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-2.svg)
+![JDBC 常见问题定位示意图](/images/posts/2018/jdbc-mysql-2.svg)
 
 ## 1. 驱动必须加入 classpath
 
@@ -638,7 +638,7 @@ public User findUserByUsername(String username) {
 
 实际项目中，不应该每次操作数据库都创建一个新的物理连接。连接池会提前维护一批连接，程序需要时从池中取，用完后归还给连接池。
 
-![Druid 连接池工作方式示意图](/images/posts/2018/2018-09-15-JDBC连接MySQL实践-image-3.svg)
+![Druid 连接池工作方式示意图](/images/posts/2018/jdbc-mysql-3.svg)
 
 Druid 是阿里开源的数据库连接池，在国内 Java 项目里很常见。Maven 依赖示例：
 

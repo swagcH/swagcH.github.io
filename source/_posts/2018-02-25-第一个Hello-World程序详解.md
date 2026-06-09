@@ -4,7 +4,7 @@ date: 2018-02-25 15:22:08
 tags: [Java, HelloWorld, 入门, 编译运行]
 categories: Java基础
 keywords: Java HelloWorld, Java第一个程序, Java编译运行流程, class文件, main方法, Java入门教程
-cover: /images/posts/2018/2018-02-25-第一个Hello-World程序详解-cover.svg
+cover: /images/posts/2018/hello-world-cover.svg
 ---
 
 # 背景
@@ -15,7 +15,7 @@ cover: /images/posts/2018/2018-02-25-第一个Hello-World程序详解-cover.svg
 
 但是 Java 这里多了一个 `.class` 文件，还要用 `javac` 和 `java` 两个命令分别处理，一开始确实有点懵。于是我想把 Java 程序从编写到运行的完整过程搞清楚，至少以后再遇到编译错误、运行错误时，知道问题大概出在哪里。
 
-![Java编译运行流程](/images/posts/2018/2018-02-25-第一个Hello-World程序详解-image-1.svg)
+![Java编译运行流程](/images/posts/2018/hello-world-1.svg)
 *配图说明：Java程序编译运行流程*
 
 # 问题
@@ -121,7 +121,7 @@ HelloWorld.java  --javac编译-->  HelloWorld.class  --JVM执行-->  程序输�
 
 这也是 Java 经常说的“一次编译，到处运行”的基础：只要目标机器安装了合适的 JVM，同一份 `.class` 字节码理论上就可以在不同平台运行。
 
-![class文件和JVM关系](/images/posts/2018/2018-02-25-第一个Hello-World程序详解-image-2.svg)
+![class文件和JVM关系](/images/posts/2018/hello-world-2.svg)
 *配图说明：class字节码文件通过JVM在不同平台运行*
 
 ## Windows默认GBK编码可能导致中文乱码
@@ -208,7 +208,7 @@ Hello World
 你好，Java
 ```
 
-![命令行编译运行HelloWorld](/images/posts/2018/2018-02-25-第一个Hello-World程序详解-image-3.svg)
+![命令行编译运行HelloWorld](/images/posts/2018/hello-world-3.svg)
 *配图说明：在命令行中编译并运行HelloWorld程序*
 
 ## 带命令行参数的版本
@@ -287,7 +287,7 @@ public class HelloWorld { // Eclipse创建的公共类，类名和文件名保�
 }
 ```
 
-![Eclipse创建Java项目](/images/posts/2018/2018-02-25-第一个Hello-World程序详解-image-4.svg)
+![Eclipse创建Java项目](/images/posts/2018/hello-world-4.svg)
 *配图说明：使用Eclipse创建并运行Java项目*
 
 ## classpath的概念
@@ -322,7 +322,7 @@ java -cp bin HelloWorld
 
 初学阶段我觉得没必要一开始就背很多 classpath 的复杂规则，但至少要知道：运行 Java 程序时，JVM 必须能在 classpath 指定的位置找到对应的 `.class` 文件。
 
-![classpath查找class文件](/images/posts/2018/2018-02-25-第一个Hello-World程序详解-image-5.svg)
+![classpath查找class文件](/images/posts/2018/hello-world-5.svg)
 *配图说明：JVM根据classpath查找class文件*
 
 # 总结

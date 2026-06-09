@@ -3,5 +3,6 @@ public/
 .deploy_git/
 db.json
 .tmp-images.py
+.tmp-ascii-images.py
 .DS_Store
 *.log
