@@ -1,3 +1,6 @@
+custom_file_path:
+  style: source/_data/styles.styl
+
 scheme: Muse
 
 darkmode: true

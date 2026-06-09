@@ -1,0 +1,31 @@
+// 强制显示动画相关元素，避免 JS 异常导致页面空白
+.use-motion
+  opacity 1 !important
+  visibility visible !important
+
+  .menu-item,
+  .sidebar,
+  .sidebar-inner,
+  .post-block,
+  .pagination,
+  .comments,
+  .post-header,
+  .post-body,
+  .collection-header,
+  .column,
+  .site-brand-container .toggle,
+  .footer,
+  .site-title,
+  .site-subtitle,
+  .custom-logo-image,
+  .logo-line
+    opacity 1 !important
+    visibility visible !important
+
+  .animated
+    visibility inherit !important
+
+  .sidebar .animated
+    animation none !important
+    opacity 1 !important
+    visibility visible !important
