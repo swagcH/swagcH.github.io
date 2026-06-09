@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="现在是 2018 年 12 月 30 日深夜，窗外很安静，桌面上摊着几本书、一杯凉掉的咖啡、开着 IDE 的屏幕。刚刚跑通了一个 Spring 的小 Demo，不算什么了不起的东西，但我盯着控制台里那几行日志，愣是坐了好一会儿。 总觉得该写点什么，为这一年。 回头看，2018 年是我真正踏进编程世界的第一年。从连编辑器都不会配，到能用 Java 写点能跑的东西，这三百多天走得七拐八拐，中间有好几次">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2018年度学习总结">
+<meta property="og:url" content="https://swagch.github.io/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="现在是 2018 年 12 月 30 日深夜，窗外很安静，桌面上摊着几本书、一杯凉掉的咖啡、开着 IDE 的屏幕。刚刚跑通了一个 Spring 的小 Demo，不算什么了不起的东西，但我盯着控制台里那几行日志，愣是坐了好一会儿。 总觉得该写点什么，为这一年。 回头看，2018 年是我真正踏进编程世界的第一年。从连编辑器都不会配，到能用 Java 写点能跑的东西，这三百多天走得七拐八拐，中间有好几次">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20back-end%20learning%20roadmap%202018,%20from%20Java%20SE%20to%20Spring%20framework,%20road%20map%20style%20timeline%20infographic,%20developer%20education%20path&image_size=landscape_16_9">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Time%20management%20and%20learning%20methods%20for%20programmers,%20Pomodoro%20technique,%20fixed%20study%20schedule,%20knowledge%20retention%20pyramid,%20tech%20blog%20illustration&image_size=landscape_16_9">
+<meta property="article:published_time" content="2018-12-30T15:47:08.000Z">
+<meta property="article:modified_time" content="2026-06-09T07:57:18.232Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="年度总结">
+<meta property="article:tag" content="学习路线">
+<meta property="article:tag" content="回顾">
+<meta property="article:tag" content="展望">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20back-end%20learning%20roadmap%202018,%20from%20Java%20SE%20to%20Spring%20framework,%20road%20map%20style%20timeline%20infographic,%20developer%20education%20path&image_size=landscape_16_9">
+
+
+<link rel="canonical" href="https://swagch.github.io/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/","path":"2018/12/30/2018-12-30-2018年度学习总结/","title":"2018年度学习总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>2018年度学习总结 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E4%B8%8D%E6%B8%85%E6%99%B0%EF%BC%8C%E8%B5%B0%E4%BA%86%E4%B8%8D%E5%B0%91%E5%BC%AF%E8%B7%AF"><span class="nav-text">1. 学习路线不清晰，走了不少弯路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%85%89%E7%9C%8B%E4%B8%8D%E7%BB%83%EF%BC%8C%E7%9C%BC%E9%AB%98%E6%89%8B%E4%BD%8E"><span class="nav-text">2. 光看不练，眼高手低</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%81%87%E5%88%B0%E9%97%AE%E9%A2%98%E4%B8%8D%E6%95%A2%E9%97%AE"><span class="nav-text">3. 遇到问题不敢问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%8D%9A%E5%AE%A2%E7%9C%8B%E5%BE%97%E5%A4%9A%EF%BC%8C%E5%86%99%E5%BE%97%E5%B0%91"><span class="nav-text">4. 博客看得多，写得少</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%97%B6%E9%97%B4%E7%AE%A1%E7%90%86%E4%B8%8D%E5%A5%BD%EF%BC%8C%E7%BB%8F%E5%B8%B8%E6%8B%96%E5%BB%B6"><span class="nav-text">5. 时间管理不好，经常拖延</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E8%A7%84%E5%88%92%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-text">学习规划的重要性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E6%98%AF%E6%89%8B%E8%89%BA%E6%B4%BB"><span class="nav-text">编程是手艺活</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BE%E5%8C%BA%E5%92%8C%E4%BA%A4%E6%B5%81%E7%9A%84%E4%BB%B7%E5%80%BC"><span class="nav-text">社区和交流的价值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E4%BD%9C%E6%98%AF%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%8A%A0%E9%80%9F%E5%99%A8"><span class="nav-text">写作是深度学习的加速器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BA%E5%AE%9A%E5%AD%A6%E4%B9%A0%E8%8A%82%E5%A5%8F"><span class="nav-text">固定学习节奏</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Q1%EF%BC%881-3-%E6%9C%88%EF%BC%89%EF%BC%9AC-%E8%AF%AD%E8%A8%80%E5%85%A5%E9%97%A8%EF%BC%8C%E5%86%B3%E5%AE%9A%E8%BD%AC-Java"><span class="nav-text">Q1（1-3 月）：C 语言入门，决定转 Java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Q2%EF%BC%884-6-%E6%9C%88%EF%BC%89%EF%BC%9AJava-%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80"><span class="nav-text">Q2（4-6 月）：Java 语法基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Q3%EF%BC%887-9-%E6%9C%88%EF%BC%89%EF%BC%9A%E6%B7%B1%E5%85%A5-Java%EF%BC%8C%E5%AE%8C%E6%88%90%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%A1%B9%E7%9B%AE"><span class="nav-text">Q3（7-9 月）：深入 Java，完成第一个小项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Q4%EF%BC%8810-12-%E6%9C%88%EF%BC%89%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E3%80%81Linux%E3%80%81Spring-%E5%85%A5%E9%97%A8"><span class="nav-text">Q4（10-12 月）：数据库、Linux、Spring 入门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-%E5%B9%B4%E8%AE%A1%E5%88%92"><span class="nav-text">2019 年计划</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="2018年度学习总结 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2018年度学习总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-12-30 23:47:08" itemprop="dateCreated datePublished" datetime="2018-12-30T23:47:08+08:00">2018-12-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 15:57:18" itemprop="dateModified" datetime="2026-06-09T15:57:18+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>现在是 2018 年 12 月 30 日深夜，窗外很安静，桌面上摊着几本书、一杯凉掉的咖啡、开着 IDE 的屏幕。刚刚跑通了一个 Spring 的小 Demo，不算什么了不起的东西，但我盯着控制台里那几行日志，愣是坐了好一会儿。</p>
+<p>总觉得该写点什么，为这一年。</p>
+<p>回头看，2018 年是我真正踏进编程世界的第一年。从连编辑器都不会配，到能用 Java 写点能跑的东西，这三百多天走得七拐八拐，中间有好几次差点放弃。趁着跨年前这个安静的夜晚，把这一年的路好好捋一捋。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 1 月，我坐在电脑前打开了一本 C 语言的电子书，那是我和编程的第一次正式见面。</p>
+<p>在此之前，我对编程的全部认知大概就是——很酷、很复杂、不适合我。高考报志愿时阴差阳错进了计算机相关专业，大一上学期懵懵懂懂地过了，真正开始认真对待，就是从 2018 年开始的。</p>
+<p>最开始学的是 C 语言，指针、内存管理、结构体——说实话，学得挺痛苦的。尤其是指针，绕来绕去，debug 的时候经常对着一个段错误发呆半小时。但也正因为 C 的硬核，让我对内存、对程序的底层运行有了一点感觉。</p>
+<p>到了三四月份，我开始纠结一个问题：C 语言当然好，但它适合作为长期深耕的方向吗？当时打听了不少学长，也刷了很多帖子，结论是——Java 在后端领域生态成熟、岗位多、学习路径清晰。于是我做了一个重要的决定：转学 Java。</p>
+<p>这个决定，基本定义了我整个 2018 年剩下的路。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20back-end%20learning%20roadmap%202018,%20from%20Java%20SE%20to%20Spring%20framework,%20road%20map%20style%20timeline%20infographic,%20developer%20education%20path&image_size=landscape_16_9" alt="2018 年 Java 后端学习路线图"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>目标定下来之后，真正走起来才发现，问题一个接一个。</p>
+<h2 id="1-学习路线不清晰，走了不少弯路"><a href="#1-学习路线不清晰，走了不少弯路" class="headerlink" title="1. 学习路线不清晰，走了不少弯路"></a>1. 学习路线不清晰，走了不少弯路</h2><p>网上关于 Java 学习的资料和路线图很多，但信息多到让人不知道该信谁。今天看到一个博客说先学 Java SE，明天又有人说直接上手 Spring Boot。我是那种喜欢把”所有前置知识”都学完再做事情的人，结果就是在基础语法阶段兜兜转转了太久。</p>
+<h2 id="2-光看不练，眼高手低"><a href="#2-光看不练，眼高手低" class="headerlink" title="2. 光看不练，眼高手低"></a>2. 光看不练，眼高手低</h2><p>这是我这一年最大的毛病。</p>
+<p>看书的时候觉得自己都懂了——不就是面向对象吗，不就是集合框架吗，有什么难的。但是合上书，打开 IDE，写一个简单的增删改查都要查半天 API。印象最深的是学完 HashMap 原理之后，自己试着实现一个简化版本，写到一半发现根本不知道从哪里下手。这才意识到，”看懂”和”会写”之间隔着十万行代码的距离。</p>
+<h2 id="3-遇到问题不敢问"><a href="#3-遇到问题不敢问" class="headerlink" title="3. 遇到问题不敢问"></a>3. 遇到问题不敢问</h2><p>当时加了一些技术群，也在论坛上潜水。遇到问题第一反应不是去问，而是反复怀疑自己是不是太笨了——这么基础的东西都不懂。于是经常一个人卡在一个小 bug 上几个小时，浪费大量时间。后来才明白，每个经历过自学的人都是从这些坑里爬出来的，问问题不是丢人的事。</p>
+<h2 id="4-博客看得多，写得少"><a href="#4-博客看得多，写得少" class="headerlink" title="4. 博客看得多，写得少"></a>4. 博客看得多，写得少</h2><p>我的浏览器书签里收藏了上百篇文章，从 HashMap 源码分析到 JVM 内存模型，应有尽有。每天刷好几篇，刷完觉得充实。但一个月后回头看，脑子里能留下的印象很模糊。因为光看不写，知识的留存率太低了。</p>
+<h2 id="5-时间管理不好，经常拖延"><a href="#5-时间管理不好，经常拖延" class="headerlink" title="5. 时间管理不好，经常拖延"></a>5. 时间管理不好，经常拖延</h2><p>“今天太累了，明天再看吧”——这句话几乎是我上半年的口头禅。没有固定的学习时间，没有计划，全凭热情驱动。热情高的时候一天学八个小时，没状态的时候一周都不碰代码。这种节奏非常低效。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>后来我慢慢想明白了这些问题的根因，也在下半年做了一些调整。</p>
+<h2 id="学习规划的重要性"><a href="#学习规划的重要性" class="headerlink" title="学习规划的重要性"></a>学习规划的重要性</h2><p>没有规划的学习就像没有地图的旅行。知识海洋是无限的，但个人的时间和精力是有限的。后来我给自己定了一条原则：选定一个方向，找到一条被验证过的路线，先踏踏实实走完，不要中途反复切换赛道。</p>
+<h2 id="编程是手艺活"><a href="#编程是手艺活" class="headerlink" title="编程是手艺活"></a>编程是手艺活</h2><p>我越来越理解一个道理：编程像学游泳，你看再多教学视频，不下水就永远学不会。代码必须亲手敲，bug 必须亲自查，项目必须亲手做。任何一个你”觉得”懂了但写不出来的知识点，都说明你还没真正掌握它。</p>
+<p>后来我强迫自己每学一个新知识点，就写一段代码验证它，哪怕只是一个十行的小 demo。</p>
+<h2 id="社区和交流的价值"><a href="#社区和交流的价值" class="headerlink" title="社区和交流的价值"></a>社区和交流的价值</h2><p>下半年我开始尝试在群里发言，偶尔回答一些别人提的问题。我发现教是最好的学——为了回答一个问题，你往往需要把那个知识点重新梳理一遍，这个过程本身就是一次高质量复习。而且当你发现别人也会犯和你一样的错误时，那种”只有我不行”的焦虑感会少很多。</p>
+<h2 id="写作是深度学习的加速器"><a href="#写作是深度学习的加速器" class="headerlink" title="写作是深度学习的加速器"></a>写作是深度学习的加速器</h2><p>十月份开始写博客之后，我明显感觉到自己对知识的理解深了一层。因为要把一个东西讲清楚，你必须先把它真正搞懂。写作强迫你梳理逻辑、查漏补缺、用自己的语言重新表达。这个过程比单纯地读十篇文章都有效。</p>
+<h2 id="固定学习节奏"><a href="#固定学习节奏" class="headerlink" title="固定学习节奏"></a>固定学习节奏</h2><p>下半年我开始用番茄工作法，每 25 分钟专注学习，然后休息 5 分钟。同时给自己定了规矩：每天晚上 8 点到 10 点是固定学习时间，雷打不动。效果比”等我有时间了再学”好太多。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Time%20management%20and%20learning%20methods%20for%20programmers,%20Pomodoro%20technique,%20fixed%20study%20schedule,%20knowledge%20retention%20pyramid,%20tech%20blog%20illustration&image_size=landscape_16_9" alt="时间管理与学习方法示意图"></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>说是解决方案，其实没有那么多方法论。就是一个普通人在跌跌撞撞中，按季度一步步走过来的真实记录。</p>
+<h2 id="Q1（1-3-月）：C-语言入门，决定转-Java"><a href="#Q1（1-3-月）：C-语言入门，决定转-Java" class="headerlink" title="Q1（1-3 月）：C 语言入门，决定转 Java"></a>Q1（1-3 月）：C 语言入门，决定转 Java</h2><p>年初从 C 语言开始，把指针、数组、结构体这些基础概念过了一遍。过程中有过一点小小的成就感——当第一个指针程序运行正确的时候，那种感觉确实很奇妙。但也逐渐意识到，C 语言在应用层面的天花板比较低，对我来说更适合作为理解计算机底层的基础，而不是长期主攻方向。</p>
+<p>三月份做了全年最重要的决定：转向 Java。</p>
+<p>这个决定不是一时冲动。当时花了一周时间调研，看了很多自学路线帖和招聘要求，确认 Java 在服务端开发中的地位和前景。确定了方向之后，整个人的心态反而安定下来了——不再东张西望，就朝这一个方向走。</p>
+<p>接着就是搭环境。JDK 安装、环境变量配置、第一个 IDE（Eclipse）的安装和使用。这些现在看来基础得不能再基础的操作，当时每一步都可能卡住。JDK 版本选哪个？环境变量配不对怎么办？Eclipse 为什么打不开？每一个问题都要查好久。</p>
+<p>当 Hello World 终于出现在控制台的时候，我截图发了个朋友圈。虽然现在想来有点好笑，但那一刻真的觉得——这个大门，我算是挤进来了。</p>
+<h2 id="Q2（4-6-月）：Java-语法基础"><a href="#Q2（4-6-月）：Java-语法基础" class="headerlink" title="Q2（4-6 月）：Java 语法基础"></a>Q2（4-6 月）：Java 语法基础</h2><p>第二季度是大量输入基础知识的时候。</p>
+<p>从基本数据类型、运算符、流程控制开始，然后是面向对象三大特性——封装、继承、多态。这些东西第一次接触时确实觉得抽象，尤其是多态，学完之后做题会做，但问自己”多态在实际项目中有什么用”就答不上来。后来才明白，有些东西的理解是分阶段的——先记住，然后在使用中慢慢感受。</p>
+<p>五月份学到集合框架。ArrayList、LinkedList、HashSet、HashMap——每个实现类都过了一遍，大概理解了接口和实现分离的设计思想。</p>
+<p>这三个月基本是靠看书 + 看视频 + 敲 demo 过来的。节奏不算快，但比较扎实。每学完一个章节，就把书上的代码亲手敲一遍，改一改，看输出有什么变化。</p>
+<h2 id="Q3（7-9-月）：深入-Java，完成第一个小项目"><a href="#Q3（7-9-月）：深入-Java，完成第一个小项目" class="headerlink" title="Q3（7-9 月）：深入 Java，完成第一个小项目"></a>Q3（7-9 月）：深入 Java，完成第一个小项目</h2><p>暑假是全年学习效率最高的一段时间。</p>
+<p>七月啃 HashMap。那时候看了好几篇源码分析的文章，自己也把源码拉下来断点跟踪。虽然当时对红黑树的理解还很浅，但至少搞清楚了哈希冲突怎么解决、扩容机制是怎么回事。也在这个月第一次写博客——<a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/07/22/HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">HashMap 基础学习</a>，写得很浅，但迈出了第一步。</p>
+<p>八月学异常处理机制，写了 <a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/08/19/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">Java 异常处理机制</a>。然后开始学 JDBC，这是第一次把 Java 和数据库联系起来，写了篇文章 <a target="_blank" rel="noopener" href="https://chenzixin.github.io/2018/09/15/JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/">JDBC 连接 MySQL 实践</a>。</p>
+<p>九月最重要的事情是完成了第一个完整的 Java 小项目——学生管理系统。</p>
+<p>说是系统，其实就是一个控制台程序：从 MySQL 里读取学生数据，展示在控制台上，支持增删改查。技术上没什么难度，但对我来说意义很大——我第一次经历了”从零开始分析需求、设计数据结构、写代码、调试、最终跑通”的完整流程。也正是在这个项目里，我初次感受到了写代码的快感。</p>
+<h2 id="Q4（10-12-月）：数据库、Linux、Spring-入门"><a href="#Q4（10-12-月）：数据库、Linux、Spring-入门" class="headerlink" title="Q4（10-12 月）：数据库、Linux、Spring 入门"></a>Q4（10-12 月）：数据库、Linux、Spring 入门</h2><p>第四季度开始进一步拓展广度。</p>
+<p>MySQL 部分不再满足于基本的 CRUD，开始深入学习表设计、索引、事务隔离级别。也正是在这个过程中，我才理解了为什么三范式、为什么加索引、什么时候用 InnoDB 什么时候用 MyISAM。</p>
+<p>十一月开始接触 Linux。装了一个虚拟机，装 CentOS，学着用命令行操作文件、配置网络、装软件。一开始觉得没有图形界面很不习惯，但后来慢慢体会到了命令行的高效。这期间也学会了搭 Nginx 和部署简单项目。</p>
+<p>十二月的关键词是 Spring。终于在年底正式接触到了这个如雷贯耳的框架。从 IoC（控制反转）和 DI（依赖注入）的概念开始，慢慢理解为什么 Spring 能让代码变得松耦合。十二月中旬跑通了第一个 Spring 项目，虽然只是配置了几个 Bean，做了最简单的依赖注入，但那种”原来框架是这样工作的”的感觉让我兴奋了好几天。</p>
+<h2 id="2019-年计划"><a href="#2019-年计划" class="headerlink" title="2019 年计划"></a>2019 年计划</h2><p>坐在 2018 年的尾巴上，对明年有一些想法：</p>
+<ul>
+<li><strong>框架学习</strong>：把 SSM（Spring + SpringMVC + MyBatis）这个组合啃下来，搭建一个完整的 Web 项目</li>
+<li><strong>Redis</strong>：学习缓存，理解 NoSQL 的适用场景</li>
+<li><strong>项目实战</strong>：不再满足于 demo 和小工具，至少做一个拿得出手的完整项目</li>
+<li><strong>坚持写博客</strong>：把学到的东西沉淀下来，不管写得好不好，先写</li>
+<li><strong>更多交流</strong>：尝试去回答别人提出的问题，在社区中参与讨论</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>2018 年结束了。</p>
+<p>这一年走过的路，用代码来表达大概是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class Year2018 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int totalDays = 365;</span><br><span class="line">        int learningDays = 250;     // 翻书 + 看视频</span><br><span class="line">        int codingDays = 150;       // 亲手写代码</span><br><span class="line">        int projectCount = 1;       // 第一个完整项目</span><br><span class="line">        int blogCount = 5;          // 这一年写的博客</span><br><span class="line">        int debugErrors = 999;      // 记不清的错误次数，上不封顶</span><br><span class="line"></span><br><span class="line">        String result = (codingDays &gt; 0 &amp;&amp; projectCount &gt; 0)</span><br><span class="line">            ? &quot;入门成功&quot; : &quot;仍需努力&quot;;</span><br><span class="line">        System.out.println(&quot;2018年结果：&quot; + result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码不会骗人。这一年的输入和输出清清楚楚地写在上面。</p>
+<p>关于心态的变化可能比知识的增长更重要。年初的时候我总觉得编程是一件需要天赋的事情，那些写框架的人、做开源项目的人，一定天生就比普通人聪明。现在我不这么认为了。我看到的所有”厉害的人”，不过是在你看不到的地方，花了你想象不到的时间。</p>
+<p>编程是一种技能，技能是可以靠持续练习获得的。这一年教会我最大的道理就是：<strong>不要高估一天能学到的东西，不要低估一年能积累的东西。</strong></p>
+<p>当然也有遗憾。有些知识点学得不够深入，很多 bug 挡了一下就绕过去了，没有彻底搞清楚根源。有些计划中的书没看完，有些想写的博客没来得及写。</p>
+<p>但没关系。2019 年还会继续。</p>
+<p>最后的最后，用一句话总结这个深夜的感慨吧：</p>
+<blockquote>
+<p>这一年，从 Hello World 写到了 Spring 容器；从对着控制台发呆，到享受 Debug 通过那一刻的畅快。路还很长，但至少，我开始享受写代码这件事了。</p>
+</blockquote>
+<p>2019，继续写下去。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/" rel="tag"># 年度总结</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/" rel="tag"># 学习路线</a>
+              <a href="/tags/%E5%9B%9E%E9%A1%BE/" rel="tag"># 回顾</a>
+              <a href="/tags/%E5%B1%95%E6%9C%9B/" rel="tag"># 展望</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/" rel="prev" title="Linux常用命令整理">
+                  <i class="fa fa-angle-left"></i> Linux常用命令整理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/06/09/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/" rel="next" title="博客重新出发">
+                  博客重新出发 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

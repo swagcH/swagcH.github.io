@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="背景最近写 Java 小项目的时候，我经常会遇到各种报错。有些错误是编译阶段就提示的，比如文件找不到、方法必须抛出异常；有些错误是程序运行到一半才出现的，比如空指针、数组越界、类型转换失败。 一开始我对异常的理解比较简单：报错了就 try-catch 一下，能运行就行。但是写得多了之后发现，异常处理并不是把代码包起来这么简单。如果处理方式不对，程序表面上不报错了，真正的问题反而被藏起来了。 尤其是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java异常处理机制">
+<meta property="og:url" content="https://swagch.github.io/2018/08/19/2018-08-19-Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="背景最近写 Java 小项目的时候，我经常会遇到各种报错。有些错误是编译阶段就提示的，比如文件找不到、方法必须抛出异常；有些错误是程序运行到一半才出现的，比如空指针、数组越界、类型转换失败。 一开始我对异常的理解比较简单：报错了就 try-catch 一下，能运行就行。但是写得多了之后发现，异常处理并不是把代码包起来这么简单。如果处理方式不对，程序表面上不报错了，真正的问题反而被藏起来了。 尤其是">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20exception%20hierarchy%20diagram%20Throwable%20Error%20Exception%20RuntimeException%20checked%20unchecked%20exceptions,%20clean%20technical%20infographic&image_size=landscape_4_3">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Checked%20exception%20vs%20unchecked%20exception%20comparison%20table%20in%20Java,%20educational%20infographic,%20blue%20and%20orange&image_size=landscape_4_3">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20try%20with%20resources%20automatic%20resource%20closing%20flowchart,%20file%20reader%20close%20process,%20clean%20infographic&image_size=landscape_4_3">
+<meta property="article:published_time" content="2018-08-19T12:33:17.000Z">
+<meta property="article:modified_time" content="2026-06-09T07:52:22.472Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="异常处理">
+<meta property="article:tag" content="try-catch">
+<meta property="article:tag" content="Exception">
+<meta property="article:tag" content="最佳实践">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20exception%20hierarchy%20diagram%20Throwable%20Error%20Exception%20RuntimeException%20checked%20unchecked%20exceptions,%20clean%20technical%20infographic&image_size=landscape_4_3">
+
+
+<link rel="canonical" href="https://swagch.github.io/2018/08/19/2018-08-19-Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2018/08/19/2018-08-19-Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/","path":"2018/08/19/2018-08-19-Java异常处理机制/","title":"Java异常处理机制"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Java异常处理机制 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E5%BC%82%E5%B8%B8%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="nav-text">Java异常体系结构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#try-catch-finally%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E8%AF%A6%E8%A7%A3"><span class="nav-text">try-catch-finally执行顺序详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%9A%E5%8A%A1%E5%BC%82%E5%B8%B8%E7%B1%BB"><span class="nav-text">自定义业务异常类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E9%93%BEcause%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">异常链cause的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9Acatch%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-text">多catch的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#try-with-resources%E9%87%8A%E6%94%BE%E8%B5%84%E6%BA%90"><span class="nav-text">try-with-resources释放资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95"><span class="nav-text">异常处理最佳实践清单</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/08/19/2018-08-19-Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Java异常处理机制 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java异常处理机制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-08-19 20:33:17" itemprop="dateCreated datePublished" datetime="2018-08-19T20:33:17+08:00">2018-08-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 15:52:22" itemprop="dateModified" datetime="2026-06-09T15:52:22+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>最近写 Java 小项目的时候，我经常会遇到各种报错。有些错误是编译阶段就提示的，比如文件找不到、方法必须抛出异常；有些错误是程序运行到一半才出现的，比如空指针、数组越界、类型转换失败。</p>
+<p>一开始我对异常的理解比较简单：报错了就 <code>try-catch</code> 一下，能运行就行。但是写得多了之后发现，异常处理并不是把代码包起来这么简单。如果处理方式不对，程序表面上不报错了，真正的问题反而被藏起来了。</p>
+<p>尤其是这段时间，我经常看到代码里有 <code>catch (Exception e)</code>，但 catch 里面只打印一句话，甚至什么都不写。这样虽然编译能通过，但以后排查问题会非常痛苦。</p>
+<p>所以我打算在 2018 年 8 月这个阶段，把 Java 异常处理机制系统梳理一遍，弄清楚异常体系、<code>try-catch-finally</code> 执行顺序、什么时候应该抛异常、什么时候应该捕获异常。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>我目前遇到的困惑主要有这几个：</p>
+<ul>
+<li>Checked异常和Unchecked异常分不清</li>
+<li><code>finally</code> 中的 <code>return</code> 会覆盖 <code>try</code> 中的返回值</li>
+<li>习惯性 <code>catch (Exception e)</code>，但 catch 之后不知道怎么处理</li>
+<li>空的 catch 块会吞掉异常，导致排查问题很困难</li>
+<li>不知道什么时候应该向上抛异常，什么时候应该自己 catch</li>
+</ul>
+<p>其中最让我印象深的是 <code>finally</code> 里的 <code>return</code>。以前我以为 <code>try</code> 里面已经 <code>return</code> 了，方法就结束了。后来才发现，只要有 <code>finally</code>，它仍然会执行；如果 <code>finally</code> 里面也写了 <code>return</code>，还会把 <code>try</code> 或 <code>catch</code> 里的返回值覆盖掉。</p>
+<p>另外，空 catch 块也很危险。异常发生了，但是代码没有任何日志、没有任何提示，就像什么都没发生一样。这种写法短期看起来“安静”，长期看就是在给自己埋雷。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Java 的异常可以先从 <code>Throwable</code> 这个顶层父类看起。它下面主要有两个分支：<code>Error</code> 和 <code>Exception</code>。</p>
+<p><code>Error</code> 通常表示比较严重的问题，比如 JVM 内存不足、栈溢出等，一般不是业务代码应该捕获处理的重点。我们平时写业务代码更多关注的是 <code>Exception</code>。</p>
+<p><code>Exception</code> 又可以分成两类：Checked异常和Unchecked异常。</p>
+<p>Checked异常是编译期检查异常。也就是说，如果方法可能抛出这类异常，编译器会要求我们必须处理：要么使用 <code>try-catch</code> 捕获，要么在方法上使用 <code>throws</code> 声明继续向上抛。</p>
+<p>Unchecked异常主要指 <code>RuntimeException</code> 以及它的子类，比如 <code>NullPointerException</code>、<code>IllegalArgumentException</code>、<code>IndexOutOfBoundsException</code> 等。这类异常编译器不会强制要求处理，但它们仍然会在运行时导致程序出错。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20exception%20hierarchy%20diagram%20Throwable%20Error%20Exception%20RuntimeException%20checked%20unchecked%20exceptions,%20clean%20technical%20infographic&image_size=landscape_4_3" alt="Java异常体系结构图"><br><em>配图说明：Java异常体系中 Throwable、Error、Exception 和 RuntimeException 的关系</em></p>
+<p>简单理解可以这样记：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>是否编译期强制处理</th>
+<th>常见例子</th>
+<th>处理思路</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Checked异常</td>
+<td>是</td>
+<td>IOException、SQLException</td>
+<td>捕获后处理，或向上抛出</td>
+</tr>
+<tr>
+<td>Unchecked异常</td>
+<td>否</td>
+<td>NullPointerException、IllegalArgumentException</td>
+<td>优先通过代码逻辑避免</td>
+</tr>
+<tr>
+<td>Error</td>
+<td>否</td>
+<td>OutOfMemoryError、StackOverflowError</td>
+<td>通常不在业务代码中捕获</td>
+</tr>
+</tbody></table>
+<p><code>finally</code> 的规则也要特别注意：无论 <code>try</code> 中是否发生异常，只要 JVM 没有直接退出，<code>finally</code> 通常都会执行。它适合用来释放资源，比如关闭文件流、数据库连接等。</p>
+<p>但是不要在 <code>finally</code> 中写 <code>return</code>。因为 <code>finally</code> 的 <code>return</code> 会覆盖 <code>try</code> 或 <code>catch</code> 中已经准备返回的结果，也可能覆盖正在抛出的异常，让问题变得非常隐蔽。</p>
+<p>从代码结构上看，比较合理的异常处理思路是：底层代码只负责发现问题并抛出带上下文的异常，上层代码统一捕获并处理，比如返回错误提示、记录日志、回滚事务等。这样职责会更清晰，也更容易排查问题。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="Java异常体系结构图"><a href="#Java异常体系结构图" class="headerlink" title="Java异常体系结构图"></a>Java异常体系结构图</h2><p>先把异常体系记清楚，对后面理解 Checked 和 Unchecked 很有帮助。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Throwable</span><br><span class="line">├── Error</span><br><span class="line">│   ├── OutOfMemoryError</span><br><span class="line">│   └── StackOverflowError</span><br><span class="line">└── Exception</span><br><span class="line">    ├── IOException</span><br><span class="line">    ├── SQLException</span><br><span class="line">    └── RuntimeException</span><br><span class="line">        ├── NullPointerException</span><br><span class="line">        ├── IllegalArgumentException</span><br><span class="line">        └── IndexOutOfBoundsException</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Checked%20exception%20vs%20unchecked%20exception%20comparison%20table%20in%20Java,%20educational%20infographic,%20blue%20and%20orange&image_size=landscape_4_3" alt="Checked和Unchecked异常对比"><br><em>配图说明：Checked异常和Unchecked异常的区别</em></p>
+<p>Checked异常的典型例子是读取文件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CheckedExceptionDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">FileInputStream</span> <span class="variable">inputStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;test.txt&quot;</span>);</span><br><span class="line">            System.out.println(inputStream);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;文件不存在：&quot;</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>FileNotFoundException</code> 是 Checked异常，如果不处理，代码不能通过编译。</p>
+<p>Unchecked异常的典型例子是空指针：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UncheckedExceptionDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">text</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        System.out.println(text.length());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码编译可以通过，但运行时会抛出 <code>NullPointerException</code>。所以 Unchecked异常不是“不重要”，而是编译器不强制我们写 <code>try-catch</code>。</p>
+<h2 id="try-catch-finally执行顺序详解"><a href="#try-catch-finally执行顺序详解" class="headerlink" title="try-catch-finally执行顺序详解"></a>try-catch-finally执行顺序详解</h2><p>先看最普通的情况：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TryCatchFinallyDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;1. 执行try代码块&quot;</span>);</span><br><span class="line">            <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">10</span> / <span class="number">0</span>;</span><br><span class="line">            System.out.println(result);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ArithmeticException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;2. 执行catch代码块：&quot;</span> + e.getMessage());</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;3. 执行finally代码块&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;4. 程序继续向下执行&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行顺序是：先进入 <code>try</code>，遇到异常后进入匹配的 <code>catch</code>，最后一定执行 <code>finally</code>，然后继续执行后面的代码。</p>
+<p>再看有 <code>return</code> 的情况：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FinallyReturnDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(getNumber());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">getNumber</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法最终返回的是 <code>3</code>，不是 <code>1</code>。原因是 <code>try</code> 中虽然已经准备返回 <code>1</code>，但是在方法真正返回之前，<code>finally</code> 仍然会执行，而 <code>finally</code> 里的 <code>return 3</code> 覆盖了原来的返回值。</p>
+<p>更推荐的写法是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BetterFinallyDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(getNumber());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">getNumber</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;释放资源或记录必要信息&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>finally</code> 只做资源释放，不做返回值控制，这样逻辑更清楚。</p>
+<h2 id="自定义业务异常类"><a href="#自定义业务异常类" class="headerlink" title="自定义业务异常类"></a>自定义业务异常类</h2><p>实际项目里，很多异常不是 Java 自带异常能准确表达的。比如用户余额不足、订单状态不正确、参数不合法等，都可以定义成业务异常。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BusinessException</span> <span class="keyword">extends</span> <span class="title class_">RuntimeException</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String errorCode;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BusinessException</span><span class="params">(String errorCode, String message)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(message);</span><br><span class="line">        <span class="built_in">this</span>.errorCode = errorCode;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BusinessException</span><span class="params">(String errorCode, String message, Throwable cause)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(message, cause);</span><br><span class="line">        <span class="built_in">this</span>.errorCode = errorCode;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getErrorCode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> errorCode;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用业务异常时，异常信息要写清楚，最好带上业务上下文：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderService</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pay</span><span class="params">(String orderId, <span class="type">int</span> balance, <span class="type">int</span> amount)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (balance &lt; amount) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;BALANCE_NOT_ENOUGH&quot;</span>, <span class="string">&quot;订单&quot;</span> + orderId + <span class="string">&quot;支付失败，余额不足&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;订单支付成功：&quot;</span> + orderId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我选择让 <code>BusinessException</code> 继承 <code>RuntimeException</code>，是因为业务异常很多时候希望由上层统一处理，而不是在每一层都被迫 <code>try-catch</code>。</p>
+<h2 id="异常链cause的使用"><a href="#异常链cause的使用" class="headerlink" title="异常链cause的使用"></a>异常链cause的使用</h2><p>有时候底层异常不能直接暴露给上层，但又不能丢失原始原因。这时就应该使用异常链，也就是把原始异常作为 <code>cause</code> 传进去。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ExceptionCauseDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            loadConfig(<span class="string">&quot;app.properties&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (BusinessException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;错误码：&quot;</span> + e.getErrorCode());</span><br><span class="line">            System.out.println(<span class="string">&quot;错误信息：&quot;</span> + e.getMessage());</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">loadConfig</span><span class="params">(String fileName)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(fileName);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;CONFIG_NOT_FOUND&quot;</span>, <span class="string">&quot;配置文件不存在：&quot;</span> + fileName, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样做的好处是：上层看到的是业务含义明确的异常，排查问题时又可以通过 <code>cause</code> 找到最原始的 <code>FileNotFoundException</code>。</p>
+<h2 id="多catch的使用"><a href="#多catch的使用" class="headerlink" title="多catch的使用"></a>多catch的使用</h2><p>Java 7 之后可以在一个 catch 中捕获多种异常，适合处理方式相同的场景。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MultiCatchDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">numberText</span> <span class="operator">=</span> args[<span class="number">0</span>];</span><br><span class="line">            <span class="type">int</span> <span class="variable">number</span> <span class="operator">=</span> Integer.parseInt(numberText);</span><br><span class="line">            System.out.println(<span class="string">&quot;数字是：&quot;</span> + number);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ArrayIndexOutOfBoundsException | NumberFormatException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;请输入一个合法的整数参数：&quot;</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果不同异常的处理方式不同，就不要强行合并，应该分开 catch。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SeparateCatchDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">numberText</span> <span class="operator">=</span> args[<span class="number">0</span>];</span><br><span class="line">            <span class="type">int</span> <span class="variable">number</span> <span class="operator">=</span> Integer.parseInt(numberText);</span><br><span class="line">            System.out.println(<span class="string">&quot;数字是：&quot;</span> + number);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ArrayIndexOutOfBoundsException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;缺少启动参数&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;参数不是合法整数：&quot;</span> + args[<span class="number">0</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，catch 的顺序要从具体异常到宽泛异常。如果先 catch <code>Exception</code>，后面的具体异常就没有机会被捕获了。</p>
+<h2 id="try-with-resources释放资源"><a href="#try-with-resources释放资源" class="headerlink" title="try-with-resources释放资源"></a>try-with-resources释放资源</h2><p>以前释放资源通常写在 <code>finally</code> 里：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.FileReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OldResourceCloseDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">BufferedReader</span> <span class="variable">reader</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            reader = <span class="keyword">new</span> <span class="title class_">BufferedReader</span>(<span class="keyword">new</span> <span class="title class_">FileReader</span>(<span class="string">&quot;test.txt&quot;</span>));</span><br><span class="line">            System.out.println(reader.readLine());</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (reader != <span class="literal">null</span>) &#123;</span><br><span class="line">                reader.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Java 7 之后更推荐使用 <code>try-with-resources</code>，它会自动关闭实现了 <code>AutoCloseable</code> 接口的资源。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.FileReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TryWithResourcesDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> (<span class="type">BufferedReader</span> <span class="variable">reader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedReader</span>(<span class="keyword">new</span> <span class="title class_">FileReader</span>(<span class="string">&quot;test.txt&quot;</span>))) &#123;</span><br><span class="line">            System.out.println(reader.readLine());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;读取文件失败：&quot;</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20try%20with%20resources%20automatic%20resource%20closing%20flowchart,%20file%20reader%20close%20process,%20clean%20infographic&image_size=landscape_4_3" alt="try-with-resources资源释放流程"><br><em>配图说明：try-with-resources 自动关闭资源的流程</em></p>
+<p>相比手写 <code>finally</code>，<code>try-with-resources</code> 更简洁，也更不容易忘记关闭资源。</p>
+<h2 id="异常处理最佳实践清单"><a href="#异常处理最佳实践清单" class="headerlink" title="异常处理最佳实践清单"></a>异常处理最佳实践清单</h2><p>经过这次整理，我觉得写异常处理时可以按下面这份清单检查：</p>
+<ul>
+<li>不要写空 catch 块，至少要记录日志或给出明确处理</li>
+<li>不要只写 <code>catch (Exception e)</code>，除非这一层确实是统一异常处理入口</li>
+<li>不要在 <code>finally</code> 中写 <code>return</code></li>
+<li>异常信息要带上下文，比如订单号、用户ID、文件名</li>
+<li>能用代码判断避免的 RuntimeException，就不要依赖 try-catch</li>
+<li>底层异常如果无法处理，就向上抛出，不要假装处理了</li>
+<li>上层统一处理异常，负责日志、提示、事务回滚等</li>
+<li>包装异常时保留原始 cause，避免丢失根因</li>
+<li>关闭资源优先使用 try-with-resources</li>
+<li>自定义异常命名要清晰，比如 <code>BusinessException</code>、<code>OrderStatusException</code></li>
+</ul>
+<p>例如下面这种空 catch 就是反模式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">10</span> / <span class="number">0</span>;</span><br><span class="line">    System.out.println(result);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更好的方式是根据当前层的职责处理异常：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> <span class="number">10</span> / <span class="number">0</span>;</span><br><span class="line">    System.out.println(result);</span><br><span class="line">&#125; <span class="keyword">catch</span> (ArithmeticException e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;CALCULATE_ERROR&quot;</span>, <span class="string">&quot;计算失败，除数不能为0&quot;</span>, e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里没有把异常吞掉，而是把底层异常包装成更有业务意义的异常，并保留原始原因。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次系统梳理 Java 异常处理机制之后，我最大的感受是：异常处理不是为了“让程序不报错”，而是为了让错误在合适的位置被发现、被记录、被处理。</p>
+<p>我的阶段性总结是：</p>
+<ul>
+<li>不要吞异常，空 catch 块是非常危险的写法</li>
+<li>异常信息要带上下文，不然排查问题会很困难</li>
+<li>底层无法处理的异常应该向上抛，上层再统一 catch</li>
+<li><code>finally</code> 适合释放资源，但不要在里面写 <code>return</code></li>
+<li>关闭文件流、网络连接等资源时，优先使用 <code>try-with-resources</code></li>
+</ul>
+<p>以后写代码时，我会尽量避免为了“消除红线”而随便 <code>try-catch</code>。真正好的异常处理，应该能帮助我更快定位问题，而不是把问题藏起来。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" rel="tag"># 异常处理</a>
+              <a href="/tags/try-catch/" rel="tag"># try-catch</a>
+              <a href="/tags/Exception/" rel="tag"># Exception</a>
+              <a href="/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" rel="tag"># 最佳实践</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/" rel="prev" title="HashMap基础学习">
+                  <i class="fa fa-angle-left"></i> HashMap基础学习
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/09/15/2018-09-15-JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/" rel="next" title="JDBC连接MySQL实践">
+                  JDBC连接MySQL实践 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

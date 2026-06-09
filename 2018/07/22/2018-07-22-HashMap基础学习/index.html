@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="背景2018 年 7 月，最近把 List 相关的内容过了一遍，接下来开始学习 Map。和 List 按顺序存储元素不同，Map 更像是一张“键值对表”，通过 key 可以快速找到对应的 value。 在 Java 集合框架里，HashMap 应该是工作中最常用的数据结构之一。比如根据用户 id 查用户信息、根据配置名查配置值、统计某个字段出现次数等，都很容易想到用 HashMap。  刚开始看">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap基础学习">
+<meta property="og:url" content="https://swagch.github.io/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="背景2018 年 7 月，最近把 List 相关的内容过了一遍，接下来开始学习 Map。和 List 按顺序存储元素不同，Map 更像是一张“键值对表”，通过 key 可以快速找到对应的 value。 在 Java 集合框架里，HashMap 应该是工作中最常用的数据结构之一。比如根据用户 id 查用户信息、根据配置名查配置值、统计某个字段出现次数等，都很容易想到用 HashMap。  刚开始看">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20HashMap%20bucket%20array%20linked%20list%20collision%20diagram,%20clean%20technical%20blog%20illustration&image_size=landscape_16_9">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=HashMap%20hash%20collision%20linked%20list%20and%20red%20black%20tree%20conversion,%20Java%20technical%20diagram&image_size=landscape_16_9">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20HashMap%20resize%20rehash%20capacity%20load%20factor%20technical%20illustration&image_size=landscape_16_9">
+<meta property="article:published_time" content="2018-07-22T06:18:39.000Z">
+<meta property="article:modified_time" content="2026-06-09T07:52:03.649Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="集合框架">
+<meta property="article:tag" content="HashMap">
+<meta property="article:tag" content="哈希表">
+<meta property="article:tag" content="Map">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20HashMap%20bucket%20array%20linked%20list%20collision%20diagram,%20clean%20technical%20blog%20illustration&image_size=landscape_16_9">
+
+
+<link rel="canonical" href="https://swagch.github.io/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/","path":"2018/07/22/2018-07-22-HashMap基础学习/","title":"HashMap基础学习"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>HashMap基础学习 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-HashMap-%E5%8F%AF%E4%BB%A5%E5%AD%98-null-%E5%90%97%EF%BC%9F"><span class="nav-text">1. HashMap 可以存 null 吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-HashMap-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%EF%BC%9F"><span class="nav-text">2. HashMap 为什么不是线程安全的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-hashCode-%E7%9B%B8%E5%90%8C%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F"><span class="nav-text">3. hashCode 相同怎么办？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%81%8D%E5%8E%86%E6%96%B9%E5%BC%8F%E5%BA%94%E8%AF%A5%E9%80%89%E5%93%AA%E4%B8%AA%EF%BC%9F"><span class="nav-text">4. 遍历方式应该选哪个？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-HashMap-%E5%92%8C-Hashtable-%E5%8C%BA%E5%88%AB"><span class="nav-text">5. HashMap 和 Hashtable 区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-HashMap-%E5%9F%BA%E6%9C%AC-CRUD-%E6%93%8D%E4%BD%9C"><span class="nav-text">1. HashMap 基本 CRUD 操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%94%A8-Student-%E4%BD%9C%E4%B8%BA-key-%E6%97%B6%E9%87%8D%E5%86%99-hashCode-%E5%92%8C-equals"><span class="nav-text">2. 用 Student 作为 key 时重写 hashCode 和 equals</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-HashMap-%E7%9A%84-4-%E7%A7%8D%E9%81%8D%E5%8E%86%E6%96%B9%E5%BC%8F"><span class="nav-text">3. HashMap 的 4 种遍历方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%80%EF%BC%9A%E9%81%8D%E5%8E%86-keySet%EF%BC%8C%E5%86%8D%E9%80%9A%E8%BF%87-key-%E8%8E%B7%E5%8F%96-value"><span class="nav-text">方式一：遍历 keySet，再通过 key 获取 value</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%BA%8C%EF%BC%9A%E9%81%8D%E5%8E%86-entrySet"><span class="nav-text">方式二：遍历 entrySet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E4%B8%89%EF%BC%9A%E5%8F%AA%E9%81%8D%E5%8E%86-values"><span class="nav-text">方式三：只遍历 values</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E5%BC%8F%E5%9B%9B%EF%BC%9A%E4%BD%BF%E7%94%A8-Iterator-%E9%81%8D%E5%8E%86"><span class="nav-text">方式四：使用 Iterator 遍历</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%88%9D%E5%A7%8B%E5%AE%B9%E9%87%8F%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9B%A0%E5%AD%90%E6%80%8E%E4%B9%88%E8%AE%BE%E7%BD%AE%EF%BC%9F"><span class="nav-text">4. 初始容量和负载因子怎么设置？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9C%BA%E6%99%AF%E4%BD%BF%E7%94%A8-ConcurrentHashMap"><span class="nav-text">5. 多线程场景使用 ConcurrentHashMap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/07/22/2018-07-22-HashMap%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="HashMap基础学习 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HashMap基础学习
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-07-22 14:18:39" itemprop="dateCreated datePublished" datetime="2018-07-22T14:18:39+08:00">2018-07-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 15:52:03" itemprop="dateModified" datetime="2026-06-09T15:52:03+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E9%9B%86%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">Java集合</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 7 月，最近把 <code>List</code> 相关的内容过了一遍，接下来开始学习 <code>Map</code>。和 <code>List</code> 按顺序存储元素不同，<code>Map</code> 更像是一张“键值对表”，通过 <code>key</code> 可以快速找到对应的 <code>value</code>。</p>
+<p>在 Java 集合框架里，<code>HashMap</code> 应该是工作中最常用的数据结构之一。比如根据用户 id 查用户信息、根据配置名查配置值、统计某个字段出现次数等，都很容易想到用 <code>HashMap</code>。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20HashMap%20bucket%20array%20linked%20list%20collision%20diagram,%20clean%20technical%20blog%20illustration&image_size=landscape_16_9" alt="HashMap桶数组与链表结构"></p>
+<p>刚开始看 <code>HashMap</code> 的时候，我觉得它只是“根据 key 存取 value”的工具类。但继续往下学才发现，里面涉及哈希算法、数组、链表、扩容、线程安全、<code>hashCode</code> 和 <code>equals</code> 等一系列知识点。也难怪它经常出现在面试题里。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>学习过程中，我主要遇到了下面几个疑问：</p>
+<ol>
+<li><code>key</code> 为 <code>null</code> 时，<code>HashMap</code> 到底怎么处理？</li>
+<li>以前听说 <code>HashMap</code> 不是线程安全的，实际会出什么问题？</li>
+<li>如果两个不同的 <code>key</code> 算出来的 <code>hashCode</code> 一样，数据会不会被覆盖？</li>
+<li>遍历 <code>HashMap</code> 的方式太多，到底该用哪一种？</li>
+<li><code>HashMap</code> 和 <code>Hashtable</code> 有什么区别？</li>
+</ol>
+<p>这些问题如果只停留在“会用 API”的层面，其实很容易混淆。所以我打算先从常用操作入手，再慢慢分析它的底层原理。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="1-HashMap-可以存-null-吗？"><a href="#1-HashMap-可以存-null-吗？" class="headerlink" title="1. HashMap 可以存 null 吗？"></a>1. HashMap 可以存 null 吗？</h2><p><code>HashMap</code> 允许一个 <code>null key</code>，也允许多个 <code>null value</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;();</span><br><span class="line">map.put(<span class="literal">null</span>, <span class="string">&quot;空key&quot;</span>);</span><br><span class="line">map.put(<span class="string">&quot;name&quot;</span>, <span class="literal">null</span>);</span><br><span class="line">map.put(<span class="string">&quot;address&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">System.out.println(map.get(<span class="literal">null</span>));</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，<code>key</code> 是唯一的，所以 <code>null key</code> 只能有一个。如果重复放入 <code>null key</code>，后面的值会覆盖前面的值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;();</span><br><span class="line">map.put(<span class="literal">null</span>, <span class="string">&quot;第一次放入&quot;</span>);</span><br><span class="line">map.put(<span class="literal">null</span>, <span class="string">&quot;第二次放入&quot;</span>);</span><br><span class="line"></span><br><span class="line">System.out.println(map.get(<span class="literal">null</span>));</span><br></pre></td></tr></table></figure>
+
+<p>输出结果是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">第二次放入</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-HashMap-为什么不是线程安全的？"><a href="#2-HashMap-为什么不是线程安全的？" class="headerlink" title="2. HashMap 为什么不是线程安全的？"></a>2. HashMap 为什么不是线程安全的？</h2><p><code>HashMap</code> 的大多数操作都没有加锁。如果多个线程同时修改同一个 <code>HashMap</code>，就可能出现问题。</p>
+<p>在 JDK7 中，<code>HashMap</code> 扩容时采用头插法迁移链表节点，在并发 <code>put</code> 的情况下，链表可能形成环，最终导致查询时死循环。</p>
+<p>在 JDK8 中，虽然扩容迁移逻辑有所调整，降低了死循环风险，但 <code>HashMap</code> 依然不是线程安全的。多个线程同时 <code>put</code> 时，仍然可能出现数据覆盖、数据丢失、扩容状态不一致等问题。</p>
+<p>所以结论很明确：如果是多线程写入场景，不要直接使用普通 <code>HashMap</code>。</p>
+<h2 id="3-hashCode-相同怎么办？"><a href="#3-hashCode-相同怎么办？" class="headerlink" title="3. hashCode 相同怎么办？"></a>3. hashCode 相同怎么办？</h2><p><code>HashMap</code> 根据 key 的哈希值计算数组下标。不同的 key 可能被计算到同一个数组位置，这种情况叫哈希冲突。</p>
+<p>JDK7 中，哈希冲突主要通过“数组 + 链表”解决：多个元素落到同一个桶时，会挂在同一条链表上。</p>
+<p>JDK8 中，底层结构变成“数组 + 链表 + 红黑树”。当链表长度达到一定阈值，并且数组容量也达到要求后，链表会转成红黑树，减少极端情况下的查询时间。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=HashMap%20hash%20collision%20linked%20list%20and%20red%20black%20tree%20conversion,%20Java%20technical%20diagram&image_size=landscape_16_9" alt="HashMap哈希冲突处理"></p>
+<p>因此，两个 key 的 <code>hashCode</code> 相同，并不代表一定会互相覆盖。<code>HashMap</code> 还会继续通过 <code>equals</code> 判断 key 是否真正相等。</p>
+<h2 id="4-遍历方式应该选哪个？"><a href="#4-遍历方式应该选哪个？" class="headerlink" title="4. 遍历方式应该选哪个？"></a>4. 遍历方式应该选哪个？</h2><p><code>HashMap</code> 的遍历方式很多，比如遍历 <code>keySet</code>、遍历 <code>entrySet</code>、只遍历 value，或者使用 <code>Iterator</code>。</p>
+<p>日常开发里，如果同时需要 key 和 value，我更推荐使用 <code>entrySet</code>。因为 <code>entrySet</code> 可以一次拿到 key 和 value，避免通过 key 再执行一次 <code>get</code> 查询。</p>
+<h2 id="5-HashMap-和-Hashtable-区别"><a href="#5-HashMap-和-Hashtable-区别" class="headerlink" title="5. HashMap 和 Hashtable 区别"></a>5. HashMap 和 Hashtable 区别</h2><p><code>Hashtable</code> 是比较早期的集合类，<code>HashMap</code> 是后来集合框架中的常用实现。两者主要区别如下：</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>HashMap</th>
+<th>Hashtable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>线程安全</td>
+<td>非线程安全</td>
+<td>方法使用 synchronized，线程安全</td>
+</tr>
+<tr>
+<td>null 支持</td>
+<td>允许一个 null key 和多个 null value</td>
+<td>不允许 null key 和 null value</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>单线程下通常更好</td>
+<td>加锁开销较大</td>
+</tr>
+<tr>
+<td>推荐程度</td>
+<td>日常开发常用</td>
+<td>现在较少使用</td>
+</tr>
+<tr>
+<td>替代方案</td>
+<td>多线程场景用 ConcurrentHashMap</td>
+<td>通常不推荐新代码使用</td>
+</tr>
+</tbody></table>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="1-HashMap-基本-CRUD-操作"><a href="#1-HashMap-基本-CRUD-操作" class="headerlink" title="1. HashMap 基本 CRUD 操作"></a>1. HashMap 基本 CRUD 操作</h2><p>先从最基础的增删改查开始。这里我用 <code>String</code> 作为 key，<code>Integer</code> 作为 value，模拟记录学生成绩。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; scoreMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, Integer&gt;();</span><br><span class="line"></span><br><span class="line">scoreMap.put(<span class="string">&quot;张三&quot;</span>, <span class="number">90</span>);</span><br><span class="line">scoreMap.put(<span class="string">&quot;李四&quot;</span>, <span class="number">85</span>);</span><br><span class="line">scoreMap.put(<span class="string">&quot;王五&quot;</span>, <span class="number">92</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> <span class="variable">zhangSanScore</span> <span class="operator">=</span> scoreMap.get(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;张三成绩：&quot;</span> + zhangSanScore);</span><br></pre></td></tr></table></figure>
+
+<p>修改和删除也很简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">scoreMap.put(<span class="string">&quot;李四&quot;</span>, <span class="number">88</span>);</span><br><span class="line">scoreMap.remove(<span class="string">&quot;王五&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (scoreMap.containsKey(<span class="string">&quot;李四&quot;</span>)) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;李四成绩：&quot;</span> + scoreMap.get(<span class="string">&quot;李四&quot;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>常见判断操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">hasZhangSan</span> <span class="operator">=</span> scoreMap.containsKey(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line"><span class="type">boolean</span> <span class="variable">hasFullScore</span> <span class="operator">=</span> scoreMap.containsValue(<span class="number">100</span>);</span><br><span class="line"><span class="type">int</span> <span class="variable">size</span> <span class="operator">=</span> scoreMap.size();</span><br><span class="line"><span class="type">boolean</span> <span class="variable">empty</span> <span class="operator">=</span> scoreMap.isEmpty();</span><br><span class="line"></span><br><span class="line">System.out.println(hasZhangSan + <span class="string">&quot;, &quot;</span> + hasFullScore);</span><br><span class="line">System.out.println(<span class="string">&quot;数量：&quot;</span> + size + <span class="string">&quot;, 是否为空：&quot;</span> + empty);</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-用-Student-作为-key-时重写-hashCode-和-equals"><a href="#2-用-Student-作为-key-时重写-hashCode-和-equals" class="headerlink" title="2. 用 Student 作为 key 时重写 hashCode 和 equals"></a>2. 用 Student 作为 key 时重写 hashCode 和 equals</h2><p>如果自定义对象要作为 <code>HashMap</code> 的 key，必须特别注意 <code>hashCode</code> 和 <code>equals</code>。</p>
+<p>比如下面这个 <code>Student</code> 类，我认为只要 <code>id</code> 相同，就是同一个学生。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Student</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Integer id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Student</span><span class="params">(Integer id, String name)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.id = id;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这时应该重写 <code>equals</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object obj)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span> == obj) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!(obj <span class="keyword">instanceof</span> Student)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Student</span> <span class="variable">other</span> <span class="operator">=</span> (Student) obj;</span><br><span class="line">    <span class="keyword">return</span> id != <span class="literal">null</span> ? id.equals(other.id) : other.id == <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时必须重写 <code>hashCode</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> id != <span class="literal">null</span> ? id.hashCode() : <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整使用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Student, String&gt; studentMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;Student, String&gt;();</span><br><span class="line"></span><br><span class="line"><span class="type">Student</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="number">1</span>, <span class="string">&quot;张三&quot;</span>);</span><br><span class="line"><span class="type">Student</span> <span class="variable">s2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="number">1</span>, <span class="string">&quot;张三同学&quot;</span>);</span><br><span class="line"></span><br><span class="line">studentMap.put(s1, <span class="string">&quot;第一次放入&quot;</span>);</span><br><span class="line">studentMap.put(s2, <span class="string">&quot;第二次放入&quot;</span>);</span><br><span class="line"></span><br><span class="line">System.out.println(studentMap.size());</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>equals</code> 和 <code>hashCode</code> 都按 <code>id</code> 判断，那么 <code>s1</code> 和 <code>s2</code> 会被认为是同一个 key，最后 <code>size</code> 是 <code>1</code>。</p>
+<p>这里最重要的规则是：重写 <code>equals</code> 必须重写 <code>hashCode</code>。否则两个对象即使 <code>equals</code> 返回 <code>true</code>，也可能因为哈希值不同而被放到不同桶里，导致 <code>HashMap</code> 行为异常。</p>
+<h2 id="3-HashMap-的-4-种遍历方式"><a href="#3-HashMap-的-4-种遍历方式" class="headerlink" title="3. HashMap 的 4 种遍历方式"></a>3. HashMap 的 4 种遍历方式</h2><h3 id="方式一：遍历-keySet，再通过-key-获取-value"><a href="#方式一：遍历-keySet，再通过-key-获取-value" class="headerlink" title="方式一：遍历 keySet，再通过 key 获取 value"></a>方式一：遍历 keySet，再通过 key 获取 value</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (String key : scoreMap.keySet()) &#123;</span><br><span class="line">    <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> scoreMap.get(key);</span><br><span class="line">    System.out.println(key + <span class="string">&quot; = &quot;</span> + value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法直观，但如果同时需要 key 和 value，会多一次 <code>get</code> 查询，不是最推荐的方式。</p>
+<h3 id="方式二：遍历-entrySet"><a href="#方式二：遍历-entrySet" class="headerlink" title="方式二：遍历 entrySet"></a>方式二：遍历 entrySet</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Map.Entry&lt;String, Integer&gt; entry : scoreMap.entrySet()) &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">    <span class="type">Integer</span> <span class="variable">value</span> <span class="operator">=</span> entry.getValue();</span><br><span class="line">    System.out.println(key + <span class="string">&quot; = &quot;</span> + value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式性能更好，也更适合需要同时访问 key 和 value 的场景。</p>
+<h3 id="方式三：只遍历-values"><a href="#方式三：只遍历-values" class="headerlink" title="方式三：只遍历 values"></a>方式三：只遍历 values</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Integer value : scoreMap.values()) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;成绩：&quot;</span> + value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果只关心 value，不关心 key，这种方式最直接。</p>
+<h3 id="方式四：使用-Iterator-遍历"><a href="#方式四：使用-Iterator-遍历" class="headerlink" title="方式四：使用 Iterator 遍历"></a>方式四：使用 Iterator 遍历</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Iterator&lt;Map.Entry&lt;String, Integer&gt;&gt; iterator = scoreMap.entrySet().iterator();</span><br><span class="line"><span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">    Map.Entry&lt;String, Integer&gt; entry = iterator.next();</span><br><span class="line">    System.out.println(entry.getKey() + <span class="string">&quot; = &quot;</span> + entry.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果遍历过程中需要删除元素，推荐使用 <code>Iterator</code> 的 <code>remove</code> 方法，避免 <code>ConcurrentModificationException</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Iterator&lt;Map.Entry&lt;String, Integer&gt;&gt; iterator = scoreMap.entrySet().iterator();</span><br><span class="line"><span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">    Map.Entry&lt;String, Integer&gt; entry = iterator.next();</span><br><span class="line">    <span class="keyword">if</span> (entry.getValue() &lt; <span class="number">60</span>) &#123;</span><br><span class="line">        iterator.remove();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>简单对比一下：</p>
+<table>
+<thead>
+<tr>
+<th>遍历方式</th>
+<th>适用场景</th>
+<th>推荐程度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>keySet + get</td>
+<td>只想看 key，或代码很简单</td>
+<td>一般</td>
+</tr>
+<tr>
+<td>entrySet</td>
+<td>同时需要 key 和 value</td>
+<td>推荐</td>
+</tr>
+<tr>
+<td>values</td>
+<td>只需要 value</td>
+<td>推荐</td>
+</tr>
+<tr>
+<td>Iterator</td>
+<td>遍历时需要删除元素</td>
+<td>推荐</td>
+</tr>
+</tbody></table>
+<h2 id="4-初始容量和负载因子怎么设置？"><a href="#4-初始容量和负载因子怎么设置？" class="headerlink" title="4. 初始容量和负载因子怎么设置？"></a>4. 初始容量和负载因子怎么设置？</h2><p><code>HashMap</code> 有两个很重要的参数：初始容量和负载因子。</p>
+<p>默认情况下，初始容量是 <code>16</code>，负载因子是 <code>0.75</code>。当元素数量超过 <code>容量 * 负载因子</code> 时，<code>HashMap</code> 会触发扩容。</p>
+<p>如果提前知道大概要存多少数据，可以合理设置初始容量，减少扩容次数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">expectedSize</span> <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"><span class="type">float</span> <span class="variable">loadFactor</span> <span class="operator">=</span> <span class="number">0.75f</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">initialCapacity</span> <span class="operator">=</span> (<span class="type">int</span>) (expectedSize / loadFactor) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">Map&lt;String, String&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String, String&gt;(initialCapacity);</span><br><span class="line">System.out.println(<span class="string">&quot;初始容量建议值：&quot;</span> + initialCapacity);</span><br></pre></td></tr></table></figure>
+
+<p>不过，<code>HashMap</code> 内部容量会调整为 2 的幂。实际开发里可以用一个简单方法计算建议容量：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">calculateHashMapCapacity</span><span class="params">(<span class="type">int</span> expectedSize)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (expectedSize &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;expectedSize不能小于0&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">int</span>) (expectedSize / <span class="number">0.75f</span>) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">capacity</span> <span class="operator">=</span> calculateHashMapCapacity(<span class="number">500</span>);</span><br><span class="line">Map&lt;Integer, String&gt; userMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;Integer, String&gt;(capacity);</span><br><span class="line"></span><br><span class="line">userMap.put(<span class="number">1</span>, <span class="string">&quot;用户A&quot;</span>);</span><br><span class="line">userMap.put(<span class="number">2</span>, <span class="string">&quot;用户B&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里的思路不是追求绝对精确，而是尽量避免明知道要放很多数据，却还使用默认容量导致频繁扩容。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20HashMap%20resize%20rehash%20capacity%20load%20factor%20technical%20illustration&image_size=landscape_16_9" alt="HashMap扩容机制"></p>
+<h2 id="5-多线程场景使用-ConcurrentHashMap"><a href="#5-多线程场景使用-ConcurrentHashMap" class="headerlink" title="5. 多线程场景使用 ConcurrentHashMap"></a>5. 多线程场景使用 ConcurrentHashMap</h2><p>如果多个线程会同时读写 Map，可以考虑使用 <code>ConcurrentHashMap</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Integer&gt; countMap = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;String, Integer&gt;();</span><br><span class="line"></span><br><span class="line">countMap.put(<span class="string">&quot;Java&quot;</span>, <span class="number">1</span>);</span><br><span class="line">countMap.put(<span class="string">&quot;HashMap&quot;</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> <span class="variable">count</span> <span class="operator">=</span> countMap.get(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;Java出现次数：&quot;</span> + count);</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，<code>ConcurrentHashMap</code> 不是简单地给所有方法都加一把大锁。它内部做了更细粒度的并发控制，所以在并发场景下通常比 <code>Hashtable</code> 更合适。</p>
+<p>不过，复合操作仍然要小心。例如“先判断再放入”不是天然原子的，可以优先使用 <code>putIfAbsent</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ConcurrentHashMap&lt;String, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;String, Integer&gt;();</span><br><span class="line"></span><br><span class="line"><span class="type">Integer</span> <span class="variable">oldValue</span> <span class="operator">=</span> map.putIfAbsent(<span class="string">&quot;Java&quot;</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span> (oldValue == <span class="literal">null</span>) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;第一次放入Java&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习 <code>HashMap</code>，我最大的感受是：它看起来简单，但底层并不简单。</p>
+<p><code>HashMap</code> 是面试高频题，也是实际开发中非常常用的集合类。只会 <code>put</code> 和 <code>get</code> 当然可以完成很多需求，但如果不了解底层原理，就容易在哈希冲突、扩容、线程安全、自定义 key 等问题上踩坑。</p>
+<p>我给自己总结了几条使用原则：</p>
+<ol>
+<li><code>HashMap</code> 允许一个 <code>null key</code> 和多个 <code>null value</code>。</li>
+<li>两个 key 的 <code>hashCode</code> 相同不会直接覆盖，还要继续比较 <code>equals</code>。</li>
+<li>同时需要 key 和 value 时，优先使用 <code>entrySet</code> 遍历。</li>
+<li>能预估数据量时，可以设置合适的初始容量，减少扩容。</li>
+<li>多线程写入场景不要直接使用 <code>HashMap</code>，可以考虑 <code>ConcurrentHashMap</code>。</li>
+<li>自定义对象作为 key 时，重写 <code>equals</code> 必须重写 <code>hashCode</code>。</li>
+</ol>
+<p>学完这些内容后，我再看 <code>HashMap</code> 就不只是一个“键值对容器”了，而是能联想到数组、链表、红黑树、哈希冲突和并发安全等知识点。理解底层原理，才能真正把这个常用工具用好。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6/" rel="tag"># 集合框架</a>
+              <a href="/tags/HashMap/" rel="tag"># HashMap</a>
+              <a href="/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/" rel="tag"># 哈希表</a>
+              <a href="/tags/Map/" rel="tag"># Map</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/06/10/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB/" rel="prev" title="ArrayList与LinkedList区别">
+                  <i class="fa fa-angle-left"></i> ArrayList与LinkedList区别
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/08/19/2018-08-19-Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/" rel="next" title="Java异常处理机制">
+                  Java异常处理机制 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

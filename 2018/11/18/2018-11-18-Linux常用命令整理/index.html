@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="背景2018年双十一刚过，项目终于要部署上线了。公司买了两台阿里云ECS服务器，操作系统是CentOS 7.4。作为一个从大学到现在一直在Windows环境下写代码的.NET程序员，听到”部署到Linux服务器”这几个字时，内心是拒绝的。 之前对Linux的印象停留在”黑乎乎的命令行窗口，一堆看不懂的英文字母”。但项目不等人，硬着头皮上吧。花了大概两周时间边查边练，把日常运维常用的Linux命令过">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux常用命令整理">
+<meta property="og:url" content="https://swagch.github.io/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="背景2018年双十一刚过，项目终于要部署上线了。公司买了两台阿里云ECS服务器，操作系统是CentOS 7.4。作为一个从大学到现在一直在Windows环境下写代码的.NET程序员，听到”部署到Linux服务器”这几个字时，内心是拒绝的。 之前对Linux的印象停留在”黑乎乎的命令行窗口，一堆看不懂的英文字母”。但项目不等人，硬着头皮上吧。花了大概两周时间边查边练，把日常运维常用的Linux命令过">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Linux%20terminal%20with%20multiple%20windows%20showing%20different%20commands%20and%20output&image_size=landscape_16_9">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Linux%20pipeline%20concept%20diagram%20showing%20commands%20connected%20by%20pipes%20data%20flow&image_size=landscape_16_9">
+<meta property="article:published_time" content="2018-11-18T07:52:31.000Z">
+<meta property="article:modified_time" content="2026-06-09T08:05:22.000Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Shell">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="命令行">
+<meta property="article:tag" content="服务器">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Linux%20terminal%20with%20multiple%20windows%20showing%20different%20commands%20and%20output&image_size=landscape_16_9">
+
+
+<link rel="canonical" href="https://swagch.github.io/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/","path":"2018/11/18/2018-11-18-Linux常用命令整理/","title":"Linux常用命令整理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux常用命令整理 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-%E4%B8%80%E5%88%87%E7%9A%86%E6%96%87%E4%BB%B6"><span class="nav-text">Linux 一切皆文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%83%E9%99%90%E7%9A%84-rwx-%E8%A1%A8%E7%A4%BA%E6%B3%95"><span class="nav-text">权限的 rwx 表示法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vim-%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F"><span class="nav-text">vim 的三种模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86%E6%80%9D%E8%B7%AF"><span class="nav-text">进程管理思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E6%9F%A5%E7%9C%8B%E6%80%9D%E8%B7%AF"><span class="nav-text">磁盘查看思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E6%9F%A5%E7%9C%8B%E4%B8%89%E6%9D%BF%E6%96%A7"><span class="nav-text">日志查看三板斧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%9F%A5%E7%9C%8B%E6%80%9D%E8%B7%AF"><span class="nav-text">端口查看思路</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%E6%93%8D%E4%BD%9C"><span class="nav-text">一、文件目录操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%96%87%E4%BB%B6%E6%9F%A5%E7%9C%8B%E4%B8%8E%E6%90%9C%E7%B4%A2"><span class="nav-text">二、文件查看与搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86"><span class="nav-text">三、权限管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="nav-text">四、用户管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86"><span class="nav-text">五、进程管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86"><span class="nav-text">六、磁盘管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%BD%91%E7%BB%9C%E7%AE%A1%E7%90%86"><span class="nav-text">七、网络管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8E%8B%E7%BC%A9%E8%A7%A3%E5%8E%8B"><span class="nav-text">八、压缩解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B9%9D%E3%80%81vim-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-text">九、vim 基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E7%BB%84%E5%90%88%E5%91%BD%E4%BB%A4%E4%B8%8E%E7%AE%A1%E9%81%93"><span class="nav-text">十、组合命令与管道</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Linux常用命令整理 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux常用命令整理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-18 15:52:31" itemprop="dateCreated datePublished" datetime="2018-11-18T15:52:31+08:00">2018-11-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:05:22" itemprop="dateModified" datetime="2026-06-09T16:05:22+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index"><span itemprop="name">Linux运维</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018年双十一刚过，项目终于要部署上线了。公司买了两台阿里云ECS服务器，操作系统是CentOS 7.4。作为一个从大学到现在一直在Windows环境下写代码的.NET程序员，听到”部署到Linux服务器”这几个字时，内心是拒绝的。</p>
+<p>之前对Linux的印象停留在”黑乎乎的命令行窗口，一堆看不懂的英文字母”。但项目不等人，硬着头皮上吧。花了大概两周时间边查边练，把日常运维常用的Linux命令过了一遍，这篇文章就是这段时间的学习笔记。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Linux%20terminal%20with%20multiple%20windows%20showing%20different%20commands%20and%20output&image_size=landscape_16_9" alt="Linux终端界面"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚接手Linux服务器时，遇到了一堆”小白问题”，说来有点丢人但确实很真实：</p>
+<p><strong>1. 文件权限看不懂</strong></p>
+<p><code>ls -l</code> 输出了一堆 <code>drwxr-xr-x</code> 这样的东西，完全不知道什么意思。想给文件加执行权限，百度了半天才找到 <code>chmod 777</code>，但到底什么是”777”也说不清楚。</p>
+<p><strong>2. vim编辑器不会用</strong></p>
+<p>用 <code>vi</code> 打开文件后，发现打不了字，想退出却退不出来，最后直接关了终端。后来才知道 vim 有三种模式，退出要用 <code>:q</code>。</p>
+<p><strong>3. 进程查不到</strong></p>
+<p>程序跑起来后不知道在哪看，Windows 有任务管理器，Linux 呢？程序挂了也不知道为什么挂的。</p>
+<p><strong>4. 磁盘满了不知道清哪里</strong></p>
+<p>有一天数据库写不进去了，排查半天发现是磁盘满了。但日志文件、临时文件散落在各个目录，不知道从哪里开始清理。</p>
+<p><strong>5. 日志文件太大查看困难</strong></p>
+<p>Java 应用的日志文件动辄几百兆甚至几个G，用记事本打开直接卡死。想查最新的报错信息，总不能把整个文件拖下来吧。</p>
+<p><strong>6. 端口被占用不知道怎么查</strong></p>
+<p>Tomcat 启动报错 <code>Address already in use</code>，知道是端口被占了，但不知道被哪个程序占了，也不知道怎么杀掉它。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>遇到这些问题后，我花了一些时间理解了 Linux 的几个核心概念，这些概念是后续学习命令的基础。</p>
+<h3 id="Linux-一切皆文件"><a href="#Linux-一切皆文件" class="headerlink" title="Linux 一切皆文件"></a>Linux 一切皆文件</h3><p>这是 Linux 最核心的设计哲学。普通文件是文件，目录是文件，设备是文件，甚至是进程信息、网络连接都被抽象成了文件。理解了这一点，就能理解为什么 Linux 有那么多文件操作命令了。</p>
+<h3 id="权限的-rwx-表示法"><a href="#权限的-rwx-表示法" class="headerlink" title="权限的 rwx 表示法"></a>权限的 rwx 表示法</h3><p><code>rwx</code> 分别代表：</p>
+<ul>
+<li><code>r</code>（read）：读取权限，值为 4</li>
+<li><code>w</code>（write）：写入权限，值为 2</li>
+<li><code>x</code>（execute）：执行权限，值为 1</li>
+</ul>
+<p>权限分三组，每组三个字符：<strong>所有者&#x2F;所属组&#x2F;其他人</strong>。所以 <code>rwxr-xr-x</code> 表示：所有者可读写执行，所属组可读执行，其他人可读执行。</p>
+<p>而 <code>chmod 755</code> 中的 755，就是用数字表示的权限：</p>
+<ul>
+<li>7 &#x3D; 4+2+1 &#x3D; rwx（所有者）</li>
+<li>5 &#x3D; 4+0+1 &#x3D; r-x（所属组）</li>
+<li>5 &#x3D; 4+0+1 &#x3D; r-x（其他人）</li>
+</ul>
+<h3 id="vim-的三种模式"><a href="#vim-的三种模式" class="headerlink" title="vim 的三种模式"></a>vim 的三种模式</h3><p>刚接触 vim 时觉得这编辑器反人类，理解了三种模式后就豁然开朗了：</p>
+<ul>
+<li><strong>命令模式</strong>：刚进入 vim 时的模式，可以复制粘贴删除，但<strong>不能输入文字</strong></li>
+<li><strong>插入模式</strong>：按 <code>i</code> 进入，这个模式才能正常打字</li>
+<li><strong>末行模式</strong>：按 <code>:</code> 进入，用来保存退出、搜索替换</li>
+</ul>
+<p>三种模式切换搞明白后，vim 就好用多了。</p>
+<h3 id="进程管理思路"><a href="#进程管理思路" class="headerlink" title="进程管理思路"></a>进程管理思路</h3><p>Linux 的进程管理不像 Windows 那样可视化，但命令行的方式其实更灵活：</p>
+<ul>
+<li><code>ps</code> 查看静态进程快照</li>
+<li><code>top</code> 查看动态进程信息（相当于任务管理器）</li>
+<li><code>kill</code> 发送信号给进程</li>
+</ul>
+<h3 id="磁盘查看思路"><a href="#磁盘查看思路" class="headerlink" title="磁盘查看思路"></a>磁盘查看思路</h3><ul>
+<li><code>df</code> 从宏观角度查看磁盘整体使用情况</li>
+<li><code>du</code> 从微观角度查看具体目录&#x2F;文件占用空间</li>
+</ul>
+<h3 id="日志查看三板斧"><a href="#日志查看三板斧" class="headerlink" title="日志查看三板斧"></a>日志查看三板斧</h3><p>大文件用编辑器打开是不现实的，Linux 提供了三个利器：</p>
+<ul>
+<li><code>tail</code>：从尾部看，适合看最新的日志</li>
+<li><code>grep</code>：按关键字过滤，适合搜索特定错误</li>
+<li><code>less</code>：分页查看，适合在文件中上下翻阅</li>
+</ul>
+<h3 id="端口查看思路"><a href="#端口查看思路" class="headerlink" title="端口查看思路"></a>端口查看思路</h3><ul>
+<li><code>netstat</code>：查看网络连接状态</li>
+<li><code>lsof</code>：查看打开的文件（一切皆文件，网络连接也是文件）</li>
+</ul>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>下面按场景分类整理常用命令，每个分类给出常用命令和实际运维示例。</p>
+<h3 id="一、文件目录操作"><a href="#一、文件目录操作" class="headerlink" title="一、文件目录操作"></a>一、文件目录操作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看目录内容</span></span><br><span class="line"><span class="built_in">ls</span>                    <span class="comment"># 列出当前目录文件</span></span><br><span class="line"><span class="built_in">ls</span> -l                 <span class="comment"># 详细列表（显示权限、大小、修改时间）</span></span><br><span class="line"><span class="built_in">ls</span> -a                 <span class="comment"># 显示隐藏文件（以.开头的文件）</span></span><br><span class="line"><span class="built_in">ls</span> -lh                <span class="comment"># 以人类可读方式显示大小（K、M、G）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 目录切换</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local         <span class="comment"># 进入指定目录</span></span><br><span class="line"><span class="built_in">cd</span> ~                  <span class="comment"># 进入home目录</span></span><br><span class="line"><span class="built_in">cd</span> -                  <span class="comment"># 返回上一个目录</span></span><br><span class="line"><span class="built_in">cd</span> ..                 <span class="comment"># 返回上级目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建和删除</span></span><br><span class="line"><span class="built_in">mkdir</span> myapp           <span class="comment"># 创建目录</span></span><br><span class="line"><span class="built_in">mkdir</span> -p a/b/c        <span class="comment"># 递归创建多级目录</span></span><br><span class="line"><span class="built_in">touch</span> README.md       <span class="comment"># 创建空文件</span></span><br><span class="line"><span class="built_in">cp</span> app.conf app.conf.bak    <span class="comment"># 复制文件</span></span><br><span class="line"><span class="built_in">cp</span> -r webapp/ webapp_bak/   <span class="comment"># 递归复制目录</span></span><br><span class="line"><span class="built_in">mv</span> app.conf /tmp/     <span class="comment"># 移动文件</span></span><br><span class="line"><span class="built_in">mv</span> oldname newname    <span class="comment"># 重命名文件</span></span><br><span class="line"><span class="built_in">rm</span> temp.txt           <span class="comment"># 删除文件（不会进回收站，直接删）</span></span><br><span class="line"><span class="built_in">rm</span> -rf logs/          <span class="comment"># 递归强制删除目录（慎用！）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查找文件</span></span><br><span class="line">find / -name <span class="string">&quot;*.log&quot;</span>                   <span class="comment"># 从根目录找所有.log文件</span></span><br><span class="line">find /var/log -mtime -7                <span class="comment"># 查找7天内修改过的文件</span></span><br><span class="line">find . -size +100M                     <span class="comment"># 查找当前目录下大于100M的文件</span></span><br><span class="line">find . -name <span class="string">&quot;*.tmp&quot;</span> -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;    <span class="comment"># 查找并删除临时文件</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：查找并清理大文件</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查找根目录下大于500M的文件，按大小排序</span></span><br><span class="line">find / -<span class="built_in">type</span> f -size +500M -<span class="built_in">exec</span> <span class="built_in">ls</span> -lh &#123;&#125; \; 2&gt;/dev/null | awk <span class="string">&#x27;&#123;print $5, $NF&#125;&#x27;</span> | <span class="built_in">sort</span> -rh</span><br><span class="line"></span><br><span class="line"><span class="comment"># 清理7天前的日志文件</span></span><br><span class="line">find /var/log/myapp/ -name <span class="string">&quot;*.log&quot;</span> -mtime +7 -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、文件查看与搜索"><a href="#二、文件查看与搜索" class="headerlink" title="二、文件查看与搜索"></a>二、文件查看与搜索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看文件内容</span></span><br><span class="line"><span class="built_in">cat</span> README.md               <span class="comment"># 显示整个文件（适合小文件）</span></span><br><span class="line"><span class="built_in">cat</span> -n app.log              <span class="comment"># 显示行号</span></span><br><span class="line">less app.log                <span class="comment"># 分页查看（按空格翻页，按q退出）</span></span><br><span class="line"><span class="built_in">head</span> -20 app.log            <span class="comment"># 查看前20行</span></span><br><span class="line"><span class="built_in">tail</span> -100 app.log           <span class="comment"># 查看后100行</span></span><br><span class="line"><span class="built_in">tail</span> -f app.log             <span class="comment"># 实时跟踪文件新增内容（看日志神器！）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 搜索文件内容</span></span><br><span class="line">grep <span class="string">&quot;ERROR&quot;</span> app.log                      <span class="comment"># 在文件中搜索关键字</span></span><br><span class="line">grep -i <span class="string">&quot;error&quot;</span> app.log                   <span class="comment"># 忽略大小写搜索</span></span><br><span class="line">grep -r <span class="string">&quot;NullPointerException&quot;</span> /logs/     <span class="comment"># 递归搜索目录下所有文件</span></span><br><span class="line">grep -n <span class="string">&quot;ERROR&quot;</span> app.log                   <span class="comment"># 显示匹配行及其行号</span></span><br><span class="line">grep -c <span class="string">&quot;ERROR&quot;</span> app.log                   <span class="comment"># 统计匹配行数</span></span><br><span class="line">grep -A5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其后5行</span></span><br><span class="line">grep -B5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其前5行</span></span><br><span class="line">grep -C5 <span class="string">&quot;ERROR&quot;</span> app.log                  <span class="comment"># 显示匹配行及其前后各5行</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：查看日志中的错误信息</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看今天出现的所有ERROR及上下文</span></span><br><span class="line"><span class="built_in">tail</span> -10000 app.log | grep -C5 <span class="string">&quot;ERROR&quot;</span> | less</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计各错误类型出现次数</span></span><br><span class="line">grep -o <span class="string">&quot;ERROR \[.*\]&quot;</span> app.log | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -rn</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看某个时间段内的日志</span></span><br><span class="line">grep <span class="string">&quot;2018-11-18 10:&quot;</span> app.log | less</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、权限管理"><a href="#三、权限管理" class="headerlink" title="三、权限管理"></a>三、权限管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改权限</span></span><br><span class="line"><span class="built_in">chmod</span> 755 script.sh          <span class="comment"># 设置权限为rwxr-xr-x</span></span><br><span class="line"><span class="built_in">chmod</span> +x script.sh           <span class="comment"># 给文件加执行权限</span></span><br><span class="line"><span class="built_in">chmod</span> -R 644 html/           <span class="comment"># 递归设置目录下所有文件权限</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改所有者</span></span><br><span class="line"><span class="built_in">chown</span> admin app.log          <span class="comment"># 修改文件所有者为admin</span></span><br><span class="line"><span class="built_in">chown</span> admin:admin app.log    <span class="comment"># 同时修改所有者和所属组</span></span><br><span class="line"><span class="built_in">chown</span> -R admin:admin /app/   <span class="comment"># 递归修改目录下所有文件所有者</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看文件权限</span></span><br><span class="line"><span class="built_in">ls</span> -l                        <span class="comment"># 查看文件的权限信息</span></span><br><span class="line"><span class="built_in">stat</span> app.conf                <span class="comment"># 查看文件的详细状态（包括权限）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：部署项目后修复权限</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 项目部署后的权限设置</span></span><br><span class="line"><span class="built_in">chown</span> -R www:www /var/www/myapp/          <span class="comment"># 设置为www用户</span></span><br><span class="line">find /var/www/myapp/ -<span class="built_in">type</span> f -<span class="built_in">exec</span> <span class="built_in">chmod</span> 644 &#123;&#125; \;   <span class="comment"># 文件设置为644</span></span><br><span class="line">find /var/www/myapp/ -<span class="built_in">type</span> d -<span class="built_in">exec</span> <span class="built_in">chmod</span> 755 &#123;&#125; \;   <span class="comment"># 目录设置为755</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="四、用户管理"><a href="#四、用户管理" class="headerlink" title="四、用户管理"></a>四、用户管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建用户</span></span><br><span class="line">useradd tom                    <span class="comment"># 创建用户tom</span></span><br><span class="line">passwd tom                     <span class="comment"># 设置用户tom的密码</span></span><br><span class="line">useradd -m -g www dev          <span class="comment"># 创建用户dev，加入www组并创建home目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看用户</span></span><br><span class="line"><span class="built_in">who</span>                            <span class="comment"># 查看当前登录用户</span></span><br><span class="line">w                              <span class="comment"># 查看更详细的登录信息</span></span><br><span class="line"><span class="built_in">id</span> tom                         <span class="comment"># 查看用户tom的UID和GID</span></span><br><span class="line"><span class="built_in">groups</span>                         <span class="comment"># 查看当前用户所属组</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换用户</span></span><br><span class="line">su - tom                       <span class="comment"># 切换到tom用户</span></span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">command</span>                   <span class="comment"># 以root身份执行命令</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="五、进程管理"><a href="#五、进程管理" class="headerlink" title="五、进程管理"></a>五、进程管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">ps -ef                         <span class="comment"># 查看所有进程的详细信息</span></span><br><span class="line">ps aux                         <span class="comment"># 查看所有进程（CPU/内存占用）</span></span><br><span class="line">ps -ef | grep java             <span class="comment"># 查看Java相关进程</span></span><br><span class="line">top                            <span class="comment"># 实时查看进程状态（按q退出）</span></span><br><span class="line">top -bn1                       <span class="comment"># 一次性输出top结果（适合脚本采集）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 终止进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345                     <span class="comment"># 优雅终止PID为12345的进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 12345                  <span class="comment"># 强制杀掉PID为12345的进程</span></span><br><span class="line">killall java                   <span class="comment"># 杀掉所有Java进程</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 后台运行</span></span><br><span class="line"><span class="built_in">nohup</span> java -jar app.jar &amp;      <span class="comment"># 后台运行Java应用，退出终端不停止</span></span><br><span class="line"><span class="built_in">jobs</span>                           <span class="comment"># 查看后台运行的任务列表</span></span><br><span class="line"><span class="built_in">fg</span> %1                          <span class="comment"># 将后台任务1调回前台</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：重启 Java 应用</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 完整的应用重启流程</span></span><br><span class="line">ps -ef | grep app.jar | grep -v grep  <span class="comment"># 先找到进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345                             <span class="comment"># 优雅停止</span></span><br><span class="line"><span class="built_in">sleep</span> 3                                <span class="comment"># 等待3秒</span></span><br><span class="line"><span class="built_in">nohup</span> java -jar app.jar &gt; app.log 2&gt;&amp;1 &amp;   <span class="comment"># 后台启动，日志重定向</span></span><br><span class="line"><span class="built_in">tail</span> -f app.log                       <span class="comment"># 实时查看启动日志</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="六、磁盘管理"><a href="#六、磁盘管理" class="headerlink" title="六、磁盘管理"></a>六、磁盘管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看磁盘整体情况</span></span><br><span class="line"><span class="built_in">df</span> -h                          <span class="comment"># 以人类可读格式查看磁盘使用情况</span></span><br><span class="line"><span class="built_in">df</span> -h /dev/sda1                <span class="comment"># 查看指定分区</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/log/               <span class="comment"># 查看目录总大小</span></span><br><span class="line"><span class="built_in">du</span> -sh *                       <span class="comment"># 查看当前目录下每个子目录的大小</span></span><br><span class="line"><span class="built_in">du</span> -h --max-depth=1 /home/     <span class="comment"># 只看一层目录的大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /* | <span class="built_in">sort</span> -rh           <span class="comment"># 查看根目录下各目录大小并排序</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 磁盘空间排查</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/log/               <span class="comment"># 检查日志目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /tmp/                   <span class="comment"># 检查临时目录大小</span></span><br><span class="line"><span class="built_in">du</span> -sh /opt/                   <span class="comment"># 检查应用目录大小</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：磁盘告警排查</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第一步：查看整体使用情况</span></span><br><span class="line"><span class="built_in">df</span> -h</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二步：找到最大的目录</span></span><br><span class="line"><span class="built_in">du</span> -sh /* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第三步：逐层深入找到大文件</span></span><br><span class="line"><span class="built_in">du</span> -sh /var/* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -5</span><br><span class="line"><span class="built_in">du</span> -sh /var/log/* | <span class="built_in">sort</span> -rh | <span class="built_in">head</span> -5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 第四步：清理日志</span></span><br><span class="line">find /var/log/ -name <span class="string">&quot;*.log&quot;</span> -mtime +30 -<span class="built_in">exec</span> <span class="built_in">rm</span> &#123;&#125; \;</span><br></pre></td></tr></table></figure>
+
+<h3 id="七、网络管理"><a href="#七、网络管理" class="headerlink" title="七、网络管理"></a>七、网络管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看端口</span></span><br><span class="line">netstat -tlnp                  <span class="comment"># 查看所有TCP监听端口及对应进程</span></span><br><span class="line">netstat -tlnp | grep 8080      <span class="comment"># 查看8080端口被谁占用</span></span><br><span class="line">netstat -an | grep ESTABLISHED <span class="comment"># 查看已建立的连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># lsof 查看端口（更直观）</span></span><br><span class="line">lsof -i :8080                  <span class="comment"># 查看8080端口被哪个进程占用</span></span><br><span class="line">lsof -i tcp                    <span class="comment"># 查看所有TCP连接</span></span><br><span class="line">lsof -p 12345                  <span class="comment"># 查看进程12345打开了哪些文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 网络连通性</span></span><br><span class="line">ping -c 4 baidu.com            <span class="comment"># 测试网络连通性，发4个包</span></span><br><span class="line">curl -I http://localhost:8080   <span class="comment"># 查看HTTP响应头</span></span><br><span class="line">telnet 192.168.1.1 3306        <span class="comment"># 测试端口是否可达</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># DNS相关</span></span><br><span class="line">nslookup www.baidu.com         <span class="comment"># 域名解析查询</span></span><br><span class="line">host www.baidu.com             <span class="comment"># 简化的域名查询</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：端口被占用了怎么办</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 场景：Tomcat启动报错 Address already in use</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 步骤1：查看端口被谁占了</span></span><br><span class="line">netstat -tlnp | grep 8080</span><br><span class="line"><span class="comment"># 输出：tcp6  0  0 :::8080  :::*  LISTEN  12345/java</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 步骤2：确认是这个进程，可以选择：</span></span><br><span class="line"><span class="comment"># 方案A：杀掉占用进程</span></span><br><span class="line"><span class="built_in">kill</span> 12345</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方案B：或者换个端口启动，如果杀不掉的话</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="八、压缩解压"><a href="#八、压缩解压" class="headerlink" title="八、压缩解压"></a>八、压缩解压</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># tar 打包/解包</span></span><br><span class="line">tar -czf myapp.tar.gz /var/www/myapp/      <span class="comment"># 打包并压缩为.tar.gz</span></span><br><span class="line">tar -xzf myapp.tar.gz                      <span class="comment"># 解压.tar.gz包</span></span><br><span class="line">tar -tzf myapp.tar.gz                      <span class="comment"># 查看包内容列表（不实际解压）</span></span><br><span class="line">tar -xjf myapp.tar.bz2                     <span class="comment"># 解压.tar.bz2包</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># gzip压缩</span></span><br><span class="line">gzip app.log                               <span class="comment"># 压缩文件（生成app.log.gz）</span></span><br><span class="line">gzip -d app.log.gz                         <span class="comment"># 解压缩</span></span><br><span class="line">gunzip app.log.gz                          <span class="comment"># 同上，解压缩</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># zip（跨平台常用）</span></span><br><span class="line">zip -r myapp.zip /var/www/myapp/           <span class="comment"># 压缩目录</span></span><br><span class="line">unzip myapp.zip -d /tmp/                   <span class="comment"># 解压到指定目录</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运维场景：备份项目并压缩</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 备份项目目录，按日期命名</span></span><br><span class="line">tar -czf myapp_$(<span class="built_in">date</span> +%Y%m%d_%H%M%S).tar.gz /var/www/myapp/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解压到指定目录</span></span><br><span class="line">tar -xzf myapp_20181118.tar.gz -C /tmp/restore/</span><br></pre></td></tr></table></figure>
+
+<h3 id="九、vim-基本操作"><a href="#九、vim-基本操作" class="headerlink" title="九、vim 基本操作"></a>九、vim 基本操作</h3><p>vim 刚接触时确实让人抓狂，记住下面这些就够日常用了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 打开文件</span></span><br><span class="line">vim app.conf               <span class="comment"># 打开文件</span></span><br><span class="line">vim +100 app.conf          <span class="comment"># 打开文件并定位到第100行</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 命令模式（刚进入vim时的状态）</span></span><br><span class="line">i                          <span class="comment"># 在光标前插入（进入插入模式）</span></span><br><span class="line">a                          <span class="comment"># 在光标后插入</span></span><br><span class="line"><span class="built_in">dd</span>                         <span class="comment"># 删除当前行</span></span><br><span class="line">5dd                        <span class="comment"># 删除从当前行开始的5行</span></span><br><span class="line">yy                         <span class="comment"># 复制当前行</span></span><br><span class="line">p                          <span class="comment"># 粘贴</span></span><br><span class="line">u                          <span class="comment"># 撤销</span></span><br><span class="line">Ctrl + r                   <span class="comment"># 重做（取消撤销）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 末行模式（按:进入）</span></span><br><span class="line">:w                         <span class="comment"># 保存</span></span><br><span class="line">:q                         <span class="comment"># 退出</span></span><br><span class="line">:wq                        <span class="comment"># 保存并退出</span></span><br><span class="line">:q!                        <span class="comment"># 不保存强制退出</span></span><br><span class="line">:%s/旧文本/新文本/g        <span class="comment"># 全文替换</span></span><br><span class="line">:<span class="built_in">set</span> nu                    <span class="comment"># 显示行号</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="十、组合命令与管道"><a href="#十、组合命令与管道" class="headerlink" title="十、组合命令与管道"></a>十、组合命令与管道</h3><p>管道 <code>|</code> 是 Linux 命令的精髓，它把前一个命令的输出作为后一个命令的输入，像流水线一样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 管道的基本使用</span></span><br><span class="line">ps -ef | grep java              <span class="comment"># 在进程列表中搜索Java进程</span></span><br><span class="line">netstat -tlnp | grep 80         <span class="comment"># 在网络连接中搜索80端口</span></span><br><span class="line"><span class="built_in">cat</span> app.log | grep ERROR | <span class="built_in">head</span> -20    <span class="comment"># 在日志中找错误，只看前20条</span></span><br><span class="line"><span class="built_in">ls</span> -l | grep <span class="string">&quot;^d&quot;</span>               <span class="comment"># 只列出目录（行首为d的是目录）</span></span><br><span class="line"><span class="built_in">ls</span> -l | awk <span class="string">&#x27;&#123;print $5, $NF&#125;&#x27;</span>   <span class="comment"># 只显示文件大小和名称</span></span><br><span class="line"><span class="built_in">ls</span> -l | <span class="built_in">sort</span> -k5 -rn | <span class="built_in">head</span> -5  <span class="comment"># 列出当前目录最大的5个文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出重定向</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Hello&quot;</span> &gt; README.md        <span class="comment"># 覆盖写入文件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;World&quot;</span> &gt;&gt; README.md       <span class="comment"># 追加写入文件</span></span><br><span class="line"><span class="built_in">ls</span> /nonexist 2&gt; error.log       <span class="comment"># 将错误信息重定向到文件</span></span><br><span class="line">java -jar app.jar &gt; app.log 2&gt;&amp;1 &amp;    <span class="comment"># 标准输出和错误都输出到日志文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 实际运维组合命令示例</span></span><br><span class="line"><span class="comment"># 找出占用CPU最高的进程</span></span><br><span class="line">top -bn1 | <span class="built_in">head</span> -20</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计日志中各IP的访问次数</span></span><br><span class="line"><span class="built_in">cat</span> access.log | awk <span class="string">&#x27;&#123;print $1&#125;&#x27;</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -rn | <span class="built_in">head</span> -10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量替换配置文件中的IP</span></span><br><span class="line">find /app/config/ -name <span class="string">&quot;*.properties&quot;</span> | xargs sed -i <span class="string">&#x27;s/192.168.1.100/192.168.2.100/g&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 压缩30天前的日志</span></span><br><span class="line">find /var/log/myapp/ -name <span class="string">&quot;*.log&quot;</span> -mtime +30 | xargs gzip</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Linux%20pipeline%20concept%20diagram%20showing%20commands%20connected%20by%20pipes%20data%20flow&image_size=landscape_16_9" alt="Linux命令管道工作流程"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>两周的密集使用下来，从最初在终端面前手足无措，到能比较顺畅地完成日常运维操作，有一些心得想分享给和我一样从 Windows 转 Linux 的同学：</p>
+<p><strong>1. Linux 命令不需要死记硬背</strong></p>
+<p>命令太多了，没有人能记住所有命令的所有参数。关键是要知道<strong>解决某个问题可以用什么命令</strong>，具体的参数用法用 <code>man</code> 或 <code>--help</code> 现查就行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">man <span class="built_in">ls</span>                 <span class="comment"># 查看ls的完整手册（按q退出）</span></span><br><span class="line"><span class="built_in">ls</span> --<span class="built_in">help</span>              <span class="comment"># 查看ls的快速帮助（推荐，更直观）</span></span><br></pre></td></tr></table></figure>
+
+<p>我基本上每天都要查几次 <code>tar</code> 的参数——“压缩是 <code>-czf</code> 还是 <code>-xzf</code> 来着”——这很正常，查多了自然就记住了。</p>
+<p><strong>2. 管道是 Linux 的精髓</strong></p>
+<p>管道 <code>|</code> 让我真正感受到了 Linux 命令行的威力。单个命令功能有限，但组合起来能做很复杂的事情。就像搭积木一样，把一个个小命令拼起来解决问题。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 学会了管道之后，就能写出这样的命令来解决复杂问题</span></span><br><span class="line">ps -ef | grep java | grep -v grep | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | xargs <span class="built_in">kill</span> -9</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. 多用 alias 简化常用操作</strong></p>
+<p>把常用的长命令设成别名，能省不少事：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> ll=<span class="string">&#x27;ls -alh&#x27;</span></span><br><span class="line"><span class="built_in">alias</span> g=<span class="string">&#x27;grep --color=auto&#x27;</span></span><br><span class="line"><span class="built_in">alias</span> ..=<span class="string">&#x27;cd ..&#x27;</span></span><br><span class="line"><span class="comment"># 写入 .bashrc 后永久生效</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;alias ll=&#x27;ls -alh&#x27;&quot;</span> &gt;&gt; ~/.bashrc</span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p><strong>4. 小心 rm -rf</strong></p>
+<p><code>rm -rf</code> 是 Linux 上最危险的命令之一。没有回收站，没有二次确认，文件直接就没了。使用前一定要确认路径是否正确，尤其是在 root 用户下。建议养成习惯：</p>
+<ul>
+<li>执行 <code>rm</code> 前先 <code>ls</code> 确认一下</li>
+<li>重要的文件先备份</li>
+<li>用 <code>mv</code> 代替 <code>rm</code>，把文件移到 <code>/tmp/</code> 目录（系统定期会清理）</li>
+</ul>
+<p><strong>5. 多敲多练是最好的学习方式</strong></p>
+<p>读十遍这篇文章不如自己在服务器上敲一遍。我在自己的电脑上装了虚拟机，把上面的命令都练了一遍。遇到实际运维问题时，先百度&#x2F;Google，解决了就记下来，慢慢就形成了自己的命令速查手册。</p>
+<p>现在回头看，Linux 命令行没有想象的那么可怕。它只是和 Windows 不同的另一种工作方式，适应了之后甚至会喜欢上这种高效的操作。希望这篇文章对同样刚接触 Linux 的你有所帮助。</p>
+<hr>
+<p><em>这篇文章发布于 2018 年 11 月，是我刚接触 Linux 时的学习笔记。命令在不同发行版上可能略有差异，文中以 CentOS 7.4 为准。</em></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag"># 命令行</a>
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag"># 服务器</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/" rel="prev" title="MySQL基础增删改查">
+                  <i class="fa fa-angle-left"></i> MySQL基础增删改查
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/" rel="next" title="2018年度学习总结">
+                  2018年度学习总结 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

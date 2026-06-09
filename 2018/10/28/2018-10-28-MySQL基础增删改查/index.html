@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#e6edf3" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="背景学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。 这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL基础增删改查">
+<meta property="og:url" content="https://swagch.github.io/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="背景学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。 这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SQL%20query%20execution%20flowchart%20showing%20FROM%20WHERE%20GROUP%20BY%20HAVING%20SELECT%20ORDER%20BY%20steps,%20technical%20diagram%20on%20dark%20blue%20background&image_size=landscape_4_3">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=MySQL%20index%20B-tree%20structure%20diagram%20showing%20how%20index%20speeds%20up%20query,%20versus%20full%20table%20scan,%20technical%20illustration%20on%20dark%20background&image_size=landscape_4_3">
+<meta property="og:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Relational%20database%20tables%20student%20course%20score%20with%20primary%20keys%20foreign%20keys%20and%20CRUD%20SQL%20examples,%20clean%20technical%20infographic&image_size=landscape_4_3">
+<meta property="article:published_time" content="2018-10-28T13:05:16.000Z">
+<meta property="article:modified_time" content="2026-06-09T08:03:53.849Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="CRUD">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SQL%20query%20execution%20flowchart%20showing%20FROM%20WHERE%20GROUP%20BY%20HAVING%20SELECT%20ORDER%20BY%20steps,%20technical%20diagram%20on%20dark%20blue%20background&image_size=landscape_4_3">
+
+
+<link rel="canonical" href="https://swagch.github.io/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/","path":"2018/10/28/2018-10-28-MySQL基础增删改查/","title":"MySQL基础增删改查"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>MySQL基础增删改查 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-terminal fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user-astronaut fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-code-branch fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-layer-group fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-clock-rotate-left fa-fw"></i>归档</a></li><li class="menu-item menu-item-sitemap"><a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DELETE%E5%92%8CTRUNCATE%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">DELETE和TRUNCATE的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GROUP-BY%E5%92%8CHAVING"><span class="nav-text">GROUP BY和HAVING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JOIN%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">JOIN类型的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8D%E6%98%AF%E4%B8%87%E8%83%BD%E7%9A%84"><span class="nav-text">索引不是万能的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%BA%94%E8%AF%A5%E5%BB%BA%E5%9C%A8%E4%BB%80%E4%B9%88%E5%88%97%E4%B8%8A"><span class="nav-text">索引应该建在什么列上</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E4%B8%89%E5%BC%A0%E8%A1%A8"><span class="nav-text">准备三张表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#INSERT%EF%BC%9A%E6%96%B0%E5%A2%9E%E6%95%B0%E6%8D%AE"><span class="nav-text">INSERT：新增数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UPDATE%EF%BC%9A%E4%BF%AE%E6%94%B9%E6%95%B0%E6%8D%AE"><span class="nav-text">UPDATE：修改数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DELETE%EF%BC%9A%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">DELETE：删除数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT%EF%BC%9A%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2"><span class="nav-text">SELECT：基础查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E8%A1%A8JOIN%E6%9F%A5%E8%AF%A2"><span class="nav-text">多表JOIN查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0%E5%92%8CGROUP-BY"><span class="nav-text">聚合函数和GROUP BY</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%88%9B%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8%E5%BB%BA%E8%AE%AE"><span class="nav-text">索引创建和使用建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EXPLAIN%E6%9F%A5%E7%9C%8B%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92"><span class="nav-text">EXPLAIN查看执行计划</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="MySQL基础增删改查 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL基础增删改查
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-10-28 21:05:16" itemprop="dateCreated datePublished" datetime="2018-10-28T21:05:16+08:00">2018-10-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-06-09 16:03:53" itemprop="dateModified" datetime="2026-06-09T16:03:53+08:00">2026-06-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。</p>
+<p>这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，一步一步把每个知识点搞清楚。这篇文章就是我在2018年10月学习MySQL基础CRUD的完整记录。</p>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=SQL%20query%20execution%20flowchart%20showing%20FROM%20WHERE%20GROUP%20BY%20HAVING%20SELECT%20ORDER%20BY%20steps,%20technical%20diagram%20on%20dark%20blue%20background&image_size=landscape_4_3"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在实际写SQL的过程中，我遇到了好几个一直没搞明白的问题：</p>
+<ol>
+<li><strong>DELETE和TRUNCATE到底有什么区别？</strong> 之前一直以为都是删数据，随便用哪个都行，结果有一次用TRUNCATE删完数据发现回不去了。</li>
+<li><strong>GROUP BY和HAVING总是写错</strong>，经常把过滤条件写在WHERE里，结果报错，搞不清什么时候该用WHERE、什么时候该用HAVING。</li>
+<li><strong>多表JOIN搞不清关系</strong>，INNER JOIN、LEFT JOIN、RIGHT JOIN到底返回什么数据，每次都要画图才能想明白。</li>
+<li><strong>索引加了但查询还是很慢</strong>，以为建了索引就万事大吉，结果有些查询根本没走索引。</li>
+<li><strong>不知道什么时候该建索引</strong>，哪些列该建、哪些不该建，完全没有概念。</li>
+</ol>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="DELETE和TRUNCATE的区别"><a href="#DELETE和TRUNCATE的区别" class="headerlink" title="DELETE和TRUNCATE的区别"></a>DELETE和TRUNCATE的区别</h2><p>这两个看起来都是“删数据”，但底层机制完全不同：</p>
+<table>
+<thead>
+<tr>
+<th>对比点</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>删除方式</td>
+<td>逐行删除</td>
+<td>清空并重建表结构</td>
+</tr>
+<tr>
+<td>SQL类型</td>
+<td>DML</td>
+<td>DDL</td>
+</tr>
+<tr>
+<td>是否可回滚</td>
+<td>在事务中可回滚</td>
+<td>通常不可回滚</td>
+</tr>
+<tr>
+<td>是否支持WHERE</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>自增ID</td>
+<td>一般不重置</td>
+<td>通常会重置</td>
+</tr>
+<tr>
+<td>执行速度</td>
+<td>数据量大时较慢</td>
+<td>通常更快</td>
+</tr>
+</tbody></table>
+<p>简单理解：DELETE是一行一行删，可以配合WHERE精确删除，也可以在事务中回滚；TRUNCATE更像是把表清空后重新整理，速度快，但风险也更高。</p>
+<h2 id="GROUP-BY和HAVING"><a href="#GROUP-BY和HAVING" class="headerlink" title="GROUP BY和HAVING"></a>GROUP BY和HAVING</h2><p>我之前经常把聚合条件写到WHERE里，例如想查平均分大于80的学生，却写成：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id;</span><br></pre></td></tr></table></figure>
+
+<p>这肯定是不对的，因为WHERE执行时还没有分组，自然也没有AVG(score)这个结果。正确写法应该是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+
+<p>WHERE是在分组前过滤原始行，HAVING是在分组后过滤聚合结果。</p>
+<h2 id="JOIN类型的区别"><a href="#JOIN类型的区别" class="headerlink" title="JOIN类型的区别"></a>JOIN类型的区别</h2><p>JOIN最核心的不是语法，而是先搞清楚两张表之间的关系：</p>
+<ul>
+<li><strong>INNER JOIN</strong>：只返回两边都匹配的数据。</li>
+<li><strong>LEFT JOIN</strong>：左表全部保留，右表匹配不到的地方用NULL补齐。</li>
+<li><strong>RIGHT JOIN</strong>：右表全部保留，左表匹配不到的地方用NULL补齐。</li>
+</ul>
+<p>实际开发中我感觉LEFT JOIN用得更多，因为很多时候我们会以一张主表为中心，再去关联其它明细表。</p>
+<h2 id="索引不是万能的"><a href="#索引不是万能的" class="headerlink" title="索引不是万能的"></a>索引不是万能的</h2><p>索引像书的目录，可以帮助数据库快速定位数据。但它不是万能药，加了索引并不代表一定快：</p>
+<ul>
+<li>表数据量很小时，全表扫描可能更快。</li>
+<li>查询返回的数据太多时，走索引反而不划算。</li>
+<li>在索引列上使用函数，可能导致索引失效。</li>
+<li>LIKE以<code>%</code>开头时，通常无法利用普通索引。</li>
+<li>字段发生隐式类型转换时，也可能导致索引失效。</li>
+</ul>
+<h2 id="索引应该建在什么列上"><a href="#索引应该建在什么列上" class="headerlink" title="索引应该建在什么列上"></a>索引应该建在什么列上</h2><p>比较适合建索引的列：</p>
+<ul>
+<li>区分度高的列，比如学生ID、手机号、身份证号。</li>
+<li>经常出现在WHERE条件里的列。</li>
+<li>经常用于JOIN关联的外键列。</li>
+<li>经常用于ORDER BY或GROUP BY的列。</li>
+</ul>
+<p>不太适合建索引的列：</p>
+<ul>
+<li>区分度很低的列，比如性别。</li>
+<li>经常更新的列，因为维护索引也有成本。</li>
+<li>很少参与查询条件的列。</li>
+</ul>
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=MySQL%20index%20B-tree%20structure%20diagram%20showing%20how%20index%20speeds%20up%20query,%20versus%20full%20table%20scan,%20technical%20illustration%20on%20dark%20background&image_size=landscape_4_3"></p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="准备三张表"><a href="#准备三张表" class="headerlink" title="准备三张表"></a>准备三张表</h2><p>我用学生、课程、成绩三张表来练习，关系比较清晰：一个学生可以选择多门课程，一门课程也可以被多个学生选择，成绩表负责连接学生和课程。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 学生表：保存学生基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> student (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;姓名&#x27;</span>,</span><br><span class="line">    age <span class="type">INT</span> COMMENT <span class="string">&#x27;年龄&#x27;</span>,</span><br><span class="line">    gender <span class="type">VARCHAR</span>(<span class="number">10</span>) COMMENT <span class="string">&#x27;性别&#x27;</span>,</span><br><span class="line">    major <span class="type">VARCHAR</span>(<span class="number">50</span>) COMMENT <span class="string">&#x27;专业&#x27;</span>,</span><br><span class="line">    create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;学生表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 课程表：保存课程基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> course (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程名称&#x27;</span>,</span><br><span class="line">    credit <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学分&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;课程表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 成绩表：保存学生和课程的对应关系以及成绩</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> score (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;成绩ID&#x27;</span>,</span><br><span class="line">    student_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    course_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    score <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>) COMMENT <span class="string">&#x27;成绩&#x27;</span>,</span><br><span class="line">    exam_time <span class="type">DATE</span> COMMENT <span class="string">&#x27;考试日期&#x27;</span>,</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_student <span class="keyword">FOREIGN KEY</span> (student_id) <span class="keyword">REFERENCES</span> student(id),</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_course <span class="keyword">FOREIGN KEY</span> (course_id) <span class="keyword">REFERENCES</span> course(id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;成绩表&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="INSERT：新增数据"><a href="#INSERT：新增数据" class="headerlink" title="INSERT：新增数据"></a>INSERT：新增数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 新增学生数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> student (name, age, gender, major) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;张三&#x27;</span>, <span class="number">20</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;李四&#x27;</span>, <span class="number">21</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;软件工程&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;王五&#x27;</span>, <span class="number">19</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;数据科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;赵六&#x27;</span>, <span class="number">22</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增课程数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> course (name, credit) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;数据库原理&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;数据结构&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">(<span class="string">&#x27;操作系统&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;计算机网络&#x27;</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增成绩数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> score (student_id, course_id, score, exam_time) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="number">1</span>, <span class="number">1</span>, <span class="number">92.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">88.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">1</span>, <span class="number">78.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">3</span>, <span class="number">95.00</span>, <span class="string">&#x27;2018-10-22&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">2</span>, <span class="number">66.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">4</span>, <span class="number">72.50</span>, <span class="string">&#x27;2018-10-23&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">1</span>, <span class="number">85.00</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">4</span>, <span class="number">90.00</span>, <span class="string">&#x27;2018-10-23&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="UPDATE：修改数据"><a href="#UPDATE：修改数据" class="headerlink" title="UPDATE：修改数据"></a>UPDATE：修改数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 修改张三的年龄</span></span><br><span class="line"><span class="keyword">UPDATE</span> student</span><br><span class="line"><span class="keyword">SET</span> age <span class="operator">=</span> <span class="number">21</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 修改数据库原理课程的学分</span></span><br><span class="line"><span class="keyword">UPDATE</span> course</span><br><span class="line"><span class="keyword">SET</span> credit <span class="operator">=</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给王五的所有成绩加5分</span></span><br><span class="line"><span class="keyword">UPDATE</span> score</span><br><span class="line"><span class="keyword">SET</span> score <span class="operator">=</span> score <span class="operator">+</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;王五&#x27;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="DELETE：删除数据"><a href="#DELETE：删除数据" class="headerlink" title="DELETE：删除数据"></a>DELETE：删除数据</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除低于60分的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> score <span class="operator">&lt;</span> <span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除某个学生的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除成绩表全部数据，可配合事务回滚</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 清空成绩表，不支持WHERE，风险更高</span></span><br><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span> score;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SELECT：基础查询"><a href="#SELECT：基础查询" class="headerlink" title="SELECT：基础查询"></a>SELECT：基础查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询所有学生</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 只查询指定列</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age, major <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 条件查询</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> major <span class="operator">=</span> <span class="string">&#x27;计算机科学&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 模糊查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 排序查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分页查询：从第0条开始取10条</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line">LIMIT <span class="number">0</span>, <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Relational%20database%20tables%20student%20course%20score%20with%20primary%20keys%20foreign%20keys%20and%20CRUD%20SQL%20examples,%20clean%20technical%20infographic&image_size=landscape_4_3"></p>
+<h2 id="多表JOIN查询"><a href="#多表JOIN查询" class="headerlink" title="多表JOIN查询"></a>多表JOIN查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- INNER JOIN：只查询有成绩的学生和课程</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- LEFT JOIN：查询所有学生，即使学生还没有成绩也会显示</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- RIGHT JOIN：以课程表为主，查询所有课程的选课成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="聚合函数和GROUP-BY"><a href="#聚合函数和GROUP-BY" class="headerlink" title="聚合函数和GROUP BY"></a>聚合函数和GROUP BY</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询每个学生的平均成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询平均成绩大于80分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(sc.score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询每门课程的选课人数、最高分和最低分</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    <span class="built_in">COUNT</span>(sc.id) <span class="keyword">AS</span> student_count,</span><br><span class="line">    <span class="built_in">MAX</span>(sc.score) <span class="keyword">AS</span> max_score,</span><br><span class="line">    <span class="built_in">MIN</span>(sc.score) <span class="keyword">AS</span> min_score</span><br><span class="line"><span class="keyword">FROM</span> course c</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> c.id <span class="operator">=</span> sc.course_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> c.id, c.name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询成绩高于全班平均分的记录</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">WHERE</span> sc.score <span class="operator">&gt;</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="built_in">AVG</span>(score) <span class="keyword">FROM</span> score</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询选择了数据库原理课程的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> name</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> sc.student_id</span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id</span><br><span class="line">    <span class="keyword">WHERE</span> c.name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询至少有一门成绩大于90分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> s.name</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">WHERE</span> sc.student_id <span class="operator">=</span> s.id</span><br><span class="line">      <span class="keyword">AND</span> sc.score <span class="operator">&gt;</span> <span class="number">90</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="索引创建和使用建议"><a href="#索引创建和使用建议" class="headerlink" title="索引创建和使用建议"></a>索引创建和使用建议</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给成绩表的学生ID建立索引，提升按学生查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_id <span class="keyword">ON</span> score(student_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给成绩表的课程ID建立索引，提升按课程查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_course_id <span class="keyword">ON</span> score(course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给学生姓名建立索引，提升按姓名精确查询的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 联合索引：适合同时按学生和课程查询成绩的场景</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_course <span class="keyword">ON</span> score(student_id, course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX idx_student_name <span class="keyword">ON</span> student;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引要注意最左前缀原则。假设建立了<code>(student_id, course_id)</code>这个联合索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span> <span class="keyword">AND</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 通常不能完整使用这个联合索引，因为跳过了最左边的student_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPLAIN查看执行计划"><a href="#EXPLAIN查看执行计划" class="headerlink" title="EXPLAIN查看执行计划"></a>EXPLAIN查看执行计划</h2><p>EXPLAIN可以帮助我判断SQL到底有没有走索引，不能只靠感觉猜。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查看按学生ID查询成绩的执行计划</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看JOIN查询的执行计划</span></span><br><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<p>EXPLAIN里我现在重点看这几个字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>type</td>
+<td>访问类型，ALL通常表示全表扫描，ref、range一般比ALL好</td>
+</tr>
+<tr>
+<td>possible_keys</td>
+<td>可能用到的索引</td>
+</tr>
+<tr>
+<td>key</td>
+<td>实际使用的索引</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>MySQL预估要扫描的行数</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>额外信息，比如Using index、Using where、Using filesort</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 如果name没有索引，可能会全表扫描</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建立索引后，再观察key和rows的变化</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次系统整理MySQL基础增删改查之后，我最大的感受是：SQL真的是后端开发的基本功。以前写JDBC时，我只关心Java代码能不能跑通，现在才发现SQL本身才是和数据库沟通的核心。</p>
+<p>我需要牢记的几个点：</p>
+<ol>
+<li><strong>理解SQL执行顺序</strong>：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY。只有知道SQL先做什么、后做什么，才能写出正确的分组查询。</li>
+<li><strong>DELETE和TRUNCATE不能混用</strong>：DELETE适合按条件删除，也更容易配合事务；TRUNCATE适合清空整张表，但风险更高。</li>
+<li><strong>JOIN要先想清楚主表和关系</strong>：INNER JOIN看匹配，LEFT JOIN保留左表，RIGHT JOIN保留右表。</li>
+<li><strong>索引要合理使用</strong>：索引应该建在区分度高、经常查询、经常关联的列上，不是越多越好。</li>
+<li><strong>用EXPLAIN验证SQL</strong>：查询慢的时候，不要靠猜，要看执行计划。</li>
+</ol>
+<p>2018年10月的这个阶段，我觉得自己终于从“会照着写SQL”，开始慢慢变成“知道为什么这样写SQL”了。下一步准备继续学习事务、锁和隔离级别，这些应该会更接近真实项目里的数据库问题。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/CRUD/" rel="tag"># CRUD</a>
+              <a href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag"># 索引</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/09/15/2018-09-15-JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/" rel="prev" title="JDBC连接MySQL实践">
+                  <i class="fa fa-angle-left"></i> JDBC连接MySQL实践
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/11/18/2018-11-18-Linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/" rel="next" title="Linux常用命令整理">
+                  Linux常用命令整理 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
