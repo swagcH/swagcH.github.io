@@ -1444,7 +1444,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #bb06f1;
+  background: #9517e4;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -2903,4 +2903,35 @@ header.header {
   .sidebar-active .footer-fixed {
     left: 320px;
   }
+}
+.use-motion {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.use-motion .menu-item,
+.use-motion .sidebar,
+.use-motion .sidebar-inner,
+.use-motion .post-block,
+.use-motion .pagination,
+.use-motion .comments,
+.use-motion .post-header,
+.use-motion .post-body,
+.use-motion .collection-header,
+.use-motion .column,
+.use-motion .site-brand-container .toggle,
+.use-motion .footer,
+.use-motion .site-title,
+.use-motion .site-subtitle,
+.use-motion .custom-logo-image,
+.use-motion .logo-line {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.use-motion .animated {
+  visibility: inherit !important;
+}
+.use-motion .sidebar .animated {
+  animation: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
