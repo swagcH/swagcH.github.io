@@ -253,7 +253,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 15:47:40" itemprop="dateModified" datetime="2026-06-09T15:47:40+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:18:58" itemprop="dateModified" datetime="2026-06-09T16:18:58+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -278,7 +278,7 @@
           <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>今天把 JDK 和开发工具都装好以后，终于开始写第一个 Java 程序了。虽然只是最简单的 <code>Hello World</code>，但是实际动手以后发现，这里面并不是只有一行输出语句那么简单。</p>
 <p>我之前学 C 语言的时候，也是从 <code>Hello World</code> 开始的。当时大概知道写完 <code>.c</code> 文件以后，用编译器编译，再运行生成的可执行文件就可以了。所以刚开始学 Java 的时候，我也下意识以为流程差不多：写代码、编译、运行。</p>
 <p>但是 Java 这里多了一个 <code>.class</code> 文件，还要用 <code>javac</code> 和 <code>java</code> 两个命令分别处理，一开始确实有点懵。于是我想把 Java 程序从编写到运行的完整过程搞清楚，至少以后再遇到编译错误、运行错误时，知道问题大概出在哪里。</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20compile%20and%20run%20flowchart%20showing%20java%20source%20to%20class%20file%20to%20JVM%20execution,%20clean%20diagram%20style&image_size=landscape_4_3" alt="Java编译运行流程"><br><em>配图说明：Java程序编译运行流程</em></p>
+<p><img src="/images/posts/2018/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3-image-1.svg" alt="Java编译运行流程"><br><em>配图说明：Java程序编译运行流程</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>第一次写 Java 的 <code>Hello World</code>，我主要遇到了下面几个问题。</p>
 <h2 id="文件名和类名不一致导致编译报错"><a href="#文件名和类名不一致导致编译报错" class="headerlink" title="文件名和类名不一致导致编译报错"></a>文件名和类名不一致导致编译报错</h2><p>我一开始把文件保存成了 <code>hello.java</code>，里面写的是：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -321,7 +321,7 @@
 
 <p>这里的 <code>.class</code> 文件不是普通文本文件，而是 Java 字节码文件。JVM 可以读取字节码，然后在不同操作系统上解释执行或即时编译执行。</p>
 <p>这也是 Java 经常说的“一次编译，到处运行”的基础：只要目标机器安装了合适的 JVM，同一份 <code>.class</code> 字节码理论上就可以在不同平台运行。</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20class%20file%20bytecode%20executed%20by%20JVM%20on%20Windows%20Linux%20and%20Mac,%20educational%20diagram&image_size=landscape_4_3" alt="class文件和JVM关系"><br><em>配图说明：class字节码文件通过JVM在不同平台运行</em></p>
+<p><img src="/images/posts/2018/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3-image-2.svg" alt="class文件和JVM关系"><br><em>配图说明：class字节码文件通过JVM在不同平台运行</em></p>
 <h2 id="Windows默认GBK编码可能导致中文乱码"><a href="#Windows默认GBK编码可能导致中文乱码" class="headerlink" title="Windows默认GBK编码可能导致中文乱码"></a>Windows默认GBK编码可能导致中文乱码</h2><p>我现在主要在 Windows 环境下学习 Java。Windows 命令行默认编码经常是 GBK，而很多编辑器保存源码时默认是 UTF-8。</p>
 <p>如果源文件实际是 UTF-8，但 <code>javac</code> 按系统默认编码去读取，或者控制台用另一种编码显示，就可能出现中文乱码。最稳妥的方式是明确告诉 <code>javac</code> 源文件编码：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
@@ -360,7 +360,7 @@
 <p>对应输出：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Windows%20command%20prompt%20running%20javac%20HelloWorld.java%20and%20java%20HelloWorld%20with%20Hello%20World%20output,%202018%20beginner%20study%20note%20style&image_size=landscape_4_3" alt="命令行编译运行HelloWorld"><br><em>配图说明：在命令行中编译并运行HelloWorld程序</em></p>
+<p><img src="/images/posts/2018/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3-image-3.svg" alt="命令行编译运行HelloWorld"><br><em>配图说明：在命令行中编译并运行HelloWorld程序</em></p>
 <h2 id="带命令行参数的版本"><a href="#带命令行参数的版本" class="headerlink" title="带命令行参数的版本"></a>带命令行参数的版本</h2><p><code>main</code> 方法里的 <code>String[] args</code> 可以接收命令行参数。为了理解它，我又写了一个版本：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义HelloWorld类，文件名仍然必须是HelloWorld.java</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// args用于接收运行程序时传入的命令行参数</span></span><br><span class="line">        <span class="keyword">if</span> (args.length == <span class="number">0</span>) &#123; <span class="comment">// 判断是否没有传入任何参数，避免直接访问数组导致异常</span></span><br><span class="line">            System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 没有参数时输出默认内容</span></span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">// 提前结束main方法，让后面的参数输出逻辑不再执行</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;收到的第一个参数是：&quot;</span> + args[<span class="number">0</span>]); <span class="comment">// 输出命令行传入的第一个参数</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -397,7 +397,7 @@
 <p>Eclipse 里生成的代码大概是：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// Eclipse创建的公共类，类名和文件名保持一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// 勾选主方法选项后，Eclipse会自动生成程序入口</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 在控制台输出Hello World</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Eclipse%20IDE%20creating%20a%20Java%20project%20HelloWorldDemo%20with%20src%20folder%20and%20HelloWorld.java,%20beginner%20tutorial%20screenshot%20style&image_size=landscape_4_3" alt="Eclipse创建Java项目"><br><em>配图说明：使用Eclipse创建并运行Java项目</em></p>
+<p><img src="/images/posts/2018/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3-image-4.svg" alt="Eclipse创建Java项目"><br><em>配图说明：使用Eclipse创建并运行Java项目</em></p>
 <h2 id="classpath的概念"><a href="#classpath的概念" class="headerlink" title="classpath的概念"></a>classpath的概念</h2><p><code>classpath</code> 可以简单理解为 JVM 查找 <code>.class</code> 文件的路径。</p>
 <p>我们执行：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
@@ -413,7 +413,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> bin HelloWorld</span><br></pre></td></tr></table></figure>
 
 <p>初学阶段我觉得没必要一开始就背很多 classpath 的复杂规则，但至少要知道：运行 Java 程序时，JVM 必须能在 classpath 指定的位置找到对应的 <code>.class</code> 文件。</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Java%20classpath%20concept%20diagram%20showing%20JVM%20searching%20current%20directory%20and%20bin%20folder%20for%20HelloWorld.class,%20clean%20educational%20style&image_size=landscape_4_3" alt="classpath查找class文件"><br><em>配图说明：JVM根据classpath查找class文件</em></p>
+<p><img src="/images/posts/2018/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3-image-5.svg" alt="classpath查找class文件"><br><em>配图说明：JVM根据classpath查找class文件</em></p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天这个 <code>Hello World</code> 程序虽然很小，但实际把 Java 的几个基础概念都串起来了。</p>
 <p>首先，Java 的编译运行机制和 C 语言有本质区别。C 语言通常直接编译成本机平台的机器码，而 Java 是先通过 <code>javac</code> 编译成 <code>.class</code> 字节码，再交给 JVM 运行。</p>
 <p>其次，写 Java 程序时要注意文件名、类名、编码的一致性。尤其是 <code>public class HelloWorld</code> 必须放在 <code>HelloWorld.java</code> 中，中文源码最好统一使用 UTF-8，并在命令行编译时加上：</p>
@@ -486,7 +486,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-06-09 16:05:21" itemprop="dateModified" datetime="2026-06-09T16:05:21+08:00">2026-06-09</time>
+      <time title="修改时间：2026-06-09 16:18:58" itemprop="dateModified" datetime="2026-06-09T16:18:58+08:00">2026-06-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -511,7 +511,7 @@
           <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年春节回来，我下定决心从 C 语言转向 Java 后端开发。上学时学过一点 C 语言，顶多写过一些控制台排序算法，对”企业级开发”完全没概念。周围同学有搞 PHP 的，有搞 Python 的，选 Java 主要是看中了它的就业面广、生态成熟。</p>
 <p>当时手头参考资料主要是两样：<strong>廖雪峰的 Java 教程</strong>（在线版）和 <strong>《Head First Java》</strong> 这本经典入门书。廖雪峰的教程偏实战，直接讲 Eclipse 怎么配、Maven 怎么用，而 Head First 用大量插图讲面向对象思想，两本搭配着看效果不错。</p>
 <p>因为之前只用过 Code::Blocks 写 C 语言，对 JDK、JRE、IDE 这些概念完全分不清，所以第一步搭建环境就折腾了好几天。</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Oracle%20JDK%20download%20page%20showing%20JDK%208%20installation%20packages,%20browser%20screenshot%20style&image_size=landscape_4_3" alt="JDK下载页面"><br><em>Oracle 官网 JDK 8 下载页面</em></p>
+<p><img src="/images/posts/2018/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95-image-1.svg" alt="JDK下载页面"><br><em>Oracle 官网 JDK 8 下载页面</em></p>
 <h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><h3 id="1-JDK-版本选择困难"><a href="#1-JDK-版本选择困难" class="headerlink" title="1. JDK 版本选择困难"></a>1. JDK 版本选择困难</h3><p>当时 Oracle 在 2017 年 9 月刚发布了 JDK 9，官网上最显眼的位置就是 JDK 9 的下载链接。JDK 8 要往下翻半天才能找到。作为新手真的纠结了很久——装新不装旧？但是网上搜了一圈，几乎所有教程都在说 JDK 8 是 LTS（长期支持版本），更稳定，企业里用的最多。廖雪峰的教程里也明确写了建议用 JDK 8。最后还是选了 JDK 8u161。</p>
 <h3 id="2-环境变量配置后还是找不到-java-命令"><a href="#2-环境变量配置后还是找不到-java-命令" class="headerlink" title="2. 环境变量配置后还是找不到 java 命令"></a>2. 环境变量配置后还是找不到 java 命令</h3><p>这是我踩的第一个坑。按照教程配置了 <code>JAVA_HOME</code>、<code>Path</code>、<code>CLASSPATH</code>，打开新命令行窗口输入 <code>java -version</code>，结果报：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x27;java&#x27; 不是内部或外部命令，也不是可运行的程序或批处理文件。</span><br></pre></td></tr></table></figure>
@@ -521,7 +521,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Failed to create the Java Virtual Machine</span><br></pre></td></tr></table></figure>
 
 <p>一脸懵，刚装好的环境怎么就起不来？</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Eclipse%20IDE%20error%20dialog%20showing%20Failed%20to%20create%20the%20Java%20Virtual%20Machine%20on%20Windows%2010%20desktop&image_size=landscape_4_3" alt="Eclipse JVM 错误弹窗"><br><em>Eclipse 启动时提示 JVM 创建失败</em></p>
+<p><img src="/images/posts/2018/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95-image-2.svg" alt="Eclipse JVM 错误弹窗"><br><em>Eclipse 启动时提示 JVM 创建失败</em></p>
 <h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>回过头来分析这几个问题，其实都不复杂，但对新手来说每个都是拦路虎。</p>
 <h3 id="JDK-版本"><a href="#JDK-版本" class="headerlink" title="JDK 版本"></a>JDK 版本</h3><p>JDK 9 引入了模块化系统（Jigsaw），算是一次比较大的架构变动。虽然新特性很吸引人，但 LTS 版本更稳妥这个道理现在懂了。JDK 8 一直到 2018 年初都还是绝对的主流，公司项目基本都在用，遇到问题网上也更容易找到解决方案。</p>
 <h3 id="环境变量问题"><a href="#环境变量问题" class="headerlink" title="环境变量问题"></a>环境变量问题</h3><p>仔细排查后发现是犯了两个低级错误：</p>
@@ -547,7 +547,7 @@
 <blockquote>
 <p>注意前面那个点号 <code>.</code> 代表当前目录，必须要加。</p>
 </blockquote>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Windows%2010%20environment%20variables%20settings%20window%20showing%20JAVA_HOME%20and%20Path%20configuration,%20system%20properties%20dialog&image_size=landscape_4_3" alt="环境变量配置界面"><br><em>Windows 10 环境变量配置窗口</em></p>
+<p><img src="/images/posts/2018/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95-image-3.svg" alt="环境变量配置界面"><br><em>Windows 10 环境变量配置窗口</em></p>
 <h3 id="第三步：验证安装"><a href="#第三步：验证安装" class="headerlink" title="第三步：验证安装"></a>第三步：验证安装</h3><p>配置完成后，重新打开一个命令行窗口，依次输入以下命令验证：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\chenzixin&gt; java -version</span><br><span class="line">java version <span class="string">&quot;1.8.0_161&quot;</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_161-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)</span><br><span class="line"></span><br><span class="line">C:\Users\chenzixin&gt; javac -version</span><br><span class="line">javac 1.8.0_161</span><br></pre></td></tr></table></figure>
 
@@ -567,7 +567,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Xms256m</span><br><span class="line">-Xmx512m</span><br></pre></td></tr></table></figure>
 
 <p>只改了一处——把 <code>-Xmx</code> 从 <code>1024m</code> 降到了 <code>512m</code>。改完后重启 Eclipse，顺利启动成功。</p>
-<p><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Eclipse%20Oxygen%20IDE%20workspace%20welcome%20screen%20on%20Windows%2010,%20Java%20perspective&image_size=landscape_4_3" alt="Eclipse Oxygen 工作台界面"><br><em>Eclipse Oxygen 启动后的欢迎界面</em></p>
+<p><img src="/images/posts/2018/2018-02-13-Java%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%AE%B0%E5%BD%95-image-4.svg" alt="Eclipse Oxygen 工作台界面"><br><em>Eclipse Oxygen 启动后的欢迎界面</em></p>
 <h3 id="第六步：配置-Eclipse-的-Workspace"><a href="#第六步：配置-Eclipse-的-Workspace" class="headerlink" title="第六步：配置 Eclipse 的 Workspace"></a>第六步：配置 Eclipse 的 Workspace</h3><p>我选择了 <code>D:\JavaWorkspace</code> 作为工作空间目录，然后在 Eclipse 中配置已安装的 JDK：</p>
 <ol>
 <li>点击菜单 <code>Window</code> -&gt; <code>Preferences</code></li>
