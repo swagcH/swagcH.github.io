@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<rect width="1280" height="720" fill="#08111f"/>
+<rect x="72" y="64" width="1136" height="592" rx="18" fill="#101827" stroke="#26364f"/>
+<text x="112" y="128" fill="#f59e0b" font-family="Menlo,Consolas,monospace" font-size="22">incident-debug / 2021</text>
+<text x="112" y="210" fill="#e5edf7" font-family="Menlo,Consolas,monospace" font-size="52" font-weight="700">一次接口超时问题排查</text>
+<rect x="112" y="282" width="300" height="120" rx="12" fill="#08111f" stroke="#26364f"/>
+<rect x="490" y="282" width="300" height="120" rx="12" fill="#08111f" stroke="#26364f"/>
+<rect x="868" y="282" width="260" height="120" rx="12" fill="#08111f" stroke="#26364f"/>
+<path d="M412 342H490M790 342H868" stroke="#f59e0b" stroke-width="3" opacity="0.8"/>
+<text x="142" y="332" fill="#f59e0b" font-family="Menlo,Consolas,monospace" font-size="20">symptom</text>
+<text x="520" y="332" fill="#f59e0b" font-family="Menlo,Consolas,monospace" font-size="20">evidence</text>
+<text x="898" y="332" fill="#f59e0b" font-family="Menlo,Consolas,monospace" font-size="20">fix</text>
+<rect x="112" y="472" width="1016" height="92" rx="12" fill="#08111f" stroke="#26364f"/>
+<text x="142" y="526" fill="#e5edf7" opacity="0.72" font-family="Menlo,Consolas,monospace" font-size="22">logs → metrics → thread dump → sql → config → rollback</text>
+</svg>

@@ -6,6 +6,7 @@ db.json
 .tmp-ascii-images.py
 .tmp-2019-posts.py
 .tmp-2020-posts.py
+.tmp-2021-posts.py
 .tmp-clean-images.py
 .tmp-prune-images.py
 .DS_Store
