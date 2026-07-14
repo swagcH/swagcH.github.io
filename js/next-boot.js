@@ -89,3 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
   NexT.boot.refresh();
   NexT.boot.motion();
 });
+
+// 兼容尚未刷新模板的静态页面，确保现代主题增强脚本能够加载。
+if (!document.querySelector('script[src*="/js/custom-modern.js"]')) {
+  const modernThemeScript = document.createElement('script');
+  modernThemeScript.src = '/js/custom-modern.js?v=20260714k';
+  document.body.appendChild(modernThemeScript);
+}
