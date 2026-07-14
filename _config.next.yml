@@ -4,18 +4,16 @@ custom_file_path:
 
 scheme: Gemini
 
-darkmode: true
+darkmode: false
 
 menu:
-  home: / || fa fa-terminal
-  about: /about/ || fa fa-user-astronaut
-  tags: /tags/ || fa fa-code-branch
-  categories: /categories/ || fa fa-layer-group
-  archives: /archives/ || fa fa-clock-rotate-left
-  sitemap: /sitemap.xml || fa fa-sitemap
+  home: /
+  archives: /archives/
+  categories: /categories/
+  about: /about/
 
 menu_settings:
-  icons: true
+  icons: false
   badges: false
 
 sidebar:
@@ -69,7 +67,7 @@ theme_color:
   dark: '#e6edf3'
 
 font:
-  enable: true
+  enable: false
   host:
   global:
     external: false
@@ -123,8 +121,8 @@ back2top:
 
 reading_progress:
   enable: true
-  color: '#8b949e'
-  height: 3px
+  color: '#713cff'
+  height: 2px
 
 bookmark:
   enable: true
