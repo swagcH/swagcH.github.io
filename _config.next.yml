@@ -1,5 +1,6 @@
 custom_file_path:
   style: source/_data/styles.styl
+  bodyEnd: source/_data/body-end.njk
 
 scheme: Gemini
 

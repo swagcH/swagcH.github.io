@@ -1,31 +1,1209 @@
-.post-body figure.highlight
-  overflow-x: auto
-  overflow-y: hidden
-  width: 100%
-  max-width: 100%
+/* 现代程序员博客主题：保留 NexT 结构，仅覆盖视觉与响应式布局。 */
+:root {
+  --geek-bg: #090b10;
+  --geek-bg-soft: #0f131a;
+  --geek-surface: #131822;
+  --geek-surface-hover: #181f2b;
+  --geek-border: #2a3240;
+  --geek-border-soft: #1d2430;
+  --geek-text: #e5e9f0;
+  --geek-muted: #98a2b3;
+  --geek-faint: #657083;
+  --geek-cyan: #2bd7e5;
+  --geek-cyan-soft: rgba(43, 215, 229, 0.1);
+  --geek-green: #45d69a;
+  --geek-purple: #bd7af0;
+  --geek-pink: #e64f8f;
+  --geek-code: #070a0f;
+  --geek-radius: 6px;
+  --geek-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+}
 
-.post-body figure.highlight table
-  table-layout: auto
-  width: max-content
-  min-width: 100%
-  margin: 0
+html {
+  background: var(--geek-bg);
+  scroll-behavior: smooth;
+}
 
-.post-body figure.highlight .gutter
-  width: 3.2em
-  min-width: 3.2em
-  max-width: 3.2em
-  white-space: nowrap
-  user-select: none
+body {
+  background:
+    linear-gradient(90deg, rgba(43, 215, 229, 0.025) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(43, 215, 229, 0.02) 1px, transparent 1px),
+    var(--geek-bg) !important;
+  background-size: 42px 42px !important;
+  color: var(--geek-text) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  letter-spacing: 0 !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 0 !important;
+}
 
-.post-body figure.highlight .code
-  width: auto
-  min-width: max-content
+::selection {
+  background: rgba(43, 215, 229, 0.3);
+  color: #fff;
+}
 
-.post-body figure.highlight pre,
-.post-body figure.highlight .line
-  white-space: pre
-  word-break: normal
-  overflow-wrap: normal
+a,
+span.exturl {
+  border-bottom-color: rgba(43, 215, 229, 0.35);
+  color: var(--geek-cyan);
+}
 
-.post-body figure.highlight .code pre
-  min-width: max-content
+a:hover,
+span.exturl:hover {
+  border-bottom-color: var(--geek-pink);
+  color: var(--geek-pink);
+}
+
+.headband {
+  display: none;
+}
+
+.main {
+  display: block !important;
+  margin: 0 !important;
+  max-width: none !important;
+  min-height: calc(100vh - 120px);
+  padding: 0 0 24px !important;
+  width: 100% !important;
+}
+
+.main > .column {
+  min-height: 0 !important;
+  position: static !important;
+  width: 100% !important;
+}
+
+/* 顶部导航 */
+.header {
+  align-items: center;
+  backdrop-filter: blur(18px);
+  background: rgba(9, 11, 16, 0.9) !important;
+  border-bottom: 1px solid var(--geek-border-soft);
+  box-shadow: none !important;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0 !important;
+  min-height: 72px;
+  padding: 0 24px !important;
+  position: sticky !important;
+  top: 0;
+  width: 100% !important;
+  z-index: 1200;
+}
+
+.site-brand-container {
+  align-items: center;
+  background: transparent !important;
+  display: flex;
+  height: 72px;
+  justify-content: flex-start;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.site-meta {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.brand {
+  align-items: center;
+  border: 0 !important;
+  display: inline-flex;
+  gap: 11px;
+  padding: 0 !important;
+}
+
+.brand::before {
+  align-items: center;
+  background: var(--geek-code);
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+  color: var(--geek-cyan);
+  content: ">_";
+  display: inline-flex;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  height: 36px;
+  justify-content: center;
+  width: 44px;
+}
+
+.logo-line {
+  display: none !important;
+}
+
+.site-title {
+  color: var(--geek-text) !important;
+  font-size: 21px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+.site-nav-right {
+  display: none;
+}
+
+.site-nav {
+  background: transparent !important;
+  border: 0 !important;
+  display: block !important;
+  margin: 0 0 0 auto !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.main-menu {
+  align-items: center;
+  display: flex;
+  gap: 3px;
+  justify-content: flex-end;
+  margin: 0 !important;
+}
+
+.menu .menu-item {
+  margin: 0 !important;
+}
+
+.menu .menu-item a,
+.menu .menu-item span.exturl {
+  border: 0 !important;
+  border-radius: var(--geek-radius);
+  color: var(--geek-muted) !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0;
+  padding: 11px 12px !important;
+}
+
+.menu .menu-item a:hover,
+.menu .menu-item-active a,
+.menu .menu-item a.menu-item-active,
+.menu .menu-item span.exturl:hover {
+  background: var(--geek-cyan-soft) !important;
+  color: var(--geek-cyan) !important;
+}
+
+.menu .menu-item a.menu-item-active::after {
+  display: none !important;
+}
+
+.menu .menu-item .fa,
+.menu .menu-item .fab,
+.menu .menu-item .far,
+.menu .menu-item .fas {
+  margin-right: 5px !important;
+}
+
+.site-nav-toggle {
+  display: none;
+}
+
+.modern-home-page .header {
+  background: transparent !important;
+  border-bottom-color: transparent;
+  left: 0;
+  position: fixed !important;
+  right: 0;
+}
+
+.modern-home-page.modern-scrolled .header {
+  background: rgba(18, 12, 24, 0.9) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22) !important;
+}
+
+.modern-home-page .brand::before {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.modern-home-page .site-title,
+.modern-home-page .menu .menu-item a,
+.modern-home-page .menu .menu-item span.exturl {
+  color: #fff !important;
+}
+
+.modern-home-page .menu .menu-item a:hover,
+.modern-home-page .menu .menu-item-active a,
+.modern-home-page .menu .menu-item a.menu-item-active {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+}
+
+/* 主体宽度 */
+.main-inner {
+  box-sizing: border-box;
+  margin: 0 auto !important;
+  padding: 38px 0 0 !important;
+  max-width: 1120px;
+  width: calc(100% - 40px) !important;
+}
+
+.sidebar {
+  display: none !important;
+}
+
+.modern-home-page .main-inner.index {
+  max-width: none !important;
+  padding-top: 0 !important;
+  width: 100% !important;
+}
+
+/* 首页首屏 */
+.modern-home-hero {
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(76, 15, 91, 0.88), rgba(183, 38, 107, 0.72)),
+    url("/images/blog-hero-code.png") center / cover no-repeat;
+  box-sizing: border-box;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 650px;
+  padding: 108px 24px 120px;
+  text-align: center;
+  width: 100%;
+}
+
+.modern-hero-kicker {
+  color: rgba(255, 255, 255, 0.78);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0;
+  margin-bottom: 20px;
+}
+
+.modern-home-hero h2 {
+  color: #fff !important;
+  font-size: 48px !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.18 !important;
+  margin: 0 0 20px !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.modern-home-hero p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  line-height: 1.8;
+  margin: 0;
+  max-width: 760px;
+}
+
+.modern-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 36px;
+}
+
+.modern-action {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  border-radius: 999px;
+  color: #fff !important;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+  min-width: 130px;
+  padding: 12px 20px;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.modern-action:hover,
+.modern-action-primary:hover {
+  background: #fff;
+  color: #a52468 !important;
+  transform: translateY(-2px);
+}
+
+.modern-tech-panel {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: -66px auto 34px;
+  max-width: 1120px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 3;
+}
+
+.modern-tech-card {
+  background: var(--geek-surface);
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+  box-shadow: var(--geek-shadow);
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+  text-align: center;
+}
+
+.modern-tech-card::before {
+  background: linear-gradient(90deg, var(--geek-cyan), var(--geek-purple), var(--geek-pink));
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.modern-tech-card strong {
+  color: var(--geek-text);
+  display: block;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.modern-tech-card span {
+  color: var(--geek-muted);
+  display: block;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* 首页文章列表 */
+.modern-home-page .post-block {
+  background: var(--geek-surface);
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+  box-shadow: var(--geek-shadow);
+  box-sizing: border-box;
+  margin: 0 auto 24px !important;
+  max-width: 1080px;
+  padding: 30px 34px !important;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.modern-home-page .post-block:hover {
+  border-color: rgba(43, 215, 229, 0.42);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+.modern-home-page .post-header {
+  margin-bottom: 22px !important;
+  text-align: left;
+}
+
+.post-title {
+  color: var(--geek-text) !important;
+  letter-spacing: 0 !important;
+}
+
+.modern-home-page .post-title {
+  font-size: 27px !important;
+  line-height: 1.35 !important;
+  margin: 0 0 12px !important;
+  text-align: left;
+}
+
+.post-title-link {
+  border: 0 !important;
+  color: var(--geek-text) !important;
+}
+
+.post-title-link:hover {
+  color: var(--geek-cyan) !important;
+}
+
+.post-title-link::after {
+  color: var(--geek-cyan);
+  content: "  ->";
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.post-title-link:hover::after {
+  opacity: 1;
+}
+
+.post-meta {
+  color: var(--geek-faint) !important;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px !important;
+  gap: 8px 18px;
+  justify-content: flex-start !important;
+}
+
+.post-meta-item {
+  margin: 0 !important;
+}
+
+.post-meta-item-icon {
+  color: var(--geek-cyan);
+  margin-right: 5px;
+}
+
+.post-meta a {
+  color: var(--geek-muted) !important;
+}
+
+.modern-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modern-post-tags span,
+.post-tags a {
+  background: var(--geek-cyan-soft);
+  border: 1px solid rgba(43, 215, 229, 0.22) !important;
+  border-radius: 3px;
+  color: var(--geek-cyan) !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px !important;
+  padding: 5px 9px;
+}
+
+.modern-post-tags span:nth-child(2),
+.post-tags a:nth-child(2) {
+  background: rgba(189, 122, 240, 0.1);
+  border-color: rgba(189, 122, 240, 0.24) !important;
+  color: var(--geek-purple) !important;
+}
+
+.modern-post-tags span:nth-child(3),
+.post-tags a:nth-child(3) {
+  background: rgba(69, 214, 154, 0.1);
+  border-color: rgba(69, 214, 154, 0.24) !important;
+  color: var(--geek-green) !important;
+}
+
+.post-body {
+  color: var(--geek-text) !important;
+}
+
+.modern-home-page .post-body {
+  font-size: 15px !important;
+  line-height: 1.85 !important;
+  text-align: left !important;
+}
+
+.modern-home-page .post-body p,
+.modern-home-page .post-body li {
+  color: var(--geek-muted) !important;
+}
+
+.modern-home-page .post-body img {
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+}
+
+.post-button {
+  margin-top: 24px !important;
+  text-align: left !important;
+}
+
+.post-button .btn {
+  background: transparent !important;
+  border: 1px solid var(--geek-cyan) !important;
+  border-radius: var(--geek-radius) !important;
+  color: var(--geek-cyan) !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  padding: 10px 16px !important;
+}
+
+.post-button .btn:hover {
+  background: var(--geek-cyan-soft) !important;
+  color: var(--geek-cyan) !important;
+}
+
+.post-eof {
+  display: none;
+}
+
+/* 归档、标签和分类页面 */
+.collection-title,
+.collection-year,
+.posts-collapse .post-title,
+.tag-cloud-title,
+.category-all-title {
+  color: var(--geek-text) !important;
+}
+
+.posts-collapse,
+.tag-cloud,
+.category-all-page,
+.archive .collection-title {
+  background: var(--geek-surface);
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+  box-shadow: var(--geek-shadow);
+  box-sizing: border-box;
+  padding: 28px !important;
+}
+
+.posts-collapse .post-header {
+  border-bottom-color: var(--geek-border-soft) !important;
+}
+
+.tag-cloud a {
+  background: var(--geek-surface-hover);
+  border: 1px solid var(--geek-border) !important;
+  border-radius: var(--geek-radius);
+  display: inline-block;
+  margin: 6px;
+  padding: 7px 10px;
+}
+
+/* 文章详情页 */
+.modern-post-page .main-inner.post {
+  margin: 0 auto !important;
+  max-width: 1200px;
+  padding: 46px 340px 0 0 !important;
+  width: calc(100% - 48px) !important;
+}
+
+.modern-post-page .post-block {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.modern-post-page .post-content {
+  min-width: 0;
+}
+
+.modern-post-page .post-header {
+  border-bottom: 1px solid var(--geek-border-soft);
+  margin: 0 0 34px !important;
+  padding: 0 0 30px !important;
+  text-align: left !important;
+}
+
+.modern-post-breadcrumb {
+  align-items: center;
+  color: var(--geek-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  gap: 7px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  min-width: 0;
+}
+
+.modern-post-breadcrumb a {
+  border: 0 !important;
+  color: var(--geek-faint) !important;
+}
+
+.modern-post-breadcrumb a:hover {
+  color: var(--geek-cyan) !important;
+}
+
+.modern-post-breadcrumb-current {
+  color: var(--geek-muted);
+  flex: 1 1 160px;
+  max-width: 460px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: auto;
+}
+
+.modern-post-page .post-title {
+  color: var(--geek-text) !important;
+  font-size: 36px !important;
+  font-weight: 750 !important;
+  line-height: 1.28 !important;
+  margin: 0 !important;
+  overflow-wrap: anywhere;
+  text-align: left !important;
+}
+
+.modern-post-page .post-meta-container {
+  margin-top: 18px !important;
+}
+
+.modern-post-page .modern-post-tags {
+  margin-top: 16px;
+}
+
+.modern-post-page .post-body {
+  color: var(--geek-text) !important;
+  font-size: 16px !important;
+  line-height: 1.9 !important;
+  text-align: left !important;
+}
+
+.modern-post-page .post-body p,
+.modern-post-page .post-body li {
+  color: var(--geek-text) !important;
+}
+
+.modern-post-page .post-body p {
+  margin: 0 0 22px !important;
+}
+
+.modern-post-page .post-body h1,
+.modern-post-page .post-body h2,
+.modern-post-page .post-body h3,
+.modern-post-page .post-body h4 {
+  border: 0 !important;
+  color: var(--geek-text) !important;
+  letter-spacing: 0 !important;
+  line-height: 1.4 !important;
+  margin: 40px 0 18px !important;
+  padding: 0 0 0 16px !important;
+  position: relative;
+  scroll-margin-top: 92px;
+}
+
+.modern-post-page .post-body h1::before,
+.modern-post-page .post-body h2::before,
+.modern-post-page .post-body h3::before,
+.modern-post-page .post-body h4::before {
+  background: var(--geek-cyan);
+  bottom: 4px;
+  box-shadow: 0 0 12px rgba(43, 215, 229, 0.35);
+  content: "";
+  left: 0;
+  position: absolute;
+  top: 4px;
+  width: 3px;
+}
+
+.modern-post-page .post-body h1 {
+  font-size: 26px !important;
+}
+
+.modern-post-page .post-body h2 {
+  font-size: 22px !important;
+}
+
+.modern-post-page .post-body h3 {
+  font-size: 19px !important;
+}
+
+.modern-post-page .post-body a {
+  color: var(--geek-cyan) !important;
+}
+
+.modern-post-page .post-body code {
+  background: var(--geek-code) !important;
+  border: 1px solid var(--geek-border-soft);
+  border-radius: 3px !important;
+  color: var(--geek-cyan) !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  font-size: 0.88em;
+  padding: 0.16em 0.4em !important;
+}
+
+.modern-post-page .post-body blockquote {
+  background: var(--geek-cyan-soft) !important;
+  border: 1px solid rgba(43, 215, 229, 0.13) !important;
+  border-left: 3px solid var(--geek-cyan) !important;
+  border-radius: 0 var(--geek-radius) var(--geek-radius) 0;
+  color: var(--geek-muted) !important;
+  margin: 24px 0 !important;
+  padding: 16px 20px !important;
+}
+
+.modern-post-page .post-body blockquote p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.modern-post-page .post-body > table {
+  background: var(--geek-surface);
+  border-color: var(--geek-border) !important;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.modern-post-page .post-body > table th,
+.modern-post-page .post-body > table td {
+  border-color: var(--geek-border) !important;
+}
+
+/* 终端式代码块，沿用 NexT 自带复制能力。 */
+.modern-post-page figure.highlight {
+  background: var(--geek-code) !important;
+  border: 1px solid var(--geek-border-soft) !important;
+  border-radius: var(--geek-radius) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  margin: 0 0 24px !important;
+  max-width: 100%;
+  overflow: hidden !important;
+  padding-top: 40px;
+  position: relative;
+  width: 100%;
+}
+
+.modern-post-page figure.highlight::before {
+  background: var(--geek-surface);
+  border-bottom: 1px solid var(--geek-border-soft);
+  content: "";
+  height: 40px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.modern-post-page figure.highlight .code-lang {
+  color: var(--geek-faint) !important;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 11px !important;
+  left: 16px !important;
+  letter-spacing: 0 !important;
+  line-height: 40px !important;
+  position: absolute !important;
+  top: 0 !important;
+  z-index: 2;
+}
+
+.modern-post-page figure.highlight .highlight-tools {
+  align-items: center;
+  display: flex;
+  height: 40px;
+  position: absolute !important;
+  right: 10px !important;
+  top: 0 !important;
+  z-index: 3;
+}
+
+.modern-post-page figure.highlight .copy-btn {
+  color: var(--geek-faint) !important;
+}
+
+.modern-post-page figure.highlight .copy-btn:hover {
+  color: var(--geek-cyan) !important;
+}
+
+.modern-post-page figure.highlight .table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.modern-post-page figure.highlight table {
+  background: var(--geek-code) !important;
+  border: 0 !important;
+  margin: 0 !important;
+  min-width: 100%;
+  width: max-content;
+}
+
+.modern-post-page figure.highlight td {
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.modern-post-page figure.highlight pre {
+  background: transparent !important;
+  border: 0 !important;
+  color: #dce3ec !important;
+  font-size: 13px !important;
+  line-height: 1.75 !important;
+  margin: 0 !important;
+}
+
+.modern-post-page figure.highlight .gutter pre {
+  background: rgba(255, 255, 255, 0.025) !important;
+  color: #525d6d !important;
+  padding: 16px 12px !important;
+}
+
+.modern-post-page figure.highlight .code pre {
+  padding: 16px 18px !important;
+}
+
+.modern-post-page figure.highlight code,
+.modern-post-page figure.highlight .line {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+.modern-post-page .highlight .keyword,
+.modern-post-page .highlight .selector-tag,
+.modern-post-page .highlight .meta-keyword {
+  color: var(--geek-purple) !important;
+}
+
+.modern-post-page .highlight .string,
+.modern-post-page .highlight .title,
+.modern-post-page .highlight .name,
+.modern-post-page .highlight .attribute {
+  color: var(--geek-green) !important;
+}
+
+.modern-post-page .highlight .comment,
+.modern-post-page .highlight .quote {
+  color: #687487 !important;
+  font-style: italic;
+}
+
+.modern-post-page .post-footer {
+  border-top: 1px solid var(--geek-border-soft);
+  margin-top: 44px !important;
+  padding-top: 24px;
+}
+
+.modern-post-page .post-tags {
+  margin-top: 0 !important;
+  text-align: left !important;
+}
+
+.modern-post-page .post-nav {
+  border-top: 0 !important;
+  display: flex;
+  gap: 14px;
+  margin-top: 28px !important;
+  padding: 0 !important;
+}
+
+.modern-post-page .post-nav-item {
+  margin: 0 !important;
+  min-width: 0;
+}
+
+.modern-post-page .post-nav-item a {
+  background: var(--geek-surface);
+  border: 1px solid var(--geek-border) !important;
+  border-radius: var(--geek-radius);
+  color: var(--geek-muted) !important;
+  min-height: 54px;
+  padding: 14px 16px !important;
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.modern-post-page .post-nav-item a:hover {
+  border-color: rgba(43, 215, 229, 0.45) !important;
+  color: var(--geek-cyan) !important;
+  transform: translateY(-2px);
+}
+
+/* 文章页右侧目录 */
+.modern-post-page .sidebar {
+  background: transparent !important;
+  bottom: auto !important;
+  box-shadow: none !important;
+  display: block !important;
+  left: auto !important;
+  position: fixed !important;
+  right: 24px !important;
+  top: 96px !important;
+  transform: none !important;
+  width: 300px !important;
+  z-index: 100;
+}
+
+.modern-post-page .sidebar-inner {
+  background: var(--geek-surface) !important;
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius);
+  box-shadow: none !important;
+  box-sizing: border-box;
+  color: var(--geek-muted) !important;
+  max-height: calc(100vh - 124px);
+  overflow: hidden;
+  padding: 18px !important;
+  width: 100% !important;
+}
+
+.modern-post-page .sidebar-nav,
+.modern-post-page .site-overview-wrap {
+  display: none !important;
+}
+
+.modern-post-page .post-toc-wrap {
+  display: block !important;
+  max-height: calc(100vh - 164px);
+  overflow-y: auto;
+}
+
+.modern-toc-heading {
+  color: var(--geek-cyan);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.modern-post-page .post-toc .nav {
+  padding: 0 !important;
+}
+
+.modern-post-page .post-toc .nav-child {
+  padding-left: 12px !important;
+}
+
+.modern-post-page .post-toc .nav-link {
+  border: 0 !important;
+  border-left: 2px solid transparent !important;
+  color: var(--geek-faint) !important;
+  display: block;
+  line-height: 1.5;
+  overflow: hidden;
+  padding: 5px 8px 5px 11px !important;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modern-post-page .post-toc .nav-link:hover,
+.modern-post-page .post-toc .active > .nav-link {
+  border-left-color: var(--geek-cyan) !important;
+  color: var(--geek-cyan) !important;
+}
+
+.modern-post-page .sidebar-toggle,
+.modern-post-page .sidebar-dimmer {
+  display: none !important;
+}
+
+@media (min-width: 1280px) {
+  .modern-post-page .sidebar {
+    right: calc((100vw - 1200px) / 2) !important;
+  }
+}
+
+/* 页脚与浮动工具 */
+.footer {
+  background: var(--geek-bg-soft) !important;
+  border-top: 1px solid var(--geek-border-soft);
+  color: var(--geek-faint) !important;
+  margin-top: 36px !important;
+  padding: 24px 0 28px !important;
+}
+
+.footer a {
+  color: var(--geek-muted) !important;
+}
+
+.back-to-top,
+.book-mark-link {
+  background: var(--geek-surface) !important;
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius) !important;
+  box-shadow: var(--geek-shadow);
+  color: var(--geek-cyan) !important;
+}
+
+.sidebar-toggle,
+.sidebar-dimmer {
+  display: none !important;
+}
+
+.reading-progress-bar {
+  background: linear-gradient(90deg, var(--geek-cyan), var(--geek-purple), var(--geek-pink)) !important;
+}
+
+.search-pop-overlay {
+  backdrop-filter: blur(10px);
+  background: rgba(4, 6, 10, 0.84) !important;
+}
+
+.search-popup {
+  background: var(--geek-surface) !important;
+  border: 1px solid var(--geek-border);
+  border-radius: var(--geek-radius) !important;
+  color: var(--geek-text) !important;
+}
+
+.search-input {
+  color: var(--geek-text) !important;
+}
+
+@media (max-width: 1100px) {
+  .modern-post-page .main-inner.post {
+    max-width: 800px;
+    padding-right: 0 !important;
+    width: calc(100% - 40px) !important;
+  }
+
+  .modern-post-page .sidebar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .header,
+  .modern-home-page .header,
+  .modern-home-page.modern-scrolled .header {
+    background: rgba(9, 11, 16, 0.96) !important;
+    grid-template-columns: 1fr;
+    padding: 0 16px !important;
+  }
+
+  .site-brand-container {
+    justify-content: space-between;
+    width: 100% !important;
+  }
+
+  .site-nav-toggle,
+  .site-nav-right {
+    color: var(--geek-muted);
+    display: block;
+  }
+
+  .site-meta {
+    flex: 1;
+    text-align: center;
+  }
+
+  .site-nav {
+    background: var(--geek-surface) !important;
+    border: 1px solid var(--geek-border) !important;
+    border-radius: var(--geek-radius);
+    display: none !important;
+    margin: 0 0 12px !important;
+    padding: 7px !important;
+    width: 100% !important;
+  }
+
+  body.site-nav-on .site-nav {
+    display: block !important;
+    height: auto !important;
+    max-height: calc(100vh - 84px);
+    overflow-y: auto !important;
+  }
+
+  .main-menu {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .menu .menu-item a,
+  .menu .menu-item span.exturl {
+    display: flex;
+    justify-content: center;
+  }
+
+  .modern-home-page .menu .menu-item a,
+  .modern-home-page .menu .menu-item span.exturl {
+    color: var(--geek-muted) !important;
+  }
+
+  .modern-home-hero {
+    min-height: 570px;
+    padding-top: 96px;
+  }
+
+  .modern-home-hero h2 {
+    font-size: 40px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .main-inner,
+  .modern-post-page .main-inner.post {
+    width: calc(100% - 28px) !important;
+  }
+
+  .modern-home-hero {
+    min-height: 540px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .modern-home-hero h2 {
+    font-size: 33px !important;
+  }
+
+  .modern-home-hero p {
+    font-size: 15px;
+  }
+
+  .modern-hero-actions {
+    flex-direction: column;
+    max-width: 240px;
+    width: 100%;
+  }
+
+  .modern-action {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .modern-tech-panel {
+    grid-template-columns: 1fr;
+    margin-top: -54px;
+    padding: 0 14px;
+  }
+
+  .modern-home-page .post-block {
+    margin-left: 14px !important;
+    margin-right: 14px !important;
+    padding: 24px 20px !important;
+  }
+
+  .modern-home-page .post-title {
+    font-size: 23px !important;
+  }
+
+  .modern-post-page .main-inner.post {
+    padding-top: 26px !important;
+  }
+
+  .modern-post-page .post-header {
+    margin-bottom: 28px !important;
+    padding-bottom: 24px !important;
+  }
+
+  .modern-post-page .post-title {
+    font-size: 28px !important;
+  }
+
+  .modern-post-page .post-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modern-post-page .post-meta-item-text {
+    display: inline !important;
+  }
+
+  .modern-post-page .post-body {
+    font-size: 15px !important;
+    line-height: 1.85 !important;
+  }
+
+  .modern-post-page .post-body h1 {
+    font-size: 23px !important;
+  }
+
+  .modern-post-page .post-body h2 {
+    font-size: 20px !important;
+  }
+
+  .modern-post-page .post-nav {
+    flex-direction: column;
+  }
+
+  .modern-post-page .post-nav-item,
+  .modern-post-page .post-nav-item:first-child,
+  .modern-post-page .post-nav-item:last-child {
+    margin: 0 !important;
+    text-align: left !important;
+  }
+
+  .modern-post-page figure.highlight pre {
+    font-size: 12px !important;
+  }
+}
