@@ -174,7 +174,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-count">65</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -185,7 +185,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">191</span>
+        <span class="site-state-item-count">193</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,6 +207,291 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/" class="post-title-link" itemprop="url">Nacos,Gateway,OpenFeign实操</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-03-27 20:46:18" itemprop="dateCreated datePublished" datetime="2022-03-27T20:46:18+08:00">2022-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
+<p>在 Spring Cloud 的基础概念跑通之后，我把重点放到 Nacos、Gateway 和 OpenFeign 三个组件上。原因很简单：它们覆盖了微服务最基础的一条链路——服务注册、统一入口和服务间调用。只要这三块稳定，至少能搭出一个可运行的微服务骨架。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
+<p>实操中遇到的问题主要集中在配置和路径上。服务已经启动，但 Nacos 控制台看不到实例；Gateway 能访问，但路由匹配不到目标服务；OpenFeign 调用时出现 404 或超时。很多问题不是代码逻辑错，而是服务名、路径前缀、配置层级和依赖版本不一致导致的。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">请求链路：</span><br><span class="line">Browser/Postman</span><br><span class="line">  ↓ /api/order/create</span><br><span class="line">Gateway</span><br><span class="line">  ↓ lb://order-service/order/create</span><br><span class="line">order-service</span><br><span class="line">  ↓ Feign: stock-service</span><br><span class="line">stock-service</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>StripPrefix</code> 配错，请求到后端服务的路径就会变化。排查时要同时看 Gateway 日志和后端 Controller 的映射。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/order&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderController</span> &#123;</span><br><span class="line">    <span class="meta">@PostMapping(&quot;/create&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">create</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;ok&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(&quot;stock-service&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockFeignClient</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/stock/check&quot;)</span></span><br><span class="line">    Boolean <span class="title function_">checkStock</span><span class="params">(<span class="meta">@RequestParam</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">检查清单：</span><br><span class="line">1. spring.application.name 是否和 Feign 名称一致</span><br><span class="line">2. Nacos 控制台是否有实例</span><br><span class="line">3. Gateway 路由 Path 是否匹配</span><br><span class="line">4. StripPrefix 是否符合后端路径</span><br><span class="line">5. Feign 超时时间是否合理</span><br></pre></td></tr></table></figure>
+
+<p>通过清单逐项排查，比直接看异常堆栈更稳定。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
+<p>Nacos、Gateway、OpenFeign 组合起来并不复杂，复杂的是路径、服务名和配置之间的细节一致性。我的经验是：每新增一个服务，先验证注册，再验证网关，再验证 Feign，不要一次性把所有配置都写完再排查。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Spring Cloud学习笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-02-20 21:07:33" itemprop="dateCreated datePublished" datetime="2022-02-20T21:07:33+08:00">2022-02-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
+<p>在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Boot 应用，Spring Cloud 更像是一组微服务治理工具箱，覆盖注册发现、配置管理、网关路由、服务调用、熔断限流等能力。研究它的原因也很明确：当服务数量超过两三个之后，手写服务地址、手动维护配置、靠人肉检查调用链会变得非常不可靠。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
+<p>刚开始学习时，最大的问题是概念很多但边界不清。注册中心、配置中心、网关、Feign、负载均衡这些组件看起来都能跑 Demo，但真正放到项目里，会发现不知道每个组件负责什么。比如服务调用失败到底是注册中心没发现服务，还是网关路由错了，还是 Feign 超时时间太短。组件之间的关系如果没有先画清楚，排查问题时会非常被动。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Spring Cloud 常见组件关系：</span><br><span class="line"></span><br><span class="line">client</span><br><span class="line">  ↓</span><br><span class="line">Gateway</span><br><span class="line">  ↓</span><br><span class="line">service-a  --Feign--&gt; service-b</span><br><span class="line">  ↓              ↓</span><br><span class="line">Nacos Registry / Config</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
+
+<p>排查时我会先确认服务是否注册，再确认配置是否加载，最后确认调用链是否正常。顺序不能乱，否则容易被表面异常误导。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">学习顺序：</span><br><span class="line">1. Spring Boot 单服务启动</span><br><span class="line">2. 接入 Nacos 注册中心</span><br><span class="line">3. 通过 OpenFeign 完成服务调用</span><br><span class="line">4. 增加 Gateway 统一入口</span><br><span class="line">5. 再考虑配置中心、熔断限流、链路追踪</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/stock/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我把每个组件都拆成最小可运行样例，再逐步组合。这样做虽然慢一点，但能清楚知道问题出现在哪一层。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
+<p>Spring Cloud 的学习重点不是背组件名，而是理解服务治理的分层。注册中心解决服务在哪里，配置中心解决配置怎么统一，网关解决入口怎么收口，Feign 解决服务之间怎么调用。只有把这些问题放回真实架构场景里，组件才有意义。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/01/16/2022-01-16-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%88%9D%E4%BD%93%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/01/16/2022-01-16-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%88%9D%E4%BD%93%E9%AA%8C/" class="post-title-link" itemprop="url">微服务架构初体验</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-16 22:18:41" itemprop="dateCreated datePublished" datetime="2022-01-16T22:18:41+08:00">2022-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
+<p>2022 年开始接触微服务时，我最直接的感受是：它不是把一个系统拆成多个服务那么简单。过去做单体应用，所有模块在一个进程里，调用方式直接、事务边界清楚、部署也简单。但当业务模块逐渐增多，订单、用户、库存、支付之间的代码耦合越来越明显，每次改一个功能都要回归一大片逻辑，发布窗口也越来越长。正是在这种背景下，我开始研究微服务架构。最初的目标并不是追求架构先进，而是想弄清楚系统拆分之后，团队协作、独立部署、故障隔离到底能解决哪些真实问题。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
+<p>第一次拆服务时遇到的情况比较典型：模块拆出去了，但调用关系反而更复杂；原来一次本地方法调用，现在变成了网络请求；原来一个数据库事务能覆盖的流程，现在要考虑分布式事务或最终一致性。尤其是订单创建这个流程，涉及用户校验、库存扣减、优惠计算和支付记录，拆开之后每一步都可能失败。如果只按代码包结构拆服务，很容易变成“物理拆分、逻辑仍然耦合”。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">单体结构：</span><br><span class="line">app</span><br><span class="line">├── user</span><br><span class="line">├── order</span><br><span class="line">├── stock</span><br><span class="line">└── payment</span><br><span class="line"></span><br><span class="line">初步拆分：</span><br><span class="line">user-service  -&gt; user_db</span><br><span class="line">order-service -&gt; order_db</span><br><span class="line">stock-service -&gt; stock_db</span><br><span class="line">pay-service   -&gt; pay_db</span><br></pre></td></tr></table></figure>
+
+<p>排查拆分边界时，我主要看三个维度：数据归属、业务闭环、变更频率。用户资料和订单生命周期明显不是同一类数据；库存服务变更频率不高，但对一致性要求高；支付服务外部依赖多，需要单独隔离。由此可以判断，服务拆分应该围绕业务能力，而不是围绕代码目录。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">拆分原则：</span><br><span class="line">1. 先按业务能力拆，而不是按技术层拆</span><br><span class="line">2. 每个服务尽量拥有自己的数据表</span><br><span class="line">3. 服务之间通过接口通信，不共享数据库</span><br><span class="line">4. 核心链路先少拆，边界稳定后再细化</span><br><span class="line">5. 引入服务治理前先把日志和调用链补齐</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">deduct</span><span class="params">(Long skuId, Integer count)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实际落地时，我没有一次性把所有模块拆开，而是先从边界相对清晰的库存查询、用户信息查询开始。这样即使出现问题，也不会直接影响订单主流程。等到接口、日志、异常处理逐渐稳定后，再考虑更核心的链路。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
+<p>微服务带来的不是天然简单，而是把原来隐藏在进程内部的问题显性化。网络延迟、接口契约、数据一致性、服务监控都会成为必须面对的工程问题。我的经验是：如果团队还没有稳定的部署流程、日志规范和接口文档，过早拆微服务只会放大混乱。微服务不是目标，降低复杂度、提升交付效率和故障隔离能力才是目标。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -827,284 +1112,6 @@
 <h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">baseSeconds</span> <span class="operator">=</span> <span class="number">30</span> * <span class="number">60</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">randomSeconds</span> <span class="operator">=</span> ThreadLocalRandom.current().nextInt(<span class="number">0</span>, <span class="number">10</span> * <span class="number">60</span>);</span><br><span class="line">redisTemplate.opsForValue().set(key, value, baseSeconds + randomSeconds, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">处理：过期时间随机化、热点预热、限流降级、多级缓存</span><br></pre></td></tr></table></figure>
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="post-title-link" itemprop="url">Redis缓存穿透解决方案</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-03-14 20:36:29" itemprop="dateCreated datePublished" datetime="2021-03-14T20:36:29+08:00">2021-03-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2021/redis-penetration-cover.svg" alt="Redis缓存穿透解决方案技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>缓存穿透的典型特征是缓存未命中后大量请求直接打到数据库。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
-
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Redis miss rate: 78%</span><br><span class="line">DB QPS: 2400 -&gt; 9600</span><br><span class="line">hot key pattern: product:not-exist:*</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-cli --bigkeys</span><br><span class="line">redis-cli monitor | grep product</span><br></pre></td></tr></table></figure>
-
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line"><span class="keyword">if</span> (product == <span class="literal">null</span>) &#123;</span><br><span class="line">    product = productMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (product != <span class="literal">null</span>) &#123;</span><br><span class="line">        redis.set(key, product, <span class="number">30</span>, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + id;</span><br><span class="line"><span class="type">Product</span> <span class="variable">cached</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line"><span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> cached == EMPTY_PRODUCT ? <span class="literal">null</span> : cached;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Product</span> <span class="variable">db</span> <span class="operator">=</span> productMapper.selectById(id);</span><br><span class="line">redis.set(key, db == <span class="literal">null</span> ? EMPTY_PRODUCT : db, db == <span class="literal">null</span> ? <span class="number">60</span> : <span class="number">1800</span>, TimeUnit.SECONDS);</span><br><span class="line"><span class="keyword">return</span> db;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">方案：缓存空值 + 参数校验 + 布隆过滤器</span><br></pre></td></tr></table></figure>
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">MySQL慢查询分析</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-02-21 16:48:05" itemprop="dateCreated datePublished" datetime="2021-02-21T16:48:05+08:00">2021-02-21</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>慢查询不能只看 SQL 文本，需要结合执行计划、索引、扫描行数和返回字段。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
-
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> slow_query_log <span class="operator">=</span> <span class="string">&#x27;ON&#x27;</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> long_query_time <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Time: 2021-02-21T14:22:19</span><br><span class="line"># Query_time: 6.834 Lock_time: 0.001 Rows_sent: 20 Rows_examined: 581239</span><br><span class="line">select * from order_info where user_id = 1001 order by created_at desc limit 20;</span><br></pre></td></tr></table></figure>
-
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: ALL</span><br><span class="line">possible_keys: idx_user_id</span><br><span class="line">key: NULL</span><br><span class="line">rows: 581239</span><br><span class="line">Extra: Using where; Using filesort</span><br></pre></td></tr></table></figure>
-
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter table</span> order_info</span><br><span class="line"><span class="keyword">add</span> index idx_user_created(user_id, created_at);</span><br><span class="line"></span><br><span class="line">explain <span class="keyword">select</span> id, order_no, order_status, created_at</span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">一次接口超时问题排查</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-01-17 22:14:38" itemprop="dateCreated datePublished" datetime="2021-01-17T22:14:38+08:00">2021-01-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2021/api-timeout-cover.svg" alt="一次接口超时问题排查技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口超时的排查重点是确认耗时发生在入口、数据库、缓存还是下游服务。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
-
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2021-01-17 20:18:42 WARN  order-api request timeout</span><br><span class="line">path=/api/orders/submit</span><br><span class="line">cost=8123ms</span><br><span class="line">traceId=adf9c0a2b1</span><br><span class="line">upstream=payment-service</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -w <span class="string">&quot;dns:%&#123;time_namelookup&#125; connect:%&#123;time_connect&#125; start:%&#123;time_starttransfer&#125; total:%&#123;time_total&#125;</span></span><br><span class="line"><span class="string">&quot;</span>   -o /dev/null -s http://localhost:8080/api/orders/submit</span><br></pre></td></tr></table></figure>
-
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;adf9c0a2b1&quot;</span> app.log</span><br><span class="line"><span class="built_in">cat</span> app.log | grep <span class="string">&quot;payment-service&quot;</span> | <span class="built_in">tail</span> -100</span><br><span class="line">jstack $(pgrep java) &gt; /tmp/order-api.jstack</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">排查顺序：</span><br><span class="line">1. 确认是单接口还是全站超时</span><br><span class="line">2. 对比接口入口耗时和下游调用耗时</span><br><span class="line">3. 查看线程是否阻塞在外部 HTTP 调用</span><br><span class="line">4. 检查连接池、超时参数、重试次数</span><br></pre></td></tr></table></figure>
-
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">payment:</span></span><br><span class="line">  <span class="attr">connect-timeout-ms:</span> <span class="number">1000</span></span><br><span class="line">  <span class="attr">read-timeout-ms:</span> <span class="number">2000</span></span><br><span class="line">  <span class="attr">max-retry:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RequestConfig</span> <span class="variable">config</span> <span class="operator">=</span> RequestConfig.custom()</span><br><span class="line">    .setConnectTimeout(<span class="number">1000</span>)</span><br><span class="line">    .setSocketTimeout(<span class="number">2000</span>)</span><br><span class="line">    .setConnectionRequestTimeout(<span class="number">500</span>)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
 
