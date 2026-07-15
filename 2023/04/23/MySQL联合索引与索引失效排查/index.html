@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="写在前面：索引建了不等于一定会用，执行计划里出现了索引也不等于查询就足够快。很多所谓的“索引失效”，其实是索引顺序和查询方式根本对不上。  这篇把工作中比较容易遇到的联合索引问题放在一起，重点不是背口诀，而是知道看到 key&#x3D;NULL 或扫描行数异常时应该怎么往下查。 1. 先看一个联合索引订单表有下面这个索引： 12CREATE INDEX idx_tenant_status_createdO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL联合索引与索引失效排查">
+<meta property="og:url" content="https://swagch.github.io/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="写在前面：索引建了不等于一定会用，执行计划里出现了索引也不等于查询就足够快。很多所谓的“索引失效”，其实是索引顺序和查询方式根本对不上。  这篇把工作中比较容易遇到的联合索引问题放在一起，重点不是背口诀，而是知道看到 key&#x3D;NULL 或扫描行数异常时应该怎么往下查。 1. 先看一个联合索引订单表有下面这个索引： 12CREATE INDEX idx_tenant_status_createdO">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-23T02:35:00.000Z">
+<meta property="article:modified_time" content="2023-04-24T14:15:00.000Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="SQL优化">
+<meta property="article:tag" content="联合索引">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://swagch.github.io/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/","path":"2023/04/23/MySQL联合索引与索引失效排查/","title":"MySQL联合索引与索引失效排查"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>MySQL联合索引与索引失效排查 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%88%E7%9C%8B%E4%B8%80%E4%B8%AA%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="nav-text">1. 先看一个联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%B8%B8%E8%A7%81%E7%9A%84%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E5%9C%BA%E6%99%AF"><span class="nav-text">2. 常见的索引失效场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%9C%A8%E7%B4%A2%E5%BC%95%E5%AD%97%E6%AE%B5%E4%B8%8A%E5%81%9A%E5%87%BD%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-text">2.1 在索引字段上做函数计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B%E4%B8%8D%E4%B8%80%E8%87%B4%E5%AF%BC%E8%87%B4%E9%9A%90%E5%BC%8F%E8%BD%AC%E6%8D%A2"><span class="nav-text">2.2 字段类型不一致导致隐式转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%89%8D%E7%BD%AE%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-text">2.3 前置通配符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E8%8C%83%E5%9B%B4%E6%9D%A1%E4%BB%B6%E5%90%8E%E9%9D%A2%E7%9A%84%E5%AD%97%E6%AE%B5"><span class="nav-text">2.4 范围条件后面的字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-OR-%E4%B8%A4%E8%BE%B9%E6%B2%A1%E6%9C%89%E5%AE%8C%E6%95%B4%E7%B4%A2%E5%BC%95"><span class="nav-text">2.5 OR 两边没有完整索引</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88%E7%B4%A2%E5%BC%95%E7%AC%A6%E5%90%88%E8%A7%84%E5%88%99%EF%BC%8C%E4%BC%98%E5%8C%96%E5%99%A8%E8%BF%98%E6%98%AF%E4%B8%8D%E7%94%A8"><span class="nav-text">3. 为什么索引符合规则，优化器还是不用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E6%80%8E%E4%B9%88%E8%AE%BE%E8%AE%A1"><span class="nav-text">4. 联合索引怎么设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%A3%80%E6%9F%A5%E9%87%8D%E5%A4%8D%E5%92%8C%E9%95%BF%E6%9C%9F%E4%B8%8D%E7%94%A8%E7%9A%84%E7%B4%A2%E5%BC%95"><span class="nav-text">5. 检查重复和长期不用的索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E4%B8%8D%E5%BB%BA%E8%AE%AE%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8-FORCE-INDEX"><span class="nav-text">6. 不建议直接使用 FORCE INDEX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E6%8E%92%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-text">7. 排查清单</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">200</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="MySQL联合索引与索引失效排查 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL联合索引与索引失效排查
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-04-23 10:35:00" itemprop="dateCreated datePublished" datetime="2023-04-23T10:35:00+08:00">2023-04-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>写在前面：索引建了不等于一定会用，执行计划里出现了索引也不等于查询就足够快。很多所谓的“索引失效”，其实是索引顺序和查询方式根本对不上。</p>
+</blockquote>
+<p>这篇把工作中比较容易遇到的联合索引问题放在一起，重点不是背口诀，而是知道看到 <code>key=NULL</code> 或扫描行数异常时应该怎么往下查。</p>
+<h2 id="1-先看一个联合索引"><a href="#1-先看一个联合索引" class="headerlink" title="1. 先看一个联合索引"></a>1. 先看一个联合索引</h2><p>订单表有下面这个索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>可以把联合索引简单理解成按照下面的顺序排列：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tenant_id -&gt; status -&gt; created_at</span><br></pre></td></tr></table></figure>
+
+<p>因此下面几类条件比较容易利用这个索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 使用 tenant_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 使用 tenant_id、status</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 等值过滤以后，再按 created_at 做范围查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>而只使用中间字段时，通常无法走出理想的索引范围：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这就是常说的最左前缀原则。它描述的是索引有序性的利用方式，不是要求 SQL 条件必须按照索引字段顺序书写。下面两种写法对优化器来说基本没有区别：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span> <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span> <span class="keyword">AND</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-常见的索引失效场景"><a href="#2-常见的索引失效场景" class="headerlink" title="2. 常见的索引失效场景"></a>2. 常见的索引失效场景</h2><h3 id="2-1-在索引字段上做函数计算"><a href="#2-1-在索引字段上做函数计算" class="headerlink" title="2.1 在索引字段上做函数计算"></a>2.1 在索引字段上做函数计算</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 不推荐：每一行都要计算 DATE(created_at)</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> <span class="type">DATE</span>(created_at) <span class="operator">=</span> <span class="string">&#x27;2023-04-23&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以改成明确的时间范围：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-23 00:00:00&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span>  <span class="string">&#x27;2023-04-24 00:00:00&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>MySQL 8.0 支持函数索引，但也不代表所有函数条件都应该依赖函数索引解决。时间范围写法更直观，也更容易复用普通索引。</p>
+<h3 id="2-2-字段类型不一致导致隐式转换"><a href="#2-2-字段类型不一致导致隐式转换" class="headerlink" title="2.2 字段类型不一致导致隐式转换"></a>2.2 字段类型不一致导致隐式转换</h3><p>假设 <code>user_phone</code> 是 <code>VARCHAR</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 数字常量可能触发隐式类型转换</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> user_info</span><br><span class="line"><span class="keyword">WHERE</span> user_phone <span class="operator">=</span> <span class="number">13800138000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 参数类型与字段保持一致</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> user_info</span><br><span class="line"><span class="keyword">WHERE</span> user_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>Java 代码里也要检查 MyBatis 参数类型。数据库字段是字符串，代码却传了 <code>Long</code>，SQL 文本看起来差别不大，执行计划可能完全不同。</p>
+<h3 id="2-3-前置通配符"><a href="#2-3-前置通配符" class="headerlink" title="2.3 前置通配符"></a>2.3 前置通配符</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 普通 B+Tree 索引无法定位字符串起点</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> article</span><br><span class="line"><span class="keyword">WHERE</span> title <span class="keyword">LIKE</span> <span class="string">&#x27;%MySQL%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 固定前缀可以利用索引范围</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> article</span><br><span class="line"><span class="keyword">WHERE</span> title <span class="keyword">LIKE</span> <span class="string">&#x27;MySQL%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>真正的任意关键词检索更适合全文索引或专门的搜索引擎，不建议为了模糊搜索不断堆普通索引。</p>
+<h3 id="2-4-范围条件后面的字段"><a href="#2-4-范围条件后面的字段" class="headerlink" title="2.4 范围条件后面的字段"></a>2.4 范围条件后面的字段</h3><p>如果索引改成下面的顺序：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_created_status</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, created_at, status);</span><br></pre></td></tr></table></figure>
+
+<p>查询条件为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>created_at</code> 进入范围扫描以后，后面的 <code>status</code> 通常不能继续缩小索引扫描区间。部分版本可能通过索引条件下推减少回表，但扫描范围仍然可能很大。因此对这个查询而言，<code>(tenant_id, status, created_at)</code> 往往更合适。</p>
+<h3 id="2-5-OR-两边没有完整索引"><a href="#2-5-OR-两边没有完整索引" class="headerlink" title="2.5 OR 两边没有完整索引"></a>2.5 OR 两边没有完整索引</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;A20230423001&#x27;</span></span><br><span class="line">   <span class="keyword">OR</span> third_party_no <span class="operator">=</span> <span class="string">&#x27;WX20230423001&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果只有 <code>order_no</code> 有索引，优化器可能选择全表扫描。可以根据业务语义评估给两个字段分别建索引，或者拆成两个查询后合并结果。不要为了让执行计划好看直接改成 <code>UNION</code>，需要确认去重规则和实际耗时。</p>
+<h2 id="3-为什么索引符合规则，优化器还是不用"><a href="#3-为什么索引符合规则，优化器还是不用" class="headerlink" title="3. 为什么索引符合规则，优化器还是不用"></a>3. 为什么索引符合规则，优化器还是不用</h2><p>索引不是越多越好，优化器会估算“走索引再回表”和“直接扫描表”的成本。下面几种情况，即使语法上可以使用索引，也可能选择全表扫描：</p>
+<ol>
+<li>表非常小，全表扫描成本更低。</li>
+<li>条件返回了表中大部分数据，回表次数过多。</li>
+<li>字段区分度很低，例如只有两个值的状态字段。</li>
+<li>统计信息过旧，优化器对数据分布估算错误。</li>
+<li>查询返回字段过多，无法形成覆盖索引。</li>
+</ol>
+<p>先用执行计划确认，不要凭感觉判断：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN FORMAT<span class="operator">=</span>JSON</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>普通 <code>EXPLAIN</code> 适合快速看结论，JSON 格式会给出更详细的成本和过滤信息。MySQL 8.0 还可以在确认查询安全后使用 <code>EXPLAIN ANALYZE</code> 查看实际行数。</p>
+<h2 id="4-联合索引怎么设计"><a href="#4-联合索引怎么设计" class="headerlink" title="4. 联合索引怎么设计"></a>4. 联合索引怎么设计</h2><p>我一般按照下面的顺序判断：</p>
+<ol>
+<li>先收集高频且重要的真实 SQL，不根据单个字段想象索引。</li>
+<li>稳定的等值条件通常放在前面，例如租户、用户、业务状态。</li>
+<li>范围和排序字段通常放在等值字段之后。</li>
+<li>比较查询返回字段，判断是否值得做覆盖索引。</li>
+<li>合并可以互相复用的索引，避免重复索引增加写放大。</li>
+</ol>
+<p>例如这个列表查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以先评估：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>网上经常说“区分度高的字段放最前面”，这个说法不够完整。联合索引首先要匹配查询路径和排序需求，区分度只是成本判断的一部分。把高区分度字段放到前面，却破坏了多个高频查询可以复用的前缀，整体效果可能更差。</p>
+<h2 id="5-检查重复和长期不用的索引"><a href="#5-检查重复和长期不用的索引" class="headerlink" title="5. 检查重复和长期不用的索引"></a>5. 检查重复和长期不用的索引</h2><p>先查看表上的索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>如果已经存在 <code>(tenant_id, status, created_at)</code>，通常不再需要单独的 <code>(tenant_id)</code> 索引，因为前者可以覆盖它的访问前缀。但是否删除仍然要结合索引大小、查询统计和执行计划验证。</p>
+<p>MySQL 的 <code>sys</code> 库可以提供未使用索引线索：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema, object_name, index_name</span><br><span class="line"><span class="keyword">FROM</span> sys.schema_unused_indexes</span><br><span class="line"><span class="keyword">WHERE</span> object_schema <span class="operator">=</span> <span class="string">&#x27;order_db&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里的数据通常来自实例启动后的统计，重启会影响观察窗口。<strong>不能看到“未使用”就立即删除索引。</strong> 应该覆盖完整业务周期，并提前准备恢复索引的 DDL。</p>
+<h2 id="6-不建议直接使用-FORCE-INDEX"><a href="#6-不建议直接使用-FORCE-INDEX" class="headerlink" title="6. 不建议直接使用 FORCE INDEX"></a>6. 不建议直接使用 FORCE INDEX</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant_status_created)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>FORCE INDEX</code> 可以用于验证猜想，但不应该成为默认修复方式。数据分布会变化，今天合适的索引路径以后未必合适。强制索引会限制优化器选择，最好先解决统计信息、SQL 写法或索引设计问题。</p>
+<h2 id="7-排查清单"><a href="#7-排查清单" class="headerlink" title="7. 排查清单"></a>7. 排查清单</h2><ol>
+<li>确认字段类型与传入参数类型是否一致。</li>
+<li>检查索引字段上是否存在函数、计算或隐式转换。</li>
+<li>检查联合索引是否满足真实查询的最左前缀。</li>
+<li>注意范围条件、排序和后续字段之间的关系。</li>
+<li>比较扫描行数、返回行数和回表成本。</li>
+<li>检查重复索引和长期不用的索引，但删除前必须持续观察。</li>
+<li>修改后重新查看执行计划，并通过真实流量指标验证。</li>
+</ol>
+<p>索引问题最后还是要回到一句话：<strong>用数据证明优化有效。</strong> 能走索引只是过程，稳定降低响应时间和数据库负载才是结果。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+              <a href="/tags/SQL%E4%BC%98%E5%8C%96/" rel="tag"># SQL优化</a>
+              <a href="/tags/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/" rel="tag"># 联合索引</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/02/19/%E4%B8%80%E6%AC%A1MySQL%E6%85%A2SQL%E8%B0%83%E4%BC%98%E8%AE%B0%E5%BD%95/" rel="prev" title="一次MySQL慢SQL调优记录">
+                  <i class="fa fa-angle-left"></i> 一次MySQL慢SQL调优记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/" rel="next" title="Linux服务器CPU飙高问题定位">
+                  Linux服务器CPU飙高问题定位 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>

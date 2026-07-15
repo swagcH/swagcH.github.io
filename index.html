@@ -174,7 +174,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -185,7 +185,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">193</span>
+        <span class="site-state-item-count">200</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1010,6 +1010,804 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/" class="post-title-link" itemprop="url">服务器磁盘空间与IO异常定位</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-26 13:50:00" itemprop="dateCreated datePublished" datetime="2023-11-26T13:50:00+08:00">2023-11-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：磁盘问题不只有“空间满了”。空间还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍然占着文件句柄。</p>
+</blockquote>
+<p>这篇把磁盘空间、inode 和 IO 延迟放在一条排查链路里。遇到告警时先判断是哪一类问题，再决定能不能清理文件，不要上来就对 <code>/var/log</code> 执行删除命令。</p>
+<h2 id="1-先判断空间还是-inode"><a href="#1-先判断空间还是-inode" class="headerlink" title="1. 先判断空间还是 inode"></a>1. 先判断空间还是 inode</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br><span class="line">lsblk -f</span><br></pre></td></tr></table></figure>
+
+<p>三个命令分别回答：</p>
+<ol>
+<li>哪个文件系统的容量用完了。</li>
+<li>哪个文件系统的 inode 用完了。</li>
+<li>分区、文件系统类型和挂载点是什么。</li>
+</ol>
+<p>典型空间告警：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filesystem     Type  Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1      xfs    80G   77G  3.0G  97% /</span><br></pre></td></tr></table></figure>
+
+<p>典型 inode 告警：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filesystem     Inodes IUsed IFree IUse% Mounted on</span><br><span class="line">/dev/vda1        40M   40M     0  100% /</span><br></pre></td></tr></table></figure>
+
+<p>inode 用完通常是产生了海量小文件，例如临时文件、会话文件、消息落盘或日志分片。此时 <code>du</code> 看到的总容量可能不大，但系统已经无法创建新文件。</p>
+<h2 id="2-从挂载点向下找大目录"><a href="#2-从挂载点向下找大目录" class="headerlink" title="2. 从挂载点向下找大目录"></a>2. 从挂载点向下找大目录</h2><p>确认是根分区以后，使用 <code>-x</code> 限制在当前文件系统，避免把其他挂载盘也统计进去：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 / 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var/log 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
+
+<p>查找大文件时可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">find /var -xdev -<span class="built_in">type</span> f -size +1G -<span class="built_in">printf</span> <span class="string">&#x27;%s %p\n&#x27;</span> 2&gt;/dev/null \</span><br><span class="line">  | <span class="built_in">sort</span> -nr \</span><br><span class="line">  | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p><code>-printf</code> 是 GNU <code>find</code> 的能力，部分精简系统不支持。命令只用于定位，找到文件以后还要确认文件归属、写入进程和保留策略，不能根据大小直接删除。</p>
+<p>如果 inode 用完，可以按目录统计文件数量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">find /var -xdev -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&#x27;%h\n&#x27;</span> 2&gt;/dev/null \</span><br><span class="line">  | <span class="built_in">sort</span> \</span><br><span class="line">  | <span class="built_in">uniq</span> -c \</span><br><span class="line">  | <span class="built_in">sort</span> -nr \</span><br><span class="line">  | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-df-和-du-对不上怎么办"><a href="#3-df-和-du-对不上怎么办" class="headerlink" title="3. df 和 du 对不上怎么办"></a>3. df 和 du 对不上怎么办</h2><p>常见现象是 <code>df</code> 显示磁盘使用了 70 GB，<code>du</code> 加起来却只有 40 GB。一个高频原因是文件已经被删除，但进程仍然打开着文件描述符。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>输出中 <code>NLINK</code> 为 0 的文件已经从目录结构删除，但只要进程没有关闭句柄，空间就不会真正释放：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">COMMAND   PID USER   FD   TYPE DEVICE  SIZE/OFF NLINK NAME</span><br><span class="line">java    18342 app   12w   REG  253,1 21474836480     0 /var/log/app.log (deleted)</span><br></pre></td></tr></table></figure>
+
+<p>最稳妥的处理方式是让应用正常重新打开日志文件，或者在可控窗口重启对应进程。直接清空 <code>/proc/&lt;PID&gt;/fd/&lt;FD&gt;</code> 指向的内容风险很高，可能破坏正在写入的数据，只能在确认文件用途并获得操作许可后作为应急方案。</p>
+<p>这也是为什么删除正在写入的大日志以后，磁盘空间有时完全没有下降。日志轮转应该通知进程重新打开文件，而不是只执行 <code>rm</code>。</p>
+<h2 id="4-空间没满，但接口还是很慢"><a href="#4-空间没满，但接口还是很慢" class="headerlink" title="4. 空间没满，但接口还是很慢"></a>4. 空间没满，但接口还是很慢</h2><p>先看系统是不是在等待 IO：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vmstat 1 5</span><br><span class="line">iostat -xz 1 5</span><br></pre></td></tr></table></figure>
+
+<p><code>iostat</code> 重点关注：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r/s、w/s：每秒读写请求数</span><br><span class="line">rkB/s、wkB/s：每秒读写数据量</span><br><span class="line">await：IO 请求平均等待时间</span><br><span class="line">aqu-sz：平均队列长度</span><br><span class="line">%util：设备忙碌时间比例</span><br></pre></td></tr></table></figure>
+
+<p>机械盘上 <code>%util</code> 长期接近 100% 往往表示设备饱和，但在 SSD、NVMe 和云盘环境里，不能只靠 <code>%util</code> 判断性能上限。还要结合 <code>await</code>、队列长度、吞吐、IOPS 和云平台磁盘配额。</p>
+<p>继续定位到进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d -p ALL 1 5</span><br></pre></td></tr></table></figure>
+
+<p>服务器安装了 <code>iotop</code> 且具备权限时，可以查看实时 IO：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iotop -oPa</span><br></pre></td></tr></table></figure>
+
+<p><code>-o</code> 只显示正在产生 IO 的进程，<code>-P</code> 按进程聚合，<code>-a</code> 显示累计值。短时间突发任务可能一闪而过，因此最好和监控上的告警时间点对齐。</p>
+<h2 id="5-常见的磁盘占用来源"><a href="#5-常见的磁盘占用来源" class="headerlink" title="5. 常见的磁盘占用来源"></a>5. 常见的磁盘占用来源</h2><h3 id="5-1-应用日志"><a href="#5-1-应用日志" class="headerlink" title="5.1 应用日志"></a>5.1 应用日志</h3><p>检查日志目录和 systemd journal：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -sh /var/log/* 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line">journalctl --disk-usage</span><br></pre></td></tr></table></figure>
+
+<p>应用日志需要同时限制单文件大小、保留天数和总文件数。只配置按天切割，如果某天流量异常，单个文件仍然可能把磁盘写满。</p>
+<h3 id="5-2-Docker-日志与镜像"><a href="#5-2-Docker-日志与镜像" class="headerlink" title="5.2 Docker 日志与镜像"></a>5.2 Docker 日志与镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker system <span class="built_in">df</span></span><br><span class="line">find /var/lib/docker/containers -name <span class="string">&#x27;*-json.log&#x27;</span> -size +500M -<span class="built_in">print</span></span><br></pre></td></tr></table></figure>
+
+<p>不要直接删除 Docker 存储目录里的未知文件。镜像和构建缓存可以先通过 <code>docker system df</code> 确认，再使用明确的清理命令；正在运行容器的 JSON 日志应该通过日志驱动设置轮转。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;log-driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;json-file&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;log-opts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;max-size&quot;</span><span class="punctuation">:</span> <span class="string">&quot;100m&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;max-file&quot;</span><span class="punctuation">:</span> <span class="string">&quot;5&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 Docker daemon 配置会影响后续创建的容器，生产操作前要验证配置并安排维护窗口。</p>
+<h3 id="5-3-MySQL-Binlog-和临时文件"><a href="#5-3-MySQL-Binlog-和临时文件" class="headerlink" title="5.3 MySQL Binlog 和临时文件"></a>5.3 MySQL Binlog 和临时文件</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="type">BINARY</span> LOGS;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;binlog_expire_logs_seconds&#x27;</span>;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;expire_logs_days&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>MySQL 8.0 优先使用 <code>binlog_expire_logs_seconds</code>，MySQL 5.7 常见 <code>expire_logs_days</code>。清理 Binlog 要结合主从复制、备份和时间点恢复要求，不能直接从文件系统删除。应使用 MySQL 提供的过期策略或 <code>PURGE BINARY LOGS</code>，并确认从库已经消费。</p>
+<h3 id="5-4-临时文件和-Core-Dump"><a href="#5-4-临时文件和-Core-Dump" class="headerlink" title="5.4 临时文件和 Core Dump"></a>5.4 临时文件和 Core Dump</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 /tmp /var/tmp 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line">find / -xdev -<span class="built_in">type</span> f -name <span class="string">&#x27;core.*&#x27;</span> -size +100M -<span class="built_in">print</span> 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<p>临时目录也不能按文件年龄盲删，需要确认是否仍被运行中的任务使用。Core Dump 可能是定位崩溃的唯一证据，转移或分析后再按保留策略清理。</p>
+<h2 id="6-使用-logrotate-控制日志"><a href="#6-使用-logrotate-控制日志" class="headerlink" title="6. 使用 logrotate 控制日志"></a>6. 使用 logrotate 控制日志</h2><p>一个基础配置示例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/var/log/myapp/*.log &#123;</span><br><span class="line">    daily</span><br><span class="line">    rotate 14</span><br><span class="line">    maxsize 200M</span><br><span class="line">    compress</span><br><span class="line">    delaycompress</span><br><span class="line">    missingok</span><br><span class="line">    notifempty</span><br><span class="line">    copytruncate</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>copytruncate</code> 不需要应用重新打开文件，但复制和截断之间可能丢少量日志，大文件复制时也会产生额外 IO。更推荐应用支持滚动日志，或者在 <code>postrotate</code> 中发送信号让进程重新打开文件。具体方式要根据应用日志框架选择。</p>
+<p>配置后先做调试检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logrotate -d /etc/logrotate.d/myapp</span><br></pre></td></tr></table></figure>
+
+<p><code>-d</code> 只输出调试信息，不真正轮转。确认结果以后再交给系统定时任务执行。</p>
+<h2 id="7-应急清理的顺序"><a href="#7-应急清理的顺序" class="headerlink" title="7. 应急清理的顺序"></a>7. 应急清理的顺序</h2><ol>
+<li>确认是容量、inode 还是 IO 性能问题。</li>
+<li>找出增长最快的目录和对应写入进程。</li>
+<li>优先清理明确可再生、已过期且没有被占用的文件。</li>
+<li>需要删除业务文件时，先确认备份和恢复要求。</li>
+<li>清理后再次检查 <code>df -h</code>、<code>df -i</code> 和应用状态。</li>
+<li>如果空间仍未释放，使用 <code>lsof +L1</code> 检查已删除文件句柄。</li>
+<li>恢复后补上轮转、容量告警和增长趋势监控。</li>
+</ol>
+<h2 id="8-排查清单"><a href="#8-排查清单" class="headerlink" title="8. 排查清单"></a>8. 排查清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">容量：df -hT、du -xhd1、find 大文件</span><br><span class="line">inode：df -ih、按目录统计文件数量</span><br><span class="line">删除未释放：lsof +L1</span><br><span class="line">IO 延迟：vmstat、iostat -xz</span><br><span class="line">进程 IO：pidstat -d、iotop</span><br><span class="line">常见来源：应用日志、Docker、Binlog、临时文件、Core Dump</span><br></pre></td></tr></table></figure>
+
+<p>磁盘告警处理完以后，最好不要只把阈值从 80% 改到 90%。真正有效的复盘是找到增长来源，为它设置保留上限，并保证告警能在磁盘还有足够处理空间时提前触发。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">服务器内存不足与OOM排查</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-10 16:40:00" itemprop="dateCreated datePublished" datetime="2023-09-10T16:40:00+08:00">2023-09-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：服务器内存“看起来快满了”和真正发生 OOM 不是一回事。Linux 会尽量利用空闲内存做缓存，<code>free</code> 很低并不一定有问题；反过来，容器被 OOM Kill 时，宿主机可能还有很多空闲内存。</p>
+</blockquote>
+<p>内存问题最重要的是先分清边界：整机内存不足、容器达到限制、JVM 堆溢出、堆外内存增长，处理方式完全不同。</p>
+<h2 id="1-先看整机内存状态"><a href="#1-先看整机内存状态" class="headerlink" title="1. 先看整机内存状态"></a>1. 先看整机内存状态</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br><span class="line">vmstat 1 5</span><br><span class="line">ps -eo pid,user,%mem,rss,vsz,etime,cmd --<span class="built_in">sort</span>=-rss | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p><code>free -h</code> 可能得到类似结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:            16G         11G        420M        210M         4.6G        4.2G</span><br><span class="line">Swap:            2G        128M        1.9G</span><br></pre></td></tr></table></figure>
+
+<p>这里优先看 <code>available</code>，它估算了不发生交换时还可以提供给新进程的内存。<code>free</code> 很少但 <code>available</code> 仍然充足，通常只是 Linux 使用了页缓存，不需要立即清理。</p>
+<p><code>vmstat</code> 里重点关注：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">si/so：是否持续发生 swap 换入和换出</span><br><span class="line">r    ：等待 CPU 的任务</span><br><span class="line">b    ：不可中断等待任务</span><br><span class="line">free ：空闲内存趋势</span><br></pre></td></tr></table></figure>
+
+<p>持续的 <code>si/so</code> 往往会明显拖慢接口，即使进程还没有被杀掉，也需要尽快处理。</p>
+<h2 id="2-确认有没有触发-Linux-OOM-Killer"><a href="#2-确认有没有触发-Linux-OOM-Killer" class="headerlink" title="2. 确认有没有触发 Linux OOM Killer"></a>2. 确认有没有触发 Linux OOM Killer</h2><p>Linux 在内存无法满足申请时，可能选择一个进程杀掉。先检查内核日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dmesg -T | grep -Ei <span class="string">&#x27;out of memory|oom-killer|killed process&#x27;</span></span><br><span class="line">journalctl -k --since <span class="string">&#x27;2 hours ago&#x27;</span> | grep -Ei <span class="string">&#x27;out of memory|oom|killed process&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>典型日志：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Out of memory: Killed process 18472 (java) total-vm:12582912kB,</span><br><span class="line">anon-rss:7340032kB, file-rss:1024kB, shmem-rss:0kB</span><br></pre></td></tr></table></figure>
+
+<p>看到这条日志以后，至少可以确认进程不是正常退出，也不是 Java 主动抛出一个普通异常，而是被操作系统直接终止。接下来要对比进程 RSS、容器限制和当时的系统内存趋势。</p>
+<h2 id="3-JVM-堆内存怎么检查"><a href="#3-JVM-堆内存怎么检查" class="headerlink" title="3. JVM 堆内存怎么检查"></a>3. JVM 堆内存怎么检查</h2><p>假设 Java 进程 PID 为 <code>18472</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PID=18472</span><br><span class="line">jcmd <span class="variable">$PID</span> VM.flags</span><br><span class="line">jcmd <span class="variable">$PID</span> GC.heap_info</span><br><span class="line">jstat -gcutil <span class="variable">$PID</span> 1000 10</span><br></pre></td></tr></table></figure>
+
+<p>JDK 8 下主要看：</p>
+<ol>
+<li>JVM 最大堆 <code>-Xmx</code> 是否超过机器或容器可用内存。</li>
+<li>老年代使用率是否持续增长。</li>
+<li>Full GC 后占用是否明显下降。</li>
+<li>Full GC 次数和耗时是否不断增加。</li>
+</ol>
+<p>查看类实例数量可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcmd <span class="variable">$PID</span> GC.class_histogram &gt; /tmp/class-histogram.txt</span><br></pre></td></tr></table></figure>
+
+<p>在线上大堆进程执行直方图或 <code>jmap -histo:live</code> 可能触发停顿，不能看到命令就直接运行。业务高峰期应先评估影响，必要时在摘流量后的实例或复现环境执行。</p>
+<h2 id="4-保留-Heap-Dump"><a href="#4-保留-Heap-Dump" class="headerlink" title="4. 保留 Heap Dump"></a>4. 保留 Heap Dump</h2><p>最理想的方式是在 JVM 启动时提前配置 OOM 自动导出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">-XX:HeapDumpPath=/data/heapdump</span><br><span class="line">-XX:+ExitOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+<p><code>-XX:+ExitOnOutOfMemoryError</code> 需要较新的 JDK 8 update 版本，使用前应通过 <code>java -version</code> 和启动测试确认。<code>HeapDumpPath</code> 所在磁盘必须预留足够空间。堆最大为 8 GB 时，Dump 文件可能同样非常大；如果磁盘本来就快满了，导出失败还会带来额外 IO 压力。</p>
+<p>进程仍然存活且确认可以承受停顿时，也可以手动导出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcmd <span class="variable">$PID</span> GC.heap_dump /data/heapdump/java-<span class="variable">$PID</span>.hprof</span><br></pre></td></tr></table></figure>
+
+<p>JDK 8 环境也常见下面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap -dump:format=b,file=/data/heapdump/java-<span class="variable">$PID</span>.hprof <span class="variable">$PID</span></span><br></pre></td></tr></table></figure>
+
+<p>Dump 文件可能包含业务数据和用户信息，上传或转移前要遵守数据安全规范。分析时可以使用 MAT、VisualVM 等工具重点查看大对象、引用链和支配树。</p>
+<h2 id="5-堆没有满，内存为什么还在涨"><a href="#5-堆没有满，内存为什么还在涨" class="headerlink" title="5. 堆没有满，内存为什么还在涨"></a>5. 堆没有满，内存为什么还在涨</h2><p>Java 进程的 RSS 不只包含 JVM 堆，还包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JVM Heap</span><br><span class="line">Metaspace</span><br><span class="line">Direct Buffer</span><br><span class="line">线程栈</span><br><span class="line">JIT Code Cache</span><br><span class="line">JNI 和本地库</span><br><span class="line">内存映射文件</span><br></pre></td></tr></table></figure>
+
+<p>先看进程级数据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/<span class="variable">$PID</span>/status | grep -E <span class="string">&#x27;VmPeak|VmSize|VmRSS|VmSwap|Threads&#x27;</span></span><br><span class="line">pmap -x <span class="variable">$PID</span> | <span class="built_in">tail</span> -1</span><br></pre></td></tr></table></figure>
+
+<p>如果启动时增加了下面的参数：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NativeMemoryTracking=summary</span><br></pre></td></tr></table></figure>
+
+<p>可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcmd <span class="variable">$PID</span> VM.native_memory summary</span><br></pre></td></tr></table></figure>
+
+<p>Native Memory Tracking 必须在 JVM 启动时开启，也会有一定性能开销。没有提前开启时，不能临时靠这条命令还原历史现场。</p>
+<p>常见堆外问题包括：</p>
+<ol>
+<li>Netty Direct Buffer 未及时释放。</li>
+<li>线程数不断增长，每个线程都需要栈空间。</li>
+<li>动态生成大量类导致 Metaspace 增长。</li>
+<li>JNI 或本地库发生内存泄漏。</li>
+<li>大量内存映射文件没有解除映射。</li>
+</ol>
+<h2 id="6-容器环境要单独检查限制"><a href="#6-容器环境要单独检查限制" class="headerlink" title="6. 容器环境要单独检查限制"></a>6. 容器环境要单独检查限制</h2><p>容器只看宿主机 <code>free -h</code> 很容易误判。先查看容器实际使用量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker stats --no-stream</span><br><span class="line">docker inspect --format <span class="string">&#x27;&#123;&#123;.HostConfig.Memory&#125;&#125;&#x27;</span> &lt;container_name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>cgroup v2 可以查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.current</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.max</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.events</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>memory.events</code> 里的 <code>oom_kill</code> 增加，就说明容器触发过内存限制。cgroup v1 的文件路径不同，需要在对应的 <code>memory</code> 控制组目录下查看 <code>memory.usage_in_bytes</code> 和 <code>memory.limit_in_bytes</code>。</p>
+<p>容器限制是 2 GB 时，不能简单设置 <code>-Xmx2g</code>。除了堆以外，线程栈、Metaspace 和堆外内存都要留空间。JDK 8 不同更新版本对容器感知能力也不同，必须核对实际 JVM 参数，而不是默认它会自动识别限制。</p>
+<h2 id="7-几种典型根因"><a href="#7-几种典型根因" class="headerlink" title="7. 几种典型根因"></a>7. 几种典型根因</h2><h3 id="7-1-无界缓存"><a href="#7-1-无界缓存" class="headerlink" title="7.1 无界缓存"></a>7.1 无界缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误示例：缓存没有数量限制和过期策略</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Object&gt; CACHE = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>修复时应该使用有最大容量、过期时间和命中率监控的缓存实现，同时确认缓存键是否真的会复用。</p>
+<h3 id="7-2-线程池队列无限增长"><a href="#7-2-线程池队列无限增长" class="headerlink" title="7.2 线程池队列无限增长"></a>7.2 线程池队列无限增长</h3><p><code>LinkedBlockingQueue</code> 默认容量接近无限。下游变慢时，任务可能不断堆积，占用大量对象。线程池必须设置有界队列、拒绝策略和队列长度告警。</p>
+<h3 id="7-3-一次性加载大结果集"><a href="#7-3-一次性加载大结果集" class="headerlink" title="7.3 一次性加载大结果集"></a>7.3 一次性加载大结果集</h3><p>导出、报表和批处理如果一次查询几十万行并全部放入 List，很容易制造瞬时大对象。可以改为游标、分页或流式处理，并限制单次任务的数据范围。</p>
+<h3 id="7-4-线程泄漏"><a href="#7-4-线程泄漏" class="headerlink" title="7.4 线程泄漏"></a>7.4 线程泄漏</h3><p>定时任务反复创建线程池却不关闭，或者每个请求都创建线程，RSS 会随着线程栈增长。除了堆分析，还要长期监控进程线程数。</p>
+<h2 id="8-应急处理不要踩这些坑"><a href="#8-应急处理不要踩这些坑" class="headerlink" title="8. 应急处理不要踩这些坑"></a>8. 应急处理不要踩这些坑</h2><ol>
+<li>不要看到 <code>free</code> 很低就执行 <code>drop_caches</code>，它可能导致后续大量磁盘读取。</li>
+<li>不要在磁盘快满时直接导出大 Heap Dump。</li>
+<li>不要在业务高峰对大堆执行高停顿风险的 <code>jmap -histo:live</code>。</li>
+<li>不要只增加 <code>-Xmx</code>，否则可能把 JVM OOM 变成整机或容器 OOM Kill。</li>
+<li>不要重启以后就结束排查，至少保留内核日志、GC 日志和监控时间点。</li>
+</ol>
+<h2 id="9-排查清单"><a href="#9-排查清单" class="headerlink" title="9. 排查清单"></a>9. 排查清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">整机：free、vmstat、ps、内核 OOM 日志</span><br><span class="line">容器：docker stats、cgroup memory.current/memory.max/memory.events</span><br><span class="line">JVM 堆：VM.flags、GC.heap_info、jstat、Heap Dump</span><br><span class="line">堆外：/proc/PID/status、线程数、NMT、Direct Buffer</span><br><span class="line">业务：缓存容量、线程池队列、批处理数据量、对象生命周期</span><br></pre></td></tr></table></figure>
+
+<p>内存排查不能只看一个瞬时数值，最有价值的是趋势：什么时间开始增长、发布前后是否变化、GC 后能不能回落、增长速度是否与流量一致。把这些时间线对齐，根因通常会清晰很多。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/" class="post-title-link" itemprop="url">Linux服务器CPU飙高问题定位</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-06-18 14:10:00" itemprop="dateCreated datePublished" datetime="2023-06-18T14:10:00+08:00">2023-06-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：看到 CPU 100% 以后，最直接的反应往往是重启服务。重启确实可能恢复业务，但也会把最有价值的线程现场一起清掉。只要业务还扛得住，最好先用几分钟把证据留下来。</p>
+</blockquote>
+<p>服务器 CPU 飙高的排查路径并不复杂：系统、进程、线程、调用栈，一层一层往下缩小范围。真正容易踩坑的是把 <code>load average</code> 当成 CPU 使用率，或者找到高 CPU 进程以后就直接下结论。</p>
+<h2 id="1-先确认是不是-CPU-问题"><a href="#1-先确认是不是-CPU-问题" class="headerlink" title="1. 先确认是不是 CPU 问题"></a>1. 先确认是不是 CPU 问题</h2><p>第一步先看负载、CPU 分类和运行队列：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uptime</span></span><br><span class="line">top -c</span><br><span class="line">vmstat 1 5</span><br><span class="line">mpstat -P ALL 1 5</span><br></pre></td></tr></table></figure>
+
+<p>重点关注这些指标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">us：用户态 CPU，Java 业务代码通常体现在这里</span><br><span class="line">sy：内核态 CPU，频繁系统调用、网络或驱动问题可能升高</span><br><span class="line">wa：等待磁盘 IO 的时间，不等于 CPU 真正在计算</span><br><span class="line">st：虚拟机被宿主机抢走的 CPU 时间</span><br><span class="line">r ：正在运行或等待 CPU 的任务数量</span><br><span class="line">b ：不可中断睡眠的任务数量，常见于 IO 等待</span><br></pre></td></tr></table></figure>
+
+<p><code>load average</code> 表示一段时间内可运行和不可中断任务的平均数量，不是 CPU 百分比。8 核机器负载为 8 和 2 核机器负载为 8，严重程度完全不同。</p>
+<p>例如下面这种情况，CPU 真正忙在用户态：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%Cpu(s): 92.1 us, 5.3 sy, 0.0 ni, 1.8 id, 0.3 wa, 0.0 hi, 0.5 si, 0.0 st</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>wa</code> 很高而 <code>us</code> 不高，方向应该切到磁盘 IO，不要继续只盯着 Java 线程。</p>
+<h2 id="2-找到最消耗-CPU-的进程"><a href="#2-找到最消耗-CPU-的进程" class="headerlink" title="2. 找到最消耗 CPU 的进程"></a>2. 找到最消耗 CPU 的进程</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -eo pid,ppid,user,%cpu,%mem,<span class="built_in">stat</span>,lstart,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p>需要持续观察时可以使用 <code>pidstat</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p ALL 1 5</span><br></pre></td></tr></table></figure>
+
+<p>假设最终定位到 Java 进程 PID 为 <code>21847</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID=21847</span><br><span class="line">ps -p <span class="variable">$PID</span> -o pid,ppid,user,%cpu,%mem,etime,cmd</span><br></pre></td></tr></table></figure>
+
+<p>这时先记录进程启动时间、CPU、内存和完整启动命令，确认是不是刚发布的新版本，或者 JVM 参数是否发生变化。</p>
+<h2 id="3-从进程继续定位到线程"><a href="#3-从进程继续定位到线程" class="headerlink" title="3. 从进程继续定位到线程"></a>3. 从进程继续定位到线程</h2><p>Java 进程内部有很多线程，需要找到具体是哪一个线程在消耗 CPU：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top -H -p <span class="variable">$PID</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以直接输出线程列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -Lp <span class="variable">$PID</span> -o pid,tid,psr,pcpu,<span class="built_in">stat</span>,<span class="built_in">comm</span> --<span class="built_in">sort</span>=-pcpu | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p>假设高 CPU 线程的十进制 TID 是 <code>21936</code>。<code>jstack</code> 中的线程编号 <code>nid</code> 使用十六进制，因此先转换：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TID=21936</span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;0x%x\n&#x27;</span> <span class="variable">$TID</span></span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x55b0</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-使用-jstack-对应-Java-调用栈"><a href="#4-使用-jstack-对应-Java-调用栈" class="headerlink" title="4. 使用 jstack 对应 Java 调用栈"></a>4. 使用 jstack 对应 Java 调用栈</h2><p>连续抓三次线程快照，比只看一次更可靠：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-1.jstack</span><br><span class="line"><span class="built_in">sleep</span> 5</span><br><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-2.jstack</span><br><span class="line"><span class="built_in">sleep</span> 5</span><br><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-3.jstack</span><br></pre></td></tr></table></figure>
+
+<p>再根据十六进制线程号查找：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n <span class="string">&#x27;nid=0x55b0&#x27;</span> -A 40 /tmp/java-<span class="variable">$PID</span>-1.jstack</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>jstack</code> 的用户最好与 Java 进程启动用户一致，并确认使用兼容的 JDK 工具。容器环境还要注意 PID 命名空间，宿主机看到的 PID 和容器内部可能不同。</p>
+<p>一个典型的高 CPU 调用栈可能是这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;retry-worker-3&quot; #86 prio=5 os_prio=0 tid=0x... nid=0x55b0 runnable</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        at com.example.order.RetryService.retry(RetryService.java:127)</span><br><span class="line">        at com.example.order.RetryService.run(RetryService.java:91)</span><br></pre></td></tr></table></figure>
+
+<p>如果连续三次都停在同一段业务代码，基本可以确定热点位置。示例中的问题是失败重试没有退避时间，在下游不可用时进入了快速循环：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误示例：失败后立即进入下一次循环，会持续占用 CPU</span></span><br><span class="line"><span class="keyword">while</span> (!success) &#123;</span><br><span class="line">    success = callDownstream();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修复时要增加最大次数、退避时间和可观测日志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">maxAttempts</span> <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">attempt</span> <span class="operator">=</span> <span class="number">1</span>; attempt &lt;= maxAttempts; attempt++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (callDownstream()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 退避时间需要结合业务超时预算设置</span></span><br><span class="line">    TimeUnit.MILLISECONDS.sleep(attempt * <span class="number">200L</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;下游调用连续失败&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-判断是不是-GC-导致-CPU-升高"><a href="#5-判断是不是-GC-导致-CPU-升高" class="headerlink" title="5. 判断是不是 GC 导致 CPU 升高"></a>5. 判断是不是 GC 导致 CPU 升高</h2><p>如果高 CPU 线程主要是 GC 线程，继续看垃圾回收情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstat -gcutil <span class="variable">$PID</span> 1000 10</span><br></pre></td></tr></table></figure>
+
+<p>重点观察：</p>
+<ol>
+<li><code>YGC</code>、<code>FGC</code> 是否快速增长。</li>
+<li><code>FGCT</code> 是否持续增加。</li>
+<li>老年代使用率是否长期接近 100%。</li>
+<li>每次 GC 后内存是否能明显下降。</li>
+</ol>
+<p>频繁 Full GC 只是现象，后面还要分析对象分配、堆大小、缓存和内存泄漏。不要看到 GC 高就先改大堆内存，堆变大以后单次 Full GC 可能更慢。</p>
+<h2 id="6-非-Java-进程怎么排查"><a href="#6-非-Java-进程怎么排查" class="headerlink" title="6. 非 Java 进程怎么排查"></a>6. 非 Java 进程怎么排查</h2><p>如果热点不是 Java，可以继续使用下面的工具：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看进程的 CPU、上下文切换和调度情况</span></span><br><span class="line">pidstat -u -w -p <span class="variable">$PID</span> 1 5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 有权限且服务器安装了 perf 时，查看热点函数</span></span><br><span class="line">perf top -p <span class="variable">$PID</span></span><br></pre></td></tr></table></figure>
+
+<p><code>perf</code> 可能需要 root 权限和内核符号支持，生产环境使用前要确认安全规范。对于 Nginx、压缩程序、日志采集器等进程，热点函数通常能帮助判断是加密、压缩、正则还是网络处理造成的消耗。</p>
+<h2 id="7-几种容易误判的情况"><a href="#7-几种容易误判的情况" class="headerlink" title="7. 几种容易误判的情况"></a>7. 几种容易误判的情况</h2><h3 id="7-1-单核打满"><a href="#7-1-单核打满" class="headerlink" title="7.1 单核打满"></a>7.1 单核打满</h3><p>在多核服务器上，一个死循环可能只打满一个核心。整机 CPU 看起来只有十几个百分点，但对应接口已经异常，因此要用 <code>mpstat -P ALL</code> 查看每个核心。</p>
+<h3 id="7-2-iowait-很高"><a href="#7-2-iowait-很高" class="headerlink" title="7.2 iowait 很高"></a>7.2 iowait 很高</h3><p><code>top</code> 里负载很高，并不代表 CPU 计算繁忙。如果大量线程处于 <code>D</code> 状态且 <code>wa</code> 很高，应该检查磁盘、网络存储和文件系统。</p>
+<h3 id="7-3-steal-很高"><a href="#7-3-steal-很高" class="headerlink" title="7.3 steal 很高"></a>7.3 steal 很高</h3><p>虚拟机的 <code>st</code> 持续升高，说明宿主机资源竞争严重。应用代码可能没有变化，这时需要结合云平台监控确认宿主机和实例规格。</p>
+<h3 id="7-4-BLOCKED-线程很多"><a href="#7-4-BLOCKED-线程很多" class="headerlink" title="7.4 BLOCKED 线程很多"></a>7.4 BLOCKED 线程很多</h3><p>大量线程等待锁会造成接口慢，但等待中的线程通常不消耗大量 CPU。真正的 CPU 热点可能是持锁线程，或者另一个不断自旋的线程。</p>
+<h2 id="8-应急处理顺序"><a href="#8-应急处理顺序" class="headerlink" title="8. 应急处理顺序"></a>8. 应急处理顺序</h2><ol>
+<li>确认影响范围，必要时先限流、摘流量或扩容。</li>
+<li>保存 <code>top</code>、<code>pidstat</code>、线程列表和至少三份 <code>jstack</code>。</li>
+<li>判断是否与刚发布版本、流量突增或下游异常有关。</li>
+<li>有明确回退版本时优先回滚，不要在线上临时改复杂代码。</li>
+<li>只有业务已经无法承受时才直接重启或终止进程。</li>
+<li>恢复后补齐监控、告警和压测用例。</li>
+</ol>
+<h2 id="9-最后的排查清单"><a href="#9-最后的排查清单" class="headerlink" title="9. 最后的排查清单"></a>9. 最后的排查清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">系统层：uptime、top、vmstat、mpstat</span><br><span class="line">进程层：ps、pidstat</span><br><span class="line">线程层：top -H、ps -L</span><br><span class="line">Java 栈：jstack，连续抓取三次</span><br><span class="line">GC 情况：jstat -gcutil</span><br><span class="line">非 Java 热点：perf top</span><br></pre></td></tr></table></figure>
+
+<p>CPU 问题定位的关键不是记住多少命令，而是始终保留“系统到进程、进程到线程、线程到代码”的证据链。这样即使重启恢复了服务，后面也还有东西可以复盘。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">MySQL联合索引与索引失效排查</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-04-23 10:35:00" itemprop="dateCreated datePublished" datetime="2023-04-23T10:35:00+08:00">2023-04-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：索引建了不等于一定会用，执行计划里出现了索引也不等于查询就足够快。很多所谓的“索引失效”，其实是索引顺序和查询方式根本对不上。</p>
+</blockquote>
+<p>这篇把工作中比较容易遇到的联合索引问题放在一起，重点不是背口诀，而是知道看到 <code>key=NULL</code> 或扫描行数异常时应该怎么往下查。</p>
+<h2 id="1-先看一个联合索引"><a href="#1-先看一个联合索引" class="headerlink" title="1. 先看一个联合索引"></a>1. 先看一个联合索引</h2><p>订单表有下面这个索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>可以把联合索引简单理解成按照下面的顺序排列：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tenant_id -&gt; status -&gt; created_at</span><br></pre></td></tr></table></figure>
+
+<p>因此下面几类条件比较容易利用这个索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 使用 tenant_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 使用 tenant_id、status</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 等值过滤以后，再按 created_at 做范围查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>而只使用中间字段时，通常无法走出理想的索引范围：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这就是常说的最左前缀原则。它描述的是索引有序性的利用方式，不是要求 SQL 条件必须按照索引字段顺序书写。下面两种写法对优化器来说基本没有区别：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span> <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span> <span class="keyword">AND</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-常见的索引失效场景"><a href="#2-常见的索引失效场景" class="headerlink" title="2. 常见的索引失效场景"></a>2. 常见的索引失效场景</h2><h3 id="2-1-在索引字段上做函数计算"><a href="#2-1-在索引字段上做函数计算" class="headerlink" title="2.1 在索引字段上做函数计算"></a>2.1 在索引字段上做函数计算</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 不推荐：每一行都要计算 DATE(created_at)</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> <span class="type">DATE</span>(created_at) <span class="operator">=</span> <span class="string">&#x27;2023-04-23&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以改成明确的时间范围：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-23 00:00:00&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span>  <span class="string">&#x27;2023-04-24 00:00:00&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>MySQL 8.0 支持函数索引，但也不代表所有函数条件都应该依赖函数索引解决。时间范围写法更直观，也更容易复用普通索引。</p>
+<h3 id="2-2-字段类型不一致导致隐式转换"><a href="#2-2-字段类型不一致导致隐式转换" class="headerlink" title="2.2 字段类型不一致导致隐式转换"></a>2.2 字段类型不一致导致隐式转换</h3><p>假设 <code>user_phone</code> 是 <code>VARCHAR</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 数字常量可能触发隐式类型转换</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> user_info</span><br><span class="line"><span class="keyword">WHERE</span> user_phone <span class="operator">=</span> <span class="number">13800138000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 参数类型与字段保持一致</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> user_info</span><br><span class="line"><span class="keyword">WHERE</span> user_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>Java 代码里也要检查 MyBatis 参数类型。数据库字段是字符串，代码却传了 <code>Long</code>，SQL 文本看起来差别不大，执行计划可能完全不同。</p>
+<h3 id="2-3-前置通配符"><a href="#2-3-前置通配符" class="headerlink" title="2.3 前置通配符"></a>2.3 前置通配符</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 普通 B+Tree 索引无法定位字符串起点</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> article</span><br><span class="line"><span class="keyword">WHERE</span> title <span class="keyword">LIKE</span> <span class="string">&#x27;%MySQL%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 固定前缀可以利用索引范围</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> article</span><br><span class="line"><span class="keyword">WHERE</span> title <span class="keyword">LIKE</span> <span class="string">&#x27;MySQL%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>真正的任意关键词检索更适合全文索引或专门的搜索引擎，不建议为了模糊搜索不断堆普通索引。</p>
+<h3 id="2-4-范围条件后面的字段"><a href="#2-4-范围条件后面的字段" class="headerlink" title="2.4 范围条件后面的字段"></a>2.4 范围条件后面的字段</h3><p>如果索引改成下面的顺序：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_created_status</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, created_at, status);</span><br></pre></td></tr></table></figure>
+
+<p>查询条件为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>created_at</code> 进入范围扫描以后，后面的 <code>status</code> 通常不能继续缩小索引扫描区间。部分版本可能通过索引条件下推减少回表，但扫描范围仍然可能很大。因此对这个查询而言，<code>(tenant_id, status, created_at)</code> 往往更合适。</p>
+<h3 id="2-5-OR-两边没有完整索引"><a href="#2-5-OR-两边没有完整索引" class="headerlink" title="2.5 OR 两边没有完整索引"></a>2.5 OR 两边没有完整索引</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;A20230423001&#x27;</span></span><br><span class="line">   <span class="keyword">OR</span> third_party_no <span class="operator">=</span> <span class="string">&#x27;WX20230423001&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果只有 <code>order_no</code> 有索引，优化器可能选择全表扫描。可以根据业务语义评估给两个字段分别建索引，或者拆成两个查询后合并结果。不要为了让执行计划好看直接改成 <code>UNION</code>，需要确认去重规则和实际耗时。</p>
+<h2 id="3-为什么索引符合规则，优化器还是不用"><a href="#3-为什么索引符合规则，优化器还是不用" class="headerlink" title="3. 为什么索引符合规则，优化器还是不用"></a>3. 为什么索引符合规则，优化器还是不用</h2><p>索引不是越多越好，优化器会估算“走索引再回表”和“直接扫描表”的成本。下面几种情况，即使语法上可以使用索引，也可能选择全表扫描：</p>
+<ol>
+<li>表非常小，全表扫描成本更低。</li>
+<li>条件返回了表中大部分数据，回表次数过多。</li>
+<li>字段区分度很低，例如只有两个值的状态字段。</li>
+<li>统计信息过旧，优化器对数据分布估算错误。</li>
+<li>查询返回字段过多，无法形成覆盖索引。</li>
+</ol>
+<p>先用执行计划确认，不要凭感觉判断：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN FORMAT<span class="operator">=</span>JSON</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>普通 <code>EXPLAIN</code> 适合快速看结论，JSON 格式会给出更详细的成本和过滤信息。MySQL 8.0 还可以在确认查询安全后使用 <code>EXPLAIN ANALYZE</code> 查看实际行数。</p>
+<h2 id="4-联合索引怎么设计"><a href="#4-联合索引怎么设计" class="headerlink" title="4. 联合索引怎么设计"></a>4. 联合索引怎么设计</h2><p>我一般按照下面的顺序判断：</p>
+<ol>
+<li>先收集高频且重要的真实 SQL，不根据单个字段想象索引。</li>
+<li>稳定的等值条件通常放在前面，例如租户、用户、业务状态。</li>
+<li>范围和排序字段通常放在等值字段之后。</li>
+<li>比较查询返回字段，判断是否值得做覆盖索引。</li>
+<li>合并可以互相复用的索引，避免重复索引增加写放大。</li>
+</ol>
+<p>例如这个列表查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以先评估：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>网上经常说“区分度高的字段放最前面”，这个说法不够完整。联合索引首先要匹配查询路径和排序需求，区分度只是成本判断的一部分。把高区分度字段放到前面，却破坏了多个高频查询可以复用的前缀，整体效果可能更差。</p>
+<h2 id="5-检查重复和长期不用的索引"><a href="#5-检查重复和长期不用的索引" class="headerlink" title="5. 检查重复和长期不用的索引"></a>5. 检查重复和长期不用的索引</h2><p>先查看表上的索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>如果已经存在 <code>(tenant_id, status, created_at)</code>，通常不再需要单独的 <code>(tenant_id)</code> 索引，因为前者可以覆盖它的访问前缀。但是否删除仍然要结合索引大小、查询统计和执行计划验证。</p>
+<p>MySQL 的 <code>sys</code> 库可以提供未使用索引线索：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema, object_name, index_name</span><br><span class="line"><span class="keyword">FROM</span> sys.schema_unused_indexes</span><br><span class="line"><span class="keyword">WHERE</span> object_schema <span class="operator">=</span> <span class="string">&#x27;order_db&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里的数据通常来自实例启动后的统计，重启会影响观察窗口。<strong>不能看到“未使用”就立即删除索引。</strong> 应该覆盖完整业务周期，并提前准备恢复索引的 DDL。</p>
+<h2 id="6-不建议直接使用-FORCE-INDEX"><a href="#6-不建议直接使用-FORCE-INDEX" class="headerlink" title="6. 不建议直接使用 FORCE INDEX"></a>6. 不建议直接使用 FORCE INDEX</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant_status_created)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>FORCE INDEX</code> 可以用于验证猜想，但不应该成为默认修复方式。数据分布会变化，今天合适的索引路径以后未必合适。强制索引会限制优化器选择，最好先解决统计信息、SQL 写法或索引设计问题。</p>
+<h2 id="7-排查清单"><a href="#7-排查清单" class="headerlink" title="7. 排查清单"></a>7. 排查清单</h2><ol>
+<li>确认字段类型与传入参数类型是否一致。</li>
+<li>检查索引字段上是否存在函数、计算或隐式转换。</li>
+<li>检查联合索引是否满足真实查询的最左前缀。</li>
+<li>注意范围条件、排序和后续字段之间的关系。</li>
+<li>比较扫描行数、返回行数和回表成本。</li>
+<li>检查重复索引和长期不用的索引，但删除前必须持续观察。</li>
+<li>修改后重新查看执行计划，并通过真实流量指标验证。</li>
+</ol>
+<p>索引问题最后还是要回到一句话：<strong>用数据证明优化有效。</strong> 能走索引只是过程，稳定降低响应时间和数据库负载才是结果。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/02/19/%E4%B8%80%E6%AC%A1MySQL%E6%85%A2SQL%E8%B0%83%E4%BC%98%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/02/19/%E4%B8%80%E6%AC%A1MySQL%E6%85%A2SQL%E8%B0%83%E4%BC%98%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">一次MySQL慢SQL调优记录</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-02-19 15:20:00" itemprop="dateCreated datePublished" datetime="2023-02-19T15:20:00+08:00">2023-02-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：SQL 调优最怕一上来就加索引。索引可能暂时把耗时压下去，也可能只是把问题从查询端转移到了写入端。比较稳妥的方式还是先保留现场，再根据慢查询日志和执行计划判断到底慢在哪里。</p>
+</blockquote>
+<p>这次整理一个比较常见的订单列表查询。数据量上来以后，接口从两三百毫秒涨到了四五秒，数据库 CPU 没有打满，但是扫描行数非常夸张。</p>
+<h2 id="1-现场现象"><a href="#1-现场现象" class="headerlink" title="1. 现场现象"></a>1. 现场现象</h2><p>接口查询的是某个用户已支付的订单，按创建时间倒序取最近 20 条：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>慢查询日志里最值得关注的不是 <code>Query_time</code>，而是 <code>Rows_examined</code> 和最终返回行数的差距：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Query_time: 4.782  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 20  Rows_examined: 2864317</span><br></pre></td></tr></table></figure>
+
+<p>只返回 20 行，却扫描了 280 多万行，方向基本已经明确：先检查执行计划和现有索引。</p>
+<h2 id="2-先确认慢-SQL-从哪里来"><a href="#2-先确认慢-SQL-从哪里来" class="headerlink" title="2. 先确认慢 SQL 从哪里来"></a>2. 先确认慢 SQL 从哪里来</h2><p>生产环境不要为了排查随手修改全局参数，先查看当前配置：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;slow_query_log&#x27;</span>;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;long_query_time&#x27;</span>;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;slow_query_log_file&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果已经启用了 <code>performance_schema</code>，也可以从聚合结果里找总耗时最高的 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,</span><br><span class="line">       COUNT_STAR,</span><br><span class="line">       ROUND(SUM_TIMER_WAIT <span class="operator">/</span> <span class="number">1000000000000</span>, <span class="number">2</span>) <span class="keyword">AS</span> total_seconds,</span><br><span class="line">       ROUND(AVG_TIMER_WAIT <span class="operator">/</span> <span class="number">1000000000</span>, <span class="number">2</span>) <span class="keyword">AS</span> avg_ms</span><br><span class="line"><span class="keyword">FROM</span> performance_schema.events_statements_summary_by_digest</span><br><span class="line"><span class="keyword">WHERE</span> DIGEST_TEXT <span class="keyword">IS</span> <span class="keyword">NOT NULL</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_TIMER_WAIT <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里要同时看三个维度：单次很慢、调用次数很多、累计耗时很高。只盯着最慢的一条 SQL，可能会漏掉高频的小慢查询。</p>
+<h2 id="3-看懂执行计划"><a href="#3-看懂执行计划" class="headerlink" title="3. 看懂执行计划"></a>3. 看懂执行计划</h2><p>先执行普通 <code>EXPLAIN</code>，这个命令不会真正跑完整查询，在线上相对安全：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>优化前的核心结果如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">type: ALL</span><br><span class="line">possible_keys: idx_user_id, idx_status</span><br><span class="line">key: NULL</span><br><span class="line">rows: 2864317</span><br><span class="line">filtered: 1.00</span><br><span class="line">Extra: Using where; Using filesort</span><br></pre></td></tr></table></figure>
+
+<p>几个字段可以这样理解：</p>
+<ol>
+<li><code>type=ALL</code>：全表扫描，这次问题的重点。</li>
+<li><code>key=NULL</code>：优化器最终没有选择索引。</li>
+<li><code>rows</code>：预计需要检查的行数，不是精确值，但可以判断量级。</li>
+<li><code>filtered</code>：经过条件过滤后预计保留的比例。</li>
+<li><code>Using filesort</code>：排序无法直接利用索引完成，并不一定真的写磁盘，但会产生额外排序成本。</li>
+</ol>
+<p>表里原来只有 <code>user_id</code> 和 <code>status</code> 两个单列索引。MySQL 通常不会把多个单列索引自动组合成最理想的访问路径，即使发生了索引合并，也解决不了后面的时间排序问题。</p>
+<h2 id="4-根据查询模式设计索引"><a href="#4-根据查询模式设计索引" class="headerlink" title="4. 根据查询模式设计索引"></a>4. 根据查询模式设计索引</h2><p>这个查询有两个等值条件，后面跟一个排序字段，因此新增联合索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER TABLE</span> order_info</span><br><span class="line"><span class="keyword">ADD</span> INDEX idx_user_status_created (user_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>再次查看执行计划：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: ref</span><br><span class="line">key: idx_user_status_created</span><br><span class="line">rows: 37</span><br><span class="line">filtered: 100.00</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
+
+<p>查询耗时从秒级降到了几十毫秒，扫描行数也从百万级下降到几十行。索引顺序不是固定公式，而是由真实查询决定：这里 <code>user_id</code> 和 <code>status</code> 都是等值条件，<code>created_at</code> 用于排序，因此这个顺序比较合适。</p>
+<p><strong>不要为了覆盖查询把所有返回字段都塞进联合索引。</strong> <code>order_no</code>、<code>amount</code> 等字段加入索引后虽然可能减少回表，但会明显增加索引体积和写入成本。是否做覆盖索引，需要结合查询频率、字段长度和写入压力再决定。</p>
+<h2 id="5-MySQL-8-0-可以进一步验证"><a href="#5-MySQL-8-0-可以进一步验证" class="headerlink" title="5. MySQL 8.0 可以进一步验证"></a>5. MySQL 8.0 可以进一步验证</h2><p>MySQL 8.0.18 以后可以使用 <code>EXPLAIN ANALYZE</code> 查看实际执行时间和真实行数：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN ANALYZE</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个命令会真正执行 SQL。对于更新、删除语句或者可能返回大量数据的查询，不能当作普通 <code>EXPLAIN</code> 随便在线上执行。MySQL 5.7 没有这个能力，只能结合慢查询日志、执行计划和监控数据验证。</p>
+<h2 id="6-还有几个容易忽略的问题"><a href="#6-还有几个容易忽略的问题" class="headerlink" title="6. 还有几个容易忽略的问题"></a>6. 还有几个容易忽略的问题</h2><h3 id="6-1-深分页"><a href="#6-1-深分页" class="headerlink" title="6.1 深分页"></a>6.1 深分页</h3><p>下面这种分页到了后面仍然会扫描并丢弃大量数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">200000</span>, <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>业务允许时，优先使用上一页最后一条记录作为游标，避免不断增大的 <code>OFFSET</code>。如果时间可能重复，需要同时携带 <code>created_at</code> 和唯一主键，保证翻页稳定。</p>
+<h3 id="6-2-统计信息过旧"><a href="#6-2-统计信息过旧" class="headerlink" title="6.2 统计信息过旧"></a>6.2 统计信息过旧</h3><p>表数据变化很大时，优化器估算可能失真。可以先比较执行计划和真实数据分布，再在低峰期评估是否执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ANALYZE <span class="keyword">TABLE</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>这不是固定的“优化命令”，执行前要确认 MySQL 版本、表大小和锁影响。</p>
+<h3 id="6-3-只看一次压测结果"><a href="#6-3-只看一次压测结果" class="headerlink" title="6.3 只看一次压测结果"></a>6.3 只看一次压测结果</h3><p>首次查询可能涉及磁盘读取，后续查询可能命中 Buffer Pool。调优前后要使用相同数据范围，多执行几轮，并观察数据库 CPU、磁盘 IO、扫描行数和接口分位耗时，不能只拿一次最快结果做结论。</p>
+<h2 id="7-复盘清单"><a href="#7-复盘清单" class="headerlink" title="7. 复盘清单"></a>7. 复盘清单</h2><ol>
+<li>从慢查询日志或聚合指标确认真实高耗时 SQL。</li>
+<li>对比扫描行数与返回行数，先判断是否存在无效扫描。</li>
+<li>使用 <code>EXPLAIN</code> 检查 <code>type</code>、<code>key</code>、<code>rows</code> 和 <code>Extra</code>。</li>
+<li>按实际查询条件设计联合索引，不机械套用字段选择性公式。</li>
+<li>同时评估索引对新增、更新和磁盘空间的影响。</li>
+<li>调优后用同一组数据和完整监控验证，保留回退方案。</li>
+</ol>
+<p>SQL 调优本质上不是让某一条 SQL 看起来更快，而是在查询性能、写入成本和维护复杂度之间找到一个能长期运行的平衡点。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
     <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1079,487 +1877,6 @@
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
 <p>从单体到微服务，本质上是从代码架构走向工程体系。服务拆分只是表象，真正重要的是边界治理、稳定性建设、自动化部署和可观测性。我的经验是：不要为了微服务而微服务，当单体还能支撑业务时，先做好模块化和工程规范；当协作、发布和稳定性成为瓶颈时，再逐步演进。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/" class="post-title-link" itemprop="url">Prometheus监控部署</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-11-20 20:29:47" itemprop="dateCreated datePublished" datetime="2022-11-20T20:29:47+08:00">2022-11-20</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>日志能回答“发生了什么”，但不能很好回答“系统现在是否健康”。为了补齐监控能力，我开始研究 Prometheus。相比传统监控，Prometheus 更适合以指标为中心观察服务状态，比如 QPS、响应耗时、错误率、线程池队列、JVM 内存等。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>刚开始部署时，最容易忽略的是指标设计。Prometheus 能抓到很多默认指标，但如果没有业务指标，排查时仍然不够。比如接口错误率升高，只知道 HTTP 500 变多，却不知道是哪个业务动作失败。另一个问题是标签设计不当，label 维度过多会导致时间序列爆炸。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">监控链路：</span><br><span class="line">Spring Boot Actuator</span><br><span class="line">  -&gt; Prometheus scrape</span><br><span class="line">  -&gt; PromQL query</span><br><span class="line">  -&gt; Grafana dashboard</span><br><span class="line">  -&gt; Alertmanager</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">prometheus,health,metrics</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="attr">tags:</span></span><br><span class="line">      <span class="attr">application:</span> <span class="string">order-service</span></span><br></pre></td></tr></table></figure>
-
-<p>监控指标需要分层：基础资源、JVM、接口、数据库连接池、业务指标。只看 CPU 和内存，无法支撑复杂业务排查。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">&quot;order-service&quot;</span></span><br><span class="line">    <span class="attr">metrics_path:</span> <span class="string">&quot;/actuator/prometheus&quot;</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span> [<span class="string">&quot;order-service:8080&quot;</span>]</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">rate(http_server_requests_seconds_count[1m])</span><br><span class="line"></span><br><span class="line">histogram_quantile(</span><br><span class="line">  0.95,</span><br><span class="line">  rate(http_server_requests_seconds_bucket[5m])</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">sum(rate(http_server_requests_seconds_count&#123;status=~&quot;5..&quot;&#125;[1m]))</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">告警建议：</span><br><span class="line">- 5xx 错误率持续升高</span><br><span class="line">- P95 响应时间超过阈值</span><br><span class="line">- JVM Old 区使用率过高</span><br><span class="line">- 线程池队列持续堆积</span><br><span class="line">- 数据库连接池耗尽</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>Prometheus 的价值不只是画图，而是建立系统健康度指标。好的监控应该能提前暴露趋势，而不是等用户反馈后才看。日志、指标、告警和复盘结合起来，才算完整的可观测性建设。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/10/23/2022-10-23-ELK%E6%97%A5%E5%BF%97%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/10/23/2022-10-23-ELK%E6%97%A5%E5%BF%97%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/" class="post-title-link" itemprop="url">ELK日志平台搭建</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-10-23 21:55:04" itemprop="dateCreated datePublished" datetime="2022-10-23T21:55:04+08:00">2022-10-23</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>服务数量增加后，登录服务器看日志的方式开始变得低效。一次请求可能经过网关、订单服务、库存服务和消息消费者，如果每个服务都登录机器 grep 日志，排查效率会很低。因此我开始搭建 ELK 日志平台，把分散日志集中采集、存储和检索。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>搭建过程中主要遇到三个问题：日志格式不统一，导致字段无法检索；Logstash 解析规则写得太随意，数据进 Elasticsearch 后结构混乱；日志量上来后磁盘增长很快，如果不设置索引生命周期，很容易把机器打满。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">日志链路：</span><br><span class="line">app.log</span><br><span class="line">  -&gt; Filebeat</span><br><span class="line">  -&gt; Logstash</span><br><span class="line">  -&gt; Elasticsearch</span><br><span class="line">  -&gt; Kibana</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2022-10-23T21:00:00&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;traceId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;create order failed&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>日志平台不是简单收集文本，而是要让日志结构化。只有字段固定，才能按 traceId、service、level、bizId 快速过滤。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat.inputs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">log</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/data/logs/*.log</span></span><br><span class="line">    <span class="attr">fields:</span></span><br><span class="line">      <span class="attr">service:</span> <span class="string">order-service</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">filter &#123;</span><br><span class="line">  json &#123;</span><br><span class="line">    source =&gt; &quot;message&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts =&gt; [&quot;http://elasticsearch:9200&quot;]</span><br><span class="line">    index =&gt; &quot;app-log-%&#123;+YYYY.MM.dd&#125;&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">落地规则：</span><br><span class="line">1. 应用统一 JSON 日志格式</span><br><span class="line">2. 必须打印 traceId</span><br><span class="line">3. ERROR 日志必须有异常栈</span><br><span class="line">4. 索引按天切分</span><br><span class="line">5. 保留周期按业务价值设置</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>ELK 的核心价值是让日志可检索、可关联、可追溯。平台搭起来只是第一步，更重要的是日志规范。没有 traceId、业务 id 和统一字段，ELK 也只能变成一个更大的文本搜索框。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">Docker基础部署，Docker Compose实践</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-08-14 17:42:26" itemprop="dateCreated datePublished" datetime="2022-08-14T17:42:26+08:00">2022-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>在多服务项目越来越多之后，本地环境和测试环境的差异变得明显。以前部署一个 Java 应用只需要 JDK、配置文件和启动脚本，现在还要依赖 MySQL、Redis、RabbitMQ、Nginx 等组件。为了减少环境搭建成本，我开始研究 Docker 和 Docker Compose。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>最开始遇到的问题是容器能启动，但服务之间连不上。比如应用容器访问 localhost:3306，结果连接的是容器内部而不是宿主机；数据卷没有挂载，容器删除后数据也没了；端口映射冲突，导致服务无法启动。这些问题说明，Docker 部署不能只记命令，要理解镜像、容器、网络、数据卷之间的关系。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Docker 关键概念：</span><br><span class="line">image     静态模板</span><br><span class="line">container 运行实例</span><br><span class="line">volume    数据持久化</span><br><span class="line">network   容器通信</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br><span class="line">docker logs app</span><br><span class="line">docker <span class="built_in">exec</span> -it app sh</span><br><span class="line">docker network <span class="built_in">ls</span></span><br><span class="line">docker volume <span class="built_in">ls</span></span><br></pre></td></tr></table></figure>
-
-<p>Docker Compose 的价值在于把多个容器的启动方式写成声明式配置，避免每次手写一堆 docker run 命令。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.8&quot;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mysql:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;3306:3306&quot;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-data:/var/lib/mysql</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:6.2</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;6379:6379&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">demo-app:1.0</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">mysql-data:</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker compose up -d</span><br><span class="line">docker compose logs -f app</span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>Docker 带来的最大收益是环境一致性。Docker Compose 则进一步把多组件依赖固化下来。我的经验是：开发环境可以用 Compose 提效，但生产环境还需要考虑镜像版本、日志收集、健康检查、资源限制和安全配置。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="post-title-link" itemprop="url">Redis高可用架构</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-07-24 19:35:52" itemprop="dateCreated datePublished" datetime="2022-07-24T19:35:52+08:00">2022-07-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>Redis 从单机缓存进入核心链路后，高可用就必须认真考虑。最初使用 Redis 只是为了缓存热点数据，服务挂了最多回源数据库。但随着登录态、限流、库存预扣等场景进入 Redis，单点故障的影响范围明显扩大，所以需要研究 Redis 高可用架构。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>单机 Redis 最大的问题是故障恢复依赖人工。Redis 进程挂掉、机器重启、内存打满都会导致业务抖动。如果没有主从、哨兵或集群方案，应用只能等待人工处理。另一个问题是，很多人以为主从复制就等于高可用，但主节点故障后如果不能自动切换，仍然无法支撑线上稳定性。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Sentinel 架构：</span><br><span class="line"></span><br><span class="line">app</span><br><span class="line"> ↓</span><br><span class="line">sentinel-1 sentinel-2 sentinel-3</span><br><span class="line"> ↓</span><br><span class="line">redis-master</span><br><span class="line"> ↓</span><br><span class="line">redis-slave-1</span><br><span class="line">redis-slave-2</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sentinel monitor mymaster 127.0.0.1 6379 2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel failover-timeout mymaster 60000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br></pre></td></tr></table></figure>
-
-<p>排查高可用时，重点看三个问题：主从复制是否正常，Sentinel 是否能判断主观下线，故障转移后客户端是否能感知新主节点。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">sentinel:</span></span><br><span class="line">      <span class="attr">master:</span> <span class="string">mymaster</span></span><br><span class="line">      <span class="attr">nodes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26379</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26380</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:26381</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -p 26379 sentinel masters</span><br><span class="line">redis-cli -p 26379 sentinel slaves mymaster</span><br><span class="line">redis-cli -p 26379 sentinel failover mymaster</span><br></pre></td></tr></table></figure>
-
-<p>对于缓存场景，我会同时配合过期时间随机化、本地缓存和降级策略，避免 Redis 故障时所有流量瞬间压到数据库。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>Redis 高可用不能只看 Redis 本身，还要看客户端、业务降级和数据库保护。Sentinel 解决主从切换问题，但不解决缓存击穿、雪崩和热点 key 问题。真正可靠的缓存架构，需要高可用、限流、降级和监控一起设计。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/" class="post-title-link" itemprop="url">RabbitMQ可靠性设计</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-06-19 23:12:09" itemprop="dateCreated datePublished" datetime="2022-06-19T23:12:09+08:00">2022-06-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>随着系统拆分，很多原本同步完成的操作开始改成异步。比如订单创建后发积分、发通知、写操作日志，这些逻辑不应该阻塞主流程，于是 RabbitMQ 就进入了架构设计范围。研究可靠性设计，是因为消息队列一旦使用不当，很容易出现“主流程成功了，但后续动作丢了”的问题。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>最典型的问题是消息丢失和重复消费。生产者以为消息发出去了，但交换机没有正确接收；队列没有持久化，服务重启后消息消失；消费者处理成功但 ack 失败，导致消息重复投递。如果没有可靠性设计，问题往往发生在线上，而且不容易第一时间发现。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">可靠投递链路：</span><br><span class="line">Producer</span><br><span class="line">  -&gt; Exchange</span><br><span class="line">  -&gt; Queue</span><br><span class="line">  -&gt; Consumer</span><br><span class="line">  -&gt; Ack</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">publisher-confirm-type:</span> <span class="string">correlated</span></span><br><span class="line">    <span class="attr">publisher-returns:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">listener:</span></span><br><span class="line">      <span class="attr">simple:</span></span><br><span class="line">        <span class="attr">acknowledge-mode:</span> <span class="string">manual</span></span><br></pre></td></tr></table></figure>
-
-<p>排查消息可靠性时，我会把链路拆成四段：生产确认、路由确认、队列持久化、消费确认。任何一段缺失，都可能导致数据不一致。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (!ack) &#123;</span><br><span class="line">        log.error(<span class="string">&quot;message send failed, id=&#123;&#125;, cause=&#123;&#125;&quot;</span>, correlationData.getId(), cause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RabbitListener(queues = &quot;order.point.queue&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(Message message, Channel channel)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">tag</span> <span class="operator">=</span> message.getMessageProperties().getDeliveryTag();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        handle(message);</span><br><span class="line">        channel.basicAck(tag, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        channel.basicNack(tag, <span class="literal">false</span>, <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">设计补充：</span><br><span class="line">- 业务表增加 message_id 去重</span><br><span class="line">- 失败消息进入死信队列</span><br><span class="line">- 消费失败次数需要监控</span><br><span class="line">- 关键消息保留发送记录</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>RabbitMQ 可靠性不是一个配置能解决的，而是一组机制共同保证。生产确认保证消息发出去，持久化保证消息不因重启丢失，手动 ack 保证消费结果可控，幂等设计保证重复投递不会破坏数据。</p>
 
       
     </div>

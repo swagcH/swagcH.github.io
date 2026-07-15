@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="写在前面：看到 CPU 100% 以后，最直接的反应往往是重启服务。重启确实可能恢复业务，但也会把最有价值的线程现场一起清掉。只要业务还扛得住，最好先用几分钟把证据留下来。  服务器 CPU 飙高的排查路径并不复杂：系统、进程、线程、调用栈，一层一层往下缩小范围。真正容易踩坑的是把 load average 当成 CPU 使用率，或者找到高 CPU 进程以后就直接下结论。 1. 先确认是不是 C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux服务器CPU飙高问题定位">
+<meta property="og:url" content="https://swagch.github.io/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="写在前面：看到 CPU 100% 以后，最直接的反应往往是重启服务。重启确实可能恢复业务，但也会把最有价值的线程现场一起清掉。只要业务还扛得住，最好先用几分钟把证据留下来。  服务器 CPU 飙高的排查路径并不复杂：系统、进程、线程、调用栈，一层一层往下缩小范围。真正容易踩坑的是把 load average 当成 CPU 使用率，或者找到高 CPU 进程以后就直接下结论。 1. 先确认是不是 C">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-18T06:10:00.000Z">
+<meta property="article:modified_time" content="2023-06-19T12:45:00.000Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="故障排查">
+<meta property="article:tag" content="CPU">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://swagch.github.io/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/","path":"2023/06/18/Linux服务器CPU飙高问题定位/","title":"Linux服务器CPU飙高问题定位"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux服务器CPU飙高问题定位 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%88%E7%A1%AE%E8%AE%A4%E6%98%AF%E4%B8%8D%E6%98%AF-CPU-%E9%97%AE%E9%A2%98"><span class="nav-text">1. 先确认是不是 CPU 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%89%BE%E5%88%B0%E6%9C%80%E6%B6%88%E8%80%97-CPU-%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="nav-text">2. 找到最消耗 CPU 的进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BB%8E%E8%BF%9B%E7%A8%8B%E7%BB%A7%E7%BB%AD%E5%AE%9A%E4%BD%8D%E5%88%B0%E7%BA%BF%E7%A8%8B"><span class="nav-text">3. 从进程继续定位到线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8-jstack-%E5%AF%B9%E5%BA%94-Java-%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-text">4. 使用 jstack 对应 Java 调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%88%A4%E6%96%AD%E6%98%AF%E4%B8%8D%E6%98%AF-GC-%E5%AF%BC%E8%87%B4-CPU-%E5%8D%87%E9%AB%98"><span class="nav-text">5. 判断是不是 GC 导致 CPU 升高</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E9%9D%9E-Java-%E8%BF%9B%E7%A8%8B%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5"><span class="nav-text">6. 非 Java 进程怎么排查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%87%A0%E7%A7%8D%E5%AE%B9%E6%98%93%E8%AF%AF%E5%88%A4%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-text">7. 几种容易误判的情况</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E5%8D%95%E6%A0%B8%E6%89%93%E6%BB%A1"><span class="nav-text">7.1 单核打满</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-iowait-%E5%BE%88%E9%AB%98"><span class="nav-text">7.2 iowait 很高</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-steal-%E5%BE%88%E9%AB%98"><span class="nav-text">7.3 steal 很高</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-BLOCKED-%E7%BA%BF%E7%A8%8B%E5%BE%88%E5%A4%9A"><span class="nav-text">7.4 BLOCKED 线程很多</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%BA%94%E6%80%A5%E5%A4%84%E7%90%86%E9%A1%BA%E5%BA%8F"><span class="nav-text">8. 应急处理顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E6%9C%80%E5%90%8E%E7%9A%84%E6%8E%92%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-text">9. 最后的排查清单</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">70</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">200</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/06/18/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8CPU%E9%A3%99%E9%AB%98%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Linux服务器CPU飙高问题定位 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux服务器CPU飙高问题定位
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-06-18 14:10:00" itemprop="dateCreated datePublished" datetime="2023-06-18T14:10:00+08:00">2023-06-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>写在前面：看到 CPU 100% 以后，最直接的反应往往是重启服务。重启确实可能恢复业务，但也会把最有价值的线程现场一起清掉。只要业务还扛得住，最好先用几分钟把证据留下来。</p>
+</blockquote>
+<p>服务器 CPU 飙高的排查路径并不复杂：系统、进程、线程、调用栈，一层一层往下缩小范围。真正容易踩坑的是把 <code>load average</code> 当成 CPU 使用率，或者找到高 CPU 进程以后就直接下结论。</p>
+<h2 id="1-先确认是不是-CPU-问题"><a href="#1-先确认是不是-CPU-问题" class="headerlink" title="1. 先确认是不是 CPU 问题"></a>1. 先确认是不是 CPU 问题</h2><p>第一步先看负载、CPU 分类和运行队列：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">uptime</span></span><br><span class="line">top -c</span><br><span class="line">vmstat 1 5</span><br><span class="line">mpstat -P ALL 1 5</span><br></pre></td></tr></table></figure>
+
+<p>重点关注这些指标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">us：用户态 CPU，Java 业务代码通常体现在这里</span><br><span class="line">sy：内核态 CPU，频繁系统调用、网络或驱动问题可能升高</span><br><span class="line">wa：等待磁盘 IO 的时间，不等于 CPU 真正在计算</span><br><span class="line">st：虚拟机被宿主机抢走的 CPU 时间</span><br><span class="line">r ：正在运行或等待 CPU 的任务数量</span><br><span class="line">b ：不可中断睡眠的任务数量，常见于 IO 等待</span><br></pre></td></tr></table></figure>
+
+<p><code>load average</code> 表示一段时间内可运行和不可中断任务的平均数量，不是 CPU 百分比。8 核机器负载为 8 和 2 核机器负载为 8，严重程度完全不同。</p>
+<p>例如下面这种情况，CPU 真正忙在用户态：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%Cpu(s): 92.1 us, 5.3 sy, 0.0 ni, 1.8 id, 0.3 wa, 0.0 hi, 0.5 si, 0.0 st</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>wa</code> 很高而 <code>us</code> 不高，方向应该切到磁盘 IO，不要继续只盯着 Java 线程。</p>
+<h2 id="2-找到最消耗-CPU-的进程"><a href="#2-找到最消耗-CPU-的进程" class="headerlink" title="2. 找到最消耗 CPU 的进程"></a>2. 找到最消耗 CPU 的进程</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -eo pid,ppid,user,%cpu,%mem,<span class="built_in">stat</span>,lstart,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p>需要持续观察时可以使用 <code>pidstat</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -u -p ALL 1 5</span><br></pre></td></tr></table></figure>
+
+<p>假设最终定位到 Java 进程 PID 为 <code>21847</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID=21847</span><br><span class="line">ps -p <span class="variable">$PID</span> -o pid,ppid,user,%cpu,%mem,etime,cmd</span><br></pre></td></tr></table></figure>
+
+<p>这时先记录进程启动时间、CPU、内存和完整启动命令，确认是不是刚发布的新版本，或者 JVM 参数是否发生变化。</p>
+<h2 id="3-从进程继续定位到线程"><a href="#3-从进程继续定位到线程" class="headerlink" title="3. 从进程继续定位到线程"></a>3. 从进程继续定位到线程</h2><p>Java 进程内部有很多线程，需要找到具体是哪一个线程在消耗 CPU：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top -H -p <span class="variable">$PID</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以直接输出线程列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -Lp <span class="variable">$PID</span> -o pid,tid,psr,pcpu,<span class="built_in">stat</span>,<span class="built_in">comm</span> --<span class="built_in">sort</span>=-pcpu | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p>假设高 CPU 线程的十进制 TID 是 <code>21936</code>。<code>jstack</code> 中的线程编号 <code>nid</code> 使用十六进制，因此先转换：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TID=21936</span><br><span class="line"><span class="built_in">printf</span> <span class="string">&#x27;0x%x\n&#x27;</span> <span class="variable">$TID</span></span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x55b0</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-使用-jstack-对应-Java-调用栈"><a href="#4-使用-jstack-对应-Java-调用栈" class="headerlink" title="4. 使用 jstack 对应 Java 调用栈"></a>4. 使用 jstack 对应 Java 调用栈</h2><p>连续抓三次线程快照，比只看一次更可靠：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-1.jstack</span><br><span class="line"><span class="built_in">sleep</span> 5</span><br><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-2.jstack</span><br><span class="line"><span class="built_in">sleep</span> 5</span><br><span class="line">jstack <span class="variable">$PID</span> &gt; /tmp/java-<span class="variable">$PID</span>-3.jstack</span><br></pre></td></tr></table></figure>
+
+<p>再根据十六进制线程号查找：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -n <span class="string">&#x27;nid=0x55b0&#x27;</span> -A 40 /tmp/java-<span class="variable">$PID</span>-1.jstack</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>jstack</code> 的用户最好与 Java 进程启动用户一致，并确认使用兼容的 JDK 工具。容器环境还要注意 PID 命名空间，宿主机看到的 PID 和容器内部可能不同。</p>
+<p>一个典型的高 CPU 调用栈可能是这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;retry-worker-3&quot; #86 prio=5 os_prio=0 tid=0x... nid=0x55b0 runnable</span><br><span class="line">   java.lang.Thread.State: RUNNABLE</span><br><span class="line">        at com.example.order.RetryService.retry(RetryService.java:127)</span><br><span class="line">        at com.example.order.RetryService.run(RetryService.java:91)</span><br></pre></td></tr></table></figure>
+
+<p>如果连续三次都停在同一段业务代码，基本可以确定热点位置。示例中的问题是失败重试没有退避时间，在下游不可用时进入了快速循环：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误示例：失败后立即进入下一次循环，会持续占用 CPU</span></span><br><span class="line"><span class="keyword">while</span> (!success) &#123;</span><br><span class="line">    success = callDownstream();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修复时要增加最大次数、退避时间和可观测日志：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">maxAttempts</span> <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">attempt</span> <span class="operator">=</span> <span class="number">1</span>; attempt &lt;= maxAttempts; attempt++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (callDownstream()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 退避时间需要结合业务超时预算设置</span></span><br><span class="line">    TimeUnit.MILLISECONDS.sleep(attempt * <span class="number">200L</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;下游调用连续失败&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-判断是不是-GC-导致-CPU-升高"><a href="#5-判断是不是-GC-导致-CPU-升高" class="headerlink" title="5. 判断是不是 GC 导致 CPU 升高"></a>5. 判断是不是 GC 导致 CPU 升高</h2><p>如果高 CPU 线程主要是 GC 线程，继续看垃圾回收情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstat -gcutil <span class="variable">$PID</span> 1000 10</span><br></pre></td></tr></table></figure>
+
+<p>重点观察：</p>
+<ol>
+<li><code>YGC</code>、<code>FGC</code> 是否快速增长。</li>
+<li><code>FGCT</code> 是否持续增加。</li>
+<li>老年代使用率是否长期接近 100%。</li>
+<li>每次 GC 后内存是否能明显下降。</li>
+</ol>
+<p>频繁 Full GC 只是现象，后面还要分析对象分配、堆大小、缓存和内存泄漏。不要看到 GC 高就先改大堆内存，堆变大以后单次 Full GC 可能更慢。</p>
+<h2 id="6-非-Java-进程怎么排查"><a href="#6-非-Java-进程怎么排查" class="headerlink" title="6. 非 Java 进程怎么排查"></a>6. 非 Java 进程怎么排查</h2><p>如果热点不是 Java，可以继续使用下面的工具：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看进程的 CPU、上下文切换和调度情况</span></span><br><span class="line">pidstat -u -w -p <span class="variable">$PID</span> 1 5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 有权限且服务器安装了 perf 时，查看热点函数</span></span><br><span class="line">perf top -p <span class="variable">$PID</span></span><br></pre></td></tr></table></figure>
+
+<p><code>perf</code> 可能需要 root 权限和内核符号支持，生产环境使用前要确认安全规范。对于 Nginx、压缩程序、日志采集器等进程，热点函数通常能帮助判断是加密、压缩、正则还是网络处理造成的消耗。</p>
+<h2 id="7-几种容易误判的情况"><a href="#7-几种容易误判的情况" class="headerlink" title="7. 几种容易误判的情况"></a>7. 几种容易误判的情况</h2><h3 id="7-1-单核打满"><a href="#7-1-单核打满" class="headerlink" title="7.1 单核打满"></a>7.1 单核打满</h3><p>在多核服务器上，一个死循环可能只打满一个核心。整机 CPU 看起来只有十几个百分点，但对应接口已经异常，因此要用 <code>mpstat -P ALL</code> 查看每个核心。</p>
+<h3 id="7-2-iowait-很高"><a href="#7-2-iowait-很高" class="headerlink" title="7.2 iowait 很高"></a>7.2 iowait 很高</h3><p><code>top</code> 里负载很高，并不代表 CPU 计算繁忙。如果大量线程处于 <code>D</code> 状态且 <code>wa</code> 很高，应该检查磁盘、网络存储和文件系统。</p>
+<h3 id="7-3-steal-很高"><a href="#7-3-steal-很高" class="headerlink" title="7.3 steal 很高"></a>7.3 steal 很高</h3><p>虚拟机的 <code>st</code> 持续升高，说明宿主机资源竞争严重。应用代码可能没有变化，这时需要结合云平台监控确认宿主机和实例规格。</p>
+<h3 id="7-4-BLOCKED-线程很多"><a href="#7-4-BLOCKED-线程很多" class="headerlink" title="7.4 BLOCKED 线程很多"></a>7.4 BLOCKED 线程很多</h3><p>大量线程等待锁会造成接口慢，但等待中的线程通常不消耗大量 CPU。真正的 CPU 热点可能是持锁线程，或者另一个不断自旋的线程。</p>
+<h2 id="8-应急处理顺序"><a href="#8-应急处理顺序" class="headerlink" title="8. 应急处理顺序"></a>8. 应急处理顺序</h2><ol>
+<li>确认影响范围，必要时先限流、摘流量或扩容。</li>
+<li>保存 <code>top</code>、<code>pidstat</code>、线程列表和至少三份 <code>jstack</code>。</li>
+<li>判断是否与刚发布版本、流量突增或下游异常有关。</li>
+<li>有明确回退版本时优先回滚，不要在线上临时改复杂代码。</li>
+<li>只有业务已经无法承受时才直接重启或终止进程。</li>
+<li>恢复后补齐监控、告警和压测用例。</li>
+</ol>
+<h2 id="9-最后的排查清单"><a href="#9-最后的排查清单" class="headerlink" title="9. 最后的排查清单"></a>9. 最后的排查清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">系统层：uptime、top、vmstat、mpstat</span><br><span class="line">进程层：ps、pidstat</span><br><span class="line">线程层：top -H、ps -L</span><br><span class="line">Java 栈：jstack，连续抓取三次</span><br><span class="line">GC 情况：jstat -gcutil</span><br><span class="line">非 Java 热点：perf top</span><br></pre></td></tr></table></figure>
+
+<p>CPU 问题定位的关键不是记住多少命令，而是始终保留“系统到进程、进程到线程、线程到代码”的证据链。这样即使重启恢复了服务，后面也还有东西可以复盘。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" rel="tag"># 故障排查</a>
+              <a href="/tags/CPU/" rel="tag"># CPU</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/" rel="prev" title="MySQL联合索引与索引失效排查">
+                  <i class="fa fa-angle-left"></i> MySQL联合索引与索引失效排查
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/" rel="next" title="服务器内存不足与OOM排查">
+                  服务器内存不足与OOM排查 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>
