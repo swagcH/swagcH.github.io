@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="这是我第一次有意识地让 AI 参与一个完整需求，而不是只让它解释报错或补一个工具方法。 需求不大：在工单列表增加“最近跟进时间”筛选，并让导出接口使用相同条件。真正做下来，AI 最有价值的部分不是写代码，而是帮助我快速梳理分散的调用链；最危险的部分也不是语法错误，而是它会非常自然地替需求补上一个没有确认过的定义。 下面按当天的开发时间线还原整个过程。项目和数据均做了简化，重点是我与 AI 怎样分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第一次用AI完成一个真实需求：从需求澄清到上线">
+<meta property="og:url" content="https://swagch.github.io/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="这是我第一次有意识地让 AI 参与一个完整需求，而不是只让它解释报错或补一个工具方法。 需求不大：在工单列表增加“最近跟进时间”筛选，并让导出接口使用相同条件。真正做下来，AI 最有价值的部分不是写代码，而是帮助我快速梳理分散的调用链；最危险的部分也不是语法错误，而是它会非常自然地替需求补上一个没有确认过的定义。 下面按当天的开发时间线还原整个过程。项目和数据均做了简化，重点是我与 AI 怎样分">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2025/ai-feature-log-cover.svg">
+<meta property="article:published_time" content="2025-04-06T13:15:00.000Z">
+<meta property="article:modified_time" content="2026-07-16T06:10:11.193Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Code Review">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="开发日志">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2025/ai-feature-log-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/","path":"2025/04/06/2025-04-06-第一次用AI完成一个真实需求/","title":"第一次用AI完成一个真实需求：从需求澄清到上线"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>第一次用AI完成一个真实需求：从需求澄清到上线 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#09-12%EF%BC%8C%E6%8B%BF%E5%88%B0%E4%B8%80%E5%8F%A5%E7%9C%8B%E4%BC%BC%E6%98%8E%E7%A1%AE%E7%9A%84%E9%9C%80%E6%B1%82"><span class="nav-text">09:12，拿到一句看似明确的需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-35%EF%BC%8C%E8%AE%A9-AI-%E5%85%88%E6%89%BE%E8%B7%AF%EF%BC%8C%E4%B8%8D%E8%A6%81%E5%85%88%E5%86%99"><span class="nav-text">09:35，让 AI 先找路，不要先写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-05%EF%BC%8C%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%AE%A1%E5%88%92%E9%87%8C%E5%87%BA%E7%8E%B0%E4%BA%86%E8%BF%87%E5%BA%A6%E8%AE%BE%E8%AE%A1"><span class="nav-text">10:05，第一次计划里出现了过度设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-32%EF%BC%8C%E6%97%A5%E6%9C%9F%E8%BE%B9%E7%95%8C%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%86%99%E9%94%99"><span class="nav-text">10:32，日期边界第一次写错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-10%EF%BC%8CSQL-%E8%83%BD%E8%BF%90%E8%A1%8C%EF%BC%8C%E4%BD%86%E8%AF%AD%E4%B9%89%E4%B8%8D%E5%AF%B9"><span class="nav-text">11:10，SQL 能运行，但语义不对</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-40%EF%BC%8C%E6%B5%8B%E8%AF%95%E6%9A%B4%E9%9C%B2%E4%BA%86%E4%B8%A4%E4%B8%AA%E9%81%97%E6%BC%8F"><span class="nav-text">13:40，测试暴露了两个遗漏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-20%EF%BC%8C%E6%88%91%E8%87%AA%E5%B7%B1%E5%81%9A%E4%BA%86%E4%B8%80%E8%BD%AE%E5%8F%AA%E7%9C%8B%E5%B7%AE%E5%BC%82%E7%9A%84-Review"><span class="nav-text">15:20，我自己做了一轮只看差异的 Review</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#16-30%EF%BC%8C%E6%8F%90%E6%B5%8B%E4%B8%8D%E6%98%AF%E7%BB%88%E7%82%B9"><span class="nav-text">16:30，提测不是终点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%93%E5%A4%A9%E7%9A%84%E6%8A%95%E5%85%A5%E5%88%B0%E5%BA%95%E6%9C%89%E6%B2%A1%E6%9C%89%E5%8F%98%E5%B0%91"><span class="nav-text">当天的投入到底有没有变少</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="第一次用AI完成一个真实需求：从需求澄清到上线 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          第一次用AI完成一个真实需求：从需求澄清到上线
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-04-06 21:15:00" itemprop="dateCreated datePublished" datetime="2025-04-06T21:15:00+08:00">2025-04-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2025/ai-feature-log-cover.svg" alt="AI 需求开发日志封面图"></p>
+<p>这是我第一次有意识地让 AI 参与一个完整需求，而不是只让它解释报错或补一个工具方法。</p>
+<p>需求不大：在工单列表增加“最近跟进时间”筛选，并让导出接口使用相同条件。真正做下来，AI 最有价值的部分不是写代码，而是帮助我快速梳理分散的调用链；最危险的部分也不是语法错误，而是它会非常自然地替需求补上一个没有确认过的定义。</p>
+<p>下面按当天的开发时间线还原整个过程。项目和数据均做了简化，重点是我与 AI 怎样分工，以及哪些地方发生了返工。</p>
+<span id="more"></span>
+
+<h2 id="09-12，拿到一句看似明确的需求"><a href="#09-12，拿到一句看似明确的需求" class="headerlink" title="09:12，拿到一句看似明确的需求"></a>09:12，拿到一句看似明确的需求</h2><p>产品描述是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">工单列表增加最近跟进时间筛选，导出也要支持。</span><br></pre></td></tr></table></figure>
+
+<p>我本来准备直接搜索列表接口，让 AI 帮我加两个时间参数。提交之前多问了一句：“最近跟进时间是最后一条跟进记录的创建时间，还是工单表上的 <code>last_follow_at</code>？”</p>
+<p>答案是前者，而且还有两个规则：</p>
+<ul>
+<li>没有跟进记录的工单不命中任何时间范围；</li>
+<li>开始时间包含，结束时间按次日零点之前处理。</li>
+</ul>
+<p>这两个规则如果没问，AI 大概率会根据字段名使用 <code>last_follow_at</code>，本地代码仍然能编译，查询结果却会悄悄出错。</p>
+<p>我先把需求改写成状态明确的任务卡：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">目标：列表与导出支持按最后一条跟进记录的 created_at 筛选。</span><br><span class="line">输入：followStartDate、followEndDate，格式 yyyy-MM-dd，可单独传。</span><br><span class="line">边界：开始日 00:00:00 包含；结束日转换为下一日 00:00:00，使用小于比较。</span><br><span class="line">空记录：无跟进记录的工单不命中。</span><br><span class="line">兼容：不传参数时，SQL 与响应保持原行为。</span><br><span class="line">完成：列表和导出共用条件，Mapper 集成测试覆盖五个边界用例。</span><br></pre></td></tr></table></figure>
+
+<p>这是当天最值得的一步，虽然一行代码都没有产生。</p>
+<h2 id="09-35，让-AI-先找路，不要先写"><a href="#09-35，让-AI-先找路，不要先写" class="headerlink" title="09:35，让 AI 先找路，不要先写"></a>09:35，让 AI 先找路，不要先写</h2><p>我让 AI 在仓库中回答四个问题：</p>
+<ol>
+<li>列表接口与导出接口分别从哪里进入；</li>
+<li>两者最终是否复用同一个查询对象；</li>
+<li>工单和跟进记录通过什么字段关联；</li>
+<li>当前项目的日期范围条件通常怎样写。</li>
+</ol>
+<p>它搜索后给出的调用图是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TicketController#page</span><br><span class="line">  -&gt; TicketQueryService#page</span><br><span class="line">  -&gt; TicketMapper#selectPage</span><br><span class="line"></span><br><span class="line">TicketExportController#export</span><br><span class="line">  -&gt; TicketExportService#export</span><br><span class="line">  -&gt; TicketMapper#selectForExport</span><br><span class="line"></span><br><span class="line">两个 Mapper 方法都接收 TicketQueryCondition</span><br><span class="line">跟进表通过 ticket_id 关联</span><br></pre></td></tr></table></figure>
+
+<p>同时找到另一个“完成时间”筛选，项目约定在 Java 层把日期转换成左闭右开的 <code>LocalDateTime</code> 区间，再传给 Mapper。</p>
+<p>这一步节省了我在目录中来回跳转的时间。更重要的是，它用真实代码否定了我最初的猜测：列表和导出并没有共用 SQL，只共用条件对象，因此验收范围至少涉及两个 Mapper 查询。</p>
+<h2 id="10-05，第一次计划里出现了过度设计"><a href="#10-05，第一次计划里出现了过度设计" class="headerlink" title="10:05，第一次计划里出现了过度设计"></a>10:05，第一次计划里出现了过度设计</h2><p>AI 建议：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">新增 FollowTimeRange 值对象</span><br><span class="line">新增 TicketFollowQueryDomainService</span><br><span class="line">新增 FollowRecordRepository</span><br><span class="line">统一重构列表与导出查询</span><br></pre></td></tr></table></figure>
+
+<p>从结构上看很完整，但对于一个已有项目中的两个筛选条件，改动太大。新增领域层会让本次需求同时承担架构迁移，Review 和回归范围都被放大。</p>
+<p>我把范围压回到四个文件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">TicketQueryCondition.java</span><br><span class="line">TicketQueryService.java</span><br><span class="line">TicketMapper.xml</span><br><span class="line">TicketMapperIntegrationTest.java</span><br></pre></td></tr></table></figure>
+
+<p>其中 XML 内有两个查询片段；导出服务继续复用同一个条件构造方法。原则是先完成可验证的业务变化，不借小需求清理整个项目。</p>
+<h2 id="10-32，日期边界第一次写错"><a href="#10-32，日期边界第一次写错" class="headerlink" title="10:32，日期边界第一次写错"></a>10:32，日期边界第一次写错</h2><p>AI 生成的转换逻辑是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">condition.setFollowEndTime(endDate.atTime(<span class="number">23</span>, <span class="number">59</span>, <span class="number">59</span>));</span><br></pre></td></tr></table></figure>
+
+<p>这在秒精度数据库中看起来可用，但会漏掉带毫秒或微秒的记录。项目中已有的正确约定是左闭右开：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">applyFollowTimeRange</span><span class="params">(TicketQueryCondition condition,</span></span><br><span class="line"><span class="params">                                  LocalDate startDate,</span></span><br><span class="line"><span class="params">                                  LocalDate endDate)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (startDate != <span class="literal">null</span>) &#123;</span><br><span class="line">        condition.setFollowStartTime(startDate.atStartOfDay());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (endDate != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 使用次日零点作为排他上界，避免丢失结束日最后一秒的小数精度记录</span></span><br><span class="line">        condition.setFollowEndExclusive(endDate.plusDays(<span class="number">1</span>).atStartOfDay());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应 SQL：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;followStartTime != null&quot;</span>&gt;</span></span><br><span class="line">  AND latest_follow.created_at &lt;![CDATA[&gt;=]]&gt; #&#123;followStartTime&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;followEndExclusive != null&quot;</span>&gt;</span></span><br><span class="line">  AND latest_follow.created_at &lt;![CDATA[&lt;]]&gt; #&#123;followEndExclusive&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这次错误让我看到一个规律：AI 很容易给出“常见答案”，而项目已有约定才是更可靠的局部答案。让它搜索相邻实现，比在提示词中反复强调“考虑边界”有效。</p>
+<h2 id="11-10，SQL-能运行，但语义不对"><a href="#11-10，SQL-能运行，但语义不对" class="headerlink" title="11:10，SQL 能运行，但语义不对"></a>11:10，SQL 能运行，但语义不对</h2><p>第一版 SQL 使用普通关联：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> ticket_follow_record follow_record</span><br><span class="line">  <span class="keyword">ON</span> follow_record.ticket_id <span class="operator">=</span> ticket.id</span><br></pre></td></tr></table></figure>
+
+<p>再对 <code>follow_record.created_at</code> 加时间条件。问题是这会匹配“任意一条在区间内的跟进”，而需求要求“最后一条跟进在区间内”。</p>
+<p>例如一张工单有两次跟进：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2025-03-01  第一次跟进</span><br><span class="line">2025-04-03  最近一次跟进</span><br></pre></td></tr></table></figure>
+
+<p>筛选三月份时，普通关联会返回它；按需求，最近跟进发生在四月，不应该返回。</p>
+<p>最终 SQL 先聚合每张工单的最新时间：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> ticket_id, <span class="built_in">MAX</span>(created_at) <span class="keyword">AS</span> latest_follow_at</span><br><span class="line">    <span class="keyword">FROM</span> ticket_follow_record</span><br><span class="line">    <span class="keyword">WHERE</span> deleted <span class="operator">=</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> ticket_id</span><br><span class="line">) latest_follow <span class="keyword">ON</span> latest_follow.ticket_id <span class="operator">=</span> ticket.id</span><br></pre></td></tr></table></figure>
+
+<p>筛选条件作用在 <code>latest_follow_at</code> 上。AI 随后提醒我检查执行计划，因为全表聚合可能成为新瓶颈。测试库数据量不大时，正确性会掩盖性能风险。</p>
+<p>查看索引后，跟进表只有单列 <code>ticket_id</code> 索引。我们补充了 <code>(ticket_id, deleted, created_at)</code> 联合索引的数据库变更，并在接近生产分布的测试数据上对比执行计划。这个索引不是由 AI 一句话决定的，而是由查询模式、数据分布和执行计划共同决定。</p>
+<h2 id="13-40，测试暴露了两个遗漏"><a href="#13-40，测试暴露了两个遗漏" class="headerlink" title="13:40，测试暴露了两个遗漏"></a>13:40，测试暴露了两个遗漏</h2><p>我先让 AI 根据任务卡列测试矩阵，再由它补测试数据。最终有六个用例：</p>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>预期</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不传时间</td>
+<td>保持原列表数量</td>
+</tr>
+<tr>
+<td>只传开始日</td>
+<td>包含开始日零点后的记录</td>
+</tr>
+<tr>
+<td>只传结束日</td>
+<td>不包含次日零点记录</td>
+</tr>
+<tr>
+<td>同时传开始和结束</td>
+<td>命中闭日期范围</td>
+</tr>
+<tr>
+<td>一张工单多条跟进</td>
+<td>只按最新一条判断</td>
+</tr>
+<tr>
+<td>无跟进记录</td>
+<td>不命中时间筛选</td>
+</tr>
+</tbody></table>
+<p>第一次执行时，两个测试失败。</p>
+<p>第一个失败来自导出。虽然 <code>TicketQueryCondition</code> 增加了字段，但导出 Controller 使用另一个请求对象，转换时漏传了两个参数。调用链分析做过一次，并不代表实现阶段不会漏掉转换边界。</p>
+<p>第二个失败来自删除数据。最新时间子查询忘记过滤逻辑删除记录，导致一条已撤回的跟进成为“最新记录”。需求卡没有写这个规则，是项目的数据约定补全了它。</p>
+<p>这两个失败都不是坏事。测试在上线前把“看起来完整”变成了具体反例。</p>
+<h2 id="15-20，我自己做了一轮只看差异的-Review"><a href="#15-20，我自己做了一轮只看差异的-Review" class="headerlink" title="15:20，我自己做了一轮只看差异的 Review"></a>15:20，我自己做了一轮只看差异的 Review</h2><p>AI 已经解释过每个改动，但我关闭对话，只阅读版本差异。检查顺序是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">有没有超出需求的文件</span><br><span class="line">请求参数是否向后兼容</span><br><span class="line">日期转换是否只有一处</span><br><span class="line">列表和导出语义是否一致</span><br><span class="line">SQL 是否处理逻辑删除</span><br><span class="line">是否引入全表扫描或重复行</span><br><span class="line">测试是不是在验证结果，而不是复述实现</span><br><span class="line">日志里有没有敏感筛选条件</span><br></pre></td></tr></table></figure>
+
+<p>这一轮删除了一段 AI 主动添加的调试日志。它会打印整个查询条件，其中包含创建人手机号。日志对排查有用，但不能把请求对象直接序列化后全部输出。</p>
+<p>我还把模型生成的 <code>buildCondition</code> 复制代码合并回已有转换方法，避免列表和导出以后再次分叉。</p>
+<h2 id="16-30，提测不是终点"><a href="#16-30，提测不是终点" class="headerlink" title="16:30，提测不是终点"></a>16:30，提测不是终点</h2><p>提测前完成了三类验证：</p>
+<ol>
+<li>Mapper 集成测试证明 SQL 边界；</li>
+<li>Service 单元测试证明日期转换和参数传递；</li>
+<li>测试环境手工比较列表与导出结果。</li>
+</ol>
+<p>发布清单增加了两项：观察慢查询中该 SQL 的扫描行数，以及确认新增索引构建不会阻塞高峰写入。数据库变更选择在低峰执行，并保留取消条件。</p>
+<p>上线后用不传参数、单边界和完整区间各验证一次，再观察接口 P95、数据库 CPU 与慢查询。没有异常，才把任务标记完成。</p>
+<h2 id="当天的投入到底有没有变少"><a href="#当天的投入到底有没有变少" class="headerlink" title="当天的投入到底有没有变少"></a>当天的投入到底有没有变少</h2><p>如果只看编码时间，AI 确实快：定位文件、生成测试骨架和整理 SQL 候选，大约节省了一到两个小时。但总交付时间没有缩短一半，因为需求确认、性能验证、数据安全和上线观察仍然必须由人完成。</p>
+<p>我把当天的工作粗略拆开：</p>
+<table>
+<thead>
+<tr>
+<th>工作</th>
+<th>AI 的作用</th>
+<th>人的责任</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>调用链梳理</td>
+<td>搜索和摘要很快</td>
+<td>判断摘要是否真实</td>
+</tr>
+<tr>
+<td>方案设计</td>
+<td>提供多个候选</td>
+<td>控制改动范围</td>
+</tr>
+<tr>
+<td>代码生成</td>
+<td>完成机械修改</td>
+<td>检查项目约定与边界</td>
+</tr>
+<tr>
+<td>测试</td>
+<td>生成矩阵和骨架</td>
+<td>确认测试能证明需求</td>
+</tr>
+<tr>
+<td>SQL 优化</td>
+<td>提醒风险、辅助读计划</td>
+<td>根据数据与生产约束决策</td>
+</tr>
+<tr>
+<td>上线</td>
+<td>整理清单</td>
+<td>承担发布与回滚责任</td>
+</tr>
+</tbody></table>
+<p>第一次完整使用 AI 交付需求后，我没有得到“以后可以少看代码”的结论。相反，我更清楚哪些工作不能被流畅的输出跳过。</p>
+<p>AI 把从问题到候选方案的距离缩短了，但从候选方案到可信改动，仍然需要需求边界、项目事实、自动测试和人工判断。这四样东西在场时，它是效率很高的搭档；缺任何一项，速度都可能只是更快地走向返工。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Code-Review/" rel="tag"># Code Review</a>
+              <a href="/tags/Spring-Boot/" rel="tag"># Spring Boot</a>
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+              <a href="/tags/%E5%BC%80%E5%8F%91%E6%97%A5%E5%BF%97/" rel="tag"># 开发日志</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/" rel="prev" title="从Prompt Engineering到Context Engineering：一次提示词改造实验">
+                  <i class="fa fa-angle-left"></i> 从Prompt Engineering到Context Engineering：一次提示词改造实验
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/" rel="next" title="Vibe Coding不是完全不看代码">
+                  Vibe Coding不是完全不看代码 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>

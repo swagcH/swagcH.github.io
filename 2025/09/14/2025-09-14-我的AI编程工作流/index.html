@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。 我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：先让模型用证据还原项目，再让它在明确边界内修改。 这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的AI编程工作流：让模型先读懂项目再动手">
+<meta property="og:url" content="https://swagch.github.io/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。 我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：先让模型用证据还原项目，再让它在明确边界内修改。 这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2025/ai-workflow-cover.svg">
+<meta property="article:published_time" content="2025-09-14T02:20:00.000Z">
+<meta property="article:modified_time" content="2026-07-16T06:15:20.444Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="测试">
+<meta property="article:tag" content="Context Engineering">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="工作流">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2025/ai-workflow-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/","path":"2025/09/14/2025-09-14-我的AI编程工作流/","title":"我的AI编程工作流：让模型先读懂项目再动手"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>我的AI编程工作流：让模型先读懂项目再动手 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E5%8F%A3%EF%BC%9A%E5%85%88%E7%BB%99%E4%BB%BB%E5%8A%A1%E5%88%86%E7%BA%A7"><span class="nav-text">入口：先给任务分级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E4%B8%80%EF%BC%9A%E6%8A%8A%E8%AF%B7%E6%B1%82%E6%94%B9%E5%86%99%E6%88%90%E4%BB%BB%E5%8A%A1%E8%AF%B4%E6%98%8E"><span class="nav-text">检查点一：把请求改写成任务说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E4%BA%8C%EF%BC%9A%E5%8F%AA%E8%AF%BB%E6%8E%A2%E7%B4%A2%E4%BB%93%E5%BA%93"><span class="nav-text">检查点二：只读探索仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E4%B8%8A%E4%B8%8B%E6%96%87%E9%A2%84%E7%AE%97"><span class="nav-text">控制上下文预算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E4%B8%89%EF%BC%9A%E4%BF%AE%E6%94%B9%E5%89%8D%E5%85%88%E5%AE%A1%E8%AE%A1%E5%88%92"><span class="nav-text">检查点三：修改前先审计划</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E5%9B%9B%EF%BC%9A%E6%8C%89%E5%B0%8F%E5%BE%AA%E7%8E%AF%E5%AE%9E%E6%96%BD"><span class="nav-text">检查点四：按小循环实施</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E4%BA%94%EF%BC%9A%E5%BB%BA%E7%AB%8B%E9%AA%8C%E8%AF%81%E9%98%B6%E6%A2%AF"><span class="nav-text">检查点五：建立验证阶梯</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E8%A6%81%E8%AE%A9%E6%A8%A1%E5%9E%8B%E4%BB%A3%E6%9B%BF%E6%B5%8B%E8%AF%95%E5%AE%A3%E5%B8%83%E6%88%90%E5%8A%9F"><span class="nav-text">不要让模型代替测试宣布成功</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E5%85%AD%EF%BC%9A%E6%8F%90%E4%BA%A4%E5%89%8D%E8%BF%9B%E8%A1%8C%E7%8B%AC%E7%AB%8B-Review"><span class="nav-text">检查点六：提交前进行独立 Review</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E7%82%B9%E4%B8%83%EF%BC%9A%E6%8A%8A%E6%9C%89%E4%BB%B7%E5%80%BC%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E7%95%99%E5%9C%A8%E4%BB%93%E5%BA%93"><span class="nav-text">检查点七：把有价值的上下文留在仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E5%B8%B8%E8%A7%81%E5%A4%B1%E6%8E%A7%E6%96%B9%E5%BC%8F"><span class="nav-text">三种常见失控方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E7%9B%B4%E8%BF%BD%E5%8A%A0%E6%8F%90%E7%A4%BA%EF%BC%8C%E4%B8%8D%E6%84%BF%E5%9B%9E%E5%88%B0%E4%BA%8B%E5%AE%9E"><span class="nav-text">一直追加提示，不愿回到事实</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E6%AC%A1%E4%BA%A4%E7%BB%99%E6%A8%A1%E5%9E%8B%E6%95%B4%E4%B8%AA%E5%8A%9F%E8%83%BD"><span class="nav-text">一次交给模型整个功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AA%E6%A3%80%E6%9F%A5%E4%BB%A3%E7%A0%81%EF%BC%8C%E4%B8%8D%E6%A3%80%E6%9F%A5%E7%8E%AF%E5%A2%83"><span class="nav-text">只检查代码，不检查环境</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E9%A1%B5%E7%89%88%E6%B5%81%E7%A8%8B"><span class="nav-text">一页版流程</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="我的AI编程工作流：让模型先读懂项目再动手 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          我的AI编程工作流：让模型先读懂项目再动手
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-09-14 10:20:00" itemprop="dateCreated datePublished" datetime="2025-09-14T10:20:00+08:00">2025-09-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%88%E7%8E%87%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">效率工具</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2025/ai-workflow-cover.svg" alt="AI 编程工作流封面图"></p>
+<p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
+<p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
+<p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
+<span id="more"></span>
+
+<h2 id="入口：先给任务分级"><a href="#入口：先给任务分级" class="headerlink" title="入口：先给任务分级"></a>入口：先给任务分级</h2><p>不是每个任务都值得启动完整流程。我先按影响范围分三档：</p>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>例子</th>
+<th>工作方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1 可逆</td>
+<td>改文案、补测试、调整局部样式</td>
+<td>快速修改，执行局部验证</td>
+</tr>
+<tr>
+<td>L2 模块内</td>
+<td>新增接口字段、修改查询、重构 Service</td>
+<td>先读调用链，写计划，小步提交</td>
+</tr>
+<tr>
+<td>L3 高风险</td>
+<td>权限、支付、迁移、生产运维</td>
+<td>人主导设计，双人审查，演练与回滚</td>
+</tr>
+</tbody></table>
+<p>风险不只看代码行数。把按钮颜色改错通常是 L1，删除脚本即使只有一行也可能是 L3。分级决定需要多少上下文、测试和人工确认。</p>
+<p>下面的完整流程主要面向 L2。L1 可以裁剪，L3 还要叠加团队正式变更流程。</p>
+<h2 id="检查点一：把请求改写成任务说明"><a href="#检查点一：把请求改写成任务说明" class="headerlink" title="检查点一：把请求改写成任务说明"></a>检查点一：把请求改写成任务说明</h2><p>原始需求经常是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">列表加一个状态筛选。</span><br></pre></td></tr></table></figure>
+
+<p>我不会直接让 AI 改代码，而是先补一张短任务卡：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">问题：运营无法只查看“等待回访”的客户。</span><br><span class="line">目标：客户列表和导出增加 followStatus 筛选。</span><br><span class="line">输入：可选枚举 PENDING、DONE；不传保持原行为。</span><br><span class="line">范围：后端查询与现有前端筛选，不改数据库。</span><br><span class="line">非目标：不重构客户状态模型，不增加批量处理。</span><br><span class="line">验收：列表与导出结果一致；非法值返回现有参数错误码。</span><br></pre></td></tr></table></figure>
+
+<p>“非目标”非常重要。模型擅长顺手完善周边，如果不写边界，一个筛选需求可能变成状态模型重构。</p>
+<p>任务卡不需要一次写对。信息缺失时，让 AI 根据现有描述列出待确认问题，我再向产品或代码事实求证。需求澄清不能由模型自问自答。</p>
+<h2 id="检查点二：只读探索仓库"><a href="#检查点二：只读探索仓库" class="headerlink" title="检查点二：只读探索仓库"></a>检查点二：只读探索仓库</h2><p>第一轮明确要求不修改文件，只回答项目现状。我通常让模型查这些位置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">构建文件：Java、框架、依赖版本</span><br><span class="line">项目入口：模块边界和启动方式</span><br><span class="line">请求入口：Controller、路由或消息消费者</span><br><span class="line">数据流：Service、Mapper、外部客户端</span><br><span class="line">相邻实现：项目里已经完成的类似功能</span><br><span class="line">测试：当前使用的框架、夹具和断言风格</span><br><span class="line">规范：README、AGENTS.md、架构决策和 CI 配置</span><br></pre></td></tr></table></figure>
+
+<p>探索结果必须带证据，格式可以很简单：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">结论：列表和导出共用 CustomerQueryCondition。</span><br><span class="line">证据：CustomerPageService.java:48、CustomerExportService.java:62。</span><br><span class="line"></span><br><span class="line">结论：项目要求 JDK 8。</span><br><span class="line">证据：pom.xml 的 maven.compiler.source=1.8。</span><br><span class="line"></span><br><span class="line">待确认：非法枚举由全局异常处理还是 Controller 转换。</span><br></pre></td></tr></table></figure>
+
+<p>“证据”和“待确认”能阻止猜测混进结论。若模型找不到某个类，就继续搜索或明确不存在，不根据常见命名补一个出来。</p>
+<h3 id="控制上下文预算"><a href="#控制上下文预算" class="headerlink" title="控制上下文预算"></a>控制上下文预算</h3><p>读仓库不是把所有文件一次塞给模型。我会沿调用链逐层加载：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">入口文件</span><br><span class="line">  -&gt; 它直接调用的接口</span><br><span class="line">  -&gt; 对应实现与数据对象</span><br><span class="line">  -&gt; 一个最接近的参考实现</span><br><span class="line">  -&gt; 相关测试和构建配置</span><br></pre></td></tr></table></figure>
+
+<p>生成目录、压缩后的前端产物、重复日志和无关模块先排除。上下文足够大时，信息选择比信息数量更重要。</p>
+<h2 id="检查点三：修改前先审计划"><a href="#检查点三：修改前先审计划" class="headerlink" title="检查点三：修改前先审计划"></a>检查点三：修改前先审计划</h2><p>项目地图清楚后，让 AI 给出计划，但暂时不写代码。一个可审查的计划至少包含：</p>
+<ol>
+<li>实际要修改的文件；</li>
+<li>每个文件为什么要改；</li>
+<li>数据和调用路径怎样变化；</li>
+<li>空值、异常、并发与兼容边界；</li>
+<li>要新增或运行哪些测试；</li>
+<li>仍然无法确认的风险。</li>
+</ol>
+<p>计划阶段最容易发现范围膨胀。例如任务只需要复用已有查询条件，计划却新建 Repository、Assembler 和通用查询框架，这时删掉比写完后再删便宜得多。</p>
+<p>我还会要求把步骤拆到可独立验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 先增加请求字段和参数校验，运行接口层测试；</span><br><span class="line">2. 再增加 Mapper 条件，运行数据库测试；</span><br><span class="line">3. 接入列表并验证原行为；</span><br><span class="line">4. 接入导出并做结果对照；</span><br><span class="line">5. 最后清理重复与更新文档。</span><br></pre></td></tr></table></figure>
+
+<p>一条计划如果要同时修改二十个文件才可运行，通常还没有找到合适的切分点。</p>
+<h2 id="检查点四：按小循环实施"><a href="#检查点四：按小循环实施" class="headerlink" title="检查点四：按小循环实施"></a>检查点四：按小循环实施</h2><p>实施阶段我使用同一条循环：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">修改一个职责</span><br><span class="line">  -&gt; 格式与静态检查</span><br><span class="line">  -&gt; 运行最小相关测试</span><br><span class="line">  -&gt; 阅读版本差异</span><br><span class="line">  -&gt; 记录结果</span><br><span class="line">  -&gt; 进入下一步</span><br></pre></td></tr></table></figure>
+
+<p>这里“阅读差异”不能省。AI 有时会在目标代码之外格式化整个文件、调整错误文案或升级依赖。测试可能照样通过，但 Review 成本和回归范围已经扩大。</p>
+<p>每轮我会检查：</p>
+<ul>
+<li>是否出现任务外文件；</li>
+<li>是否复制了已有能力；</li>
+<li>是否改变公共接口或默认值；</li>
+<li>是否添加未经批准的依赖；</li>
+<li>是否打印密钥、个人数据或完整请求；</li>
+<li>是否使用项目版本不支持的语法；</li>
+<li>注释是在解释原因，还是重复代码表面含义。</li>
+</ul>
+<p>发现方向错误时，优先回到最后一个小步骤，而不是继续提示模型在错误实现上打补丁。</p>
+<h2 id="检查点五：建立验证阶梯"><a href="#检查点五：建立验证阶梯" class="headerlink" title="检查点五：建立验证阶梯"></a>检查点五：建立验证阶梯</h2><p>“已完成”需要对应证据。我把验证从便宜到昂贵排成阶梯：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">语法与格式</span><br><span class="line">  -&gt; 编译 / 类型检查</span><br><span class="line">  -&gt; 目标单元测试</span><br><span class="line">  -&gt; 模块测试</span><br><span class="line">  -&gt; 集成或端到端测试</span><br><span class="line">  -&gt; 构建生产产物</span><br><span class="line">  -&gt; 测试环境真实操作</span><br><span class="line">  -&gt; 监控与回滚演练</span><br></pre></td></tr></table></figure>
+
+<p>简单改动可以停在较低层，高风险改动必须继续向上。关键是清楚说出停在哪里，而不是把“代码看起来没问题”写成“验证通过”。</p>
+<p>Java 项目中，一组常见命令可能是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先跑目标测试，快速得到反馈</span></span><br><span class="line">mvn -Dtest=CustomerQueryServiceTest <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再运行模块测试并打包，确认依赖与资源完整</span></span><br><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
+
+<p>若仓库提供 Maven Wrapper，应优先使用仓库固定的 <code>./mvnw</code>。命令只是入口，真正的验收还要匹配业务，例如比较筛选前后数据、重复请求、权限用户和空记录。</p>
+<h3 id="不要让模型代替测试宣布成功"><a href="#不要让模型代替测试宣布成功" class="headerlink" title="不要让模型代替测试宣布成功"></a>不要让模型代替测试宣布成功</h3><p>我要求执行结果分三类写：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">已验证：命令真实执行，附关键结果。</span><br><span class="line">未验证：当前环境无法执行，并说明原因。</span><br><span class="line">待观察：只能上线后从监控或真实流量确认。</span><br></pre></td></tr></table></figure>
+
+<p>这三类比一句“应该没问题”诚实，也方便下一位接手的人继续。</p>
+<h2 id="检查点六：提交前进行独立-Review"><a href="#检查点六：提交前进行独立-Review" class="headerlink" title="检查点六：提交前进行独立 Review"></a>检查点六：提交前进行独立 Review</h2><p>实现对话会让人产生路径依赖：模型已经解释了为什么这样改，我也一路看着它完成，很容易默认结论正确。</p>
+<p>提交前，我会暂时不看对话，只从需求卡和最终差异重新审一遍：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">需求中的每条验收是否有对应代码和测试</span><br><span class="line">没有写进需求的行为是否被意外改变</span><br><span class="line">错误路径是否比正常路径更危险</span><br><span class="line">数据库和外部调用是否处在合理事务边界</span><br><span class="line">测试是否会在实现被删掉时失败</span><br><span class="line">回滚是否只需回退代码，还是涉及数据处理</span><br></pre></td></tr></table></figure>
+
+<p>这相当于给自己换一个 Reviewer 视角。复杂任务还应由另一位工程师审查，不能因为代码由 AI 生成就降低门槛。</p>
+<h2 id="检查点七：把有价值的上下文留在仓库"><a href="#检查点七：把有价值的上下文留在仓库" class="headerlink" title="检查点七：把有价值的上下文留在仓库"></a>检查点七：把有价值的上下文留在仓库</h2><p>一次任务中反复告诉模型的内容，如果下次仍然适用，应该沉淀成项目资产：</p>
+<ul>
+<li>构建和测试方式写进 README；</li>
+<li>编码约束写进项目级说明；</li>
+<li>关键架构取舍写成 ADR；</li>
+<li>容易回归的规则写成测试；</li>
+<li>发布步骤和回滚条件写进 Runbook。</li>
+</ul>
+<p>不要把对话记录当唯一文档。对话适合探索，仓库才是团队共同维护的长期上下文。</p>
+<p>我还会在提交说明中保留三个信息：为什么改、行为怎样变、用什么验证。过几个月再看历史，不需要重新翻完整对话。</p>
+<h2 id="三种常见失控方式"><a href="#三种常见失控方式" class="headerlink" title="三种常见失控方式"></a>三种常见失控方式</h2><h3 id="一直追加提示，不愿回到事实"><a href="#一直追加提示，不愿回到事实" class="headerlink" title="一直追加提示，不愿回到事实"></a>一直追加提示，不愿回到事实</h3><p>模型改错方向后，连续说“再修一下”会堆积补丁。先停止修改，重新确认入口和约束，通常更快。</p>
+<h3 id="一次交给模型整个功能"><a href="#一次交给模型整个功能" class="headerlink" title="一次交给模型整个功能"></a>一次交给模型整个功能</h3><p>任务越大，错误越晚暴露，最终差异越难 Review。把垂直功能拆成可运行的小片段，让每一步都有反馈。</p>
+<h3 id="只检查代码，不检查环境"><a href="#只检查代码，不检查环境" class="headerlink" title="只检查代码，不检查环境"></a>只检查代码，不检查环境</h3><p>代码正确不等于配置、数据库、权限和部署正确。尤其是版本、环境变量和外部接口，必须用真实构建与运行证据验证。</p>
+<h2 id="一页版流程"><a href="#一页版流程" class="headerlink" title="一页版流程"></a>一页版流程</h2><p>需要快速回忆时，我只看这七行：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. 说明问题、目标、范围和验收。</span><br><span class="line">2. 只读项目，用文件与日志建立事实。</span><br><span class="line">3. 先审计划，删除不必要的改动。</span><br><span class="line">4. 一次修改一个职责，小步看差异。</span><br><span class="line">5. 从编译到真实场景逐层验证。</span><br><span class="line">6. 脱离对话，按需求独立 Review。</span><br><span class="line">7. 把稳定知识沉淀进文档和测试。</span><br></pre></td></tr></table></figure>
+
+<p>这套流程没有神奇提示词，甚至会让开始写代码的时间晚几分钟。但它减少了最昂贵的部分：在错误上下文上高速前进。</p>
+<p>模型不需要一开始就“完全读懂项目”。它需要在每个决策点看到足够的真实信息，并及时收到构建、测试和人工判断的反馈。把这条循环设计好，AI 才会从偶尔惊艳的演示，变成可以稳定复用的开发工具。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+              <a href="/tags/Context-Engineering/" rel="tag"># Context Engineering</a>
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+              <a href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/" rel="tag"># 工作流</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/" rel="prev" title="AI辅助Java重构实战：拆解一个过长Service">
+                  <i class="fa fa-angle-left"></i> AI辅助Java重构实战：拆解一个过长Service
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/12/28/2025-12-28-2025%E5%B9%B4AI%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E5%A4%8D%E7%9B%98/" rel="next" title="2025 AI编程实践复盘：效率、安全与能力边界">
+                  2025 AI编程实践复盘：效率、安全与能力边界 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>

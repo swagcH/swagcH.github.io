@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0b1018"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#141b27" stroke="#34445c"/>
+  <text x="112" y="126" fill="#fb923c" font-family="Menlo,Consolas,monospace" font-size="22">JAVA 8 / SAFE REFACTOR</text>
+  <text x="112" y="207" fill="#f8fafc" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="48" font-weight="700">AI 辅助 Java 重构实战</text>
+  <text x="112" y="260" fill="#a8b4c4" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">拆解一个过长 Service</text>
+  <g font-family="Menlo,Consolas,monospace">
+    <rect x="112" y="322" width="310" height="218" rx="8" fill="#1d1517" stroke="#fb7185"/>
+    <text x="144" y="367" fill="#fb7185" font-size="20">createOrder()</text>
+    <text x="144" y="410" fill="#d7c9cc" font-size="17">validate + price</text>
+    <text x="144" y="445" fill="#d7c9cc" font-size="17">stock + persist</text>
+    <text x="144" y="480" fill="#d7c9cc" font-size="17">coupon + notify</text>
+    <text x="144" y="518" fill="#8f7e82" font-size="16">186 lines</text>
+    <rect x="570" y="322" width="214" height="86" rx="8" fill="#121c1b" stroke="#2dd4bf"/>
+    <text x="607" y="373" fill="#b9f4e9" font-size="18">validator</text>
+    <rect x="836" y="322" width="268" height="86" rx="8" fill="#171a22" stroke="#60a5fa"/>
+    <text x="878" y="373" fill="#c9defb" font-size="18">pricing service</text>
+    <rect x="570" y="454" width="214" height="86" rx="8" fill="#201b12" stroke="#fbbf24"/>
+    <text x="625" y="505" fill="#f8dea2" font-size="18">transaction</text>
+    <rect x="836" y="454" width="268" height="86" rx="8" fill="#1b171f" stroke="#c084fc"/>
+    <text x="888" y="505" fill="#e7d0fa" font-size="18">retry task</text>
+  </g>
+  <path d="M422 431H526M510 421L526 431L510 441" fill="none" stroke="#fb923c" stroke-width="3"/>
+  <text x="112" y="596" fill="#8493a8" font-family="Menlo,Consolas,monospace" font-size="18">characterize → extract → test → review</text>
+</svg>

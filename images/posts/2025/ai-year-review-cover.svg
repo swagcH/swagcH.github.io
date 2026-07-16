@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#10100c"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#1c1c16" stroke="#494738"/>
+  <text x="112" y="126" fill="#facc15" font-family="Menlo,Consolas,monospace" font-size="22">YEAR IN REVIEW / 2025</text>
+  <text x="112" y="207" fill="#fafaf5" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="48" font-weight="700">AI 编程实践复盘</text>
+  <text x="112" y="260" fill="#b8b7a8" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">效率 · 安全 · 能力边界</text>
+  <g font-family="Menlo,Consolas,monospace">
+    <rect x="112" y="324" width="292" height="180" rx="8" fill="#161a1b" stroke="#2dd4bf"/>
+    <text x="144" y="369" fill="#5eead4" font-size="19">SPEED</text>
+    <path d="M144 462L190 435L238 447L288 390L370 363" fill="none" stroke="#2dd4bf" stroke-width="4"/>
+    <rect x="450" y="324" width="292" height="180" rx="8" fill="#1c1718" stroke="#fb7185"/>
+    <text x="482" y="369" fill="#fda4af" font-size="19">RISK</text>
+    <text x="482" y="421" fill="#d9c8ca" font-size="17">data / auth</text>
+    <text x="482" y="456" fill="#d9c8ca" font-size="17">deps / actions</text>
+    <rect x="788" y="324" width="316" height="180" rx="8" fill="#181821" stroke="#60a5fa"/>
+    <text x="820" y="369" fill="#93c5fd" font-size="19">JUDGMENT</text>
+    <text x="820" y="421" fill="#cbd5e1" font-size="17">scope → evidence</text>
+    <text x="820" y="456" fill="#cbd5e1" font-size="17">tests → ownership</text>
+  </g>
+  <text x="112" y="582" fill="#a19f8e" font-family="Menlo,Consolas,monospace" font-size="19">faster output requires stronger judgment</text>
+</svg>

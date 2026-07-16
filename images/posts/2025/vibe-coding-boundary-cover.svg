@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#121014"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#1c1920" stroke="#443b49"/>
+  <text x="112" y="126" fill="#f472b6" font-family="Menlo,Consolas,monospace" font-size="22">VIBE CODING / BOUNDARIES</text>
+  <text x="112" y="211" fill="#faf5f8" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="49" font-weight="700">不是完全不看代码</text>
+  <g font-family="Menlo,Consolas,monospace">
+    <rect x="112" y="302" width="430" height="210" rx="8" fill="#241822" stroke="#f472b6"/>
+    <text x="146" y="353" fill="#f9a8d4" font-size="21">EXPLORE</text>
+    <text x="146" y="401" fill="#ddd3dc" font-size="18">prototype / local / reversible</text>
+    <text x="146" y="445" fill="#9c8e9b" font-size="17">follow the feedback</text>
+    <rect x="662" y="302" width="442" height="210" rx="8" fill="#171e20" stroke="#2dd4bf"/>
+    <text x="696" y="353" fill="#5eead4" font-size="21">SHIP</text>
+    <text x="696" y="401" fill="#d8e2e1" font-size="18">review / tests / rollback</text>
+    <text x="696" y="445" fill="#91a3a1" font-size="17">own the consequences</text>
+  </g>
+  <path d="M602 290V528" stroke="#f8fafc" stroke-width="2" stroke-dasharray="8 10" opacity="0.55"/>
+  <text x="112" y="582" fill="#9f949f" font-family="Menlo,Consolas,monospace" font-size="19">move fast where failure is cheap</text>
+</svg>

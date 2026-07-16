@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#081018"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#121b25" stroke="#2d4358"/>
+  <text x="112" y="126" fill="#60a5fa" font-family="Menlo,Consolas,monospace" font-size="22">AI WORKFLOW / RUNBOOK</text>
+  <text x="112" y="207" fill="#f3f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="48" font-weight="700">让模型先读懂项目再动手</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="17" text-anchor="middle">
+    <rect x="112" y="315" width="138" height="92" rx="8" fill="#0b141e" stroke="#60a5fa"/>
+    <text x="181" y="367" fill="#d8e8fb">scope</text>
+    <rect x="282" y="315" width="138" height="92" rx="8" fill="#0b141e" stroke="#2dd4bf"/>
+    <text x="351" y="367" fill="#d5f6f0">read</text>
+    <rect x="452" y="315" width="138" height="92" rx="8" fill="#0b141e" stroke="#a3e635"/>
+    <text x="521" y="367" fill="#e8f8c5">plan</text>
+    <rect x="622" y="315" width="138" height="92" rx="8" fill="#0b141e" stroke="#fbbf24"/>
+    <text x="691" y="367" fill="#fae8ae">edit</text>
+    <rect x="792" y="315" width="138" height="92" rx="8" fill="#0b141e" stroke="#fb7185"/>
+    <text x="861" y="367" fill="#fbd5dc">test</text>
+    <rect x="962" y="315" width="142" height="92" rx="8" fill="#0b141e" stroke="#c084fc"/>
+    <text x="1033" y="367" fill="#ead7fa">review</text>
+  </g>
+  <path d="M250 361H282M420 361H452M590 361H622M760 361H792M930 361H962" stroke="#60758a" stroke-width="3"/>
+  <path d="M1028 430C1028 518 194 518 194 430" fill="none" stroke="#60758a" stroke-width="2" stroke-dasharray="8 9"/>
+  <text x="112" y="574" fill="#8da0b3" font-family="Menlo,Consolas,monospace" font-size="19">evidence in, verified changes out</text>
+</svg>

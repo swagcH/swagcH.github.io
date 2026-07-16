@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。 为了确认这个判断，我拿一个相同的小需求做了三轮实验。任务是给 Spring Boot 项目的订单查询接口增加一个 deliveryStatus 字段。三轮使用同一个模型，只改变输入上下文，不手">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Prompt Engineering到Context Engineering：一次提示词改造实验">
+<meta property="og:url" content="https://swagch.github.io/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。 为了确认这个判断，我拿一个相同的小需求做了三轮实验。任务是给 Spring Boot 项目的订单查询接口增加一个 deliveryStatus 字段。三轮使用同一个模型，只改变输入上下文，不手">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2025/context-engineering-cover.svg">
+<meta property="article:published_time" content="2025-02-23T08:20:00.000Z">
+<meta property="article:modified_time" content="2026-07-16T06:07:44.555Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Prompt Engineering">
+<meta property="article:tag" content="Context Engineering">
+<meta property="article:tag" content="AI编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2025/context-engineering-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/","path":"2025/02/23/2025-02-23-从Prompt-Engineering到Context-Engineering/","title":"从Prompt Engineering到Context Engineering：一次提示词改造实验"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>从Prompt Engineering到Context Engineering：一次提示词改造实验 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%A7%84%E5%88%99"><span class="nav-text">实验规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E8%BD%AE%EF%BC%9A%E4%B8%80%E5%8F%A5%E8%AF%9D%E9%9C%80%E6%B1%82"><span class="nav-text">第一轮：一句话需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E8%BD%AE%EF%BC%9A%E6%8A%8A%E6%8F%90%E7%A4%BA%E8%AF%8D%E5%86%99%E5%BE%97%E6%9B%B4%E4%B8%93%E4%B8%9A"><span class="nav-text">第二轮：把提示词写得更专业</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E8%BD%AE%EF%BC%9A%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%A4%9F%E5%B7%A5%E4%BD%9C%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-text">第三轮：设计模型能够工作的上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E7%BB%99%E5%87%BA%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9B%BE"><span class="nav-text">1. 给出项目地图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%8F%90%E4%BE%9B%E5%BF%85%E8%A6%81%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E6%95%B4%E4%B8%AA%E4%BB%93%E5%BA%93"><span class="nav-text">2. 提供必要代码，而不是整个仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%86%99%E6%B8%85%E6%A5%9A%E4%B8%9A%E5%8A%A1%E7%8A%B6%E6%80%81%E8%A1%A8"><span class="nav-text">3. 写清楚业务状态表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E9%99%90%E5%AE%9A%E5%B7%A5%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="nav-text">4. 限定工作方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E8%BD%AE%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-text">第三轮发生了什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E8%BD%AE%E7%BB%93%E6%9E%9C%E6%94%BE%E5%9C%A8%E4%B8%80%E8%B5%B7"><span class="nav-text">三轮结果放在一起</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B9%9F%E4%BC%9A%E5%8F%98%E8%B4%A8"><span class="nav-text">上下文也会变质</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%9C%9F%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-text">过期上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E4%BA%92%E5%86%B2%E7%AA%81%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-text">相互冲突的上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B2%A1%E6%9C%89%E4%BC%98%E5%85%88%E7%BA%A7%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-text">没有优先级的上下文</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%8E%B0%E5%9C%A8%E4%BD%BF%E7%94%A8%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E6%B8%85%E5%8D%95"><span class="nav-text">我现在使用的上下文清单</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="从Prompt Engineering到Context Engineering：一次提示词改造实验 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从Prompt Engineering到Context Engineering：一次提示词改造实验
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-02-23 16:20:00" itemprop="dateCreated datePublished" datetime="2025-02-23T16:20:00+08:00">2025-02-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2025/context-engineering-cover.svg" alt="Context Engineering 实验封面图"></p>
+<p>刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。</p>
+<p>为了确认这个判断，我拿一个相同的小需求做了三轮实验。任务是给 Spring Boot 项目的订单查询接口增加一个 <code>deliveryStatus</code> 字段。三轮使用同一个模型，只改变输入上下文，不手工修正中间结果。</p>
+<span id="more"></span>
+
+<h2 id="实验规则"><a href="#实验规则" class="headerlink" title="实验规则"></a>实验规则</h2><p>项目的真实约束如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JDK 8 + Spring Boot 2.x</span><br><span class="line">Controller 返回统一的 ApiResult&lt;OrderDetailVO&gt;</span><br><span class="line">配送状态来自 delivery_record 表，不在 order_info 表</span><br><span class="line">一笔订单可能有多条配送记录，以 created_at 最新一条为准</span><br><span class="line">无配送记录时返回 NOT_STARTED</span><br><span class="line">不允许改变现有接口路径和字段含义</span><br></pre></td></tr></table></figure>
+
+<p>评价结果时，我没有使用“看起来不错”这种标准，而是列了六项检查：</p>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th align="right">分值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>找到正确的接口和返回对象</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>找到配送状态的真实数据来源</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>正确处理多条记录</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>正确处理空记录</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>遵守 JDK 8 与现有项目风格</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>给出并通过对应测试</td>
+<td align="right">2</td>
+</tr>
+</tbody></table>
+<p>满分 10 分。这个分数不是严谨的模型评测，只用来比较上下文改变后的结果。</p>
+<h2 id="第一轮：一句话需求"><a href="#第一轮：一句话需求" class="headerlink" title="第一轮：一句话需求"></a>第一轮：一句话需求</h2><p>我只输入：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">给订单详情接口增加 deliveryStatus 字段，请直接修改代码。</span><br></pre></td></tr></table></figure>
+
+<p>模型很快给出了一套完整方案：修改 Entity、DTO、Mapper 和数据库脚本，还建议在 <code>order_info</code> 表增加 <code>delivery_status</code> 字段。</p>
+<p>代码组织得很像一个正常 Spring Boot 项目，甚至主动补充了 Swagger 注解。但项目根本没有它假设的 <code>OrderEntity</code>，状态也不应该存到订单表。</p>
+<p>第一轮得分：<strong>2&#x2F;10</strong>。</p>
+<p>得到的两分来自“字段确实加到了一个返回对象里”和“代码大致兼容 JDK 8”。其余内容主要由常见项目模式补全。模型不是故意忽略设计，它只是没有看到真实设计。</p>
+<p>这轮让我意识到一个不太舒服的事实：输出越完整，越容易让人忘记检查前提。若我只浏览文件名，很可能会把这份错误方案当成高效率。</p>
+<h2 id="第二轮：把提示词写得更专业"><a href="#第二轮：把提示词写得更专业" class="headerlink" title="第二轮：把提示词写得更专业"></a>第二轮：把提示词写得更专业</h2><p>第二轮仍然没有提供仓库，只把提示词改成结构化版本：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">角色：你是一名资深 Java 后端工程师。</span><br><span class="line"></span><br><span class="line">任务：为订单详情接口增加 deliveryStatus 字段。</span><br><span class="line"></span><br><span class="line">要求：</span><br><span class="line">1. 遵循分层架构和 SOLID 原则；</span><br><span class="line">2. 兼容 JDK 8；</span><br><span class="line">3. 考虑空值、异常和性能；</span><br><span class="line">4. 添加完整单元测试；</span><br><span class="line">5. 修改前先分析，修改后总结影响。</span><br></pre></td></tr></table></figure>
+
+<p>第二轮的回答更谨慎。模型列出了待确认问题，提出可能从物流表获取状态，并给出 Service 聚合的伪代码。它没有直接要求改表，也提醒要检查 N+1 查询。</p>
+<p>但只要进入具体代码，问题仍然存在：</p>
+<ul>
+<li>猜测项目使用 <code>ResponseEntity</code>；</li>
+<li>创建了不存在的 <code>DeliveryStatusEnum</code>；</li>
+<li>默认调用 <code>findTopByOrderIdOrderByCreatedAtDesc</code>；</li>
+<li>测试使用 Mockito 5，而项目锁定的是 Mockito 2；</li>
+<li>没有办法证明修改位置正确。</li>
+</ul>
+<p>第二轮得分：<strong>4&#x2F;10</strong>。</p>
+<p>更清晰的提示词改善了任务纪律，却没有补上项目事实。它让模型更像一个会先问问题的工程师，但不能让工程师凭空看到仓库。</p>
+<h2 id="第三轮：设计模型能够工作的上下文"><a href="#第三轮：设计模型能够工作的上下文" class="headerlink" title="第三轮：设计模型能够工作的上下文"></a>第三轮：设计模型能够工作的上下文</h2><p>第三轮没有继续润色角色，而是先准备上下文包。</p>
+<h3 id="1-给出项目地图"><a href="#1-给出项目地图" class="headerlink" title="1. 给出项目地图"></a>1. 给出项目地图</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">请求入口：OrderController#getDetail</span><br><span class="line">业务编排：OrderQueryService#getDetail</span><br><span class="line">返回对象：OrderDetailVO</span><br><span class="line">订单查询：OrderMapper#selectDetail</span><br><span class="line">配送记录：DeliveryRecordMapper#selectLatestByOrderId</span><br><span class="line">同类实现：AfterSaleQueryService#getDetail</span><br><span class="line">测试入口：OrderQueryServiceTest</span><br></pre></td></tr></table></figure>
+
+<p>这张地图不是凭感觉写的。我先在仓库里搜索接口路径、类型引用和 Mapper 方法，确保每个名字真实存在。</p>
+<h3 id="2-提供必要代码，而不是整个仓库"><a href="#2-提供必要代码，而不是整个仓库" class="headerlink" title="2. 提供必要代码，而不是整个仓库"></a>2. 提供必要代码，而不是整个仓库</h3><p>我让模型读取上述六个文件，同时补充 <code>pom.xml</code> 中的 Java 与测试依赖版本。没有把无关 Controller、生成目录、历史日志全部塞进去。</p>
+<h3 id="3-写清楚业务状态表"><a href="#3-写清楚业务状态表" class="headerlink" title="3. 写清楚业务状态表"></a>3. 写清楚业务状态表</h3><table>
+<thead>
+<tr>
+<th>最新配送记录</th>
+<th><code>deliveryStatus</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>不存在</td>
+<td><code>NOT_STARTED</code></td>
+</tr>
+<tr>
+<td><code>CREATED</code></td>
+<td><code>PREPARING</code></td>
+</tr>
+<tr>
+<td><code>PICKED_UP</code></td>
+<td><code>DELIVERING</code></td>
+</tr>
+<tr>
+<td><code>SIGNED</code></td>
+<td><code>COMPLETED</code></td>
+</tr>
+<tr>
+<td>未知值</td>
+<td><code>UNKNOWN</code>，并记录告警日志</td>
+</tr>
+</tbody></table>
+<p>自然语言中的“按最新记录判断”很容易漏掉空值和未知值。状态表能让模型与人使用同一份边界定义。</p>
+<h3 id="4-限定工作方式"><a href="#4-限定工作方式" class="headerlink" title="4. 限定工作方式"></a>4. 限定工作方式</h3><p>最终输入变成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">先阅读我列出的文件，说明当前调用链和最小修改范围。</span><br><span class="line">不要创建仓库中不存在的通用框架，也不要修改表结构。</span><br><span class="line">计划确认后再修改，每次只处理一个职责。</span><br><span class="line"></span><br><span class="line">验收条件：</span><br><span class="line">- 原有订单详情字段保持不变；</span><br><span class="line">- 四类配送记录映射符合状态表；</span><br><span class="line">- 无记录与未知状态有测试；</span><br><span class="line">- 执行项目现有测试命令；</span><br><span class="line">- 最后列出实际修改文件和仍未验证的风险。</span><br></pre></td></tr></table></figure>
+
+<p>这里真正起作用的不是措辞更长，而是输入中包含可定位的文件、确定的业务规则和可执行的完成条件。</p>
+<h2 id="第三轮发生了什么"><a href="#第三轮发生了什么" class="headerlink" title="第三轮发生了什么"></a>第三轮发生了什么</h2><p>模型先还原了实际调用链：Controller 只转发参数，<code>OrderQueryService</code> 负责组装 <code>OrderDetailVO</code>，同类的售后服务已经采用 Mapper 查询最新记录再映射状态的方式。</p>
+<p>它提出只修改三个文件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OrderDetailVO.java</span><br><span class="line">OrderQueryService.java</span><br><span class="line">OrderQueryServiceTest.java</span><br></pre></td></tr></table></figure>
+
+<p>由于 <code>DeliveryRecordMapper#selectLatestByOrderId</code> 已存在，不需要新建 Mapper 或改 SQL。映射逻辑也没有额外创造枚举，而是复用了项目中的 <code>DeliveryNodeEnum</code>。</p>
+<p>测试第一次执行时，有一个未知状态用例失败。原因不是业务代码，而是测试夹具默认给 <code>createdAt</code> 留空，Mapper 模拟数据排序时触发空指针。模型根据真实失败信息修复了测试数据，再次执行通过。</p>
+<p>第三轮得分：<strong>9&#x2F;10</strong>。</p>
+<p>扣掉的一分来自它最初建议把映射方法放进 VO。我认为状态解释属于查询服务，不应让纯返回对象依赖配送领域枚举，因此人工审查后调整了位置。</p>
+<h2 id="三轮结果放在一起"><a href="#三轮结果放在一起" class="headerlink" title="三轮结果放在一起"></a>三轮结果放在一起</h2><table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>输入重点</th>
+<th align="right">得分</th>
+<th>主要问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>一句话需求</td>
+<td>目标</td>
+<td align="right">2</td>
+<td>大量猜测项目结构</td>
+</tr>
+<tr>
+<td>结构化 Prompt</td>
+<td>角色、原则、步骤</td>
+<td align="right">4</td>
+<td>行为更谨慎，事实仍缺失</td>
+</tr>
+<tr>
+<td>Context Engineering</td>
+<td>文件、规则、约束、验证</td>
+<td align="right">9</td>
+<td>基本可用，仍需架构判断</td>
+</tr>
+</tbody></table>
+<p>这次实验并不能证明提示词不重要。清楚的任务表达仍然能减少歧义，但在代码仓库里，它只是上下文的一部分。</p>
+<p>我对两者的区分是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Prompt Engineering</span><br><span class="line">关注“这一句话怎样表达得更有效”。</span><br><span class="line"></span><br><span class="line">Context Engineering</span><br><span class="line">关注“为了完成任务，模型在每一步应该看到什么事实、工具和反馈”。</span><br></pre></td></tr></table></figure>
+
+<p>后者更像设计一条信息流水线。它不仅包含用户的第一段输入，还包括仓库检索、文件选择、构建日志、测试结果、团队规范和前一步产生的决策。</p>
+<h2 id="上下文也会变质"><a href="#上下文也会变质" class="headerlink" title="上下文也会变质"></a>上下文也会变质</h2><p>上下文不是越多越好。我在后续任务中遇到过三个反例。</p>
+<h3 id="过期上下文"><a href="#过期上下文" class="headerlink" title="过期上下文"></a>过期上下文</h3><p>需求文档写的是旧接口，代码已经迁移到新服务。模型严格遵循文档，反而改错位置。重要事实要标明来源与时间，冲突时以当前可执行代码和明确决策为准。</p>
+<h3 id="相互冲突的上下文"><a href="#相互冲突的上下文" class="headerlink" title="相互冲突的上下文"></a>相互冲突的上下文</h3><p>全局规范要求所有异常转换成统一错误码，模块内却保留了旧的直接抛出方式。若不说明本次遵循哪一层，模型可能随机选择。冲突不能靠增加更多文本解决，需要人做决策。</p>
+<h3 id="没有优先级的上下文"><a href="#没有优先级的上下文" class="headerlink" title="没有优先级的上下文"></a>没有优先级的上下文</h3><p>我曾一次提供十几个“参考实现”。模型混用了其中三种风格。后来只给一个最接近的主参考，其余资料明确标注“仅用于理解字段，不复制结构”，结果稳定很多。</p>
+<p>所以，上下文设计还需要三条规则：</p>
+<ol>
+<li>保证来源真实且尽量新；</li>
+<li>冲突信息写明优先级；</li>
+<li>每份材料说明它在任务中的用途。</li>
+</ol>
+<h2 id="我现在使用的上下文清单"><a href="#我现在使用的上下文清单" class="headerlink" title="我现在使用的上下文清单"></a>我现在使用的上下文清单</h2><p>开始一个代码任务前，我通常检查下面这些信息是否齐全：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 用户问题与业务目标</span><br><span class="line">[ ] 当前可复现的现象</span><br><span class="line">[ ] 入口、调用链和关键数据结构</span><br><span class="line">[ ] 语言、框架和依赖版本</span><br><span class="line">[ ] 可以复用的相邻实现</span><br><span class="line">[ ] 明确不能改变的行为</span><br><span class="line">[ ] 异常、空值、并发和权限边界</span><br><span class="line">[ ] 要执行的测试与构建命令</span><br><span class="line">[ ] 修改范围和回滚方式</span><br></pre></td></tr></table></figure>
+
+<p>简单任务不必把每一项写成长文，但缺失项要心里有数。尤其是“怎样算完成”，如果人自己都没有答案，模型只能生成一个听起来合理的终点。</p>
+<p>从 Prompt Engineering 走向 Context Engineering，对我最大的改变不是提示词变长了，而是开始把 AI 编程当成工程协作：先准备事实，控制信息流，再用真实反馈纠偏。模型负责快速探索和执行，人负责选择上下文、处理冲突并对结果签字。</p>
+<p>这也许没有“一句话生成整个系统”那么有戏剧性，却更接近可以重复使用的生产力。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/Prompt-Engineering/" rel="tag"># Prompt Engineering</a>
+              <a href="/tags/Context-Engineering/" rel="tag"># Context Engineering</a>
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/" rel="prev" title="大模型入门：从Token、上下文到幻觉">
+                  <i class="fa fa-angle-left"></i> 大模型入门：从Token、上下文到幻觉
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/" rel="next" title="第一次用AI完成一个真实需求：从需求澄清到上线">
+                  第一次用AI完成一个真实需求：从需求澄清到上线 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>

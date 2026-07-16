@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="第一次使用大模型时，我把它当成了一个更聪明的搜索框：输入问题，等待正确答案。用了一段时间后才发现，这个理解会制造很多误判。模型不是从知识库里查出一段标准答案，而是在已有上下文后面，持续预测更可能出现的下一个 Token。 这句话看起来抽象，却能解释日常使用中的大部分现象：为什么同一个问题会得到不同答案，为什么一段无关日志会让结果变差，为什么模型能写出语法正确但根本不存在的 API，也能解释为什么">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大模型入门：从Token、上下文到幻觉">
+<meta property="og:url" content="https://swagch.github.io/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="第一次使用大模型时，我把它当成了一个更聪明的搜索框：输入问题，等待正确答案。用了一段时间后才发现，这个理解会制造很多误判。模型不是从知识库里查出一段标准答案，而是在已有上下文后面，持续预测更可能出现的下一个 Token。 这句话看起来抽象，却能解释日常使用中的大部分现象：为什么同一个问题会得到不同答案，为什么一段无关日志会让结果变差，为什么模型能写出语法正确但根本不存在的 API，也能解释为什么">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2025/llm-basics-cover.svg">
+<meta property="article:published_time" content="2025-01-12T12:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-16T06:07:44.554Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="大模型">
+<meta property="article:tag" content="Token">
+<meta property="article:tag" content="上下文">
+<meta property="article:tag" content="幻觉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2025/llm-basics-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/","path":"2025/01/12/2025-01-12-大模型入门-从Token上下文到幻觉/","title":"大模型入门：从Token、上下文到幻觉"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>大模型入门：从Token、上下文到幻觉 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E7%94%BB%E4%B8%80%E5%BC%A0%E6%9C%80%E5%B0%8F%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B"><span class="nav-text">先画一张最小心智模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Token-%E4%B8%8D%E6%98%AF%E6%B1%89%E5%AD%97%EF%BC%8C%E4%B9%9F%E4%B8%8D%E7%AD%89%E4%BA%8E%E5%8D%95%E8%AF%8D"><span class="nav-text">Token 不是汉字，也不等于单词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AA%97%E5%8F%A3%E6%9B%B4%E5%83%8F%E5%B7%A5%E4%BD%9C%E5%8F%B0%EF%BC%8C%E4%B8%8D%E5%83%8F%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86"><span class="nav-text">上下文窗口更像工作台，不像长期记忆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B%E7%9A%84%E6%9C%AC%E8%B4%A8%E4%BB%8D%E7%84%B6%E6%98%AF%E7%94%9F%E6%88%90"><span class="nav-text">推理过程的本质仍然是生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BB%E8%A7%89%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9C%8B%E8%B5%B7%E6%9D%A5%E9%82%A3%E4%B9%88%E5%83%8F%E7%9C%9F%E7%9A%84"><span class="nav-text">幻觉为什么看起来那么像真的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E4%BA%94%E5%88%86%E9%92%9F%E7%9A%84%E5%B0%8F%E5%AE%9E%E9%AA%8C"><span class="nav-text">一个五分钟的小实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E9%97%A8%E9%98%B6%E6%AE%B5%EF%BC%8C%E6%88%91%E8%AE%A4%E4%B8%BA%E6%9C%80%E5%80%BC%E5%BE%97%E4%BF%9D%E7%95%99%E7%9A%84%E5%9B%9B%E4%B8%AA%E4%B9%A0%E6%83%AF"><span class="nav-text">入门阶段，我认为最值得保留的四个习惯</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="大模型入门：从Token、上下文到幻觉 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          大模型入门：从Token、上下文到幻觉
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-01-12 20:30:00" itemprop="dateCreated datePublished" datetime="2025-01-12T20:30:00+08:00">2025-01-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2025/llm-basics-cover.svg" alt="大模型入门封面图"></p>
+<p>第一次使用大模型时，我把它当成了一个更聪明的搜索框：输入问题，等待正确答案。用了一段时间后才发现，这个理解会制造很多误判。模型不是从知识库里查出一段标准答案，而是在已有上下文后面，持续预测更可能出现的下一个 Token。</p>
+<p>这句话看起来抽象，却能解释日常使用中的大部分现象：为什么同一个问题会得到不同答案，为什么一段无关日志会让结果变差，为什么模型能写出语法正确但根本不存在的 API，也能解释为什么“把需求说清楚”比反复要求它聪明一点更有效。</p>
+<span id="more"></span>
+
+<h2 id="先画一张最小心智模型"><a href="#先画一张最小心智模型" class="headerlink" title="先画一张最小心智模型"></a>先画一张最小心智模型</h2><p>不讨论复杂公式，一个请求可以先理解成下面这条流水线：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入文本</span><br><span class="line">  ↓ 分词</span><br><span class="line">Token 序列</span><br><span class="line">  ↓ 结合已有上下文计算概率</span><br><span class="line">下一个 Token</span><br><span class="line">  ↓ 把新 Token 放回上下文继续计算</span><br><span class="line">一段完整回复</span><br></pre></td></tr></table></figure>
+
+<p>这里有四个关键词：Token、上下文、概率生成和训练数据。它们不是模型的全部，但足够支撑入门阶段的判断。</p>
+<p>如果把模型当数据库，就会问“它明明知道，为什么还答错”；把它当概率生成系统，问题会变成“我提供的上下文是否足以约束下一步输出”。后一个问题更接近可操作的工程问题。</p>
+<h2 id="Token-不是汉字，也不等于单词"><a href="#Token-不是汉字，也不等于单词" class="headerlink" title="Token 不是汉字，也不等于单词"></a>Token 不是汉字，也不等于单词</h2><p>模型读取的基本单位不是“一个汉字”或“一个英文单词”，而是 Token。不同模型使用不同的分词方式，一段文本可能按完整词、词的一部分、标点或空格切分。</p>
+<p>例如下面只是便于理解的示意，不代表某个具体模型的真实分词结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Spring Boot 启动失败</span><br><span class="line"></span><br><span class="line">可能被拆成：</span><br><span class="line">[Spring] [ Boot] [ 启动] [失败]</span><br><span class="line"></span><br><span class="line">orderService.getById(1001)</span><br><span class="line"></span><br><span class="line">可能被拆成：</span><br><span class="line">[order] [Service] [.] [get] [By] [Id] [(] [1001] [)]</span><br></pre></td></tr></table></figure>
+
+<p>Token 直接影响三件事：</p>
+<ol>
+<li><strong>上下文容量</strong>：模型能同时处理多少输入和输出，通常以 Token 计量。</li>
+<li><strong>调用成本</strong>：API 常按输入与输出 Token 数收费。</li>
+<li><strong>响应时间</strong>：输入越长、输出越长，处理和生成通常越慢。</li>
+</ol>
+<p>所以“我只发了一个文件”并不代表输入很小。一个两千行的压缩 Java 类、完整依赖锁文件、重复堆栈和打包后的 HTML，都可能消耗大量上下文，却没有提供等比例的信息。</p>
+<p>我后来会在提交问题前先做一次人工降噪：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">删除重复异常堆栈</span><br><span class="line">只保留相关配置段</span><br><span class="line">给代码附上文件路径</span><br><span class="line">说明入口方法和预期行为</span><br><span class="line">用摘要代替整份构建日志</span><br></pre></td></tr></table></figure>
+
+<p>这不是为了替模型省字，而是提高有效信息密度。</p>
+<h2 id="上下文窗口更像工作台，不像长期记忆"><a href="#上下文窗口更像工作台，不像长期记忆" class="headerlink" title="上下文窗口更像工作台，不像长期记忆"></a>上下文窗口更像工作台，不像长期记忆</h2><p>上下文窗口可以理解成模型当前这次任务能够看到的工作台。系统指令、历史对话、用户输入、工具读取到的代码和模型已经生成的内容，都要占用这张工作台。</p>
+<p>工作台很大，不代表可以随意堆东西。一个常见误区是：既然模型支持很长上下文，就把整个项目一次性贴进去。结果往往是关键约束被埋在中间，模型抓住了相似但无关的实现。</p>
+<p>我更愿意把上下文分成四层：</p>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>应提供的内容</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>任务</td>
+<td>这次到底要改变什么</td>
+<td>“订单详情增加预计送达时间”</td>
+</tr>
+<tr>
+<td>约束</td>
+<td>哪些行为不能变</td>
+<td>“JDK 8；不修改数据库；旧客户端兼容”</td>
+</tr>
+<tr>
+<td>证据</td>
+<td>当前系统真实是什么样</td>
+<td>Controller、DTO、测试、报错日志</td>
+</tr>
+<tr>
+<td>验收</td>
+<td>怎样证明已经完成</td>
+<td>指定测试、接口样例、构建命令</td>
+</tr>
+</tbody></table>
+<p>这四层都比“你是一个资深 Java 专家，请认真完成”更有约束力。角色设定可以影响表达方式，却不能代替项目事实。</p>
+<p>上下文也不等于长期记忆。新对话里，模型通常不会天然知道上一次讨论的决策。对于长期项目，真正可靠的记忆仍然应该落在仓库中，例如：</p>
+<ul>
+<li><code>README.md</code> 说明运行方式；</li>
+<li><code>AGENTS.md</code> 记录编码约束；</li>
+<li>ADR 记录架构决策；</li>
+<li>测试固定行为边界；</li>
+<li>Issue 或设计文档解释需求背景。</li>
+</ul>
+<p>能被版本管理的知识，比“希望模型下次还记得”可靠得多。</p>
+<h2 id="推理过程的本质仍然是生成"><a href="#推理过程的本质仍然是生成" class="headerlink" title="推理过程的本质仍然是生成"></a>推理过程的本质仍然是生成</h2><p>模型回复并不是一次性吐出整段文字，而是一个 Token 接一个 Token 地生成。每一步都会根据当前上下文给候选 Token 分配概率，再按配置选择结果。</p>
+<p>可以用一个不严谨但直观的例子理解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：Java 中 HashMap 在并发写入时可能出现 ____</span><br><span class="line"></span><br><span class="line">候选：</span><br><span class="line">数据覆盖       0.42</span><br><span class="line">结构异常       0.24</span><br><span class="line">可见性问题     0.19</span><br><span class="line">性能提升       0.01</span><br><span class="line">其他候选       0.14</span><br></pre></td></tr></table></figure>
+
+<p>采样参数越偏确定，模型越倾向选择高概率候选；采样越开放，表达可能更有变化，也更容易偏离。写创意文案和修复支付代码显然不该使用同一种容错态度。</p>
+<p>所谓“推理模型”能在回答前进行更充分的中间计算，复杂任务上的表现通常更好。但它仍然不会自动获得项目权限、真实数据库状态或团队没有写下来的业务规则。推理能力提升，不能弥补输入事实缺失。</p>
+<h2 id="幻觉为什么看起来那么像真的"><a href="#幻觉为什么看起来那么像真的" class="headerlink" title="幻觉为什么看起来那么像真的"></a>幻觉为什么看起来那么像真的</h2><p>幻觉并不一定表现为胡言乱语。更危险的情况是：答案语法正确、解释流畅、命名符合生态习惯，但其中一个类、配置项或版本能力并不存在。</p>
+<p>这与模型的目标有关。它擅长生成“像答案的内容”，不天然负责证明每句话来自可靠来源。</p>
+<p>我遇到过几类典型幻觉：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">引用一个不存在的 Spring Boot 配置项</span><br><span class="line">把新版本 API 用在 JDK 8 项目中</span><br><span class="line">为内部 SDK 猜测一个风格很合理的方法名</span><br><span class="line">根据 Controller 名称臆测数据库字段</span><br><span class="line">声称测试已经通过，但实际上没有执行测试</span><br></pre></td></tr></table></figure>
+
+<p>应对幻觉不能只靠一句“不要编造”。更有效的是让任务具备证据闭环：</p>
+<ol>
+<li><strong>要求引用来源</strong>：结论对应哪个文件、哪段日志或哪份官方文档。</li>
+<li><strong>允许表达不确定</strong>：证据不足时明确写“无法从当前上下文确认”。</li>
+<li><strong>让工具验证</strong>：搜索仓库、编译代码、执行测试，而不是凭记忆猜 API。</li>
+<li><strong>缩小修改范围</strong>：先处理可验证的小步骤，避免一次生成几十个文件。</li>
+<li><strong>人工阅读差异</strong>：模型写得越顺，越要检查被默认掉的前提。</li>
+</ol>
+<p>对代码任务，我现在会把“事实”和“建议”分开看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事实：项目 pom.xml 的 Java 版本是 1.8</span><br><span class="line">事实：现有分页统一使用 PageInfo</span><br><span class="line">建议：复用 PageInfo，而不是引入新的分页对象</span><br><span class="line">待确认：空列表时 total 字段是否必须为 0</span><br></pre></td></tr></table></figure>
+
+<p>只要这几种信息混在一起，猜测就容易披上事实的外衣。</p>
+<h2 id="一个五分钟的小实验"><a href="#一个五分钟的小实验" class="headerlink" title="一个五分钟的小实验"></a>一个五分钟的小实验</h2><p>理解概念最简单的方式不是继续背术语，而是做一次对照。</p>
+<p>先只问：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">帮我优化这段代码。</span><br></pre></td></tr></table></figure>
+
+<p>然后补齐上下文：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">这是 JDK 8 的 Spring Boot 项目。</span><br><span class="line">目标：降低批量查询中的数据库访问次数。</span><br><span class="line">约束：接口响应结构不能变化，不新增依赖。</span><br><span class="line">现状：循环中调用 orderMapper.selectById，共 500 次。</span><br><span class="line">请先指出性能证据和修改范围，再给方案；没有看到的类不要猜。</span><br><span class="line">验收：原有单元测试通过，并新增“500 个重复订单只查询一次”的测试。</span><br></pre></td></tr></table></figure>
+
+<p>比较两次结果时，不只看第二次是不是更长，而是看：</p>
+<ul>
+<li>是否识别到真正的 N+1 查询；</li>
+<li>是否遵守 JDK 8 和不新增依赖；</li>
+<li>是否区分重复 ID 与不存在的数据；</li>
+<li>是否提供可以证明改进的测试；</li>
+<li>是否仍然编造了仓库里没有的方法。</li>
+</ul>
+<p>这个实验会直观说明，输出质量并不只取决于模型大小，也取决于输入是否包含任务边界和验证方式。</p>
+<h2 id="入门阶段，我认为最值得保留的四个习惯"><a href="#入门阶段，我认为最值得保留的四个习惯" class="headerlink" title="入门阶段，我认为最值得保留的四个习惯"></a>入门阶段，我认为最值得保留的四个习惯</h2><p><strong>第一，把模型当协作者，不当权威。</strong> 它可以快速提出候选方案，却不替开发者承担上线结果。</p>
+<p><strong>第二，先给事实，再提要求。</strong> 文件、日志、版本、约束和验收条件，比堆叠形容词更有效。</p>
+<p><strong>第三，生成之后必须验证。</strong> 能执行测试就执行测试，能查官方文档就查文档，不能验证就明确风险。</p>
+<p><strong>第四，敏感信息默认不进入模型。</strong> Token、密码、客户数据、生产日志和内部地址要先脱敏，并遵守团队的数据使用规则。</p>
+<p>学会几个提示词技巧并不难，真正需要时间的是建立正确预期：大模型擅长在上下文中生成高概率答案，而工程交付要求我们把这个答案变成可追溯、可测试、可回退的改动。</p>
+<p>理解这个差距，才算真正开始使用 AI 编程。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="tag"># 大模型</a>
+              <a href="/tags/Token/" rel="tag"># Token</a>
+              <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87/" rel="tag"># 上下文</a>
+              <a href="/tags/%E5%B9%BB%E8%A7%89/" rel="tag"># 幻觉</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/05/22/%E6%97%A0%E5%A4%96%E7%BD%91%E5%AE%89%E8%A3%85nginx/" rel="prev" title="无外网安装nginx">
+                  <i class="fa fa-angle-left"></i> 无外网安装nginx
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/" rel="next" title="从Prompt Engineering到Context Engineering：一次提示词改造实验">
+                  从Prompt Engineering到Context Engineering：一次提示词改造实验 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>

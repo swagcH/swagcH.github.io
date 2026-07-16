@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Vibe Coding 最吸引人的画面，是只描述想法，AI 持续修改代码，人看着页面变化说“再来一点”，直到产品能用。这个过程真实存在，而且非常适合探索。但当它被简化成“以后不需要看代码”，问题就从一种高效交互方式变成了责任错位。 我的理解是：Vibe Coding 可以降低表达想法的门槛，不能取消软件运行后的后果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vibe Coding不是完全不看代码">
+<meta property="og:url" content="https://swagch.github.io/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="Vibe Coding 最吸引人的画面，是只描述想法，AI 持续修改代码，人看着页面变化说“再来一点”，直到产品能用。这个过程真实存在，而且非常适合探索。但当它被简化成“以后不需要看代码”，问题就从一种高效交互方式变成了责任错位。 我的理解是：Vibe Coding 可以降低表达想法的门槛，不能取消软件运行后的后果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2025/vibe-coding-boundary-cover.svg">
+<meta property="article:published_time" content="2025-05-18T11:40:00.000Z">
+<meta property="article:modified_time" content="2026-07-16T06:10:11.194Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="工程实践">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="Vibe Coding">
+<meta property="article:tag" content="代码审查">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2025/vibe-coding-boundary-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/","path":"2025/05/18/2025-05-18-Vibe-Coding不是完全不看代码/","title":"Vibe Coding不是完全不看代码"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Vibe Coding不是完全不看代码 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E7%A7%8D%E5%9C%BA%E6%99%AF%EF%BC%8C%E4%B8%8D%E5%BA%94%E8%AF%A5%E4%BD%BF%E7%94%A8%E5%90%8C%E4%B8%80%E5%A5%97%E7%BA%AA%E5%BE%8B"><span class="nav-text">两种场景，不应该使用同一套纪律</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E7%9C%8B%E6%AF%8F%E4%B8%80%E8%A1%8C%EF%BC%8C%E4%B8%8D%E7%AD%89%E4%BA%8E%E4%B8%8D%E7%90%86%E8%A7%A3%E7%B3%BB%E7%BB%9F"><span class="nav-text">不看每一行，不等于不理解系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%BB%99-Vibe-Coding-%E8%AE%BE%E7%9A%84%E4%BA%94%E6%9D%A1%E7%BA%A2%E7%BA%BF"><span class="nav-text">我给 Vibe Coding 设的五条红线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%AF%86%E9%92%A5%E4%B8%8D%E8%BF%9B%E5%85%A5%E5%AF%B9%E8%AF%9D"><span class="nav-text">1. 密钥不进入对话</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E7%A0%B4%E5%9D%8F%E6%93%8D%E4%BD%9C%E5%BF%85%E9%A1%BB%E4%BA%BA%E5%B7%A5%E7%A1%AE%E8%AE%A4"><span class="nav-text">2. 数据破坏操作必须人工确认</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%9D%83%E9%99%90%E4%BB%A3%E7%A0%81%E5%BF%85%E9%A1%BB%E8%AF%BB%E6%87%82"><span class="nav-text">3. 权限代码必须读懂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%96%B0%E4%BE%9D%E8%B5%96%E8%A6%81%E8%AF%B4%E6%98%8E%E4%BB%A3%E4%BB%B7"><span class="nav-text">4. 新依赖要说明代价</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%8D%E6%8E%A5%E5%8F%97%E2%80%9C%E5%BA%94%E8%AF%A5%E5%8F%AF%E4%BB%A5%E2%80%9D%E4%BD%9C%E4%B8%BA%E9%AA%8C%E6%94%B6"><span class="nav-text">5. 不接受“应该可以”作为验收</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E6%AD%A3%E7%9A%84%E6%96%B0%E8%83%BD%E5%8A%9B%E6%98%AF%E9%A9%BE%E9%A9%AD%E5%8F%8D%E9%A6%88%E5%BE%AA%E7%8E%AF"><span class="nav-text">真正的新能力是驾驭反馈循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%AD%A6%E8%80%85%E5%8F%AF%E4%BB%A5%E4%BB%8E%E5%B0%8F%E8%80%8C%E5%8F%AF%E9%80%86%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%BC%80%E5%A7%8B"><span class="nav-text">初学者可以从小而可逆的任务开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E8%BF%98%E6%98%AF%E9%82%A3%E5%8F%A5%E8%80%81%E8%AF%9D%EF%BC%9A%E8%B0%81%E6%8F%90%E4%BA%A4%EF%BC%8C%E8%B0%81%E8%B4%9F%E8%B4%A3"><span class="nav-text">最后还是那句老话：谁提交，谁负责</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Vibe Coding不是完全不看代码 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vibe Coding不是完全不看代码
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-05-18 19:40:00" itemprop="dateCreated datePublished" datetime="2025-05-18T19:40:00+08:00">2025-05-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%A8%8B%E5%BA%8F%E5%91%98%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">程序员随笔</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2025/vibe-coding-boundary-cover.svg" alt="Vibe Coding 边界封面图"></p>
+<p>Vibe Coding 最吸引人的画面，是只描述想法，AI 持续修改代码，人看着页面变化说“再来一点”，直到产品能用。这个过程真实存在，而且非常适合探索。但当它被简化成“以后不需要看代码”，问题就从一种高效交互方式变成了责任错位。</p>
+<p>我的理解是：<strong>Vibe Coding 可以降低表达想法的门槛，不能取消软件运行后的后果。</strong></p>
+<span id="more"></span>
+
+<h2 id="两种场景，不应该使用同一套纪律"><a href="#两种场景，不应该使用同一套纪律" class="headerlink" title="两种场景，不应该使用同一套纪律"></a>两种场景，不应该使用同一套纪律</h2><p>周末做一个只在本机运行的小工具，最重要的是快速看到结果。数据丢了可以重来，页面崩了重新生成，没有用户依赖它。此时跟着感觉迭代很合理：先有可玩的东西，再理解实现。</p>
+<p>但下面这些场景完全不同：</p>
+<ul>
+<li>修改支付、权限或数据删除逻辑；</li>
+<li>接触生产密钥和客户数据；</li>
+<li>在多人维护的仓库里引入新依赖；</li>
+<li>改变数据库结构或公共接口；</li>
+<li>让生成的服务长期对外运行。</li>
+</ul>
+<p>它们共同拥有一个特点：失败成本会落到别人身上。只要影响从“我自己的时间”扩展到数据、资金、隐私和团队维护成本，开发方式就必须升级。</p>
+<p>所以我会把 AI 编程分为两个模式：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>目标</th>
+<th>可以接受</th>
+<th>不能省略</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>探索模式</td>
+<td>验证想法是否值得继续</td>
+<td>临时代码、快速改写、少量手测</td>
+<td>隔离环境、无真实数据、明确可丢弃</td>
+</tr>
+<tr>
+<td>交付模式</td>
+<td>让功能稳定进入真实系统</td>
+<td>AI 生成大部分实现</td>
+<td>Review、测试、安全检查、发布与回滚</td>
+</tr>
+</tbody></table>
+<p>前者可以更有“氛围”，后者必须留下证据。</p>
+<h2 id="不看每一行，不等于不理解系统"><a href="#不看每一行，不等于不理解系统" class="headerlink" title="不看每一行，不等于不理解系统"></a>不看每一行，不等于不理解系统</h2><p>传统开发也很少要求工程师阅读依赖库的每一行源码。我们依赖抽象、接口、测试和社区维护来控制复杂度。AI 生成代码后，人同样不一定要逐字符检查，但至少要能回答：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">改了哪些模块</span><br><span class="line">数据从哪里来，到哪里去</span><br><span class="line">失败后系统处于什么状态</span><br><span class="line">权限在哪一层校验</span><br><span class="line">哪些测试证明了关键行为</span><br><span class="line">出现问题怎样停止和回退</span><br></pre></td></tr></table></figure>
+
+<p>如果这些问题都答不出来，所谓“不看代码”其实是“不知道自己交付了什么”。</p>
+<p>尤其需要警惕一种假象：页面正常打开，主流程点得通，就认为功能完成。真实故障通常藏在重复提交、并发请求、空数据、超时重试、时区、权限绕过和升级兼容里。演示成功只能证明一条路径，不等于系统可靠。</p>
+<h2 id="我给-Vibe-Coding-设的五条红线"><a href="#我给-Vibe-Coding-设的五条红线" class="headerlink" title="我给 Vibe Coding 设的五条红线"></a>我给 Vibe Coding 设的五条红线</h2><h3 id="1-密钥不进入对话"><a href="#1-密钥不进入对话" class="headerlink" title="1. 密钥不进入对话"></a>1. 密钥不进入对话</h3><p>配置文件、日志和截图里的 Token、密码、Cookie、客户信息先脱敏。模型能不能保密不是唯一问题，团队的数据合规要求才是边界。</p>
+<h3 id="2-数据破坏操作必须人工确认"><a href="#2-数据破坏操作必须人工确认" class="headerlink" title="2. 数据破坏操作必须人工确认"></a>2. 数据破坏操作必须人工确认</h3><p>删除、覆盖、迁移、批量更新和生产环境操作，不允许因为模型“很确定”就自动执行。先备份、估算影响、准备回滚，再由有权限的人确认。</p>
+<h3 id="3-权限代码必须读懂"><a href="#3-权限代码必须读懂" class="headerlink" title="3. 权限代码必须读懂"></a>3. 权限代码必须读懂</h3><p>登录、鉴权、租户隔离和资源归属校验不能只看测试绿灯。测试本身也可能只覆盖正常用户。至少要检查越权路径和默认拒绝策略。</p>
+<h3 id="4-新依赖要说明代价"><a href="#4-新依赖要说明代价" class="headerlink" title="4. 新依赖要说明代价"></a>4. 新依赖要说明代价</h3><p>AI 很喜欢用一个新包解决十行代码的问题。依赖会带来许可证、漏洞、体积、升级和维护成本。能复用现有能力时，不为了生成方便扩大供应链。</p>
+<h3 id="5-不接受“应该可以”作为验收"><a href="#5-不接受“应该可以”作为验收" class="headerlink" title="5. 不接受“应该可以”作为验收"></a>5. 不接受“应该可以”作为验收</h3><p>编译过、测试过、接口真实请求过，分别是不同证据。没有执行就写“未验证”，不能把推测包装成完成状态。</p>
+<h2 id="真正的新能力是驾驭反馈循环"><a href="#真正的新能力是驾驭反馈循环" class="headerlink" title="真正的新能力是驾驭反馈循环"></a>真正的新能力是驾驭反馈循环</h2><p>Vibe Coding 并不是完全放弃工程，而是把编程界面从“逐行输入代码”扩展成“描述目标、观察结果、继续校正”。其中最重要的能力，也从记住 API 变成了设计反馈循环：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">想法</span><br><span class="line">  -&gt; 最小实现</span><br><span class="line">  -&gt; 可观察结果</span><br><span class="line">  -&gt; 发现偏差</span><br><span class="line">  -&gt; 缩小问题</span><br><span class="line">  -&gt; 再次修改</span><br></pre></td></tr></table></figure>
+
+<p>一个反馈循环是否可靠，取决于“可观察结果”是什么。若反馈只有视觉效果，模型会优先把页面调得像；若反馈包含类型检查、单元测试、性能数据、安全扫描和真实用户行为，生成方向才会逐渐靠近工程目标。</p>
+<p>这也是为什么优秀的 AI 编程并不轻松。人不再敲每段样板代码，却要更快识别错误假设、更清楚地表达约束，并构造能让错误尽早暴露的测试。</p>
+<h2 id="初学者可以从小而可逆的任务开始"><a href="#初学者可以从小而可逆的任务开始" class="headerlink" title="初学者可以从小而可逆的任务开始"></a>初学者可以从小而可逆的任务开始</h2><p>我不赞成因为有风险就拒绝 Vibe Coding。相反，它非常适合做这些事：</p>
+<ul>
+<li>生成一次性数据转换脚本，并对比转换前后数量；</li>
+<li>为已有函数补边界测试；</li>
+<li>制作内部原型或个人效率工具；</li>
+<li>解释陌生模块并画出调用关系；</li>
+<li>把重复代码整理成候选重构方案；</li>
+<li>根据明确规范调整样式和文案。</li>
+</ul>
+<p>共同点是范围清楚、结果可验证、失败可恢复。先在这样的任务上练习，能逐渐建立对模型能力和失误模式的真实认识。</p>
+<h2 id="最后还是那句老话：谁提交，谁负责"><a href="#最后还是那句老话：谁提交，谁负责" class="headerlink" title="最后还是那句老话：谁提交，谁负责"></a>最后还是那句老话：谁提交，谁负责</h2><p>AI 不会参加故障复盘，也不会在凌晨判断是否回滚。生成速度可以属于模型，合并代码的决定仍然属于提交者。</p>
+<p>我愿意拥抱 Vibe Coding，因为它让很多想法能更快变成可运行的东西；我也不愿把它解释成“代码已经不重要”，因为软件最终仍然由代码、配置、数据和运行环境组成。</p>
+<p>最舒服的状态不是完全不看，而是把注意力从机械输入转向真正重要的地方：问题是否值得解决，边界是否清楚，证据是否足够，系统失败时能否安全回来。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" rel="tag"># 工程实践</a>
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+              <a href="/tags/Vibe-Coding/" rel="tag"># Vibe Coding</a>
+              <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5/" rel="tag"># 代码审查</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/" rel="prev" title="第一次用AI完成一个真实需求：从需求澄清到上线">
+                  <i class="fa fa-angle-left"></i> 第一次用AI完成一个真实需求：从需求澄清到上线
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/" rel="next" title="AI辅助Java重构实战：拆解一个过长Service">
+                  AI辅助Java重构实战：拆解一个过长Service <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260714l"></script>
+
+</body>
+</html>
