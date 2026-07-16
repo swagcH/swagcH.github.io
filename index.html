@@ -1859,24 +1859,94 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>回看 2022 年，从单体应用到微服务架构，我最大的变化不是学会了更多组件，而是开始理解架构演进的代价。单体并不落后，微服务也不天然先进。架构选择必须服务于团队规模、业务复杂度、交付频率和稳定性要求。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>这一年遇到的典型问题包括：服务拆分后调用链变长，排查问题更困难；配置项分散，环境差异变大；消息队列、缓存、注册中心都引入了新的故障点；原来一个事务能保证的逻辑，现在要考虑最终一致性。微服务解决了一部分单体问题，同时也引入了新的复杂度。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">单体优势：</span><br><span class="line">- 部署简单</span><br><span class="line">- 本地调试方便</span><br><span class="line">- 事务边界清晰</span><br><span class="line">- 小团队效率高</span><br><span class="line"></span><br><span class="line">微服务优势：</span><br><span class="line">- 服务边界清晰</span><br><span class="line">- 可独立部署</span><br><span class="line">- 故障隔离更好</span><br><span class="line">- 团队协作更灵活</span><br></pre></td></tr></table></figure>
+          <blockquote>
+<p>2022 年最后一篇不再写组件配置，想回头看一看这一年的技术路线。年初我关心的是“一个系统怎么拆成多个服务”，到年末更关心“团队能不能长期维护拆完以后的复杂度”。这个变化比多会几个框架更重要。</p>
+</blockquote>
+<h2 id="年初的理解：服务越独立越先进"><a href="#年初的理解：服务越独立越先进" class="headerlink" title="年初的理解：服务越独立越先进"></a>年初的理解：服务越独立越先进</h2><p>最开始看到单体应用的问题很直接：工程越来越大，发布越来越慢，模块之间相互影响。微服务看起来给出了一个明确答案：把用户、订单、库存、支付拆开，每个服务独立数据库、独立部署、独立扩容。</p>
+<p>这个方向没有错，但太容易忽略前提。服务从一个进程拆成四个进程以后，原来隐藏的成本全部显性化：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">本地调用变成网络调用</span><br><span class="line">本地事务变成跨服务状态协调</span><br><span class="line">一个配置文件变成多环境配置管理</span><br><span class="line">一份日志变成跨实例检索</span><br><span class="line">一次发布变成多服务版本兼容</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">架构演进路径：</span><br><span class="line">单体应用</span><br><span class="line">  -&gt; 模块化单体</span><br><span class="line">  -&gt; 拆分边界服务</span><br><span class="line">  -&gt; 引入注册发现</span><br><span class="line">  -&gt; 引入网关和配置中心</span><br><span class="line">  -&gt; 补齐日志、监控、链路追踪</span><br></pre></td></tr></table></figure>
+<p>系统不是被拆小了，而是把代码复杂度的一部分换成了分布式系统和组织协作复杂度。</p>
+<h2 id="这一年的实际路线"><a href="#这一年的实际路线" class="headerlink" title="这一年的实际路线"></a>这一年的实际路线</h2><p>回看文章顺序，基本就是我对微服务认识逐渐完整的过程：</p>
+<h3 id="一月：先讨论边界"><a href="#一月：先讨论边界" class="headerlink" title="一月：先讨论边界"></a>一月：先讨论边界</h3><p>第一步不是引入注册中心，而是判断用户、订单、库存和支付的数据归属。边界不清楚时，服务拆得越快，后面跨服务修改越多。</p>
+<p>这一阶段最大的收获是“服务按业务能力拆，不按 Controller 或数据库表数量拆”。如果订单服务仍然直接更新库存表，两个仓库并没有形成两个边界。</p>
+<h3 id="二月至三月：补服务治理"><a href="#二月至三月：补服务治理" class="headerlink" title="二月至三月：补服务治理"></a>二月至三月：补服务治理</h3><p>服务数量增加以后，固定 IP 调用很快失效，于是接触 Nacos、Gateway 和 OpenFeign。它们分别解决服务位置、统一入口和声明式调用，但也引入 namespace、路由、超时和版本兼容问题。</p>
+<p>这让我意识到组件只有放在故障链路里才有意义。注册中心不是为了控制台里出现服务名，而是让调用方能在实例变化后继续找到可用地址；网关不是为了统一加一个前缀，而是为了入口治理和流量控制。</p>
+<h3 id="六月至七月：开始面对异步和高可用"><a href="#六月至七月：开始面对异步和高可用" class="headerlink" title="六月至七月：开始面对异步和高可用"></a>六月至七月：开始面对异步和高可用</h3><p>RabbitMQ 把非核心动作从订单主流程拆出去，响应更快了，但消息丢失、重复消费和最终一致性成为新的责任。Redis 主从和 Sentinel 提升了可用性，却仍然存在异步复制窗口、客户端重连和数据库回源风险。</p>
+<p>从这一阶段开始，我不再把“中间件集群已部署”当成完成，而会继续追问：</p>
+<ul>
+<li>数据有没有可能丢。</li>
+<li>故障以后多久恢复。</li>
+<li>重试会不会制造重复结果。</li>
+<li>整个组件不可用时业务怎么降级。</li>
+</ul>
+<h3 id="八月：让环境可以重复"><a href="#八月：让环境可以重复" class="headerlink" title="八月：让环境可以重复"></a>八月：让环境可以重复</h3><p>Docker 和 Compose 解决了本地、测试环境反复安装依赖的问题。镜像把运行环境固化，Compose 把服务关系写成配置。</p>
+<p>但容器化不是把 Jar 放进镜像就结束。数据卷、容器网络、健康检查、日志轮转、资源边界和密钥管理都需要重新设计。环境一致性提高了，部署规范的重要性反而更高了。</p>
+<h3 id="十月至十一月：补上可观测性"><a href="#十月至十一月：补上可观测性" class="headerlink" title="十月至十一月：补上可观测性"></a>十月至十一月：补上可观测性</h3><p>服务拆开以后，排查问题最明显的痛点出现了：不知道请求经过了哪些实例，也不知道系统是在偶发报错还是整体变慢。</p>
+<p>ELK 让分散日志可以通过 traceId 关联，Prometheus 让请求速率、错误率、延迟和资源饱和度形成趋势。直到这一步，我才真正感受到“可观测性应该先于大规模拆分”。没有日志和指标，微服务的故障隔离只是架构图上的描述。</p>
+<h2 id="单体和微服务不是二选一"><a href="#单体和微服务不是二选一" class="headerlink" title="单体和微服务不是二选一"></a>单体和微服务不是二选一</h2><p>现在再比较两者，我不会简单列优缺点，而会看系统正处于什么阶段。</p>
+<table>
+<thead>
+<tr>
+<th>判断维度</th>
+<th>更适合模块化单体</th>
+<th>可以考虑微服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>团队</td>
+<td>单一小团队</td>
+<td>多团队需要独立交付</td>
+</tr>
+<tr>
+<td>业务边界</td>
+<td>仍在频繁变化</td>
+<td>能形成稳定业务能力</td>
+</tr>
+<tr>
+<td>发布</td>
+<td>整体发布仍可接受</td>
+<td>不同模块发布相互阻塞</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>各模块负载接近</td>
+<td>部分能力需要独立扩容</td>
+</tr>
+<tr>
+<td>故障</td>
+<td>影响范围可控</td>
+<td>需要明确隔离关键链路</td>
+</tr>
+<tr>
+<td>工程能力</td>
+<td>自动化和监控较弱</td>
+<td>CI&#x2F;CD、监控、治理已具备</td>
+</tr>
+</tbody></table>
+<p>模块化单体不是失败的微服务。模块边界、数据所有权和依赖方向做得好，未来要拆时成本更低；如果业务一直不需要拆，它本身也可以是长期架构。</p>
+<h2 id="这一年踩过的几个认知坑"><a href="#这一年踩过的几个认知坑" class="headerlink" title="这一年踩过的几个认知坑"></a>这一年踩过的几个认知坑</h2><h3 id="1-把“服务数量”当作架构成熟度"><a href="#1-把“服务数量”当作架构成熟度" class="headerlink" title="1. 把“服务数量”当作架构成熟度"></a>1. 把“服务数量”当作架构成熟度</h3><p>服务很多不代表边界合理。拆得过细会增加接口数量、部署单元和跨服务事务。成熟度更应该看发布成功率、恢复时间、故障影响范围和团队交付效率。</p>
+<h3 id="2-先引入组件，再寻找问题"><a href="#2-先引入组件，再寻找问题" class="headerlink" title="2. 先引入组件，再寻找问题"></a>2. 先引入组件，再寻找问题</h3><p>注册中心、消息队列、缓存和监控都有适用场景。为了技术栈完整而引入，会让团队维护一组没有明确收益的基础设施。</p>
+<p>更合理的顺序是：先描述当前痛点和目标，再选择最小能力解决它，并定义如何验证收益。</p>
+<h3 id="3-认为重试可以提升稳定性"><a href="#3-认为重试可以提升稳定性" class="headerlink" title="3. 认为重试可以提升稳定性"></a>3. 认为重试可以提升稳定性</h3><p>没有超时预算、退避和幂等的重试，会把一次失败放大成多次流量。下游已经过载时，上游同时重试只会让恢复更慢。</p>
+<p>重试是一种有成本的恢复手段，不是异常处理的默认模板。</p>
+<h3 id="4-只设计正常流程"><a href="#4-只设计正常流程" class="headerlink" title="4. 只设计正常流程"></a>4. 只设计正常流程</h3><p>架构图通常只画成功箭头，但线上问题都发生在箭头中间：网络超时、部分成功、实例重启、消息重复、配置未刷新。</p>
+<p>现在设计接口时，我会同时写失败状态、幂等键、补偿方式和可观测字段。能解释失败后的状态，比成功时少几毫秒更重要。</p>
+<h3 id="5-低估团队协作成本"><a href="#5-低估团队协作成本" class="headerlink" title="5. 低估团队协作成本"></a>5. 低估团队协作成本</h3><p>服务边界也是团队边界。接口变更、错误码、数据库迁移和发布顺序都需要约定。没有明确负责人时，独立服务很容易变成“所有人都能改，但没人真正维护”。</p>
+<h2 id="我现在理解的演进顺序"><a href="#我现在理解的演进顺序" class="headerlink" title="我现在理解的演进顺序"></a>我现在理解的演进顺序</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">整理单体模块边界</span><br><span class="line">  -&gt; 明确数据所有权和依赖方向</span><br><span class="line">  -&gt; 建立自动化测试、部署和回滚</span><br><span class="line">  -&gt; 补齐日志、指标和接口契约</span><br><span class="line">  -&gt; 拆出边界稳定且收益明确的服务</span><br><span class="line">  -&gt; 对真实故障做限流、降级、幂等和补偿</span><br><span class="line">  -&gt; 根据运行数据继续调整边界</span><br></pre></td></tr></table></figure>
 
-<p>如果基础设施没有跟上，微服务会把复杂度直接暴露给业务开发。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">落地建议：</span><br><span class="line">1. 先做模块化治理，再拆服务</span><br><span class="line">2. 优先拆边界清晰、风险较低的模块</span><br><span class="line">3. 服务之间禁止共享数据库</span><br><span class="line">4. 所有接口必须有文档和错误码</span><br><span class="line">5. 日志必须带 traceId</span><br><span class="line">6. 核心链路必须有监控和告警</span><br><span class="line">7. 异步消息必须设计幂等和补偿</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">基础设施清单：</span><br><span class="line">- 注册中心</span><br><span class="line">- 配置中心</span><br><span class="line">- API 网关</span><br><span class="line">- 统一日志</span><br><span class="line">- 指标监控</span><br><span class="line">- 链路追踪</span><br><span class="line">- 自动化部署</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>从单体到微服务，本质上是从代码架构走向工程体系。服务拆分只是表象，真正重要的是边界治理、稳定性建设、自动化部署和可观测性。我的经验是：不要为了微服务而微服务，当单体还能支撑业务时，先做好模块化和工程规范；当协作、发布和稳定性成为瓶颈时，再逐步演进。</p>
+<p>这不是所有项目必须照走的路线，但顺序背后有一个原则：先获得控制复杂度的能力，再增加分布式复杂度。</p>
+<h2 id="还有哪些没有解决"><a href="#还有哪些没有解决" class="headerlink" title="还有哪些没有解决"></a>还有哪些没有解决</h2><p>到 2022 年底，系统能运行不等于治理已经成熟。下一阶段仍然要补：</p>
+<ol>
+<li>接口版本和兼容性管理，避免服务独立发布后相互破坏。</li>
+<li>数据一致性对账，不能只依赖消息“应该会到”。</li>
+<li>容量评估和压测，让限流阈值有数据依据。</li>
+<li>告警分级和 Runbook，让监控真正进入故障处理。</li>
+<li>交付指标，验证微服务是否真的缩短了发布时间。</li>
+<li>定期故障演练，验证文档中的恢复方案是否可执行。</li>
+</ol>
+<h2 id="年末结论"><a href="#年末结论" class="headerlink" title="年末结论"></a>年末结论</h2><p>这一年最大的变化，不是系统从单体变成了微服务，而是看待架构的角度从“用了什么技术”转向“解决了什么约束”。技术组件可以快速学习，边界、数据和失败语义需要在实践中反复调整。</p>
+<p>微服务不是一个终点。它只是当业务、团队和交付方式发展到一定阶段后，用来重新分配复杂度的手段。真正值得追求的仍然是可理解、可交付、可观察、可恢复的系统。只要这四件事在变好，架构就在向正确方向演进。</p>
 
       
     </div>

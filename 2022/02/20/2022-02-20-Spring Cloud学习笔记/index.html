@@ -18,19 +18,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景为什么会研究这个问题 在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Boot 应用，Spring Cloud 更像是一组微服务治理工具箱，覆盖注册发现、配置管理、网关路由、服务调用、熔断限流等能力。研究它的原因也很明确：当服务数量超过两三个之后，手写服务地址、手动维护配置、靠人肉检查调用链会变得非常不可靠。 问题遇到了什么情况 刚开始学习时">
+    <meta name="description" content="这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。  1. 先建立一张治理地图我把常见能力分成七层： 1234567流量入口：Gateway服务位置：Nacos Discovery &#x2F; Eureka &#x2F; Consul远程调用：OpenFeign + LoadBalancer配置">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Cloud学习笔记">
 <meta property="og:url" content="https://swagch.github.io/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景为什么会研究这个问题 在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Boot 应用，Spring Cloud 更像是一组微服务治理工具箱，覆盖注册发现、配置管理、网关路由、服务调用、熔断限流等能力。研究它的原因也很明确：当服务数量超过两三个之后，手写服务地址、手动维护配置、靠人肉检查调用链会变得非常不可靠。 问题遇到了什么情况 刚开始学习时">
+<meta property="og:description" content="这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。  1. 先建立一张治理地图我把常见能力分成七层： 1234567流量入口：Gateway服务位置：Nacos Discovery &#x2F; Eureka &#x2F; Consul远程调用：OpenFeign + LoadBalancer配置">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-02-20T13:07:33.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T03:00:02.021Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="配置管理">
-<meta property="article:tag" content="Spring Cloud">
 <meta property="article:tag" content="微服务">
+<meta property="article:tag" content="Spring Cloud">
 <meta property="article:tag" content="注册中心">
 <meta name="twitter:card" content="summary">
 
@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%88%E5%BB%BA%E7%AB%8B%E4%B8%80%E5%BC%A0%E6%B2%BB%E7%90%86%E5%9C%B0%E5%9B%BE"><span class="nav-text">1. 先建立一张治理地图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%89%88%E6%9C%AC%E5%85%BC%E5%AE%B9%E6%AF%94%E9%85%8D%E7%BD%AE%E6%9B%B4%E5%85%88%E6%A3%80%E6%9F%A5"><span class="nav-text">2. 版本兼容比配置更先检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E8%A7%A3%E5%86%B3%E2%80%9C%E6%9C%8D%E5%8A%A1%E5%9C%A8%E5%93%AA%E9%87%8C%E2%80%9D"><span class="nav-text">3. 注册中心解决“服务在哪里”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E8%A7%A3%E5%86%B3%E2%80%9C%E9%85%8D%E7%BD%AE%E6%80%8E%E4%B9%88%E7%AE%A1%E7%90%86%E2%80%9D"><span class="nav-text">4. 配置中心解决“配置怎么管理”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-OpenFeign-%E8%A7%A3%E5%86%B3%E2%80%9C%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E8%B0%83%E7%94%A8%E2%80%9D"><span class="nav-text">5. OpenFeign 解决“服务怎么调用”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Gateway-%E8%A7%A3%E5%86%B3%E2%80%9C%E5%85%A5%E5%8F%A3%E6%80%8E%E4%B9%88%E6%94%B6%E5%8F%A3%E2%80%9D"><span class="nav-text">6. Gateway 解决“入口怎么收口”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%BB%84%E4%BB%B6%E4%B8%8D%E6%98%AF%E9%94%99%E8%AF%AF%E5%90%9E%E6%8E%89%E5%99%A8"><span class="nav-text">7. 稳定性组件不是错误吞掉器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%88%91%E7%9A%84%E5%AD%A6%E4%B9%A0%E9%A1%BA%E5%BA%8F"><span class="nav-text">8. 我的学习顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B8%80%E5%A5%97%E5%9B%BA%E5%AE%9A%E6%8E%92%E6%9F%A5%E9%A1%BA%E5%BA%8F"><span class="nav-text">9. 一套固定排查顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E8%BF%99%E4%BB%BD%E7%AC%94%E8%AE%B0%E6%9C%80%E5%90%8E%E7%95%99%E4%B8%8B%E4%BB%80%E4%B9%88"><span class="nav-text">10. 这份笔记最后留下什么</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -276,24 +276,97 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>为什么会研究这个问题</p>
-<p>在理解了微服务的基本拆分思路之后，我开始系统学习 Spring Cloud。相比单个 Spring Boot 应用，Spring Cloud 更像是一组微服务治理工具箱，覆盖注册发现、配置管理、网关路由、服务调用、熔断限流等能力。研究它的原因也很明确：当服务数量超过两三个之后，手写服务地址、手动维护配置、靠人肉检查调用链会变得非常不可靠。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>遇到了什么情况</p>
-<p>刚开始学习时，最大的问题是概念很多但边界不清。注册中心、配置中心、网关、Feign、负载均衡这些组件看起来都能跑 Demo，但真正放到项目里，会发现不知道每个组件负责什么。比如服务调用失败到底是注册中心没发现服务，还是网关路由错了，还是 Feign 超时时间太短。组件之间的关系如果没有先画清楚，排查问题时会非常被动。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>排查过程</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Spring Cloud 常见组件关系：</span><br><span class="line"></span><br><span class="line">client</span><br><span class="line">  ↓</span><br><span class="line">Gateway</span><br><span class="line">  ↓</span><br><span class="line">service-a  --Feign--&gt; service-b</span><br><span class="line">  ↓              ↓</span><br><span class="line">Nacos Registry / Config</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。</p>
+</blockquote>
+<h2 id="1-先建立一张治理地图"><a href="#1-先建立一张治理地图" class="headerlink" title="1. 先建立一张治理地图"></a>1. 先建立一张治理地图</h2><p>我把常见能力分成七层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">流量入口：Gateway</span><br><span class="line">服务位置：Nacos Discovery / Eureka / Consul</span><br><span class="line">远程调用：OpenFeign + LoadBalancer</span><br><span class="line">配置管理：Nacos Config / Config Server</span><br><span class="line">稳定性：CircuitBreaker / Sentinel</span><br><span class="line">可观测性：Micrometer / Prometheus / Trace</span><br><span class="line">交付运行：Docker / CI/CD / Kubernetes</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
+<p>一次请求大概会经过：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Browser</span><br><span class="line">  -&gt; Gateway</span><br><span class="line">  -&gt; order-service</span><br><span class="line">       -&gt; OpenFeign</span><br><span class="line">       -&gt; stock-service</span><br><span class="line"></span><br><span class="line">order-service 和 stock-service</span><br><span class="line">  -&gt; 注册到服务注册中心</span><br><span class="line">  -&gt; 从配置中心读取各自配置</span><br><span class="line">  -&gt; 输出日志、指标和链路信息</span><br></pre></td></tr></table></figure>
 
-<p>排查时我会先确认服务是否注册，再确认配置是否加载，最后确认调用链是否正常。顺序不能乱，否则容易被表面异常误导。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>具体操作</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">学习顺序：</span><br><span class="line">1. Spring Boot 单服务启动</span><br><span class="line">2. 接入 Nacos 注册中心</span><br><span class="line">3. 通过 OpenFeign 完成服务调用</span><br><span class="line">4. 增加 Gateway 统一入口</span><br><span class="line">5. 再考虑配置中心、熔断限流、链路追踪</span><br></pre></td></tr></table></figure>
+<p>这张图最重要的作用不是画架构，而是排查故障。请求没有到订单服务，先看网关；订单服务找不到库存服务，先看注册发现；服务能找到但调用超时，再看网络、线程池和 Feign 超时。</p>
+<h2 id="2-版本兼容比配置更先检查"><a href="#2-版本兼容比配置更先检查" class="headerlink" title="2. 版本兼容比配置更先检查"></a>2. 版本兼容比配置更先检查</h2><p>Spring Cloud 初学时最容易忽略版本。网上复制一段配置，依赖可能来自完全不同的年代：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Spring Boot 2.x：仍可使用 JDK 8，匹配 Spring Cloud 2020/2021 等版本线</span><br><span class="line">Spring Boot 3.x：要求 Java 17，包名迁移到 jakarta.*</span><br><span class="line">Spring Cloud Netflix 旧版本：常见 Ribbon、Hystrix、Zuul</span><br><span class="line">较新版本：更多使用 Spring Cloud LoadBalancer、CircuitBreaker、Gateway</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/stock/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本项目默认 JDK 8，因此示例以 Spring Boot 2.x 和 Spring Cloud 2021.x 的思路为主。具体小版本必须通过官方兼容矩阵确认，尤其是同时使用 Spring Cloud Alibaba 时，不能只让 Maven“没有报错”就认为版本兼容。</p>
+<p>使用 BOM 统一依赖版本：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">spring-cloud.version</span>&gt;</span>2021.0.8<span class="tag">&lt;/<span class="name">spring-cloud.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p>我把每个组件都拆成最小可运行样例，再逐步组合。这样做虽然慢一点，但能清楚知道问题出现在哪一层。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经验沉淀</p>
-<p>Spring Cloud 的学习重点不是背组件名，而是理解服务治理的分层。注册中心解决服务在哪里，配置中心解决配置怎么统一，网关解决入口怎么收口，Feign 解决服务之间怎么调用。只有把这些问题放回真实架构场景里，组件才有意义。</p>
+<p>Spring Cloud Alibaba 也应该使用对应 BOM，并根据兼容表选择版本。不要在各个子项目单独写组件版本，否则服务之间很快会出现难以解释的差异。</p>
+<h2 id="3-注册中心解决“服务在哪里”"><a href="#3-注册中心解决“服务在哪里”" class="headerlink" title="3. 注册中心解决“服务在哪里”"></a>3. 注册中心解决“服务在哪里”</h2><p>单体应用可以把下游地址写在配置里：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stock-service:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://10.0.0.15:8082</span></span><br></pre></td></tr></table></figure>
+
+<p>实例扩容、迁移或重启以后，固定地址会变得难以维护。注册发现把实例列表交给注册中心：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure>
+
+<p>服务名是治理体系里的稳定标识。<code>order-service</code> 注册后，调用方通过服务名获取实例列表，再由客户端负载均衡选择一个实例。</p>
+<p>排查注册问题时依次确认：</p>
+<ol>
+<li>应用是否真正启动成功。</li>
+<li><code>spring.application.name</code> 是否符合约定。</li>
+<li>Nacos 地址、namespace、group 和认证是否一致。</li>
+<li>控制台是否能看到实例，实例 IP 和端口是否可达。</li>
+<li>服务是否被标记为不健康。</li>
+</ol>
+<p>控制台“有实例”只代表注册成功，不代表调用方一定能连通。注册进去一个容器内部 IP，也会出现发现成功、调用超时。</p>
+<h2 id="4-配置中心解决“配置怎么管理”"><a href="#4-配置中心解决“配置怎么管理”" class="headerlink" title="4. 配置中心解决“配置怎么管理”"></a>4. 配置中心解决“配置怎么管理”</h2><p>注册中心和配置中心可能由同一个 Nacos 提供，但它们是两条不同链路。注册正常不代表配置一定加载成功。</p>
+<p>配置中心适合管理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">环境相关地址</span><br><span class="line">连接池和超时参数</span><br><span class="line">功能开关</span><br><span class="line">限流阈值</span><br><span class="line">不需要重新构建即可调整的业务参数</span><br></pre></td></tr></table></figure>
+
+<p>不适合把所有配置都动态刷新。数据库连接、线程池大小等参数修改后是否能安全生效，取决于组件实现。核心参数变更仍然需要评审、灰度和回滚记录。</p>
+<p>Spring Boot 2.4 以后配置加载机制发生过变化，部分版本使用 <code>spring.config.import</code>，旧项目常通过 <code>bootstrap.yml</code> 加载。实际项目要先确认 Spring Boot、Spring Cloud 和 Alibaba 版本，再决定配置写法，不能把两套机制混在一起。</p>
+<p>排查配置时记录三件事：</p>
+<ul>
+<li>最终加载的是哪个 Data ID、group 和 namespace。</li>
+<li>本地配置、环境变量和远程配置谁的优先级更高。</li>
+<li>配置变更以后 Bean 是否真的支持刷新。</li>
+</ul>
+<h2 id="5-OpenFeign-解决“服务怎么调用”"><a href="#5-OpenFeign-解决“服务怎么调用”" class="headerlink" title="5. OpenFeign 解决“服务怎么调用”"></a>5. OpenFeign 解决“服务怎么调用”</h2><p>OpenFeign 把 HTTP 契约声明成 Java 接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;, path = &quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它减少了重复的 HTTP 客户端代码，但远程调用的本质没有改变：仍然可能连接失败、超时、返回非预期状态码，也可能被重复调用。</p>
+<p>接口设计要明确：</p>
+<ol>
+<li>URL、HTTP 方法和参数序列化方式。</li>
+<li>连接超时和读取超时。</li>
+<li>错误码如何映射，不能把所有失败都转成 <code>null</code>。</li>
+<li>是否允许重试，写操作是否幂等。</li>
+<li>调用日志是否包含 traceId、目标服务和耗时。</li>
+</ol>
+<p>一段常见超时配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">default:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">1000</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">3000</span></span><br><span class="line">        <span class="attr">loggerLevel:</span> <span class="string">basic</span></span><br></pre></td></tr></table></figure>
+
+<p>不同 Spring Cloud OpenFeign 版本的配置前缀可能变化，升级时需要查看实际版本文档和启动日志。超时不是越大越稳定，应该从整条接口的时间预算倒推。</p>
+<h2 id="6-Gateway-解决“入口怎么收口”"><a href="#6-Gateway-解决“入口怎么收口”" class="headerlink" title="6. Gateway 解决“入口怎么收口”"></a>6. Gateway 解决“入口怎么收口”</h2><p>Gateway 常见职责包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">路由</span><br><span class="line">认证信息透传</span><br><span class="line">跨域处理</span><br><span class="line">限流</span><br><span class="line">灰度标记</span><br><span class="line">统一访问日志</span><br></pre></td></tr></table></figure>
+
+<p>它不适合承载大量业务编排。把订单逻辑写进网关过滤器，会让入口层难以扩容和测试。</p>
+<p>基础路由示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
+
+<p>这里外部请求 <code>/api/order/create</code> 去掉一段前缀后，转发为 <code>/order/create</code>。遇到 404 时，必须同时写出“外部路径、过滤后路径、Controller 路径”，只看其中一段很容易绕晕。</p>
+<h2 id="7-稳定性组件不是错误吞掉器"><a href="#7-稳定性组件不是错误吞掉器" class="headerlink" title="7. 稳定性组件不是错误吞掉器"></a>7. 稳定性组件不是错误吞掉器</h2><p>熔断、限流和降级解决的是故障扩散问题，不是让异常消失。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">超时：限制一次调用最长占用资源的时间</span><br><span class="line">限流：限制进入系统的请求速率</span><br><span class="line">熔断：下游持续失败时快速拒绝，给它恢复时间</span><br><span class="line">降级：核心依赖不可用时返回可接受的替代结果</span><br><span class="line">隔离：限制某类调用可以占用的线程或并发量</span><br></pre></td></tr></table></figure>
+
+<p>库存扣减失败不能随便降级成“扣减成功”，商品推荐失败则可以返回空列表。降级策略必须由业务语义决定。</p>
+<h2 id="8-我的学习顺序"><a href="#8-我的学习顺序" class="headerlink" title="8. 我的学习顺序"></a>8. 我的学习顺序</h2><p>相比一次启动十个组件，下面的顺序更容易建立确定性：</p>
+<ol>
+<li>两个普通 Spring Boot 服务分别启动，先用固定 URL 调通。</li>
+<li>接入注册中心，验证服务名调用和实例切换。</li>
+<li>使用 OpenFeign，补齐超时、错误码和调用日志。</li>
+<li>增加 Gateway，逐条验证路由和过滤器。</li>
+<li>接入配置中心，验证配置来源和刷新边界。</li>
+<li>人工制造超时和实例下线，观察客户端行为。</li>
+<li>最后接入指标、日志和链路追踪。</li>
+</ol>
+<p>每一步都保留一个最小测试：健康检查、查询接口、写接口和超时接口。组件增加以后，先重复旧测试，再验证新能力。</p>
+<h2 id="9-一套固定排查顺序"><a href="#9-一套固定排查顺序" class="headerlink" title="9. 一套固定排查顺序"></a>9. 一套固定排查顺序</h2><p>遇到“微服务调用失败”时，我会按下面的顺序缩小范围：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">应用是否启动</span><br><span class="line">  -&gt; 配置是否加载</span><br><span class="line">  -&gt; 实例是否注册且地址可达</span><br><span class="line">  -&gt; 网关路由后的路径是否正确</span><br><span class="line">  -&gt; Feign 是否拿到实例</span><br><span class="line">  -&gt; TCP 连接和超时是否正常</span><br><span class="line">  -&gt; 下游线程池、连接池和业务日志是否异常</span><br></pre></td></tr></table></figure>
+
+<p>不要先怀疑最复杂的组件。很多 404 只是路径前缀错了，很多超时只是注册了不可达 IP，很多配置问题只是 namespace 不一致。</p>
+<h2 id="10-这份笔记最后留下什么"><a href="#10-这份笔记最后留下什么" class="headerlink" title="10. 这份笔记最后留下什么"></a>10. 这份笔记最后留下什么</h2><p>Spring Cloud 的价值不是提供一套固定架构，而是把微服务常见问题抽象成可替换的能力。理解“注册发现、配置、调用、入口、稳定性、可观测性”这些层次以后，即使以后替换 Nacos、Feign 或 Gateway，排查思路仍然有效。</p>
+<p>学习组件时，我更关心三个问题：它解决什么故障，它自己会引入什么故障，以及没有它时有没有更简单的办法。能回答这三个问题，才算真正把组件放进了架构里。</p>
 
     </div>
 
@@ -304,8 +377,8 @@
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86/" rel="tag"># 配置管理</a>
-              <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
               <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag"># 微服务</a>
+              <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
               <a href="/tags/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/" rel="tag"># 注册中心</a>
           </div>
 
