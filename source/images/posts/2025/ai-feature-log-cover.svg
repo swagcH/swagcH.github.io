@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#071215"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#102124" stroke="#2a4e52"/>
+  <text x="112" y="126" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="22">DEV LOG / REAL FEATURE</text>
+  <text x="112" y="207" fill="#f0fdfa" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="47" font-weight="700">第一次用 AI 完成真实需求</text>
+  <text x="112" y="260" fill="#a6c3c1" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">从需求澄清到上线</text>
+  <path d="M150 390H1090" stroke="#3f6567" stroke-width="4"/>
+  <g font-family="Menlo,Consolas,monospace" font-size="17" text-anchor="middle">
+    <circle cx="170" cy="390" r="14" fill="#2dd4bf"/>
+    <text x="170" y="442" fill="#b7cfcd">scope</text>
+    <circle cx="390" cy="390" r="14" fill="#fbbf24"/>
+    <text x="390" y="442" fill="#b7cfcd">read</text>
+    <circle cx="610" cy="390" r="14" fill="#60a5fa"/>
+    <text x="610" y="442" fill="#b7cfcd">code</text>
+    <circle cx="830" cy="390" r="14" fill="#fb7185"/>
+    <text x="830" y="442" fill="#b7cfcd">test</text>
+    <circle cx="1070" cy="390" r="14" fill="#a3e635"/>
+    <text x="1070" y="442" fill="#b7cfcd">ship</text>
+  </g>
+  <rect x="112" y="512" width="978" height="66" rx="8" fill="#091719" stroke="#2a4e52"/>
+  <text x="144" y="554" fill="#9cb9b8" font-family="Menlo,Consolas,monospace" font-size="19">requirement → evidence → diff → tests → observation</text>
+</svg>

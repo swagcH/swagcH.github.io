@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#07111d"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#101a29" stroke="#294158"/>
+  <text x="112" y="126" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="22">AI FOUNDATIONS / 2025</text>
+  <text x="112" y="212" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="50" font-weight="700">大模型入门</text>
+  <text x="112" y="266" fill="#9eb0c2" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="25">Token · 上下文 · 推理 · 幻觉</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="21">
+    <rect x="112" y="342" width="190" height="94" rx="8" fill="#07111d" stroke="#22d3ee"/>
+    <text x="162" y="399" fill="#e7f8fb">input</text>
+    <rect x="360" y="342" width="190" height="94" rx="8" fill="#07111d" stroke="#34d399"/>
+    <text x="407" y="399" fill="#e7f8fb">tokens</text>
+    <rect x="608" y="342" width="190" height="94" rx="8" fill="#07111d" stroke="#fbbf24"/>
+    <text x="640" y="399" fill="#e7f8fb">context</text>
+    <rect x="856" y="342" width="248" height="94" rx="8" fill="#07111d" stroke="#fb7185"/>
+    <text x="894" y="399" fill="#e7f8fb">next token</text>
+  </g>
+  <path d="M302 389H360M550 389H608M798 389H856" stroke="#70869b" stroke-width="3"/>
+  <path d="M346 380L360 389L346 398M594 380L608 389L594 398M842 380L856 389L842 398" fill="none" stroke="#70869b" stroke-width="3"/>
+  <rect x="112" y="500" width="992" height="72" rx="8" fill="#0b1522" stroke="#294158"/>
+  <text x="144" y="545" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="20">facts + constraints + verification &gt; confident wording</text>
+</svg>

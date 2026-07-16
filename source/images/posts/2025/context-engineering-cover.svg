@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0a1018"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#151b24" stroke="#354151"/>
+  <text x="112" y="126" fill="#a3e635" font-family="Menlo,Consolas,monospace" font-size="22">CONTEXT ENGINEERING / LAB 02</text>
+  <text x="112" y="205" fill="#f5f7f8" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="46" font-weight="700">从 Prompt 到 Context</text>
+  <text x="112" y="258" fill="#9aa8b6" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">一次提示词改造实验</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="19">
+    <rect x="112" y="328" width="210" height="76" rx="8" fill="#0a1018" stroke="#617083"/>
+    <text x="177" y="374" fill="#dbe3ea">task</text>
+    <rect x="112" y="438" width="210" height="76" rx="8" fill="#0a1018" stroke="#617083"/>
+    <text x="177" y="484" fill="#dbe3ea">repo</text>
+    <rect x="376" y="328" width="210" height="76" rx="8" fill="#0a1018" stroke="#617083"/>
+    <text x="435" y="374" fill="#dbe3ea">rules</text>
+    <rect x="376" y="438" width="210" height="76" rx="8" fill="#0a1018" stroke="#617083"/>
+    <text x="435" y="484" fill="#dbe3ea">tests</text>
+    <rect x="734" y="348" width="370" height="146" rx="8" fill="#111c17" stroke="#a3e635" stroke-width="2"/>
+    <text x="801" y="410" fill="#a3e635">useful context</text>
+    <text x="790" y="452" fill="#dbe3ea" font-size="17">grounded · scoped · testable</text>
+  </g>
+  <path d="M586 366L734 397M586 476L734 445M322 366L734 409M322 476L734 433" stroke="#617083" stroke-width="2"/>
+  <text x="112" y="582" fill="#82909e" font-family="Menlo,Consolas,monospace" font-size="19">better inputs create better feedback loops</text>
+</svg>
