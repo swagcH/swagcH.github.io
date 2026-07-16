@@ -9,13 +9,13 @@ tags:
 categories: 数据库
 ---
 
-> 写在前面：SQL 调优最怕一上来就加索引。索引可能暂时把耗时压下去，也可能只是把问题从查询端转移到了写入端。比较稳妥的方式还是先保留现场，再根据慢查询日志和执行计划判断到底慢在哪里。
+> 写在前面：SQL 调优最怕一上来就加索引。索引可能暂时把耗时压下去，也可能只是把成本从查询转移到写入和存储。下面按一次完整实验记录来写：先保存基线，再提出候选方案，用执行计划和对照数据筛选，最后明确上线与回滚条件。
 
-这次整理一个比较常见的订单列表查询。数据量上来以后，接口从两三百毫秒涨到了四五秒，数据库 CPU 没有打满，但是扫描行数非常夸张。
+问题接口查询某个用户最近的已支付订单。数据增长后，P99 从 300ms 左右升到 5 秒，数据库 CPU 没有打满，但慢查询中的扫描行数非常夸张。
 
-## 1. 现场现象
+## 13:50，固定问题样本
 
-接口查询的是某个用户已支付的订单，按创建时间倒序取最近 20 条：
+原始 SQL：
 
 ```sql
 SELECT id, order_no, user_id, status, amount, created_at
@@ -26,43 +26,51 @@ ORDER BY created_at DESC
 LIMIT 20;
 ```
 
-慢查询日志里最值得关注的不是 `Query_time`，而是 `Rows_examined` 和最终返回行数的差距：
+慢查询摘要：
 
 ```text
 # Query_time: 4.782  Lock_time: 0.000
 # Rows_sent: 20  Rows_examined: 2864317
 ```
 
-只返回 20 行，却扫描了 280 多万行，方向基本已经明确：先检查执行计划和现有索引。
+只返回 20 行，却扫描 286 万行。为了避免优化错对象，还需要确认：
 
-## 2. 先确认慢 SQL 从哪里来
-
-生产环境不要为了排查随手修改全局参数，先查看当前配置：
-
-```sql
-SHOW VARIABLES LIKE 'slow_query_log';
-SHOW VARIABLES LIKE 'long_query_time';
-SHOW VARIABLES LIKE 'slow_query_log_file';
+```text
+SQL digest：0x7A82...
+过去 1 小时调用：18,420 次
+参数分布：高频用户与普通用户都慢
+调用入口：订单列表、支付结果页
+数据库实例：只读副本
+表数据量：约 1,860 万行
 ```
 
-如果已经启用了 `performance_schema`，也可以从聚合结果里找总耗时最高的 SQL：
+应用日志中的 SQL 可能经过 ORM 动态拼装，真正执行的字段、条件和排序应以数据库采样为准。样本中的用户和订单数据均做脱敏。
 
-```sql
-SELECT DIGEST_TEXT,
-       COUNT_STAR,
-       ROUND(SUM_TIMER_WAIT / 1000000000000, 2) AS total_seconds,
-       ROUND(AVG_TIMER_WAIT / 1000000000, 2) AS avg_ms
-FROM performance_schema.events_statements_summary_by_digest
-WHERE DIGEST_TEXT IS NOT NULL
-ORDER BY SUM_TIMER_WAIT DESC
-LIMIT 10;
+## 14:05，建立可比较的基线
+
+测试环境使用一份接近生产分布的快照，数据库版本与参数保持一致。每个候选方案执行：
+
+```text
+冷缓存：重启隔离测试实例后执行 3 次
+暖缓存：预热后执行 20 次
+并发：1、20、50 三档
+写入：保持相同订单写入压测
+记录：P50、P95、P99、Rows_examined、CPU、IO
 ```
 
-这里要同时看三个维度：单次很慢、调用次数很多、累计耗时很高。只盯着最慢的一条 SQL，可能会漏掉高频的小慢查询。
+这里不通过生产执行 `RESET QUERY CACHE` 或重启数据库制造冷缓存。冷缓存实验只在隔离实例进行。
 
-## 3. 看懂执行计划
+基线结果：
 
-先执行普通 `EXPLAIN`，这个命令不会真正跑完整查询，在线上相对安全：
+| 场景 | P50 | P99 | Rows_examined | 数据库 CPU |
+| --- | ---: | ---: | ---: | ---: |
+| 单线程暖缓存 | 4.12s | 4.91s | 2,864,317 | 18% |
+| 20 并发 | 5.86s | 8.42s | 2,864,317 | 63% |
+| 50 并发 | 9.74s | 超时 | 2,864,317 | 91% |
+
+单次查询时 CPU 看起来不高，并发放大后问题才接近生产影响。只测一次很容易低估扫描成本。
+
+## 14:18，读执行计划而不是只看 key
 
 ```sql
 EXPLAIN
@@ -74,53 +82,22 @@ ORDER BY created_at DESC
 LIMIT 20;
 ```
 
-优化前的核心结果如下：
+关键结果：
 
 ```text
-type: ALL
-possible_keys: idx_user_id, idx_status
-key: NULL
-rows: 2864317
-filtered: 1.00
-Extra: Using where; Using filesort
+type: index
+possible_keys: idx_user_id,idx_status
+key: idx_created_at
+rows: 2840000
+filtered: 0.1
+Extra: Using where
 ```
 
-几个字段可以这样理解：
+优化器选择 `idx_created_at`，是因为它能按创建时间倒序扫描并尽早满足 `LIMIT`。但用户 10001 的已支付订单很稀疏，为找到 20 条匹配记录，它沿时间索引跳过了大量其他用户订单。
 
-1. `type=ALL`：全表扫描，这次问题的重点。
-2. `key=NULL`：优化器最终没有选择索引。
-3. `rows`：预计需要检查的行数，不是精确值，但可以判断量级。
-4. `filtered`：经过条件过滤后预计保留的比例。
-5. `Using filesort`：排序无法直接利用索引完成，并不一定真的写磁盘，但会产生额外排序成本。
+`key` 不为空只说明使用了某个索引，不说明这个访问路径足够便宜。`rows` 和实际 `Rows_examined` 才暴露扫描规模。
 
-表里原来只有 `user_id` 和 `status` 两个单列索引。MySQL 通常不会把多个单列索引自动组合成最理想的访问路径，即使发生了索引合并，也解决不了后面的时间排序问题。
-
-## 4. 根据查询模式设计索引
-
-这个查询有两个等值条件，后面跟一个排序字段，因此新增联合索引：
-
-```sql
-ALTER TABLE order_info
-ADD INDEX idx_user_status_created (user_id, status, created_at);
-```
-
-再次查看执行计划：
-
-```text
-type: ref
-key: idx_user_status_created
-rows: 37
-filtered: 100.00
-Extra: Using index condition
-```
-
-查询耗时从秒级降到了几十毫秒，扫描行数也从百万级下降到几十行。索引顺序不是固定公式，而是由真实查询决定：这里 `user_id` 和 `status` 都是等值条件，`created_at` 用于排序，因此这个顺序比较合适。
-
-**不要为了覆盖查询把所有返回字段都塞进联合索引。** `order_no`、`amount` 等字段加入索引后虽然可能减少回表，但会明显增加索引体积和写入成本。是否做覆盖索引，需要结合查询频率、字段长度和写入压力再决定。
-
-## 5. MySQL 8.0 可以进一步验证
-
-MySQL 8.0.18 以后可以使用 `EXPLAIN ANALYZE` 查看实际执行时间和真实行数：
+在 MySQL 8.0.18 以上的隔离环境，还可以使用：
 
 ```sql
 EXPLAIN ANALYZE
@@ -132,45 +109,216 @@ ORDER BY created_at DESC
 LIMIT 20;
 ```
 
-这个命令会真正执行 SQL。对于更新、删除语句或者可能返回大量数据的查询，不能当作普通 `EXPLAIN` 随便在线上执行。MySQL 5.7 没有这个能力，只能结合慢查询日志、执行计划和监控数据验证。
+`EXPLAIN ANALYZE` 会真实执行查询，可能产生负载和读取开销，不能把它当成生产环境的无成本命令。它显示大部分时间消耗在按 `created_at` 扫描后过滤。
 
-## 6. 还有几个容易忽略的问题
-
-### 6.1 深分页
-
-下面这种分页到了后面仍然会扫描并丢弃大量数据：
+## 14:32，先看选择性和数据分布
 
 ```sql
-SELECT id, order_no, created_at
-FROM order_info
-WHERE user_id = 10001
-ORDER BY created_at DESC
+SELECT
+    COUNT(*) AS total,
+    COUNT(DISTINCT user_id) AS users,
+    SUM(status = 'PAID') AS paid_rows
+FROM order_info;
+```
+
+结果概要：
+
+```text
+总行数：18,600,000
+用户数：1,240,000
+PAID 占比：约 61%
+普通用户订单中位数：9
+高频用户最大订单数：84,000
+```
+
+`status` 单列区分度很低，`user_id` 更适合作为联合索引前导列。查询还有按时间排序，因此候选索引应同时考虑过滤和顺序。
+
+## 14:45，候选 A：user_id + status
+
+```sql
+CREATE INDEX idx_user_status
+ON order_info (user_id, status);
+```
+
+执行计划改为按用户和状态定位，但仍有：
+
+```text
+rows: 84216
+Extra: Using index condition; Using filesort
+```
+
+普通用户查询约 28ms，高频用户约 310ms。相比原方案已经明显改善，但热门用户需要读取并排序 8 万多行，P99 仍不稳定。
+
+这个实验验证了前两列的过滤价值，也说明排序字段不能忽略。
+
+## 15:10，候选 B：加入 created_at
+
+```sql
+CREATE INDEX idx_user_status_created
+ON order_info (user_id, status, created_at DESC);
+```
+
+MySQL 8.0 支持降序索引；在不支持的版本中，InnoDB 也可以反向扫描普通 B-Tree，需要以实际执行计划验证。
+
+新计划：
+
+```text
+type: ref
+key: idx_user_status_created
+rows: 84216
+Extra: Backward index scan
+```
+
+`rows` 仍是统计估算，但实际执行在按顺序取到 20 行后停止：
+
+```text
+Rows_sent: 20
+Rows_examined: 20
+```
+
+关键不是计划里某个字段看起来漂亮，而是实际扫描量已经与返回量接近。
+
+## 15:35，候选 C：做成宽覆盖索引
+
+为了验证回表成本，又测试：
+
+```sql
+CREATE INDEX idx_user_status_created_cover
+ON order_info (
+    user_id,
+    status,
+    created_at DESC,
+    order_no,
+    amount
+);
+```
+
+因为 InnoDB 二级索引叶子节点已经包含主键，查询所需字段基本都在索引中。单查询 P99 从 14ms 下降到约 10ms，但索引体积增加明显，订单写入 P99 上升约 13%。
+
+一次只返回 20 行，方案 B 的回表次数很少。为了 4ms 收益承担更宽索引和更高写放大不划算，因此候选 C 被淘汰。
+
+## 三个方案的对照结果
+
+| 方案 | 暖缓存 P99 | 50 并发 P99 | 实际扫描行 | 写入 P99 变化 |
+| --- | ---: | ---: | ---: | ---: |
+| 原始索引 | 4.91s | 超时 | 2,864,317 | 基线 |
+| A：user,status | 310ms | 1.12s | 84,216 | +5% |
+| B：user,status,time | 14ms | 68ms | 20 | +7% |
+| C：宽覆盖索引 | 10ms | 55ms | 20 | +13% |
+
+最终选择 B。它不是查询绝对最快的方案，但在读取收益、写入成本和索引体积之间更平衡。
+
+## 16:10，上线前先写回滚门槛
+
+大表加索引不是普通代码发布。执行前记录：
+
+```text
+预计索引大小
+构建临时空间
+DDL 预计时间
+元数据锁等待
+主从复制延迟
+写入延迟变化
+中止方式
+旧索引保留时间
+```
+
+本次先在只读副本创建并验证，再通过数据库变更平台执行。是否支持在线 DDL 与 `LOCK=NONE` 取决于 MySQL 版本、存储引擎和具体操作，不能只看语法：
+
+```sql
+ALTER TABLE order_info
+ADD INDEX idx_user_status_created (user_id, status, created_at DESC),
+ALGORITHM=INPLACE,
+LOCK=NONE;
+```
+
+执行由数据库负责人操作，并持续观察。预先约定暂停或回滚条件：
+
+```text
+元数据锁阻塞核心写入
+复制延迟持续超过 30 秒
+磁盘剩余空间低于安全线
+订单写入 P99 比基线上升超过 15%
+新索引上线后仍未被目标 SQL 使用
+```
+
+删除索引同样是生产 DDL，不在发现异常后凭情绪立即执行。先确认异常与索引相关，再按变更流程回退。
+
+## 17:20，灰度验证真实流量
+
+索引完成后先让一个只读实例承接少量订单查询，核对：
+
+```text
+目标 SQL 的 key 是否为新索引
+Rows_examined / Rows_sent 是否接近 1
+普通用户与高频用户 P99
+Buffer Pool、磁盘读取与 CPU
+订单写入和复制延迟
+错误率与结果一致性
+```
+
+灰度一小时后：
+
+```text
+接口 P99：4.9s -> 72ms
+Rows_examined P95：280 万 -> 20
+只读实例 CPU 峰值：76% -> 31%
+订单写入 P99：增加约 6%
+复制延迟：无明显变化
+```
+
+结果符合实验，才逐步扩大流量。
+
+## 索引解决不了深分页
+
+首页查询改善后，运营后台仍有：
+
+```sql
 LIMIT 200000, 20;
 ```
 
-业务允许时，优先使用上一页最后一条记录作为游标，避免不断增大的 `OFFSET`。如果时间可能重复，需要同时携带 `created_at` 和唯一主键，保证翻页稳定。
-
-### 6.2 统计信息过旧
-
-表数据变化很大时，优化器估算可能失真。可以先比较执行计划和真实数据分布，再在低峰期评估是否执行：
+即使使用联合索引，数据库仍要跳过大量记录。用户侧列表改为游标分页：
 
 ```sql
-ANALYZE TABLE order_info;
+SELECT id, order_no, user_id, status, amount, created_at
+FROM order_info
+WHERE user_id = :userId
+  AND status = 'PAID'
+  AND (
+      created_at < :lastCreatedAt
+      OR (created_at = :lastCreatedAt AND id < :lastId)
+  )
+ORDER BY created_at DESC, id DESC
+LIMIT 20;
 ```
 
-这不是固定的“优化命令”，执行前要确认 MySQL 版本、表大小和锁影响。
+正式索引相应增加 `id` 作为稳定排序键。只按时间游标时，相同时间的订单可能重复或遗漏。
 
-### 6.3 只看一次压测结果
+运营导出不再通过深分页同步拉取，而是走异步批任务，避免一个请求长期占用数据库连接。
 
-首次查询可能涉及磁盘读取，后续查询可能命中 Buffer Pool。调优前后要使用相同数据范围，多执行几轮，并观察数据库 CPU、磁盘 IO、扫描行数和接口分位耗时，不能只拿一次最快结果做结论。
+## 一周后的复核
 
-## 7. 复盘清单
+索引上线不是实验结束。我们在一周后再次检查：
 
-1. 从慢查询日志或聚合指标确认真实高耗时 SQL。
-2. 对比扫描行数与返回行数，先判断是否存在无效扫描。
-3. 使用 `EXPLAIN` 检查 `type`、`key`、`rows` 和 `Extra`。
-4. 按实际查询条件设计联合索引，不机械套用字段选择性公式。
-5. 同时评估索引对新增、更新和磁盘空间的影响。
-6. 调优后用同一组数据和完整监控验证，保留回退方案。
+- 慢查询 digest 的调用量和 P99。
+- 新索引实际使用次数。
+- 单表索引体积和 Buffer Pool 命中。
+- 写入、更新和删除成本。
+- 旧单列索引是否与新索引重复。
+- 数据分布变化后计划是否稳定。
 
-SQL 调优本质上不是让某一条 SQL 看起来更快，而是在查询性能、写入成本和维护复杂度之间找到一个能长期运行的平衡点。
+确认新联合索引覆盖了 `idx_user_id` 的用途后，才单独发起旧索引下线评审。删除前还要检索其他 SQL，不能只围绕本次接口判断。
+
+这次调优最后留下的不是一句“加联合索引”，而是一条可以复查的决策链：
+
+```text
+真实慢日志建立基线
+执行计划解释扫描路径
+数据分布决定候选顺序
+多个索引方案对照读写成本
+提前定义上线和回滚门槛
+灰度验证真实流量
+持续复核索引价值
+```
+
+性能优化不是把某一次耗时压到最低，而是在真实负载下，让读取、写入、容量和可回退性达到更稳定的平衡。

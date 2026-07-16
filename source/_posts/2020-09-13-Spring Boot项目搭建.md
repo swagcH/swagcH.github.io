@@ -9,69 +9,385 @@ cover: /images/posts/2020/spring-boot-setup-cover.svg
 
 ![Spring Boot项目搭建封面图](/images/posts/2020/spring-boot-setup-cover.svg)
 
-# 背景
+用 Spring Initializr 生成一个工程只需要几分钟，但“能启动”和“能交付”之间还隔着配置、异常、日志、测试、监控和构建规则。早期项目最容易留下的债，往往不是业务代码，而是大家在没有约定的骨架上各写一套。
 
-Spring Boot 降低了项目启动门槛，但也要求我们理解默认配置背后的约定。
+这次不追求搭一个万能脚手架，只从一个订单查询接口出发，把空工程补到可以进入团队开发的最小状态。示例统一基于 Spring Boot 2.x 和 JDK 8。
 
-如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。
+## 先定义最小交付边界
 
-这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。
+开始引入依赖前，先写清楚本期需要什么：
 
+```text
+需要：
+- HTTP JSON 接口
+- 参数校验与统一错误响应
+- MySQL 访问和事务
+- 分环境配置
+- 健康检查、日志和自动测试
+- Maven 可重复构建
 
-# 问题
+暂时不需要：
+- 分布式事务
+- 配置中心
+- 消息队列
+- 通用代码生成平台
+- 抽象所有未来业务
+```
 
-这类问题在工作中并不少见，当时我主要遇到下面几个情况：
+边界能防止“刚创建项目就先封装一切”。没有第二个真实用例之前，很多所谓公共能力只是猜测。
 
-1. 依赖引入很快，但默认配置理解不足
-2. 配置文件拆分不清晰
-3. 项目结构没有统一约定
+## 建立可控的 Maven 依赖
 
-这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。
+`pom.xml` 中只放当前需要的 Starter，并明确 Java 版本：
 
-# 分析
+```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.3.4.RELEASE</version>
+    <relativePath/>
+</parent>
 
-Spring Boot 把大量工程默认值封装起来，成熟使用方式不是只会启动，而是知道默认值如何被覆盖。
+<properties>
+    <java.version>1.8</java.version>
+</properties>
 
-我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
 
+依赖版本优先交给 Spring Boot 的依赖管理，不在每个依赖上单独指定版本。额外覆盖版本时，要在提交说明里写清兼容或安全原因。
 
-# 解决方案
+构建基线先验证：
 
-我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。
+```bash
+mvn -v
+mvn clean verify
+mvn dependency:tree
+```
+
+团队使用 IDEA 自带 Maven 时，也要确保 IDEA 的 JDK、Maven Runner JDK 和项目 `java.version` 一致，避免 IDE 能运行、命令行却失败。
+
+## 包结构围绕业务组织
+
+我不再把所有 Controller、Service、Mapper 分别堆进三个巨型目录，而是先按业务模块分组：
+
+```text
+com.example.order
+├── OrderApplication.java
+├── common
+│   ├── api
+│   ├── error
+│   └── web
+└── order
+    ├── api
+    ├── application
+    ├── domain
+    └── infrastructure
+```
+
+模块内部仍有层次，但订单相关代码能够放在一起。以后新增支付模块，不需要在四个全局目录之间来回跳转。
+
+启动类放在根包，保证默认组件扫描覆盖业务模块：
 
 ```java
 @SpringBootApplication
-public class DemoApplication {
+public class OrderApplication {
+
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(OrderApplication.class, args);
     }
 }
 ```
 
+不建议一开始添加大量 `@ComponentScan`。扫描范围异常往往说明包边界或启动类位置不合理。
+
+## 配置只提供安全默认值
+
+公共配置放行为一致的部分，环境差异通过 Profile 或外部配置注入：
+
 ```yaml
-server:
-  port: 8080
+# application.yml
 spring:
+  application:
+    name: order-service
   profiles:
-    active: dev
+    active: ${APP_PROFILE:local}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
 ```
+
+`application-local.yml` 可以指向本机数据库，但不要提交真实密码：
+
+```yaml
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/order_demo}
+    username: ${DB_USERNAME:order_app}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+```
+
+生产环境必须在部署平台提供必填值。密码为空时应在启动阶段失败，而不是连库时才暴露问题。
+
+## 请求对象承担输入约束
+
+不要让 Controller 接收一个无边界的 Map。订单查询可以使用明确的请求对象：
+
+```java
+public class OrderQueryRequest {
+
+    @NotNull(message = "用户编号不能为空")
+    @Min(value = 1, message = "用户编号必须大于 0")
+    private Long userId;
+
+    @Min(value = 1, message = "页码必须大于 0")
+    private int page = 1;
+
+    @Min(value = 1, message = "每页数量必须大于 0")
+    @Max(value = 100, message = "每页最多查询 100 条")
+    private int pageSize = 20;
+
+    // getter 和 setter 省略
+}
+```
+
+DTO 只描述接口契约，不直接复用数据库实体。否则表字段变化可能意外改变接口，调用方也可能提交本不允许修改的字段。
+
+## Controller 只做协议转换
+
+```java
+@RestController
+@RequestMapping("/api/orders")
+public class OrderQueryController {
+
+    private final OrderQueryService orderQueryService;
+
+    public OrderQueryController(OrderQueryService orderQueryService) {
+        this.orderQueryService = orderQueryService;
+    }
+
+    @GetMapping
+    public PageResult<OrderSummary> query(@Valid OrderQueryRequest request) {
+        return orderQueryService.query(
+                request.getUserId(),
+                request.getPage(),
+                request.getPageSize()
+        );
+    }
+}
+```
+
+Controller 不编写 SQL，不决定事务，也不捕获所有异常后返回 `200`。它负责 HTTP 参数、认证上下文和响应状态，业务规则放进应用服务或领域对象。
+
+构造器注入能让依赖显式，也便于测试；相比字段注入，不需要通过反射才能创建对象。
+
+## 业务服务守住事务边界
+
+```java
+@Service
+public class OrderQueryService {
+
+    private final OrderRepository orderRepository;
+
+    public OrderQueryService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public PageResult<OrderSummary> query(Long userId, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        List<OrderSummary> items =
+                orderRepository.findByUserId(userId, offset, pageSize);
+        long total = orderRepository.countByUserId(userId);
+        return PageResult.of(items, total, page, pageSize);
+    }
+}
+```
+
+事务放在公共 Service 方法上，并保持范围尽可能小。不要在数据库事务中执行耗时 HTTP 调用；数据库锁会一直占用，失败语义也更难处理。
+
+示例中的分页偏移需要防止超大页码。数据量增加后，可以改成基于 `id` 或创建时间的游标分页，而不是无限增大的 `OFFSET`。
+
+## Repository 封装数据访问
+
+早期工程使用 `NamedParameterJdbcTemplate` 已经足够：
+
+```java
+@Repository
+public class JdbcOrderRepository implements OrderRepository {
+
+    private static final String FIND_SQL =
+            "SELECT id, order_no, status, amount, created_at " +
+            "FROM order_info WHERE user_id = :userId " +
+            "ORDER BY created_at DESC LIMIT :offset, :pageSize";
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+
+    public JdbcOrderRepository(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public List<OrderSummary> findByUserId(Long userId, int offset, int pageSize) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("offset", offset)
+                .addValue("pageSize", pageSize);
+        return jdbcTemplate.query(FIND_SQL, parameters, new OrderSummaryRowMapper());
+    }
+}
+```
+
+参数必须绑定，不能拼接用户输入。SQL 字段显式列出，不使用 `SELECT *`。当查询逐渐复杂，再决定是否引入 MyBatis 等框架，不必为了一个接口提前增加整套抽象。
+
+## 错误响应要稳定
+
+接口错误至少包含业务码、可读消息、traceId 和时间。不要把 Java 异常类名直接暴露给调用方：
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleValidation(MethodArgumentNotValidException exception) {
+        String message = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(FieldError::getDefaultMessage)
+                .orElse("请求参数不合法");
+        return ApiError.of("INVALID_ARGUMENT", message, MDC.get("traceId"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiError handleUnknown(Exception exception) {
+        String traceId = MDC.get("traceId");
+        // 未知异常只在统一边界记录一次完整堆栈
+        log.error("unhandled_request_error traceId={}", traceId, exception);
+        return ApiError.of("INTERNAL_ERROR", "系统暂时不可用", traceId);
+    }
+}
+```
+
+业务异常还应单独映射合适的 HTTP 状态和业务码。前端可以根据稳定的业务码决定提示或重试，不依赖容易变化的中文消息。
+
+## 健康检查不等于进程存在
+
+引入 Actuator 后，先开放最少端点：
 
 ```bash
-mvn spring-boot:run
+curl -s http://127.0.0.1:8080/actuator/health
 ```
 
-具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。
+生产环境不要默认暴露全部管理端点，尤其是环境变量、Bean 和线程信息。管理端点应走内部网络并有访问控制。
 
-# 总结
+健康检查也要区分：
 
-关于 **Spring Boot项目搭建**，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。
+- 存活：进程是否需要重启。
+- 就绪：是否能够接收新流量。
+- 依赖状态：数据库或外部服务是否异常。
 
-这篇文章可以沉淀为几条原则：
+如果下游短暂波动就让存活检查失败，容器可能反复重启，反而放大故障。
 
-- 先明确问题边界，再讨论技术方案；
-- 能形成清单的事情，不要只靠记忆；
-- 能通过规范减少沟通的地方，就不要反复口头确认；
-- 重要结论要留痕，方便后续追溯；
-- 技术方案要服务于交付质量，而不是只追求形式上的先进。
+## 至少准备三层测试
 
-2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。
+项目骨架建立时就放入测试样例，后来的人才会沿用：
+
+```text
+纯单元测试      业务规则和边界，不启动 Spring
+Web 层测试      参数校验、状态码、JSON 契约
+集成测试        Repository、事务和真实数据库行为
+```
+
+一个最小 Web 测试：
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(OrderQueryController.class)
+public class OrderQueryControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private OrderQueryService orderQueryService;
+
+    @Test
+    public void shouldRejectInvalidUserId() throws Exception {
+        mockMvc.perform(get("/api/orders").param("userId", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_ARGUMENT"));
+    }
+}
+```
+
+集成测试不要长期依赖开发共享数据库，否则数据和执行顺序会互相污染。可以使用独立测试库，并通过迁移脚本初始化结构。
+
+## 构建产物必须可以重复
+
+交付前使用同一条命令完成编译、测试和打包：
+
+```bash
+mvn clean verify
+java -jar target/order-service.jar --spring.profiles.active=local
+```
+
+不要把 IDEA 输出目录、日志、上传文件或本地配置打进 Jar。版本号、Git 提交和构建时间可以写入构建信息，方便线上追溯。
+
+容器或服务器启动参数也应进入部署脚本，而不是留在某位同事的终端历史中。
+
+## 第一个接口完成后的骨架验收
+
+```text
+[ ] JDK 8 与 Maven 构建版本一致
+[ ] 依赖最小且来源清楚
+[ ] 包结构按业务边界组织
+[ ] 配置不包含真实密钥
+[ ] 请求参数有明确校验
+[ ] Controller、事务和数据访问职责分开
+[ ] 错误码、traceId 和日志可用于排查
+[ ] 健康检查仅暴露必要信息
+[ ] 单元、Web 和集成测试各有样例
+[ ] Jar 能在 IDE 外独立启动
+[ ] 部署、验证和回退步骤已记录
+```
+
+Spring Boot 的价值不只是少写配置，而是让团队用约定快速建立一致基线。一个合格骨架不需要塞满技术名词，它应该让新增业务代码有位置、失败能够被看见、环境差异可控制，并且任何人都能用同一条命令得到相同产物。

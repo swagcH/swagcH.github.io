@@ -125,7 +125,7 @@ reading_progress:
   height: 2px
 
 bookmark:
-  enable: true
+  enable: false
   color: '#8b949e'
   save: auto
 
@@ -235,3 +235,4 @@ pjax: false
 vendors:
   internal: local
   plugins: jsdelivr
+  local_search: /js/local-search-engine.js
