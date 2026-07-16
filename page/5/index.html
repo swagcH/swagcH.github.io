@@ -16,7 +16,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="一个 Java 后端开发的技术笔记博客">
 <meta property="og:type" content="website">
@@ -52,9 +52,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -268,34 +268,75 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>数据库设计一旦进入线上环境，修改成本会远高于代码，因此前期设计需要更谨慎。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>字段先随手加，后续统计和查询非常痛苦</li>
-<li>索引建得过早或过多，反而增加维护成本</li>
-<li>表关系没有边界，业务变更时牵一发动全身</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>数据库结构承载的是业务事实，表、字段、索引和约束都应该围绕业务长期演进来设计。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> order_info (</span><br><span class="line">  id <span class="type">bigint</span> <span class="keyword">primary key</span>,</span><br><span class="line">  order_no <span class="type">varchar</span>(<span class="number">64</span>) <span class="keyword">not null</span>,</span><br><span class="line">  user_id <span class="type">bigint</span> <span class="keyword">not null</span>,</span><br><span class="line">  order_status tinyint <span class="keyword">not null</span>,</span><br><span class="line">  total_amount <span class="type">decimal</span>(<span class="number">12</span>,<span class="number">2</span>) <span class="keyword">not null</span>,</span><br><span class="line">  created_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  updated_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  <span class="keyword">unique</span> key uk_order_no(order_no),</span><br><span class="line">  key idx_user_status(user_id, order_status)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。</p>
+</blockquote>
+<h2 id="先从业务事实开始"><a href="#先从业务事实开始" class="headerlink" title="先从业务事实开始"></a>先从业务事实开始</h2><p>设计订单表前，不急着列字段，先确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">订单由谁创建</span><br><span class="line">一个订单包含哪些商品</span><br><span class="line">金额在哪个时间点确定</span><br><span class="line">状态有哪些合法流转</span><br><span class="line">取消、退款和删除是否保留历史</span><br><span class="line">订单号是否需要对外展示</span><br><span class="line">查询主要按用户、状态还是时间</span><br><span class="line">预计数据量和保留年限</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> order_info <span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span> <span class="keyword">and</span> order_status <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>“用户可以买商品”不足以支撑表设计。金额是否允许调整、订单是否拆单、退款能否部分发生，都会改变数据模型。</p>
+<h2 id="1-主键和业务编号分开"><a href="#1-主键和业务编号分开" class="headerlink" title="1. 主键和业务编号分开"></a>1. 主键和业务编号分开</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status TINYINT UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    paid_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0.00</span>,</span><br><span class="line">    version <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_user_created (user_id, created_at),</span><br><span class="line">    KEY idx_status_created (status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>数据库设计经验总结</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p><code>id</code> 是数据库内部主键，适合聚簇索引和关联；<code>order_no</code> 是稳定的业务编号，可以暴露给外部。不要把自增 ID 直接当公开订单号，也不要让一个过长随机字符串承担所有关联主键成本。</p>
+<p>业务编号生成要考虑全局唯一、趋势性、时钟回拨和信息泄露。使用雪花算法、号段或数据库序列都可以，但要明确失败和重复检测方式。</p>
+<h2 id="2-数据类型按语义选择"><a href="#2-数据类型按语义选择" class="headerlink" title="2. 数据类型按语义选择"></a>2. 数据类型按语义选择</h2><h3 id="金额"><a href="#金额" class="headerlink" title="金额"></a>金额</h3><p>使用 <code>DECIMAL</code> 或最小货币单位整数，不使用浮点数：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>同时记录币种时，金额精度不能假设永远是两位小数。跨币种系统需要专门的 Money 设计。</p>
+<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>团队必须约定数据库时区和应用转换方式。<code>TIMESTAMP</code> 与 <code>DATETIME</code> 的范围、时区行为不同，不能只因为示例常见就随意选择。</p>
+<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p><code>TINYINT</code> 节省空间，但数据库里看到 <code>3</code> 不直观。需要在代码、文档和数据字典中维护同一映射：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">10 CREATED</span><br><span class="line">20 PAID</span><br><span class="line">30 SHIPPED</span><br><span class="line">40 FINISHED</span><br><span class="line">90 CANCELLED</span><br></pre></td></tr></table></figure>
+
+<p>给状态值留间隔，后续可以插入中间状态。不要复用已经废弃的数字表示新含义，否则历史数据会被重新解释。</p>
+<h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>字段长度来自业务约束，而不是统一写 <code>VARCHAR(255)</code>。手机号、订单号、外部流水号的长度和字符集不同。超长正文放 <code>TEXT</code> 时，也要考虑是否真的需要频繁查询和索引。</p>
+<h2 id="3-NULL-和默认值要表达真实含义"><a href="#3-NULL-和默认值要表达真实含义" class="headerlink" title="3. NULL 和默认值要表达真实含义"></a>3. NULL 和默认值要表达真实含义</h2><p><code>NULL</code> 应该表示“未知或不存在”，不是“开发暂时没想好”。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">paid_at = NULL：尚未支付</span><br><span class="line">cancel_reason = NULL：没有取消</span><br><span class="line">paid_amount = 0.00：已知支付金额为零</span><br></pre></td></tr></table></figure>
+
+<p>把所有字符串默认成空串，会让“未填写”和“明确为空”无法区分。反过来，所有字段都允许 NULL 也会把校验压力推给每个查询。</p>
+<h2 id="4-订单明细单独建表"><a href="#4-订单明细单独建表" class="headerlink" title="4. 订单明细单独建表"></a>4. 订单明细单独建表</h2><p>不要把商品列表保存成逗号字符串：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_item (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_name <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    unit_price <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    quantity <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    KEY idx_order_id (order_id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
+
+<p><code>sku_name</code> 和成交单价是下单时快照。商品后来改名或改价，历史订单仍应保持当时事实。是否同时保存规格、图片和税费，要根据展示和对账需求决定。</p>
+<h2 id="5-索引从查询模式出发"><a href="#5-索引从查询模式出发" class="headerlink" title="5. 索引从查询模式出发"></a>5. 索引从查询模式出发</h2><p>先列高频查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 用户订单列表</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, status, total_amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 待处理订单扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at</span><br><span class="line">LIMIT <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对应索引 <code>(user_id, created_at)</code> 和 <code>(status, created_at)</code>。索引字段顺序要匹配过滤和排序，不是简单把区分度最高的字段放最前面。</p>
+<p>每个二级索引都会保存主键，并增加写入、存储和维护成本。下面几类索引需要重点检查：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>被联合索引前缀覆盖的重复索引。</li>
+<li>低区分度单列索引。</li>
+<li>为一次临时报表增加、长期无人使用的索引。</li>
+<li>包含过多长字符串的“万能覆盖索引”。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>上线前使用真实数据量查看执行计划，不能只在几十行测试数据上验证。</p>
+<h2 id="6-唯一约束是业务防线"><a href="#6-唯一约束是业务防线" class="headerlink" title="6. 唯一约束是业务防线"></a>6. 唯一约束是业务防线</h2><p>应用先查询“订单号是否存在”再插入，在并发下仍可能重复。数据库唯一索引提供最终保证：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_order_no (order_no)</span><br></pre></td></tr></table></figure>
+
+<p>幂等请求也可以建立唯一约束：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_user_request (user_id, request_id)</span><br></pre></td></tr></table></figure>
+
+<p>捕获唯一键冲突后，要查询并返回原业务结果，而不是统一转换成“系统异常”。</p>
+<h2 id="7-外键是否使用"><a href="#7-外键是否使用" class="headerlink" title="7. 外键是否使用"></a>7. 外键是否使用</h2><p>外键能保护引用完整性，但会增加迁移、写入和跨表操作约束。单体且表关系稳定时可以使用；高并发、分库分表或跨服务数据所有权场景通常由应用和对账保证。</p>
+<p>无论是否创建数据库外键，关系都必须明确：删除用户后订单如何保留，删除商品后订单快照是否还可展示。没有外键不代表没有约束。</p>
+<h2 id="8-逻辑删除不能滥用"><a href="#8-逻辑删除不能滥用" class="headerlink" title="8. 逻辑删除不能滥用"></a>8. 逻辑删除不能滥用</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deleted TINYINT <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>逻辑删除方便恢复和审计，但会影响唯一索引、所有查询条件和数据量。订单通常不是“删除”，而是取消或关闭；用业务状态表达比统一 <code>deleted=1</code> 更准确。</p>
+<p>真正需要删除的临时数据，应有明确生命周期和归档任务。不要让所有表永久增长。</p>
+<h2 id="9-乐观锁和并发更新"><a href="#9-乐观锁和并发更新" class="headerlink" title="9. 乐观锁和并发更新"></a>9. 乐观锁和并发更新</h2><p>订单状态更新可以带版本号：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> order_info</span><br><span class="line"><span class="keyword">SET</span> status <span class="operator">=</span> ?, version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span>, updated_at <span class="operator">=</span> NOW(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
+
+<p>检查受影响行数，零行表示状态已变化或版本冲突。这样比先查后改更能保护合法状态流转。</p>
+<p>乐观锁不适合所有高冲突场景。冲突频繁时要重新审视业务串行化、队列或数据库锁策略。</p>
+<h2 id="10-表结构变更要可回退"><a href="#10-表结构变更要可回退" class="headerlink" title="10. 表结构变更要可回退"></a>10. 表结构变更要可回退</h2><p>开发环境能瞬间执行的 DDL，在线上大表可能锁表、占满磁盘或造成复制延迟。</p>
+<p>变更前确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">表大小和增长速度</span><br><span class="line">MySQL 版本及 Online DDL 能力</span><br><span class="line">新增索引的磁盘空间</span><br><span class="line">主从复制和延迟</span><br><span class="line">应用新旧版本兼容窗口</span><br><span class="line">失败后的回退方式</span><br></pre></td></tr></table></figure>
+
+<p>新增字段优先做到新旧代码都能运行：先加可兼容字段，再发布写入，再迁移历史数据，最后切换读取。不要把表变更和代码行为切换压在同一秒完成。</p>
+<h2 id="11-评审清单"><a href="#11-评审清单" class="headerlink" title="11. 评审清单"></a>11. 评审清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ ] 表名和字段使用统一业务术语</span><br><span class="line">[ ] 主键与公开业务编号分离</span><br><span class="line">[ ] 金额、时间、状态类型符合语义</span><br><span class="line">[ ] NULL 与默认值有明确含义</span><br><span class="line">[ ] 唯一约束覆盖并发重复风险</span><br><span class="line">[ ] 索引来自真实查询和排序</span><br><span class="line">[ ] 历史快照不会被主数据变化污染</span><br><span class="line">[ ] 状态迁移和并发更新有保护</span><br><span class="line">[ ] 数据保留、归档和删除策略明确</span><br><span class="line">[ ] DDL 有容量评估和回退方案</span><br></pre></td></tr></table></figure>
+
+<p>好的数据库设计不是一次把未来所有字段都猜出来，而是准确表达当前业务事实，同时为常见演进保留空间。表结构越接近业务语言，后续查询、接口和故障排查就越少依赖口头解释。</p>
 
       
     </div>
@@ -374,34 +415,77 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/code-style-cover.svg" alt="代码规范的重要性封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>代码规范不是为了追求形式统一，而是为了降低团队沟通成本和长期维护成本。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<blockquote>
+<p>代码规范真正节省的不是敲键盘时间，而是未来每一次阅读、Review 和故障排查的时间。格式可以交给工具，命名、边界和失败语义仍然需要团队判断。</p>
+</blockquote>
+<h2 id="一次看似普通的-Review"><a href="#一次看似普通的-Review" class="headerlink" title="一次看似普通的 Review"></a>一次看似普通的 Review</h2><p>下面的方法功能没有错，却让 Review 很难进行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doIt</span><span class="params">(Long id, String s, Integer t)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">u</span> <span class="operator">=</span> userMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (u != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (t == <span class="number">1</span>) &#123;</span><br><span class="line">            u.setStatus(<span class="number">2</span>);</span><br><span class="line">            userMapper.updateById(u);</span><br><span class="line">            log.info(<span class="string">&quot;ok:&#123;&#125;&quot;</span>, id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题不只是缩写：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">doIt 不表达业务动作</span><br><span class="line">s 没有被使用，调用方却必须传</span><br><span class="line">数字 1、2 的含义不可见</span><br><span class="line">用户不存在时静默返回</span><br><span class="line">没有说明为什么允许状态变化</span><br><span class="line">日志无法判断动作、旧状态和原因</span><br></pre></td></tr></table></figure>
+
+<p>如果团队只统一缩进，这段代码仍然难维护。规范必须覆盖业务表达和失败语义。</p>
+<h2 id="改造后的版本"><a href="#改造后的版本" class="headerlink" title="改造后的版本"></a>改造后的版本</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> getExistingUser(userId);</span><br><span class="line">    <span class="keyword">if</span> (UserStatus.FROZEN.equals(user.getStatus())) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    validateCanFreeze(user, reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;用户账号已冻结, userId=&#123;&#125;, previousStatus=&#123;&#125;, reason=&#123;&#125;&quot;</span>,</span><br><span class="line">        userId, user.getStatus(), reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>变化包括：方法名表达动作，魔法值变成枚举，校验提取为单一职责方法，日志包含排查所需上下文。代码多了几行，却减少了调用者和维护者的猜测。</p>
+<h2 id="1-命名是最便宜的设计"><a href="#1-命名是最便宜的设计" class="headerlink" title="1. 命名是最便宜的设计"></a>1. 命名是最便宜的设计</h2><p>变量和方法名应该回答“它代表什么”，而不是“它是什么类型”：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不清晰</span></span><br><span class="line">List&lt;Order&gt; list;</span><br><span class="line"><span class="type">boolean</span> flag;</span><br><span class="line"><span class="type">long</span> time;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更具体</span></span><br><span class="line">List&lt;Order&gt; pendingOrders;</span><br><span class="line"><span class="type">boolean</span> inventoryReserved;</span><br><span class="line"><span class="type">long</span> paymentDeadlineMillis;</span><br></pre></td></tr></table></figure>
+
+<p>命名也要保持同一业务词汇。产品文档写“冻结库存”，代码一部分叫 <code>lockStock</code>，另一部分叫 <code>occupyAmount</code>，会增加沟通成本。可以维护一份领域术语表，让接口、数据库和代码尽量使用同一语言。</p>
+<p>避免为了短而缩写。<code>ctx</code>、<code>req</code> 在局部范围可能清楚，<code>ps</code>、<code>d</code>、<code>x1</code> 通常只对作者当时清楚。</p>
+<h2 id="2-方法只处在一个抽象层次"><a href="#2-方法只处在一个抽象层次" class="headerlink" title="2. 方法只处在一个抽象层次"></a>2. 方法只处在一个抽象层次</h2><p>业务方法里同时出现流程判断、SQL 拼装和 HTTP 细节，会很难阅读：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">submitOrder</span><br><span class="line">  -&gt; validateCommand</span><br><span class="line">  -&gt; calculatePrice</span><br><span class="line">  -&gt; reserveInventory</span><br><span class="line">  -&gt; createOrder</span><br><span class="line">  -&gt; publishCreatedEvent</span><br></pre></td></tr></table></figure>
+
+<p>顶层方法应该像流程说明，具体实现下沉到对应对象。提取方法不是为了把 100 行机械拆成十个 10 行方法，而是给不同意图命名。</p>
+<p>过长参数列表也会暴露缺少业务对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 参数含义容易传错</span></span><br><span class="line">createOrder(userId, skuId, count, addressId, couponId, source);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令对象可以统一校验和演进</span></span><br><span class="line">createOrder(CreateOrderCommand command);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-提前返回减少嵌套"><a href="#3-提前返回减少嵌套" class="headerlink" title="3. 提前返回减少嵌套"></a>3. 提前返回减少嵌套</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> OrderView <span class="title function_">queryOrder</span><span class="params">(String orderNo)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(orderNo)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;订单号不能为空&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderRepository.findByOrderNo(orderNo);</span><br><span class="line">    <span class="keyword">if</span> (order == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderNotFoundException</span>(orderNo);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> orderAssembler.toView(order);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数非法和对象不存在先退出，主流程保持在较低缩进层级。提前返回不是所有地方都要使用，但对校验和异常分支很有效。</p>
+<h2 id="4-异常要带业务上下文"><a href="#4-异常要带业务上下文" class="headerlink" title="4. 异常要带业务上下文"></a>4. 异常要带业务上下文</h2><p>下面的处理让故障变得不可追踪：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;支付失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至少保留原始异常和关键业务标识：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (PaymentException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderPaymentException</span>(</span><br><span class="line">        <span class="string">&quot;订单支付失败, orderNo=&quot;</span> + command.getOrderNo(), ex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不要捕获 <code>Exception</code> 后返回成功，也不要同一个异常在每层重复打印完整堆栈。通常由最了解业务上下文的一层补充信息，在统一边界记录一次。</p>
+<h2 id="5-日志规范不是多打印"><a href="#5-日志规范不是多打印" class="headerlink" title="5. 日志规范不是多打印"></a>5. 日志规范不是多打印</h2><p>有价值的日志包含动作、结果、业务主键和必要原因：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;库存冻结成功, orderNo=&#123;&#125;, skuId=&#123;&#125;, quantity=&#123;&#125;&quot;</span>,</span><br><span class="line">    orderNo, skuId, quantity);</span><br></pre></td></tr></table></figure>
+
+<p>避免：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">进入方法</span><br><span class="line">执行成功</span><br><span class="line">参数=&#123;整个请求对象&#125;</span><br><span class="line">发生异常=&#123;只有 getMessage()&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个请求对象可能包含密码、Token 或个人信息，也会制造大量日志。规范应明确敏感字段、日志级别和采样策略。</p>
+<h2 id="6-注释解释为什么"><a href="#6-注释解释为什么" class="headerlink" title="6. 注释解释为什么"></a>6. 注释解释为什么</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 支付渠道最多查询最近 30 天记录，超过范围必须走离线对账</span></span><br><span class="line"><span class="keyword">if</span> (createdAt.isBefore(thirtyDaysAgo)) &#123;</span><br><span class="line">    <span class="keyword">return</span> offlineReconciliation(orderNo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这类注释解释业务约束，保留价值高。下面的注释只重复代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用户 ID 赋值给 userId</span></span><br><span class="line"><span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> user.getId();</span><br></pre></td></tr></table></figure>
+
+<p>代码变化后，过期注释比没有注释更危险。Review 时要把注释和代码当成一个整体检查。</p>
+<h2 id="7-可以自动化的全部交给工具"><a href="#7-可以自动化的全部交给工具" class="headerlink" title="7. 可以自动化的全部交给工具"></a>7. 可以自动化的全部交给工具</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式化：IDE Formatter / Spotless</span><br><span class="line">静态检查：Checkstyle / PMD / SpotBugs</span><br><span class="line">依赖漏洞：依赖扫描</span><br><span class="line">测试：Maven test + CI</span><br><span class="line">覆盖率：JaCoCo，作为趋势而不是唯一质量指标</span><br></pre></td></tr></table></figure>
+
+<p>统一 IDEA 格式配置并放入仓库，避免每个人手工争论空格和换行。CI 检查失败要给出明确修复命令，不能只留下一个红色任务。</p>
+<p>自动化规则不要一次开启几百条并要求全量旧代码立即通过。可以先对新增和修改代码生效，再逐步治理存量。</p>
+<h2 id="8-Review-看什么"><a href="#8-Review-看什么" class="headerlink" title="8. Review 看什么"></a>8. Review 看什么</h2><p>我会按这个顺序 Review：</p>
 <ol>
-<li>同一类逻辑在不同人手里写法差异很大</li>
-<li>命名随意导致 Review 成本上升</li>
-<li>没有统一异常、日志、返回值规范</li>
+<li>需求是否被正确理解，边界条件有没有遗漏。</li>
+<li>数据和接口是否兼容，失败后状态是否可解释。</li>
+<li>是否存在重复、过长方法、多层嵌套和不清晰命名。</li>
+<li>异常、日志和事务边界是否合理。</li>
+<li>并发、性能和安全风险是否被考虑。</li>
+<li>测试是否覆盖主要分支。</li>
+<li>最后才是格式问题，通常应由工具解决。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>规范的本质是降低差异。代码会被多人阅读和长期维护，统一风格能让团队把注意力放在业务逻辑，而不是表达方式。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐：命名表达业务含义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeUserAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    validateFreezeReason(reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;user account frozen, userId=&#123;&#125;, reason=&#123;&#125;&quot;</span>, userId, reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Review 意见要说明原因和风险：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">不建议：这里写得不好，改一下。</span><br><span class="line"></span><br><span class="line">建议：当前先写订单再调用库存，库存失败会留下 CREATED 状态。</span><br><span class="line">请明确失败状态或补偿任务，并增加对应测试。</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Review 关注点：</span><br><span class="line">- 命名是否清晰</span><br><span class="line">- 异常是否有上下文</span><br><span class="line">- 日志是否能支撑排查</span><br><span class="line">- 方法是否过长</span><br><span class="line">- 是否存在重复逻辑</span><br></pre></td></tr></table></figure>
+<h2 id="9-规范如何在团队落地"><a href="#9-规范如何在团队落地" class="headerlink" title="9. 规范如何在团队落地"></a>9. 规范如何在团队落地</h2><p>一份没人看的文档不会自动改变代码。有效做法是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">从高频问题中提炼 10 条核心规则</span><br><span class="line">提供正反示例</span><br><span class="line">格式和静态检查进入 CI</span><br><span class="line">PR 模板加入业务、数据、测试和回滚项</span><br><span class="line">Review 中统一引用规则编号</span><br><span class="line">每季度删除无价值规则并补充新案例</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>代码规范的重要性</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
-<ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
-</ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>规范也需要例外机制。性能热点、框架约束或兼容代码可能无法遵循普通写法，但例外应在代码或设计记录中解释原因。</p>
+<h2 id="最后看质量"><a href="#最后看质量" class="headerlink" title="最后看质量"></a>最后看质量</h2><p>规范的目标不是让所有代码看起来像一个人写的，而是让任何团队成员都能更快理解、修改和验证。真正有效的规范会减少 Review 往返、降低缺陷率、缩短新人上手时间，并让线上日志更容易使用。</p>
+<p>当团队开始讨论业务边界和失败语义，而不是反复争论括号位置，代码规范才真正发挥作用。</p>
 
       
     </div>
@@ -480,34 +564,121 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/onboarding-project-cover.svg" alt="新人如何快速熟悉项目封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从“能把项目跑起来”到“能独立改需求”，中间隔着对业务、代码结构和协作方式的系统理解。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<blockquote>
+<p>刚进入一个项目时，最容易走两个极端：从第一行源码开始读，几天后仍然没有全局概念；或者只等别人分配任务，能改代码却解释不清请求为什么这样流转。比较有效的方法，是用一周建立一张“可以工作的项目地图”。</p>
+</blockquote>
+<h2 id="第-0-天：先约定上手目标"><a href="#第-0-天：先约定上手目标" class="headerlink" title="第 0 天：先约定上手目标"></a>第 0 天：先约定上手目标</h2><p>“熟悉项目”太模糊。第一周不要求掌握所有模块，我会把目标改成五个可以验证的结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">能在本地独立启动</span><br><span class="line">能讲清一个核心业务流程</span><br><span class="line">能找到对应接口、服务和数据表</span><br><span class="line">能通过日志调试一次请求</span><br><span class="line">能提交一个低风险修改并完成测试</span><br></pre></td></tr></table></figure>
+
+<p>同时确认联系人：业务问题问谁、环境问题问谁、数据库变更由谁审核、线上故障如何升级。提前知道责任边界，比卡住以后在群里泛问“有人知道吗”有效得多。</p>
+<h2 id="第-1-天：把项目可靠地跑起来"><a href="#第-1-天：把项目可靠地跑起来" class="headerlink" title="第 1 天：把项目可靠地跑起来"></a>第 1 天：把项目可靠地跑起来</h2><p>先读这些文件，而不是立即搜索业务类：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">README.md</span><br><span class="line">pom.xml</span><br><span class="line">application*.yml</span><br><span class="line">Dockerfile / compose.yaml</span><br><span class="line">数据库初始化脚本</span><br><span class="line">CI 配置</span><br><span class="line">启动脚本</span><br></pre></td></tr></table></figure>
+
+<p>记录本地依赖和版本：JDK、Maven、MySQL、Redis、消息队列，以及必须申请的配置或账号。敏感值只记录获取方式，不复制到个人笔记。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">mvn -version</span><br><span class="line">mvn clean <span class="built_in">test</span></span><br><span class="line">mvn spring-boot:run -Dspring-boot.run.profiles=<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+
+<p>启动完成后，不以“控制台没有报错”为标准，而要验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl -i http://127.0.0.1:8080/api/ping</span><br></pre></td></tr></table></figure>
+
+<p>把启动过程中遇到的缺失配置、端口冲突和初始化步骤补回团队文档。新人遇到的问题往往也是下一位新人会遇到的问题。</p>
+<h2 id="第-2-天：画业务地图，不急着画类图"><a href="#第-2-天：画业务地图，不急着画类图" class="headerlink" title="第 2 天：画业务地图，不急着画类图"></a>第 2 天：画业务地图，不急着画类图</h2><p>先问产品或同事三个问题：</p>
 <ol>
-<li>只关注代码入口，忽略业务流程和数据流</li>
-<li>本地环境搭建耗时过长，影响进入真实需求</li>
-<li>遇到问题只问结论，没有沉淀排查路径</li>
+<li>系统最重要的用户是谁。</li>
+<li>哪三个流程最影响业务结果。</li>
+<li>哪些状态一旦错误最难修复。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>熟悉项目的关键不是把每一行代码都看懂，而是先建立业务地图、系统边界、核心链路和本地调试能力。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目熟悉清单：</span><br><span class="line">1. 本地启动方式</span><br><span class="line">2. 核心业务流程</span><br><span class="line">3. 数据库核心表</span><br><span class="line">4. 主要外部依赖</span><br><span class="line">5. 最近三个月变更记录</span><br><span class="line">6. 常见问题排查文档</span><br></pre></td></tr></table></figure>
+<p>例如订单系统可以先画成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户下单</span><br><span class="line">  -&gt; 价格计算</span><br><span class="line">  -&gt; 库存校验</span><br><span class="line">  -&gt; 创建订单</span><br><span class="line">  -&gt; 支付</span><br><span class="line">  -&gt; 履约</span><br><span class="line">  -&gt; 完成/退款</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 熟悉项目时常用命令</span></span><br><span class="line">git <span class="built_in">log</span> --oneline --decorate -20</span><br><span class="line">grep -R <span class="string">&quot;@RequestMapping\|@GetMapping\|@PostMapping&quot;</span> src/main/java</span><br><span class="line">mvn clean <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<p>再标出每一步的入口、数据和外部依赖：</p>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>接口</th>
+<th>核心表</th>
+<th>外部依赖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建订单</td>
+<td><code>POST /orders</code></td>
+<td><code>order_info</code></td>
+<td>库存服务</td>
+</tr>
+<tr>
+<td>支付</td>
+<td><code>POST /payments</code></td>
+<td><code>payment_record</code></td>
+<td>支付渠道</td>
+</tr>
+<tr>
+<td>退款</td>
+<td><code>POST /refunds</code></td>
+<td><code>refund_record</code></td>
+<td>支付渠道、消息队列</td>
+</tr>
+</tbody></table>
+<p>这张表不需要第一天就完全正确。它的价值是暴露未知项，让后续阅读有方向。</p>
+<h2 id="第-3-天：认识数据和状态"><a href="#第-3-天：认识数据和状态" class="headerlink" title="第 3 天：认识数据和状态"></a>第 3 天：认识数据和状态</h2><p>代码可以重构，数据库里的历史数据会长期存在。优先了解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">核心表主键和业务唯一键</span><br><span class="line">状态字段及合法流转</span><br><span class="line">金额、时间和逻辑删除字段</span><br><span class="line">读写量最大的索引</span><br><span class="line">定时任务和数据修复脚本</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>新人如何快速熟悉项目</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>不要用生产账号随意执行查询。通过只读环境或脱敏数据查看表结构：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">CREATE TABLE</span> order_info;</span><br><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>针对状态字段，写出状态机：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CREATED -&gt; PAID -&gt; SHIPPED -&gt; FINISHED</span><br><span class="line">   |         |</span><br><span class="line">   v         v</span><br><span class="line">CANCELLED  REFUNDING -&gt; REFUNDED</span><br></pre></td></tr></table></figure>
+
+<p>如果代码里任何状态都能改成任何状态，这是一个值得记录的风险，但新人第一周不需要立刻重构它。</p>
+<h2 id="第-4-天：跟踪一条完整请求"><a href="#第-4-天：跟踪一条完整请求" class="headerlink" title="第 4 天：跟踪一条完整请求"></a>第 4 天：跟踪一条完整请求</h2><p>选择一个查询接口，从入口追到数据库：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Controller</span><br><span class="line">  -&gt; Application Service</span><br><span class="line">  -&gt; Domain/Business Service</span><br><span class="line">  -&gt; Repository/Mapper</span><br><span class="line">  -&gt; SQL</span><br><span class="line">  -&gt; Response</span><br></pre></td></tr></table></figure>
+
+<p>常用搜索：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rg <span class="string">&#x27;@(Get|Post|Put|Delete)Mapping&#x27;</span> src/main/java</span><br><span class="line">rg <span class="string">&#x27;orderNo|requestId&#x27;</span> src/main/java src/main/resources</span><br><span class="line">rg <span class="string">&#x27;select .*order_info|from order_info&#x27;</span> src/main/resources</span><br></pre></td></tr></table></figure>
+
+<p>IDEA 中用 Call Hierarchy、Find Usages 和断点确认真实调用，不能只凭类名猜。记录请求参数在哪一层校验、事务从哪里开始、异常在哪里转换、日志是否能串起全过程。</p>
+<h2 id="第-5-天：看最近修改，而不是考古所有历史"><a href="#第-5-天：看最近修改，而不是考古所有历史" class="headerlink" title="第 5 天：看最近修改，而不是考古所有历史"></a>第 5 天：看最近修改，而不是考古所有历史</h2><p>最近三个月的提交最接近当前业务重点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> --oneline --decorate -30</span><br><span class="line">git <span class="built_in">log</span> --since=<span class="string">&#x27;3 months ago&#x27;</span> --<span class="built_in">stat</span></span><br><span class="line">git blame -L 80,130 src/main/java/com/example/order/OrderService.java</span><br></pre></td></tr></table></figure>
+
+<p><code>git blame</code> 不是为了找责任人，而是找到引入这段逻辑的提交，再理解当时的上下文。结合需求单、PR 描述和测试用例，通常比猜注释更准确。</p>
+<p>选择两个近期需求回答：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>为什么要改。</li>
+<li>改了哪些层。</li>
+<li>哪些兼容逻辑被保留。</li>
+<li>测试覆盖了什么。</li>
+<li>上线后如何验证。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<h2 id="第-6-天：完成一个低风险闭环"><a href="#第-6-天：完成一个低风险闭环" class="headerlink" title="第 6 天：完成一个低风险闭环"></a>第 6 天：完成一个低风险闭环</h2><p>合适的首个任务可以是：补充校验、修复文案、增加测试、完善日志或调整只读接口。重点不是任务大小，而是完整走一遍流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">理解需求</span><br><span class="line">  -&gt; 定位代码</span><br><span class="line">  -&gt; 修改和测试</span><br><span class="line">  -&gt; 自查影响范围</span><br><span class="line">  -&gt; 提交 PR</span><br><span class="line">  -&gt; 响应 Review</span><br><span class="line">  -&gt; 验证环境</span><br></pre></td></tr></table></figure>
+
+<p>提交前至少运行关联测试，不要因为任务小就跳过：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn -Dtest=OrderServiceTest <span class="built_in">test</span></span><br><span class="line">git diff --check</span><br><span class="line">git diff --<span class="built_in">stat</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="第-7-天：输出一页项目地图"><a href="#第-7-天：输出一页项目地图" class="headerlink" title="第 7 天：输出一页项目地图"></a>第 7 天：输出一页项目地图</h2><p>我的一页总结通常包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目目标与核心用户</span><br><span class="line">三个核心业务流程</span><br><span class="line">主要模块和负责人</span><br><span class="line">核心表与状态机</span><br><span class="line">外部依赖和环境入口</span><br><span class="line">启动、测试和发布命令</span><br><span class="line">当前仍不理解的问题</span><br></pre></td></tr></table></figure>
+
+<p>最后一项很重要。项目复杂时，不可能一周全部掌握。把未知项显式列出，后续任务会自然补全地图。</p>
+<h2 id="怎样提一个高质量问题"><a href="#怎样提一个高质量问题" class="headerlink" title="怎样提一个高质量问题"></a>怎样提一个高质量问题</h2><p>不要只说“项目启动不了”，可以这样组织：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">目标：使用 local profile 启动 order-service</span><br><span class="line">已做：JDK 8、MySQL 和 Redis 已确认；mvn test 通过</span><br><span class="line">现象：启动时连接 config-service 超时</span><br><span class="line">证据：异常首行、目标地址、发生时间</span><br><span class="line">判断：怀疑缺少本地配置或网络权限</span><br><span class="line">问题：local 环境应使用哪个配置入口？</span><br></pre></td></tr></table></figure>
+
+<p>这能让对方快速判断，也证明自己已经完成基础排查。</p>
+<h2 id="最容易浪费时间的做法"><a href="#最容易浪费时间的做法" class="headerlink" title="最容易浪费时间的做法"></a>最容易浪费时间的做法</h2><ol>
+<li>从工具类开始逐行阅读，没有业务问题作为线索。</li>
+<li>复制同事配置却不知道来源和权限边界。</li>
+<li>一上来重构公共代码，尚未理解兼容原因。</li>
+<li>只记录结论，不记录命令、现象和判断过程。</li>
+<li>遇到问题立即问人，从不先搜索日志和历史提交。</li>
+</ol>
+<h2 id="一个月后的验收"><a href="#一个月后的验收" class="headerlink" title="一个月后的验收"></a>一个月后的验收</h2><p>第一周建立地图，第一个月应该逐步做到：</p>
+<ul>
+<li>能独立完成一个中等需求。</li>
+<li>能解释核心链路的事务和失败分支。</li>
+<li>能处理常见环境和数据问题。</li>
+<li>能在 Review 中发现业务影响，不只看格式。</li>
+<li>至少补齐一份团队可复用的文档或测试。</li>
+</ul>
+<p>快速熟悉项目不是记住最多类名，而是形成定位问题的坐标系。知道业务目标、数据边界、调用入口和协作流程后，陌生代码会从一片文件变成可以逐步验证的系统。</p>
 
       
     </div>
@@ -1340,7 +1511,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

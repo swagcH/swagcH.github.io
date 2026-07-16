@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景部署标准化的价值，是让上线从一次“手工冒险”变成一套可重复执行的工程动作。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并">
+    <meta name="description" content="早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。 部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。 发布单先于操作没有发布单，不开始生产操作。最小发布单包含： 1234567891011">
 <meta property="og:type" content="article">
 <meta property="og:title" content="项目部署标准化流程">
 <meta property="og:url" content="https://swagch.github.io/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景部署标准化的价值，是让上线从一次“手工冒险”变成一套可重复执行的工程动作。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并">
+<meta property="og:description" content="早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。 部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。 发布单先于操作没有发布单，不开始生产操作。最小发布单包含： 1234567891011">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2020/deploy-standard-cover.svg">
 <meta property="article:published_time" content="2020-10-18T09:58:45.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.177Z">
+<meta property="article:modified_time" content="2026-07-16T03:48:36.275Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="运维">
 <meta property="article:tag" content="项目部署">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E5%8D%95%E5%85%88%E4%BA%8E%E6%93%8D%E4%BD%9C"><span class="nav-text">发布单先于操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E7%A1%AE%E8%AE%A4%E5%8F%98%E6%9B%B4%E5%86%BB%E7%BB%93"><span class="nav-text">0. 确认变更冻结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5"><span class="nav-text">1. 上线前检查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E6%9D%A1%E4%BB%B6"><span class="nav-text">业务条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%9D%A1%E4%BB%B6"><span class="nav-text">系统条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%81%A2%E5%A4%8D%E6%9D%A1%E4%BB%B6"><span class="nav-text">恢复条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%98%E6%9B%B4%E5%85%88%E5%81%9A%E5%85%BC%E5%AE%B9%E8%AE%BE%E8%AE%A1"><span class="nav-text">2. 数据库变更先做兼容设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%85%88%E7%81%B0%E5%BA%A6%E4%B8%80%E4%B8%AA%E8%8A%82%E7%82%B9"><span class="nav-text">3. 先灰度一个节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%86%92%E7%83%9F%E9%AA%8C%E8%AF%81%E8%A6%81%E8%A6%86%E7%9B%96%E5%86%99%E8%B7%AF%E5%BE%84"><span class="nav-text">4. 冒烟验证要覆盖写路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%A7%82%E5%AF%9F%E6%8C%87%E6%A0%87%E5%86%B3%E5%AE%9A%E6%98%AF%E5%90%A6%E7%BB%A7%E7%BB%AD"><span class="nav-text">5. 观察指标决定是否继续</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%9B%9E%E9%80%80%E6%98%AF%E4%B8%80%E9%A1%B9%E9%A2%84%E5%85%88%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%8A%A8%E4%BD%9C"><span class="nav-text">6. 回退是一项预先设计的动作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%8F%91%E5%B8%83%E7%BB%93%E6%9D%9F%E4%B8%8D%E6%98%AF%E7%BE%A4%E9%87%8C%E8%AF%B4%E4%B8%80%E5%8F%A5%E2%80%9C%E5%A5%BD%E4%BA%86%E2%80%9D"><span class="nav-text">7. 发布结束不是群里说一句“好了”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88-Runbook"><span class="nav-text">最终 Runbook</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,34 +279,96 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>部署标准化的价值，是让上线从一次“手工冒险”变成一套可重复执行的工程动作。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>上线步骤依赖个人经验，缺少清单</li>
-<li>部署后没有验证项</li>
-<li>出现问题时没有回滚方案</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>标准化部署把个人经验转化为团队流程，让每次上线都能被复盘、复用和持续改进。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line">scp target/app.jar deploy@server:/data/app/</span><br><span class="line">ssh deploy@server <span class="string">&quot;systemctl restart app&quot;</span></span><br></pre></td></tr></table></figure>
+<p>早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。</p>
+<p>部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。</p>
+<h2 id="发布单先于操作"><a href="#发布单先于操作" class="headerlink" title="发布单先于操作"></a>发布单先于操作</h2><p>没有发布单，不开始生产操作。最小发布单包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">版本：v1.12.0</span><br><span class="line">Git 提交：3a91f2c</span><br><span class="line">构建编号：build-20201018-42</span><br><span class="line">变更范围：订单导出、支付回调幂等修复</span><br><span class="line">影响服务：order-service</span><br><span class="line">数据库变更：V20201018_01__add_payment_unique_key.sql</span><br><span class="line">配置变更：PAYMENT_READ_TIMEOUT 3s -&gt; 5s</span><br><span class="line">计划窗口：20:00-20:30</span><br><span class="line">执行人 / 复核人：</span><br><span class="line">观察指标：</span><br><span class="line">回退触发条件：</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">部署步骤：构建 -&gt; 备份 -&gt; 上传 -&gt; 停服 -&gt; 替换 -&gt; 启动 -&gt; 验证 -&gt; 观察日志</span><br></pre></td></tr></table></figure>
+<p>标题相同的 Jar 不等于同一个版本。发布单必须能对应到唯一 Git 提交和构建产物。</p>
+<h2 id="0-确认变更冻结"><a href="#0-确认变更冻结" class="headerlink" title="0. 确认变更冻结"></a>0. 确认变更冻结</h2><p>发布窗口开始前，确认待发布提交不再变化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git show --<span class="built_in">stat</span> 3a91f2c</span><br><span class="line">git tag --contains 3a91f2c</span><br><span class="line">shasum -a 256 order-service.jar</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>项目部署标准化流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>校验值应由 CI 生成，并在目标服务器再次核对。不要在服务器上临时修改 Jar、class 或配置后仍沿用原版本号，这会让后续节点无法复现。</p>
+<p>需要一起冻结的还有：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>数据库脚本内容和执行顺序。</li>
+<li>配置版本。</li>
+<li>依赖服务版本。</li>
+<li>灰度节点范围。</li>
+<li>验证用例和测试数据。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<h2 id="1-上线前检查"><a href="#1-上线前检查" class="headerlink" title="1. 上线前检查"></a>1. 上线前检查</h2><p>我把检查分成业务、系统和恢复能力三组。</p>
+<h3 id="业务条件"><a href="#业务条件" class="headerlink" title="业务条件"></a>业务条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 需求验收完成，已知问题有明确结论</span><br><span class="line">[ ] 新旧客户端兼容</span><br><span class="line">[ ] 定时任务、消息消费者和批处理影响已确认</span><br><span class="line">[ ] 数据初始化、历史迁移和权限配置已准备</span><br><span class="line">[ ] 客服或业务方知道用户可见变化</span><br></pre></td></tr></table></figure>
+
+<h3 id="系统条件"><a href="#系统条件" class="headerlink" title="系统条件"></a>系统条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] CPU、内存、磁盘和连接池处于正常水位</span><br><span class="line">[ ] 当前无未处理生产告警</span><br><span class="line">[ ] 配置项已经双人复核</span><br><span class="line">[ ] 依赖的数据库、缓存、MQ 和外部接口正常</span><br><span class="line">[ ] 监控看板与日志检索可用</span><br></pre></td></tr></table></figure>
+
+<p>不要在系统已经不稳定时叠加发布变量。必须紧急发布时，要在发布单中说明当前故障状态和额外风险。</p>
+<h3 id="恢复条件"><a href="#恢复条件" class="headerlink" title="恢复条件"></a>恢复条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 上一稳定版本产物可获取且校验通过</span><br><span class="line">[ ] 旧配置版本可恢复</span><br><span class="line">[ ] 数据库变更明确可逆或向后兼容</span><br><span class="line">[ ] 回退操作人和决策人在线</span><br><span class="line">[ ] 回退预计耗时符合业务容忍度</span><br></pre></td></tr></table></figure>
+
+<p>“保留旧 Jar”不是完整回退方案。如果新代码已经写入旧版本无法识别的数据，应用回退仍可能失败。</p>
+<h2 id="2-数据库变更先做兼容设计"><a href="#2-数据库变更先做兼容设计" class="headerlink" title="2. 数据库变更先做兼容设计"></a>2. 数据库变更先做兼容设计</h2><p>数据库变更优先使用扩展、迁移、收缩三步：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">扩展：新增可空字段、表或索引，新旧代码都能运行</span><br><span class="line">迁移：新代码双写或迁移历史数据，持续校验</span><br><span class="line">收缩：确认旧版本退出后，再删除旧字段和兼容逻辑</span><br></pre></td></tr></table></figure>
+
+<p>避免在同一个窗口直接重命名字段并立即发布只认识新字段的代码。大表 DDL 还要预估锁时间、临时空间、主从延迟和失败恢复。</p>
+<p>执行脚本前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 已在相近数据量环境验证</span><br><span class="line">[ ] 脚本带唯一版本号且不可重复修改</span><br><span class="line">[ ] 明确是否幂等</span><br><span class="line">[ ] 评估执行时间、锁和磁盘空间</span><br><span class="line">[ ] 有执行后校验 SQL</span><br><span class="line">[ ] 高风险操作得到数据库负责人授权</span><br></pre></td></tr></table></figure>
+
+<p>生产 DDL 和数据修复应由有权限的人按审批执行。不要把未经 Review 的临时 SQL 粘贴进生产终端。</p>
+<h2 id="3-先灰度一个节点"><a href="#3-先灰度一个节点" class="headerlink" title="3. 先灰度一个节点"></a>3. 先灰度一个节点</h2><p>多实例服务不要一次替换全部节点。标准顺序是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">从负载均衡摘除一个节点</span><br><span class="line">等待存量请求完成</span><br><span class="line">部署新产物和配置</span><br><span class="line">启动并通过就绪检查</span><br><span class="line">执行冒烟验证</span><br><span class="line">重新接入少量流量</span><br><span class="line">观察一个完整业务周期</span><br><span class="line">逐批替换其余节点</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会影响服务容量，必须由具备生产权限的操作人执行，并确认剩余节点能够承载当前流量。</p>
+<p>一个简单的启动检查不能只看进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl --fail --silent http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl --fail --silent http://127.0.0.1:8080/api/internal/version</span><br></pre></td></tr></table></figure>
+
+<p>版本接口应返回当前 Git 提交、构建号和启动时间，避免流量打到错误产物。</p>
+<h2 id="4-冒烟验证要覆盖写路径"><a href="#4-冒烟验证要覆盖写路径" class="headerlink" title="4. 冒烟验证要覆盖写路径"></a>4. 冒烟验证要覆盖写路径</h2><p>只打开首页不足以证明后端可用。订单服务至少验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">读：查询一条授权范围内的订单</span><br><span class="line">写：创建一笔可清理的测试订单</span><br><span class="line">改：完成一次状态变化</span><br><span class="line">依赖：数据库、缓存和下游调用成功</span><br><span class="line">异步：消息被消费且没有进入死信队列</span><br><span class="line">权限：无权限请求被正确拒绝</span><br></pre></td></tr></table></figure>
+
+<p>测试数据要有固定前缀和清理策略，不能污染报表或触发真实通知。涉及支付、短信和外部客户的流程，应使用专门沙箱或受控验证路径。</p>
+<p>每项冒烟都记录请求时间、traceId 和结果。这样失败时能直接进入日志检索，而不是重新猜测。</p>
+<h2 id="5-观察指标决定是否继续"><a href="#5-观察指标决定是否继续" class="headerlink" title="5. 观察指标决定是否继续"></a>5. 观察指标决定是否继续</h2><p>灰度后至少看四组信号：</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>关注点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流量</td>
+<td>QPS、实例流量是否符合灰度比例</td>
+</tr>
+<tr>
+<td>质量</td>
+<td>错误率、业务失败码、消息失败数</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>P95&#x2F;P99、慢 SQL、下游耗时</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>CPU、堆内存、GC、线程池、连接池</td>
+</tr>
+</tbody></table>
+<p>不能只看平均响应时间。少量长尾请求可能已经影响核心用户，但均值仍然正常。</p>
+<p>发布前应写清触发条件，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5 分钟错误率高于基线 1 个百分点：暂停扩容</span><br><span class="line">核心接口 P99 连续 3 分钟超过 2 秒：回退灰度节点</span><br><span class="line">出现数据重复或状态不可逆错误：立即停止发布并升级决策</span><br></pre></td></tr></table></figure>
+
+<p>阈值根据系统基线设定，不能把示例数字机械搬到所有服务。</p>
+<h2 id="6-回退是一项预先设计的动作"><a href="#6-回退是一项预先设计的动作" class="headerlink" title="6. 回退是一项预先设计的动作"></a>6. 回退是一项预先设计的动作</h2><p>回退判断由发布负责人根据既定条件做出，不在故障现场临时争论“再看看”。执行顺序通常是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">停止继续发布</span><br><span class="line">隔离新版本节点</span><br><span class="line">保存日志、线程和关键指标</span><br><span class="line">恢复旧产物与旧配置</span><br><span class="line">通过健康与业务验证</span><br><span class="line">逐步恢复流量</span><br><span class="line">确认数据兼容与积压任务</span><br></pre></td></tr></table></figure>
+
+<p>如果数据库变更不可逆，可能只能前向修复，不能简单回滚应用。发布前必须把这种情况写进决策记录，并准备降级开关或兼容代码。</p>
+<p>不要为了赶时间删除现场日志或覆盖旧产物。恢复业务和保留证据可以并行安排。</p>
+<h2 id="7-发布结束不是群里说一句“好了”"><a href="#7-发布结束不是群里说一句“好了”" class="headerlink" title="7. 发布结束不是群里说一句“好了”"></a>7. 发布结束不是群里说一句“好了”</h2><p>发布完成记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">实际开始与结束时间</span><br><span class="line">每批节点和当前版本</span><br><span class="line">数据库、配置的实际版本</span><br><span class="line">冒烟结果和 traceId</span><br><span class="line">核心指标与基线对比</span><br><span class="line">期间异常及处理</span><br><span class="line">遗留观察项和负责人</span><br></pre></td></tr></table></figure>
+
+<p>至少跨过一个业务高峰或约定观察期后再关闭发布单。定时任务在凌晨执行、账务在次日对账时，十分钟无告警不代表变更已经完全验证。</p>
+<h2 id="最终-Runbook"><a href="#最终-Runbook" class="headerlink" title="最终 Runbook"></a>最终 Runbook</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">发布前：范围冻结 -&gt; 产物校验 -&gt; 条件检查 -&gt; 回退演练</span><br><span class="line">发布中：兼容变更 -&gt; 单节点灰度 -&gt; 冒烟 -&gt; 指标观察 -&gt; 分批扩展</span><br><span class="line">异常时：停止扩展 -&gt; 保存证据 -&gt; 按阈值回退或前向修复</span><br><span class="line">发布后：版本核对 -&gt; 业务验证 -&gt; 持续观察 -&gt; 关闭与复盘</span><br></pre></td></tr></table></figure>
+
+<p>标准化发布的意义，是把原本藏在个人经验里的判断变成团队可以执行和复核的步骤。流程不一定让上线更快，却能让每一次快和慢都有证据，让故障发生时不用从“这次到底改了什么”开始查起。</p>
 
     </div>
 
@@ -395,7 +457,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

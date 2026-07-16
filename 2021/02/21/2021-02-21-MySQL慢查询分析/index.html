@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景慢查询不能只看 SQL 文本，需要结合执行计划、索引、扫描行数和返回字段。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12set global slow_query_log &#x3D; &amp;#x27;ON&amp;#x27;;set global long_query_time &#x3D; 1;  123# Time: 2021-02-21T14:22:19# Qu">
+    <meta name="description" content="这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。 测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。 实验对象1234567SELECT id, order_no, amount, created_atFROM order_infoWHERE tena">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL慢查询分析">
 <meta property="og:url" content="https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景慢查询不能只看 SQL 文本，需要结合执行计划、索引、扫描行数和返回字段。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12set global slow_query_log &#x3D; &amp;#x27;ON&amp;#x27;;set global long_query_time &#x3D; 1;  123# Time: 2021-02-21T14:22:19# Qu">
+<meta property="og:description" content="这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。 测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。 实验对象1234567SELECT id, order_no, amount, created_atFROM order_infoWHERE tena">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2021/mysql-slow-query-cover.svg">
 <meta property="article:published_time" content="2021-02-21T08:48:05.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T03:57:55.710Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="索引">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%AF%B9%E8%B1%A1"><span class="nav-text">实验对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E5%9B%BA%E5%AE%9A%E5%AE%9E%E9%AA%8C%E6%96%B9%E6%B3%95"><span class="nav-text">先固定实验方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%BA%BF%EF%BC%9A%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="nav-text">基线：执行计划在做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%AE%BE-A%EF%BC%9A%E5%8F%AA%E5%BC%BA%E5%88%B6%E4%BD%BF%E7%94%A8%E7%A7%9F%E6%88%B7%E7%B4%A2%E5%BC%95"><span class="nav-text">假设 A：只强制使用租户索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%AE%BE-B%EF%BC%9A%E5%BB%BA%E7%AB%8B%E7%AC%A6%E5%90%88%E6%9F%A5%E8%AF%A2%E9%A1%BA%E5%BA%8F%E7%9A%84%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="nav-text">假设 B：建立符合查询顺序的联合索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%AE%BE-C%EF%BC%9A%E6%8A%8A%E6%89%80%E6%9C%89%E8%BF%94%E5%9B%9E%E5%88%97%E9%83%BD%E5%A1%9E%E8%BF%9B%E7%B4%A2%E5%BC%95"><span class="nav-text">假设 C：把所有返回列都塞进索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E8%AE%BE-D%EF%BC%9A%E5%8E%BB%E6%8E%89%E6%97%B6%E9%97%B4%E6%9D%A1%E4%BB%B6%E4%BC%9A%E6%80%8E%E6%A0%B7"><span class="nav-text">假设 D：去掉时间条件会怎样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8A%E7%BA%BF%E5%89%8D%E5%90%8E%E5%88%86%E5%88%AB%E9%AA%8C%E8%AF%81"><span class="nav-text">索引上线前后分别验证</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,20 +279,104 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>慢查询不能只看 SQL 文本，需要结合执行计划、索引、扫描行数和返回字段。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+<p>这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。</p>
+<p>测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。</p>
+<h2 id="实验对象"><a href="#实验对象" class="headerlink" title="实验对象"></a>实验对象</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> slow_query_log <span class="operator">=</span> <span class="string">&#x27;ON&#x27;</span>;</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">global</span> long_query_time <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>表上原有索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">KEY idx_tenant (tenant_id),</span><br><span class="line">KEY idx_status (status),</span><br><span class="line">KEY idx_created_at (created_at)</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Time: 2021-02-21T14:22:19</span><br><span class="line"># Query_time: 6.834 Lock_time: 0.001 Rows_sent: 20 Rows_examined: 581239</span><br><span class="line">select * from order_info where user_id = 1001 order by created_at desc limit 20;</span><br></pre></td></tr></table></figure>
+<p>三个查询字段分别有索引，很容易产生“应该不会慢”的判断。但 MySQL 通常不会把三个单列索引自动组合成最符合过滤和排序的访问路径。</p>
+<h2 id="先固定实验方法"><a href="#先固定实验方法" class="headerlink" title="先固定实验方法"></a>先固定实验方法</h2><p>为了让结果可比较，我约定：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">数据库版本：MySQL 5.7</span><br><span class="line">数据快照：同一份脱敏数据</span><br><span class="line">结果数量：固定 50</span><br><span class="line">每个方案：预热 2 次，记录后续 5 次</span><br><span class="line">同时记录：耗时、Rows_examined、执行计划、CPU</span><br><span class="line">每轮之间：不修改其他参数</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>缓存冷暖会显著影响耗时，所以不能拿第一次查询和第十次查询直接比较。生产问题还要从慢查询日志确认真实频率：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Query_time: 2.846  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 50  Rows_examined: 1184297</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: ALL</span><br><span class="line">possible_keys: idx_user_id</span><br><span class="line">key: NULL</span><br><span class="line">rows: 581239</span><br><span class="line">Extra: Using where; Using filesort</span><br></pre></td></tr></table></figure>
+<p>只返回 50 行却扫描 118 万行，是比单次 2.8 秒更稳定的信号。</p>
+<p>慢查询日志的全局开关会影响数据库行为，应由数据库管理员按规范操作。排查人员优先读取现有平台和日志，不在生产随意执行 <code>SET GLOBAL</code>。</p>
+<h2 id="基线：执行计划在做什么"><a href="#基线：执行计划在做什么" class="headerlink" title="基线：执行计划在做什么"></a>基线：执行计划在做什么</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter table</span> order_info</span><br><span class="line"><span class="keyword">add</span> index idx_user_created(user_id, created_at);</span><br><span class="line"></span><br><span class="line">explain <span class="keyword">select</span> id, order_no, order_status, created_at</span><br><span class="line"><span class="keyword">from</span> order_info</span><br><span class="line"><span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">desc</span></span><br><span class="line">limit <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>精简后的结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">possible_keys: idx_tenant,idx_status,idx_created_at</span><br><span class="line">key: idx_status</span><br><span class="line">rows: 1120000</span><br><span class="line">Extra: Using index condition; Using where; Using filesort</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>这里重点看四项：</p>
+<ol>
+<li><code>key</code>：实际选择了哪个索引。</li>
+<li><code>rows</code>：优化器估算要检查多少行。</li>
+<li><code>Using where</code>：取出索引记录后仍需过滤。</li>
+<li><code>Using filesort</code>：结果顺序无法直接由当前索引满足。</li>
+</ol>
+<p><code>type=range</code> 不代表一定高效。状态 <code>PAID</code> 在全表中占比很高，先按状态扫描仍会读取大量不属于租户 1001 的记录。</p>
+<h2 id="假设-A：只强制使用租户索引"><a href="#假设-A：只强制使用租户索引" class="headerlink" title="假设 A：只强制使用租户索引"></a>假设 A：只强制使用租户索引</h2><p>为了验证选择性，我在隔离环境使用 <code>FORCE INDEX</code> 做对照：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>扫描从约 112 万行下降到 31 万行，平均耗时从 2.8 秒下降到 0.9 秒，但仍需要过滤和排序。</p>
+<p>这个实验说明 <code>tenant_id</code> 比 <code>status</code> 更有选择性，不说明应该把 <code>FORCE INDEX</code> 写进业务 SQL。数据分布变化后，强制策略可能比优化器更差。</p>
+<h2 id="假设-B：建立符合查询顺序的联合索引"><a href="#假设-B：建立符合查询顺序的联合索引" class="headerlink" title="假设 B：建立符合查询顺序的联合索引"></a>假设 B：建立符合查询顺序的联合索引</h2><p>查询模式是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tenant_id：等值</span><br><span class="line">status：等值</span><br><span class="line">created_at：范围 + 倒序</span><br></pre></td></tr></table></figure>
+
+<p>因此实验索引为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>在生产执行该 DDL 前，必须确认数据库版本、在线 DDL 能力、表大小、额外磁盘、锁等待和复制延迟，并准备中止与回退方案。</p>
+<p>新执行计划：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">key: idx_tenant_status_created</span><br><span class="line">rows: 41862</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
+
+<p><code>Using filesort</code> 消失。因为前两列是等值条件，MySQL 可以沿 <code>created_at</code> 的索引顺序取最近记录，并在满足 <code>LIMIT 50</code> 后尽早停止。</p>
+<p>五次记录：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th align="right">平均耗时</th>
+<th align="right">P95</th>
+<th align="right">Rows_examined</th>
+<th>filesort</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始索引</td>
+<td align="right">2.81s</td>
+<td align="right">3.06s</td>
+<td align="right">1,184,297</td>
+<td>是</td>
+</tr>
+<tr>
+<td>强制租户索引</td>
+<td align="right">0.91s</td>
+<td align="right">1.02s</td>
+<td align="right">312,460</td>
+<td>是</td>
+</tr>
+<tr>
+<td>联合索引</td>
+<td align="right">43ms</td>
+<td align="right">58ms</td>
+<td align="right">50</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>慢查询日志里的实际 <code>Rows_examined</code> 比 <code>EXPLAIN rows</code> 更能反映本次执行。执行计划的 <code>rows</code> 是估算值，两者不应混为一谈。</p>
+<h2 id="假设-C：把所有返回列都塞进索引"><a href="#假设-C：把所有返回列都塞进索引" class="headerlink" title="假设 C：把所有返回列都塞进索引"></a>假设 C：把所有返回列都塞进索引</h2><p>有人提出把 <code>order_no</code> 和 <code>amount</code> 也加到索引，做成覆盖索引。实验中查询确实少了回表，但收益只有几毫秒，索引体积和写入成本却继续增加。</p>
+<p>这个接口只读取 50 行，回表 50 次并不是主要矛盾。最终没有扩大索引。</p>
+<p>覆盖索引适合返回列少、调用频繁、扫描量明显的场景。不能为了让 <code>Extra</code> 出现 <code>Using index</code>，就把大字段和大量业务字段都加入索引。</p>
+<h2 id="假设-D：去掉时间条件会怎样"><a href="#假设-D：去掉时间条件会怎样" class="headerlink" title="假设 D：去掉时间条件会怎样"></a>假设 D：去掉时间条件会怎样</h2><p>另一个接口复用了相同 SQL，但允许用户查询全部历史。去掉 <code>created_at</code> 条件后，联合索引仍能根据租户和状态定位，并按时间取前 50 条，因此首页仍然很快。</p>
+<p>问题出现在深分页：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>数据库必须跳过前 20 万条，耗时重新上升。解决方式不是继续加索引，而是改成游标：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (created_at <span class="operator">&lt;</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span></span><br><span class="line">       <span class="keyword">OR</span> (created_at <span class="operator">=</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span> <span class="keyword">AND</span> id <span class="operator">&lt;</span> <span class="number">2918172</span>))</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>为了让排序稳定，正式方案将 <code>id</code> 放到索引末尾并作为游标的一部分。仅按时间分页时，相同时间的记录可能重复或遗漏。</p>
+<h2 id="索引上线前后分别验证"><a href="#索引上线前后分别验证" class="headerlink" title="索引上线前后分别验证"></a>索引上线前后分别验证</h2><p>上线前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] SQL 来自真实慢日志，不是凭印象优化</span><br><span class="line">[ ] 数据分布和生产相近</span><br><span class="line">[ ] 联合索引顺序匹配过滤与排序</span><br><span class="line">[ ] 检查已有重复索引</span><br><span class="line">[ ] 评估索引大小、写放大和复制延迟</span><br><span class="line">[ ] 准备 DDL 观察与中止方案</span><br></pre></td></tr></table></figure>
+
+<p>上线后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 实际执行计划使用预期索引</span><br><span class="line">[ ] Rows_examined 与耗时下降</span><br><span class="line">[ ] 数据库 CPU 和 IO 没有异常上升</span><br><span class="line">[ ] INSERT、UPDATE 延迟仍在基线内</span><br><span class="line">[ ] 主从延迟正常</span><br><span class="line">[ ] 一周后复核真实查询分布</span><br></pre></td></tr></table></figure>
+
+<p>这次优化最有价值的并不是“加了一个联合索引”，而是验证过程：先用真实慢日志建立基线，再用单列索引实验理解选择性，最后让索引顺序匹配查询模式，并拒绝收益很小的过宽覆盖索引。</p>
+<p>执行计划不是一张及格证。只有扫描量、响应时间、写入成本和真实业务负载一起改善，这次调优才算完成。</p>
 
     </div>
 
@@ -381,7 +465,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

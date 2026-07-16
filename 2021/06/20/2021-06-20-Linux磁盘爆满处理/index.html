@@ -16,17 +16,17 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景磁盘爆满处理要先恢复服务写入能力，再定位增长来源。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123df -hFilesystem      Size  Used Avail Use% Mounted on&#x2F;dev&#x2F;vda1        40G   40G     0 100% &#x2F;  123应用报错：No space left on dev">
+    <meta name="description" content="这是一段磁盘告警值班记录。表面现象是根分区 100%，但真正占用空间的文件已经被删除，因此 du 怎么找都对不上 df。 磁盘爆满时最危险的动作，是为了尽快腾空间直接删除不了解用途的大文件。值班处理应先确认挂载点和增长来源，再由对应负责人选择释放方式。 01:17，告警与业务现象1234567host: app-02mount: &#x2F;usage: 100%available: 0应用错误：java.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux磁盘爆满处理">
 <meta property="og:url" content="https://swagch.github.io/2021/06/20/2021-06-20-Linux%E7%A3%81%E7%9B%98%E7%88%86%E6%BB%A1%E5%A4%84%E7%90%86/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景磁盘爆满处理要先恢复服务写入能力，再定位增长来源。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123df -hFilesystem      Size  Used Avail Use% Mounted on&#x2F;dev&#x2F;vda1        40G   40G     0 100% &#x2F;  123应用报错：No space left on dev">
+<meta property="og:description" content="这是一段磁盘告警值班记录。表面现象是根分区 100%，但真正占用空间的文件已经被删除，因此 du 怎么找都对不上 df。 磁盘爆满时最危险的动作，是为了尽快腾空间直接删除不了解用途的大文件。值班处理应先确认挂载点和增长来源，再由对应负责人选择释放方式。 01:17，告警与业务现象1234567host: app-02mount: &#x2F;usage: 100%available: 0应用错误：java.">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-20T11:18:37.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T04:02:50.494Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="运维">
@@ -53,9 +53,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#01-17%EF%BC%8C%E5%91%8A%E8%AD%A6%E4%B8%8E%E4%B8%9A%E5%8A%A1%E7%8E%B0%E8%B1%A1"><span class="nav-text">01:17，告警与业务现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#01-20%EF%BC%8C%E5%85%88%E7%A1%AE%E8%AE%A4%E6%98%AF%E5%93%AA%E4%B8%80%E7%A7%8D%E2%80%9C%E6%BB%A1%E2%80%9D"><span class="nav-text">01:20，先确认是哪一种“满”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#01-24%EF%BC%8Cdf-%E4%B8%8E-du-%E7%9A%84%E5%B7%AE%E5%80%BC"><span class="nav-text">01:24，df 与 du 的差值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#01-27%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E6%96%87%E4%BB%B6%E5%88%A0%E4%BA%86%E8%BF%98%E5%9C%A8%E5%A2%9E%E9%95%BF"><span class="nav-text">01:27，为什么文件删了还在增长</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#01-30%EF%BC%8C%E5%8F%97%E6%8E%A7%E9%87%8A%E6%94%BE%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-text">01:30，受控释放文件描述符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C-du-%E6%89%BE%E5%88%B0%E7%9A%84%E5%B0%B1%E6%98%AF%E7%9C%9F%E5%AE%9E%E5%A4%A7%E6%96%87%E4%BB%B6"><span class="nav-text">如果 du 找到的就是真实大文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%8A%E6%97%A5%E5%BF%97%E6%BB%9A%E5%8A%A8%E4%BA%A4%E7%BB%99%E5%BA%94%E7%94%A8"><span class="nav-text">把日志滚动交给应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%8A%E8%AD%A6%E4%B8%8D%E8%83%BD%E7%AD%89%E5%88%B0-100"><span class="nav-text">告警不能等到 100%</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%80%BC%E7%8F%AD%E8%AE%B0%E5%BD%95%E6%9C%80%E5%90%8E%E5%86%99%E4%B8%8B%E4%BB%80%E4%B9%88"><span class="nav-text">值班记录最后写下什么</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -276,18 +276,72 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>磁盘爆满处理要先恢复服务写入能力，再定位增长来源。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><p>这是一段磁盘告警值班记录。表面现象是根分区 100%，但真正占用空间的文件已经被删除，因此 <code>du</code> 怎么找都对不上 <code>df</code>。</p>
+<p>磁盘爆满时最危险的动作，是为了尽快腾空间直接删除不了解用途的大文件。值班处理应先确认挂载点和增长来源，再由对应负责人选择释放方式。</p>
+<h2 id="01-17，告警与业务现象"><a href="#01-17，告警与业务现象" class="headerlink" title="01:17，告警与业务现象"></a>01:17，告警与业务现象</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">host: app-02</span><br><span class="line">mount: /</span><br><span class="line">usage: 100%</span><br><span class="line">available: 0</span><br><span class="line"></span><br><span class="line">应用错误：</span><br><span class="line">java.io.IOException: No space left on device</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -h</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1        40G   40G     0 100% /</span><br></pre></td></tr></table></figure>
+<p>订单服务仍能处理部分查询，但日志无法写入，临时文件创建失败。我们先暂停该节点的新发布和批处理任务，并确认其他实例有足够容量承接流量。</p>
+<h2 id="01-20，先确认是哪一种“满”"><a href="#01-20，先确认是哪一种“满”" class="headerlink" title="01:20，先确认是哪一种“满”"></a>01:20，先确认是哪一种“满”</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">应用报错：No space left on device</span><br><span class="line">MySQL 写入失败</span><br><span class="line">日志无法继续滚动</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Filesystem  Type  Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1   xfs    40G   40G     0 100% /</span><br><span class="line"></span><br><span class="line">Filesystem  Inodes IUsed IFree IUse% Mounted on</span><br><span class="line">/dev/vda1     20M  210K 19.8M    2% /</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -h --max-depth=1 / | <span class="built_in">sort</span> -hr | <span class="built_in">head</span></span><br><span class="line"><span class="built_in">du</span> -h --max-depth=1 /var/log | <span class="built_in">sort</span> -hr | <span class="built_in">head</span></span><br><span class="line">lsof | grep deleted | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+<p>容量用完，inode 很充足，因此不是海量小文件。后续查找始终限制在根文件系统，避免进入其他挂载点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 / 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /var/log -name <span class="string">&quot;*.log&quot;</span> -mtime +7 -<span class="built_in">type</span> f -delete</span><br><span class="line">journalctl --vacuum-time=7d</span><br><span class="line"></span><br><span class="line"><span class="comment"># 处理已删除但仍被进程占用的文件</span></span><br><span class="line">lsof | grep deleted</span><br><span class="line">systemctl restart app</span><br></pre></td></tr></table></figure>
+<p><code>du</code> 合计只有约 14G，而 <code>df</code> 显示已用 40G，差了 20 多 G。此时继续向下找目录意义不大，应该解释两种统计为什么不同。</p>
+<h2 id="01-24，df-与-du-的差值"><a href="#01-24，df-与-du-的差值" class="headerlink" title="01:24，df 与 du 的差值"></a>01:24，df 与 du 的差值</h2><p><code>df</code> 从文件系统块使用情况统计，只要块还被占用就会计入；<code>du</code> 从目录树遍历可见文件。一个文件被删除后，如果进程仍持有文件描述符：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">目录项已经消失 -&gt; du 看不到</span><br><span class="line">进程仍在写入     -&gt; 磁盘块没有释放</span><br><span class="line">进程关闭描述符   -&gt; 空间才真正归还</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>检查已删除但仍被占用的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>输出中有一条：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java  1842  app  17w  REG  253,1  21474836480  /var/log/order/app.log (deleted)</span><br></pre></td></tr></table></figure>
+
+<p>Java 进程仍持有约 20G 的已删除日志。原因已经足以解释 <code>df</code> 和 <code>du</code> 的差值。</p>
+<h2 id="01-27，为什么文件删了还在增长"><a href="#01-27，为什么文件删了还在增长" class="headerlink" title="01:27，为什么文件删了还在增长"></a>01:27，为什么文件删了还在增长</h2><p>当天有人手工删除了正在写入的 <code>app.log</code>，以为可以立即释放空间。Linux 删除的是文件名与 inode 的关联，进程已经打开的描述符仍指向原 inode。日志框架不知道路径消失，继续往同一个文件写。</p>
+<p>这也是为什么不建议把 <code>rm</code> 当日志轮转。删除命令成功，不代表空间已经释放。</p>
+<h2 id="01-30，受控释放文件描述符"><a href="#01-30，受控释放文件描述符" class="headerlink" title="01:30，受控释放文件描述符"></a>01:30，受控释放文件描述符</h2><p>可选方式按优先级评估：</p>
+<ol>
+<li>让日志框架主动滚动并重新打开文件。</li>
+<li>平滑重载支持重开日志的进程。</li>
+<li>摘流后重启单个应用实例。</li>
+<li>极端情况下由负责人评估是否截断对应描述符。</li>
+</ol>
+<p>本次 Java 应用没有可靠的重开信号，我们选择：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">从负载均衡摘除 app-02</span><br><span class="line">等待存量请求结束</span><br><span class="line">保存必要日志与进程证据</span><br><span class="line">正常停止服务</span><br><span class="line">确认旧描述符消失</span><br><span class="line">启动服务并通过健康检查</span><br><span class="line">逐步恢复流量</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会改变生产容量，必须由有权限的值班人员执行，并确认其他实例健康。不要为了释放文件直接 <code>kill -9</code>；强制终止可能中断事务，也不利于保留现场。</p>
+<p>进程退出后再次检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT /</span><br><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>根分区使用率从 100% 降到 48%，应用健康检查和写入恢复。</p>
+<h2 id="如果-du-找到的就是真实大文件"><a href="#如果-du-找到的就是真实大文件" class="headerlink" title="如果 du 找到的就是真实大文件"></a>如果 du 找到的就是真实大文件</h2><p>不能因为“日志通常可删”就直接处理。先把候选文件按用途分类：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">应用日志：确认保留周期、采集状态和当前写入文件</span><br><span class="line">临时文件：确认是否被任务使用</span><br><span class="line">数据库文件：必须交给数据库机制管理</span><br><span class="line">容器数据：通过容器运行时清理策略处理</span><br><span class="line">Core Dump：确认是否已留存排障证据</span><br><span class="line">发布产物：确认当前和回退版本</span><br></pre></td></tr></table></figure>
+
+<p>数据库数据、binlog、Docker 存储目录都不应通过手工删除底层文件释放空间。错误删除可能让服务无法恢复。</p>
+<p>应急时优先处理已经确认可再生、已归档、不会影响运行的文件，并记录删除范围。所有破坏性操作都需要责任人和复核人。</p>
+<h2 id="把日志滚动交给应用"><a href="#把日志滚动交给应用" class="headerlink" title="把日志滚动交给应用"></a>把日志滚动交给应用</h2><p>本次根因是日志没有稳定滚动，手工处理又删除了当前活跃文件。Spring Boot 使用 Logback 时，可以按日期和大小滚动：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;FILE&quot;</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">file</span>&gt;</span>/var/log/order/app.log<span class="tag">&lt;/<span class="name">file</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rollingPolicy</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileNamePattern</span>&gt;</span>/var/log/order/app.%d&#123;yyyy-MM-dd&#125;.%i.log.gz<span class="tag">&lt;/<span class="name">fileNamePattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maxFileSize</span>&gt;</span>200MB<span class="tag">&lt;/<span class="name">maxFileSize</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maxHistory</span>&gt;</span>14<span class="tag">&lt;/<span class="name">maxHistory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">totalSizeCap</span>&gt;</span>8GB<span class="tag">&lt;/<span class="name">totalSizeCap</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rollingPolicy</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">encoder</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>%d %-5level [%X&#123;traceId&#125;] %logger - %msg%n<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>数值要根据流量、磁盘容量、采集延迟和合规保留要求确定。配置 <code>totalSizeCap</code> 前，先确认当前 Logback 版本支持且 <code>maxHistory</code> 已设置。</p>
+<p>如果统一使用 <code>logrotate</code>，应用必须配合重开文件；<code>copytruncate</code> 虽然不要求进程重开，但复制和截断之间可能丢少量日志，高吞吐场景要评估。不要让应用滚动和系统滚动同时管理同一个文件。</p>
+<h2 id="告警不能等到-100"><a href="#告警不能等到-100" class="headerlink" title="告警不能等到 100%"></a>告警不能等到 100%</h2><p>磁盘容量以增长速度而不是单一百分比判断更有意义：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">预警：使用率 75%，检查趋势</span><br><span class="line">高危：使用率 85% 或预计 24 小时内耗尽</span><br><span class="line">紧急：使用率 95% 或关键写入失败</span><br></pre></td></tr></table></figure>
+
+<p>同时监控：</p>
+<ul>
+<li>inode 使用率。</li>
+<li>每小时增长量和预计耗尽时间。</li>
+<li>日志写入速率。</li>
+<li>已删除文件占用。</li>
+<li>容器层和宿主机各自容量。</li>
+</ul>
+<p>阈值需要按文件系统用途设置。一个 2TB 数据盘的 90% 剩余空间，与 20G 根分区的 90% 完全不同。</p>
+<h2 id="值班记录最后写下什么"><a href="#值班记录最后写下什么" class="headerlink" title="值班记录最后写下什么"></a>值班记录最后写下什么</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">直接原因：Java 持有已删除的 20G 日志文件</span><br><span class="line">触发原因：当前日志被手工 rm，应用未重开描述符</span><br><span class="line">系统缺口：无大小上限、告警过晚、缺少标准处理手册</span><br><span class="line">恢复动作：单实例摘流并正常重启</span><br><span class="line">验证：磁盘 48%，日志可写，订单接口正常</span><br><span class="line">后续：启用滚动策略、增加趋势告警、禁止手工删除活跃日志</span><br></pre></td></tr></table></figure>
+
+<p>这次经历让我记住：磁盘满时，<code>df</code> 回答文件系统还剩多少，<code>du</code> 回答目录树里什么可见，两者对不上本身就是重要证据。先解释差值，再释放空间，比从最大的目录开始盲删可靠得多。</p>
 
     </div>
 
@@ -376,7 +430,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

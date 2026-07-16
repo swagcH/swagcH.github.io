@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景接口文档不是附属品，而是前后端协作、测试验证和后续维护的共同契约。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并不少见，">
+    <meta name="description" content="接口文档不是开发完成后的说明书，而是前端、后端、测试和调用方共同依赖的契约。文档与代码分离维护时，最常见的结果不是“有人忘记更新”，而是团队没有机制证明两者一致。  一个联调现场前端按照文档提交： 1234&amp;#123;  &quot;orderNo&quot;: &quot;202004190001&quot;,  &quot;reason&quot;: &quot;地址填写错误&quot;&amp;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="接口文档管理实践">
 <meta property="og:url" content="https://swagch.github.io/2020/04/19/2020-04-19-%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景接口文档不是附属品，而是前后端协作、测试验证和后续维护的共同契约。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并不少见，">
+<meta property="og:description" content="接口文档不是开发完成后的说明书，而是前端、后端、测试和调用方共同依赖的契约。文档与代码分离维护时，最常见的结果不是“有人忘记更新”，而是团队没有机制证明两者一致。  一个联调现场前端按照文档提交： 1234&amp;#123;  &quot;orderNo&quot;: &quot;202004190001&quot;,  &quot;reason&quot;: &quot;地址填写错误&quot;&amp;">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2020/api-docs-cover.svg">
 <meta property="article:published_time" content="2020-04-19T14:06:17.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.176Z">
+<meta property="article:modified_time" content="2026-07-16T03:36:55.229Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="接口文档">
 <meta property="article:tag" content="API">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E8%81%94%E8%B0%83%E7%8E%B0%E5%9C%BA"><span class="nav-text">一个联调现场</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%80%E4%BB%BD%E5%AE%8C%E6%95%B4%E5%A5%91%E7%BA%A6%E5%8C%85%E5%90%AB%E4%BB%80%E4%B9%88"><span class="nav-text">1. 一份完整契约包含什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%85%88%E5%86%99%E5%A5%91%E7%BA%A6%E5%86%8D%E5%AE%9E%E7%8E%B0"><span class="nav-text">2. 先写契约再实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Schema-%E8%A6%81%E5%A4%8D%E7%94%A8%E4%BD%86%E4%B8%8D%E8%83%BD%E4%B8%87%E8%83%BD%E5%8C%96"><span class="nav-text">3. Schema 要复用但不能万能化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E9%94%99%E8%AF%AF%E7%A0%81%E5%BF%85%E9%A1%BB%E5%8F%AF%E8%A1%8C%E5%8A%A8"><span class="nav-text">4. 错误码必须可行动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%88%86%E9%A1%B5%E8%AF%AD%E4%B9%89%E8%A6%81%E5%86%99%E6%B8%85%E6%A5%9A"><span class="nav-text">5. 分页语义要写清楚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%86%99%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E%E5%B9%82%E7%AD%89"><span class="nav-text">6. 写接口说明幂等</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E8%AE%A4%E8%AF%81%E5%92%8C%E6%9D%83%E9%99%90%E4%B8%8D%E6%98%AF%E4%B8%80%E5%8F%A5%E2%80%9C%E9%9C%80%E8%A6%81-Token%E2%80%9D"><span class="nav-text">7. 认证和权限不是一句“需要 Token”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%96%87%E6%A1%A3%E5%92%8C%E4%BB%A3%E7%A0%81%E5%A6%82%E4%BD%95%E4%BF%9D%E6%8C%81%E4%B8%80%E8%87%B4"><span class="nav-text">8. 文档和代码如何保持一致</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Code-First"><span class="nav-text">Code First</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Design-First"><span class="nav-text">Design First</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E5%8F%98%E6%9B%B4%E5%88%86%E7%B1%BB"><span class="nav-text">9. 变更分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E6%96%87%E6%A1%A3%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-text">10. 文档的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-Review-%E6%B8%85%E5%8D%95"><span class="nav-text">11. Review 清单</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,34 +279,108 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2020/api-docs-cover.svg" alt="接口文档管理实践封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口文档不是附属品，而是前后端协作、测试验证和后续维护的共同契约。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>接口实现和文档长期不一致</li>
-<li>错误码、字段含义、示例数据缺失</li>
-<li>前后端联调时大量时间浪费在口头确认</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>接口文档是协作契约，只有和代码、测试用例、版本变更绑定在一起，才不会沦为过期说明。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">GET</span> <span class="string">/api/orders/&#123;orderNo&#125;</span></span><br><span class="line"><span class="attr">response:</span></span><br><span class="line">  <span class="attr">code:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">message:</span> <span class="string">success</span></span><br><span class="line">  <span class="attr">data:</span></span><br><span class="line">    <span class="attr">orderNo:</span> <span class="string">&quot;202004190001&quot;</span></span><br><span class="line">    <span class="attr">status:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">totalAmount:</span> <span class="number">199.00</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>接口文档不是开发完成后的说明书，而是前端、后端、测试和调用方共同依赖的契约。文档与代码分离维护时，最常见的结果不是“有人忘记更新”，而是团队没有机制证明两者一致。</p>
+</blockquote>
+<h2 id="一个联调现场"><a href="#一个联调现场" class="headerlink" title="一个联调现场"></a>一个联调现场</h2><p>前端按照文档提交：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;orderNo&quot;</span><span class="punctuation">:</span> <span class="string">&quot;202004190001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;reason&quot;</span><span class="punctuation">:</span> <span class="string">&quot;地址填写错误&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">接口文档必须包含：</span><br><span class="line">- 请求方式和路径</span><br><span class="line">- 参数说明</span><br><span class="line">- 响应字段</span><br><span class="line">- 错误码</span><br><span class="line">- 示例数据</span><br><span class="line">- 变更记录</span><br></pre></td></tr></table></figure>
+<p>接口却返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">40013</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;reasonCode不能为空&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>接口文档管理实践</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>后端代码两天前新增了 <code>reasonCode</code>，文档没有更新，测试用例只验证了旧参数。三方花了半小时确认，真正修复只有一行字段说明。</p>
+<p>这类浪费说明接口管理要覆盖设计、实现、测试、变更和下线，而不只是生成一个 Swagger 页面。</p>
+<h2 id="1-一份完整契约包含什么"><a href="#1-一份完整契约包含什么" class="headerlink" title="1. 一份完整契约包含什么"></a>1. 一份完整契约包含什么</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用途和调用方</span><br><span class="line">HTTP 方法与路径</span><br><span class="line">认证和权限</span><br><span class="line">请求头、路径、查询和请求体参数</span><br><span class="line">字段类型、必填、长度、枚举和示例</span><br><span class="line">成功响应</span><br><span class="line">业务错误码和处理建议</span><br><span class="line">幂等、分页、限流与超时语义</span><br><span class="line">版本和变更记录</span><br><span class="line">负责人</span><br></pre></td></tr></table></figure>
+
+<p>只给一个请求 JSON 不够。调用方还需要知道字段为空、重复提交、权限不足和下游超时时会发生什么。</p>
+<h2 id="2-先写契约再实现"><a href="#2-先写契约再实现" class="headerlink" title="2. 先写契约再实现"></a>2. 先写契约再实现</h2><p>订单查询示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/api/orders/&#123;orderNo&#125;:</span></span><br><span class="line">    <span class="attr">get:</span></span><br><span class="line">      <span class="attr">summary:</span> <span class="string">查询订单详情</span></span><br><span class="line">      <span class="attr">operationId:</span> <span class="string">getOrder</span></span><br><span class="line">      <span class="attr">parameters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">orderNo</span></span><br><span class="line">          <span class="attr">in:</span> <span class="string">path</span></span><br><span class="line">          <span class="attr">required:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">schema:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">            <span class="attr">maxLength:</span> <span class="number">32</span></span><br><span class="line">      <span class="attr">responses:</span></span><br><span class="line">        <span class="attr">&#x27;200&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">查询成功</span></span><br><span class="line">        <span class="attr">&#x27;404&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">订单不存在或当前用户无权查看</span></span><br></pre></td></tr></table></figure>
+
+<p>评审阶段先确认契约，前端可以基于 Mock 开发，测试可以提前编写用例，后端实现也有清晰边界。</p>
+<p>OpenAPI 文件应进入版本库，和代码一起 Review。只存在运行时页面中的文档无法比较历史，也很难在 CI 中检查破坏性变更。</p>
+<h2 id="3-Schema-要复用但不能万能化"><a href="#3-Schema-要复用但不能万能化" class="headerlink" title="3. Schema 要复用但不能万能化"></a>3. Schema 要复用但不能万能化</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">components:</span></span><br><span class="line">  <span class="attr">schemas:</span></span><br><span class="line">    <span class="attr">OrderSummary:</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">      <span class="attr">required:</span> [<span class="string">orderNo</span>, <span class="string">status</span>, <span class="string">totalAmount</span>, <span class="string">createdAt</span>]</span><br><span class="line">      <span class="attr">properties:</span></span><br><span class="line">        <span class="attr">orderNo:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;202004190001&#x27;</span></span><br><span class="line">        <span class="attr">status:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">enum:</span> [<span class="string">CREATED</span>, <span class="string">PAID</span>, <span class="string">SHIPPED</span>, <span class="string">FINISHED</span>, <span class="string">CANCELLED</span>]</span><br><span class="line">        <span class="attr">totalAmount:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;199.00&#x27;</span></span><br><span class="line">        <span class="attr">createdAt:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">format:</span> <span class="string">date-time</span></span><br></pre></td></tr></table></figure>
+
+<p>公共分页结构、错误结构可以复用，但不要建立一个包含所有业务字段的 <code>CommonResponseData</code>。过度复用会让一个字段修改影响大量无关接口。</p>
+<p>金额是否用字符串或数字需要团队统一。JSON Number 没有十进制精度语义，跨语言调用时尤其要谨慎。</p>
+<h2 id="4-错误码必须可行动"><a href="#4-错误码必须可行动" class="headerlink" title="4. 错误码必须可行动"></a>4. 错误码必须可行动</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORDER_NOT_FOUND&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;订单不存在&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;traceId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;f4cc2b1d03b14d12&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;details&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>错误码表至少说明：</p>
+<table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>含义</th>
+<th align="right">HTTP 状态</th>
+<th>调用方动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ORDER_NOT_FOUND</code></td>
+<td>订单不存在或无权查看</td>
+<td align="right">404</td>
+<td>提示并停止重试</td>
+</tr>
+<tr>
+<td><code>ORDER_STATUS_CONFLICT</code></td>
+<td>当前状态不允许操作</td>
+<td align="right">409</td>
+<td>刷新订单状态</td>
+</tr>
+<tr>
+<td><code>RATE_LIMITED</code></td>
+<td>请求过于频繁</td>
+<td align="right">429</td>
+<td>按 <code>Retry-After</code> 重试</td>
+</tr>
+</tbody></table>
+<p>不要所有业务失败都返回 HTTP 200，也不要所有异常都返回 500。HTTP 状态表达协议层结果，业务错误码提供领域细节。</p>
+<p>错误信息不能泄露 SQL、内部 IP 和完整异常栈。<code>traceId</code> 用于关联服务端日志。</p>
+<h2 id="5-分页语义要写清楚"><a href="#5-分页语义要写清楚" class="headerlink" title="5. 分页语义要写清楚"></a>5. 分页语义要写清楚</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">page:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">size:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maximum:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">sort:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">  <span class="attr">enum:</span> [<span class="string">createdAt</span>, <span class="string">updatedAt</span>]</span><br></pre></td></tr></table></figure>
+
+<p>响应需要说明总数是否精确、排序是否稳定、同一时间新增数据是否影响翻页。大数据量使用游标分页时，游标是否过期、能否反向翻页也属于契约。</p>
+<h2 id="6-写接口说明幂等"><a href="#6-写接口说明幂等" class="headerlink" title="6. 写接口说明幂等"></a>6. 写接口说明幂等</h2><p>订单创建可以要求幂等头：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Idempotency-Key: 0fcaf3a1-4d54-4d4d-9ae2-80d99df2be5d</span><br></pre></td></tr></table></figure>
+
+<p>文档明确：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>同一个用户和 Key 在多久内有效。</li>
+<li>请求体不同时是否返回冲突。</li>
+<li>首次请求处理中再次提交返回什么。</li>
+<li>原请求成功后是否返回同一结果。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>只写“接口支持幂等”没有可执行意义。</p>
+<h2 id="7-认证和权限不是一句“需要-Token”"><a href="#7-认证和权限不是一句“需要-Token”" class="headerlink" title="7. 认证和权限不是一句“需要 Token”"></a>7. 认证和权限不是一句“需要 Token”</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">认证方式：Bearer Token</span><br><span class="line">权限：order:read</span><br><span class="line">数据范围：只能访问当前租户订单</span><br><span class="line">Token 过期：401</span><br><span class="line">权限不足：403</span><br><span class="line">资源不存在或不可见：404</span><br></pre></td></tr></table></figure>
+
+<p>上传接口还要说明文件类型、大小、病毒扫描和存储时限。Webhook 要说明签名算法、防重放时间窗口和重试策略。</p>
+<p>示例中不能放真实 Token、手机号或客户数据。</p>
+<h2 id="8-文档和代码如何保持一致"><a href="#8-文档和代码如何保持一致" class="headerlink" title="8. 文档和代码如何保持一致"></a>8. 文档和代码如何保持一致</h2><p>两种常见方式：</p>
+<h3 id="Code-First"><a href="#Code-First" class="headerlink" title="Code First"></a>Code First</h3><p>通过 Spring 注解从实现生成 OpenAPI。优点是靠近代码，缺点是设计容易滞后到实现阶段，复杂说明仍需人工维护。</p>
+<h3 id="Design-First"><a href="#Design-First" class="headerlink" title="Design First"></a>Design First</h3><p>先维护 OpenAPI，再生成服务端接口或客户端。优点是契约先行，缺点是需要处理生成代码和业务实现边界。</p>
+<p>无论选择哪种，都应该在 CI 中：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">生成最新 OpenAPI</span><br><span class="line">与仓库基线比较</span><br><span class="line">检查语法和引用</span><br><span class="line">识别删除字段、修改类型等破坏性变更</span><br><span class="line">发布带版本的文档</span><br></pre></td></tr></table></figure>
+
+<p>文档生成失败不能被静默忽略，否则线上页面可能一直停留在旧版本。</p>
+<h2 id="9-变更分类"><a href="#9-变更分类" class="headerlink" title="9. 变更分类"></a>9. 变更分类</h2><p>通常兼容的变化：</p>
+<ul>
+<li>新增可选请求字段。</li>
+<li>新增响应字段，前提是调用方能忽略未知字段。</li>
+<li>新增错误码并有默认处理。</li>
+</ul>
+<p>通常破坏兼容的变化：</p>
+<ul>
+<li>删除或重命名字段。</li>
+<li>修改字段类型、单位或含义。</li>
+<li>可选字段改为必填。</li>
+<li>修改枚举值语义。</li>
+<li>改变分页、排序或幂等行为。</li>
+</ul>
+<p>破坏性变更应通过新版本、双写兼容或迁移窗口发布，不能只在群里通知。</p>
+<h2 id="10-文档的生命周期"><a href="#10-文档的生命周期" class="headerlink" title="10. 文档的生命周期"></a>10. 文档的生命周期</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">草稿：正在评审，不允许生产调用</span><br><span class="line">已发布：与某个服务版本对应</span><br><span class="line">已废弃：标明替代接口和停止时间</span><br><span class="line">已下线：文档保留历史，但不再出现在默认入口</span><br></pre></td></tr></table></figure>
+
+<p>每个接口要有负责人。没有负责人时，文档问题、兼容问题和调用咨询都会变成公共群里的随机响应。</p>
+<h2 id="11-Review-清单"><a href="#11-Review-清单" class="headerlink" title="11. Review 清单"></a>11. Review 清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 路径和 HTTP 方法符合语义</span><br><span class="line">[ ] 请求字段包含类型、约束和示例</span><br><span class="line">[ ] 成功与失败响应都有定义</span><br><span class="line">[ ] 错误码能指导调用方动作</span><br><span class="line">[ ] 权限、数据范围和敏感字段明确</span><br><span class="line">[ ] 分页、幂等、超时和重试语义明确</span><br><span class="line">[ ] 变更兼容性经过检查</span><br><span class="line">[ ] 文档、Mock、测试和代码使用同一契约</span><br><span class="line">[ ] 负责人和下线策略明确</span><br></pre></td></tr></table></figure>
+
+<p>接口文档的最终价值不是页面好看，而是减少口头确认，让实现、测试和调用方对同一个行为达成一致。当契约可以被 Review、测试和自动比较时，文档才从附属材料变成工程资产。</p>
 
     </div>
 
@@ -395,7 +469,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

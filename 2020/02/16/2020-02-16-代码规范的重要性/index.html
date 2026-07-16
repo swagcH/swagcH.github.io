@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景代码规范不是为了追求形式统一，而是为了降低团队沟通成本和长期维护成本。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并不少">
+    <meta name="description" content="代码规范真正节省的不是敲键盘时间，而是未来每一次阅读、Review 和故障排查的时间。格式可以交给工具，命名、边界和失败语义仍然需要团队判断。  一次看似普通的 Review下面的方法功能没有错，却让 Review 很难进行： 12345678910public void doIt(Long id, String s, Integer t) &amp;#123;    User u &#x3D; userMap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="代码规范的重要性">
 <meta property="og:url" content="https://swagch.github.io/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景代码规范不是为了追求形式统一，而是为了降低团队沟通成本和长期维护成本。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并不少">
+<meta property="og:description" content="代码规范真正节省的不是敲键盘时间，而是未来每一次阅读、Review 和故障排查的时间。格式可以交给工具，命名、边界和失败语义仍然需要团队判断。  一次看似普通的 Review下面的方法功能没有错，却让 Review 很难进行： 12345678910public void doIt(Long id, String s, Integer t) &amp;#123;    User u &#x3D; userMap">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2020/code-style-cover.svg">
 <meta property="article:published_time" content="2020-02-16T08:42:09.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.176Z">
+<meta property="article:modified_time" content="2026-07-16T03:36:55.229Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="团队协作">
 <meta property="article:tag" content="代码规范">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E6%AC%A1%E7%9C%8B%E4%BC%BC%E6%99%AE%E9%80%9A%E7%9A%84-Review"><span class="nav-text">一次看似普通的 Review</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E9%80%A0%E5%90%8E%E7%9A%84%E7%89%88%E6%9C%AC"><span class="nav-text">改造后的版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%91%BD%E5%90%8D%E6%98%AF%E6%9C%80%E4%BE%BF%E5%AE%9C%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="nav-text">1. 命名是最便宜的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%B9%E6%B3%95%E5%8F%AA%E5%A4%84%E5%9C%A8%E4%B8%80%E4%B8%AA%E6%8A%BD%E8%B1%A1%E5%B1%82%E6%AC%A1"><span class="nav-text">2. 方法只处在一个抽象层次</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%8F%90%E5%89%8D%E8%BF%94%E5%9B%9E%E5%87%8F%E5%B0%91%E5%B5%8C%E5%A5%97"><span class="nav-text">3. 提前返回减少嵌套</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%BC%82%E5%B8%B8%E8%A6%81%E5%B8%A6%E4%B8%9A%E5%8A%A1%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-text">4. 异常要带业务上下文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83%E4%B8%8D%E6%98%AF%E5%A4%9A%E6%89%93%E5%8D%B0"><span class="nav-text">5. 日志规范不是多打印</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%B3%A8%E9%87%8A%E8%A7%A3%E9%87%8A%E4%B8%BA%E4%BB%80%E4%B9%88"><span class="nav-text">6. 注释解释为什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%8F%AF%E4%BB%A5%E8%87%AA%E5%8A%A8%E5%8C%96%E7%9A%84%E5%85%A8%E9%83%A8%E4%BA%A4%E7%BB%99%E5%B7%A5%E5%85%B7"><span class="nav-text">7. 可以自动化的全部交给工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Review-%E7%9C%8B%E4%BB%80%E4%B9%88"><span class="nav-text">8. Review 看什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E8%A7%84%E8%8C%83%E5%A6%82%E4%BD%95%E5%9C%A8%E5%9B%A2%E9%98%9F%E8%90%BD%E5%9C%B0"><span class="nav-text">9. 规范如何在团队落地</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E7%9C%8B%E8%B4%A8%E9%87%8F"><span class="nav-text">最后看质量</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,34 +279,77 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2020/code-style-cover.svg" alt="代码规范的重要性封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>代码规范不是为了追求形式统一，而是为了降低团队沟通成本和长期维护成本。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<blockquote>
+<p>代码规范真正节省的不是敲键盘时间，而是未来每一次阅读、Review 和故障排查的时间。格式可以交给工具，命名、边界和失败语义仍然需要团队判断。</p>
+</blockquote>
+<h2 id="一次看似普通的-Review"><a href="#一次看似普通的-Review" class="headerlink" title="一次看似普通的 Review"></a>一次看似普通的 Review</h2><p>下面的方法功能没有错，却让 Review 很难进行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doIt</span><span class="params">(Long id, String s, Integer t)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">u</span> <span class="operator">=</span> userMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (u != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (t == <span class="number">1</span>) &#123;</span><br><span class="line">            u.setStatus(<span class="number">2</span>);</span><br><span class="line">            userMapper.updateById(u);</span><br><span class="line">            log.info(<span class="string">&quot;ok:&#123;&#125;&quot;</span>, id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题不只是缩写：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">doIt 不表达业务动作</span><br><span class="line">s 没有被使用，调用方却必须传</span><br><span class="line">数字 1、2 的含义不可见</span><br><span class="line">用户不存在时静默返回</span><br><span class="line">没有说明为什么允许状态变化</span><br><span class="line">日志无法判断动作、旧状态和原因</span><br></pre></td></tr></table></figure>
+
+<p>如果团队只统一缩进，这段代码仍然难维护。规范必须覆盖业务表达和失败语义。</p>
+<h2 id="改造后的版本"><a href="#改造后的版本" class="headerlink" title="改造后的版本"></a>改造后的版本</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> getExistingUser(userId);</span><br><span class="line">    <span class="keyword">if</span> (UserStatus.FROZEN.equals(user.getStatus())) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    validateCanFreeze(user, reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;用户账号已冻结, userId=&#123;&#125;, previousStatus=&#123;&#125;, reason=&#123;&#125;&quot;</span>,</span><br><span class="line">        userId, user.getStatus(), reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>变化包括：方法名表达动作，魔法值变成枚举，校验提取为单一职责方法，日志包含排查所需上下文。代码多了几行，却减少了调用者和维护者的猜测。</p>
+<h2 id="1-命名是最便宜的设计"><a href="#1-命名是最便宜的设计" class="headerlink" title="1. 命名是最便宜的设计"></a>1. 命名是最便宜的设计</h2><p>变量和方法名应该回答“它代表什么”，而不是“它是什么类型”：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不清晰</span></span><br><span class="line">List&lt;Order&gt; list;</span><br><span class="line"><span class="type">boolean</span> flag;</span><br><span class="line"><span class="type">long</span> time;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更具体</span></span><br><span class="line">List&lt;Order&gt; pendingOrders;</span><br><span class="line"><span class="type">boolean</span> inventoryReserved;</span><br><span class="line"><span class="type">long</span> paymentDeadlineMillis;</span><br></pre></td></tr></table></figure>
+
+<p>命名也要保持同一业务词汇。产品文档写“冻结库存”，代码一部分叫 <code>lockStock</code>，另一部分叫 <code>occupyAmount</code>，会增加沟通成本。可以维护一份领域术语表，让接口、数据库和代码尽量使用同一语言。</p>
+<p>避免为了短而缩写。<code>ctx</code>、<code>req</code> 在局部范围可能清楚，<code>ps</code>、<code>d</code>、<code>x1</code> 通常只对作者当时清楚。</p>
+<h2 id="2-方法只处在一个抽象层次"><a href="#2-方法只处在一个抽象层次" class="headerlink" title="2. 方法只处在一个抽象层次"></a>2. 方法只处在一个抽象层次</h2><p>业务方法里同时出现流程判断、SQL 拼装和 HTTP 细节，会很难阅读：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">submitOrder</span><br><span class="line">  -&gt; validateCommand</span><br><span class="line">  -&gt; calculatePrice</span><br><span class="line">  -&gt; reserveInventory</span><br><span class="line">  -&gt; createOrder</span><br><span class="line">  -&gt; publishCreatedEvent</span><br></pre></td></tr></table></figure>
+
+<p>顶层方法应该像流程说明，具体实现下沉到对应对象。提取方法不是为了把 100 行机械拆成十个 10 行方法，而是给不同意图命名。</p>
+<p>过长参数列表也会暴露缺少业务对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 参数含义容易传错</span></span><br><span class="line">createOrder(userId, skuId, count, addressId, couponId, source);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令对象可以统一校验和演进</span></span><br><span class="line">createOrder(CreateOrderCommand command);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-提前返回减少嵌套"><a href="#3-提前返回减少嵌套" class="headerlink" title="3. 提前返回减少嵌套"></a>3. 提前返回减少嵌套</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> OrderView <span class="title function_">queryOrder</span><span class="params">(String orderNo)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(orderNo)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;订单号不能为空&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderRepository.findByOrderNo(orderNo);</span><br><span class="line">    <span class="keyword">if</span> (order == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderNotFoundException</span>(orderNo);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> orderAssembler.toView(order);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数非法和对象不存在先退出，主流程保持在较低缩进层级。提前返回不是所有地方都要使用，但对校验和异常分支很有效。</p>
+<h2 id="4-异常要带业务上下文"><a href="#4-异常要带业务上下文" class="headerlink" title="4. 异常要带业务上下文"></a>4. 异常要带业务上下文</h2><p>下面的处理让故障变得不可追踪：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;支付失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至少保留原始异常和关键业务标识：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (PaymentException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderPaymentException</span>(</span><br><span class="line">        <span class="string">&quot;订单支付失败, orderNo=&quot;</span> + command.getOrderNo(), ex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不要捕获 <code>Exception</code> 后返回成功，也不要同一个异常在每层重复打印完整堆栈。通常由最了解业务上下文的一层补充信息，在统一边界记录一次。</p>
+<h2 id="5-日志规范不是多打印"><a href="#5-日志规范不是多打印" class="headerlink" title="5. 日志规范不是多打印"></a>5. 日志规范不是多打印</h2><p>有价值的日志包含动作、结果、业务主键和必要原因：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;库存冻结成功, orderNo=&#123;&#125;, skuId=&#123;&#125;, quantity=&#123;&#125;&quot;</span>,</span><br><span class="line">    orderNo, skuId, quantity);</span><br></pre></td></tr></table></figure>
+
+<p>避免：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">进入方法</span><br><span class="line">执行成功</span><br><span class="line">参数=&#123;整个请求对象&#125;</span><br><span class="line">发生异常=&#123;只有 getMessage()&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个请求对象可能包含密码、Token 或个人信息，也会制造大量日志。规范应明确敏感字段、日志级别和采样策略。</p>
+<h2 id="6-注释解释为什么"><a href="#6-注释解释为什么" class="headerlink" title="6. 注释解释为什么"></a>6. 注释解释为什么</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 支付渠道最多查询最近 30 天记录，超过范围必须走离线对账</span></span><br><span class="line"><span class="keyword">if</span> (createdAt.isBefore(thirtyDaysAgo)) &#123;</span><br><span class="line">    <span class="keyword">return</span> offlineReconciliation(orderNo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这类注释解释业务约束，保留价值高。下面的注释只重复代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用户 ID 赋值给 userId</span></span><br><span class="line"><span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> user.getId();</span><br></pre></td></tr></table></figure>
+
+<p>代码变化后，过期注释比没有注释更危险。Review 时要把注释和代码当成一个整体检查。</p>
+<h2 id="7-可以自动化的全部交给工具"><a href="#7-可以自动化的全部交给工具" class="headerlink" title="7. 可以自动化的全部交给工具"></a>7. 可以自动化的全部交给工具</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式化：IDE Formatter / Spotless</span><br><span class="line">静态检查：Checkstyle / PMD / SpotBugs</span><br><span class="line">依赖漏洞：依赖扫描</span><br><span class="line">测试：Maven test + CI</span><br><span class="line">覆盖率：JaCoCo，作为趋势而不是唯一质量指标</span><br></pre></td></tr></table></figure>
+
+<p>统一 IDEA 格式配置并放入仓库，避免每个人手工争论空格和换行。CI 检查失败要给出明确修复命令，不能只留下一个红色任务。</p>
+<p>自动化规则不要一次开启几百条并要求全量旧代码立即通过。可以先对新增和修改代码生效，再逐步治理存量。</p>
+<h2 id="8-Review-看什么"><a href="#8-Review-看什么" class="headerlink" title="8. Review 看什么"></a>8. Review 看什么</h2><p>我会按这个顺序 Review：</p>
 <ol>
-<li>同一类逻辑在不同人手里写法差异很大</li>
-<li>命名随意导致 Review 成本上升</li>
-<li>没有统一异常、日志、返回值规范</li>
+<li>需求是否被正确理解，边界条件有没有遗漏。</li>
+<li>数据和接口是否兼容，失败后状态是否可解释。</li>
+<li>是否存在重复、过长方法、多层嵌套和不清晰命名。</li>
+<li>异常、日志和事务边界是否合理。</li>
+<li>并发、性能和安全风险是否被考虑。</li>
+<li>测试是否覆盖主要分支。</li>
+<li>最后才是格式问题，通常应由工具解决。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>规范的本质是降低差异。代码会被多人阅读和长期维护，统一风格能让团队把注意力放在业务逻辑，而不是表达方式。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 推荐：命名表达业务含义</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeUserAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    validateFreezeReason(reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;user account frozen, userId=&#123;&#125;, reason=&#123;&#125;&quot;</span>, userId, reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Review 意见要说明原因和风险：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">不建议：这里写得不好，改一下。</span><br><span class="line"></span><br><span class="line">建议：当前先写订单再调用库存，库存失败会留下 CREATED 状态。</span><br><span class="line">请明确失败状态或补偿任务，并增加对应测试。</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Review 关注点：</span><br><span class="line">- 命名是否清晰</span><br><span class="line">- 异常是否有上下文</span><br><span class="line">- 日志是否能支撑排查</span><br><span class="line">- 方法是否过长</span><br><span class="line">- 是否存在重复逻辑</span><br></pre></td></tr></table></figure>
+<h2 id="9-规范如何在团队落地"><a href="#9-规范如何在团队落地" class="headerlink" title="9. 规范如何在团队落地"></a>9. 规范如何在团队落地</h2><p>一份没人看的文档不会自动改变代码。有效做法是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">从高频问题中提炼 10 条核心规则</span><br><span class="line">提供正反示例</span><br><span class="line">格式和静态检查进入 CI</span><br><span class="line">PR 模板加入业务、数据、测试和回滚项</span><br><span class="line">Review 中统一引用规则编号</span><br><span class="line">每季度删除无价值规则并补充新案例</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>代码规范的重要性</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
-<ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
-</ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>规范也需要例外机制。性能热点、框架约束或兼容代码可能无法遵循普通写法，但例外应在代码或设计记录中解释原因。</p>
+<h2 id="最后看质量"><a href="#最后看质量" class="headerlink" title="最后看质量"></a>最后看质量</h2><p>规范的目标不是让所有代码看起来像一个人写的，而是让任何团队成员都能更快理解、修改和验证。真正有效的规范会减少 Review 往返、降低缺陷率、缩短新人上手时间，并让线上日志更容易使用。</p>
+<p>当团队开始讨论业务边界和失败语义，而不是反复争论括号位置，代码规范才真正发挥作用。</p>
 
     </div>
 
@@ -395,7 +438,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

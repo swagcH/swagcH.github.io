@@ -16,7 +16,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="一个 Java 后端开发的技术笔记博客">
 <meta property="og:type" content="website">
@@ -52,9 +52,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -268,34 +268,124 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/dev-test-collaboration-cover.svg" alt="开发与测试协作经验封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>开发和测试不是对立关系，真正的目标是用更低成本把问题挡在上线之前。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<p>有一次测试提了一个缺陷：“优惠券使用失败。”开发看完回复：“我这里正常，无法复现。”两句话都是真的，但没有推动问题前进一步。测试看到的是某组环境和数据下的失败，开发验证的是另一组条件下的成功。</p>
+<p>后来回看，这不是谁描述得不认真，而是双方没有共享同一套上下文。开发与测试的协作，核心不是把缺陷在系统里来回指派，而是共同缩小“预期”和“实际”之间的差异。</p>
+<h2 id="同一个问题的两个视角"><a href="#同一个问题的两个视角" class="headerlink" title="同一个问题的两个视角"></a>同一个问题的两个视角</h2><p>测试首先关心：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户做了什么</span><br><span class="line">预期看到什么</span><br><span class="line">实际发生什么</span><br><span class="line">哪些条件下稳定复现</span><br><span class="line">还可能影响哪些场景</span><br></pre></td></tr></table></figure>
+
+<p>开发首先关心：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">请求进入哪个版本和实例</span><br><span class="line">参数、身份和数据状态是什么</span><br><span class="line">代码走到哪个分支</span><br><span class="line">日志、异常和下游返回是什么</span><br><span class="line">最小改动会影响哪些调用方</span><br></pre></td></tr></table></figure>
+
+<p>两边并不冲突。测试提供可观察行为，开发补充内部证据，合在一起才是一份可定位的问题。</p>
+<h2 id="把“优惠券失败”补完整"><a href="#把“优惠券失败”补完整" class="headerlink" title="把“优惠券失败”补完整"></a>把“优惠券失败”补完整</h2><p>一份可以直接开始排查的缺陷记录应该像这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">标题：新用户券在商品金额等于门槛时提示不可用</span><br><span class="line">环境：test，order-service 1.11.3</span><br><span class="line">账号：测试账号 U10027</span><br><span class="line">前置数据：</span><br><span class="line">- 优惠券满 100 减 20，未使用，未过期</span><br><span class="line">- 商品原价 100，无其他优惠</span><br><span class="line"></span><br><span class="line">步骤：</span><br><span class="line">1. 加入商品并进入结算页</span><br><span class="line">2. 选择该优惠券</span><br><span class="line">3. 提交订单</span><br><span class="line"></span><br><span class="line">预期：应抵扣 20，实付 80</span><br><span class="line">实际：返回 COUPON_THRESHOLD_NOT_REACHED</span><br><span class="line">时间：2020-11-15 14:32:18</span><br><span class="line">traceId：b3f1078a92</span><br><span class="line">频率：重复 5 次均出现</span><br><span class="line">对照：商品金额 101 时可以使用</span><br></pre></td></tr></table></figure>
+
+<p>“100 失败、101 成功”比一张错误截图更接近根因。开发沿 traceId 查到门槛判断使用了 <code>amount &gt; threshold</code>，而需求是大于等于。</p>
+<p>截图可以保留界面现象，但文本字段必须可搜索、可复制。密码、Token 和真实用户信息不能作为附件上传。</p>
+<h2 id="测试开始前，开发交付什么"><a href="#测试开始前，开发交付什么" class="headerlink" title="测试开始前，开发交付什么"></a>测试开始前，开发交付什么</h2><p>提测不能只有一个分支名。开发至少说明：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">改动目的和范围</span><br><span class="line">明确未实现的内容</span><br><span class="line">接口、数据库、配置变化</span><br><span class="line">主流程与异常流程</span><br><span class="line">自测结果</span><br><span class="line">已知风险</span><br><span class="line">日志和监控入口</span><br><span class="line">回退方式</span><br></pre></td></tr></table></figure>
+
+<p>对于优惠券需求，开发自测不只验证“能用”：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>金额</td>
+<td>99.99、100、100.01</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>生效前、有效期内、刚过期</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>未使用、已锁定、已核销</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>重复提交、超时重试</td>
+</tr>
+<tr>
+<td>组合</td>
+<td>与会员价、满减是否互斥</td>
+</tr>
+<tr>
+<td>权限</td>
+<td>是否属于当前用户</td>
+</tr>
+</tbody></table>
+<p>边界表能让双方在提测前对齐重点，也减少低成本问题进入测试队列。</p>
+<h2 id="测试不是最后一站"><a href="#测试不是最后一站" class="headerlink" title="测试不是最后一站"></a>测试不是最后一站</h2><p>协作应该从需求评审开始。测试在评审阶段提出“金额等于门槛怎么算”“支付失败后券是否释放”，通常比代码完成后发现便宜得多。</p>
+<p>我习惯把工作拆成四个交接点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需求评审：共同补边界和验收标准</span><br><span class="line">方案评审：测试了解状态、依赖和风险</span><br><span class="line">开发阶段：关键用例先自动化，环境提前准备</span><br><span class="line">提测之后：按证据定位、验证修复并补回归</span><br></pre></td></tr></table></figure>
+
+<p>测试也不必理解所有代码，但知道数据状态和系统边界后，能够设计出比页面点击更有效的场景。</p>
+<h2 id="发现缺陷后先做分诊"><a href="#发现缺陷后先做分诊" class="headerlink" title="发现缺陷后先做分诊"></a>发现缺陷后先做分诊</h2><p>不是每个失败都立刻归为代码 Bug。先判断属于哪类：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>证据</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>需求歧义</td>
+<td>验收标准没有定义边界</td>
+<td>产品确认并更新需求</td>
+</tr>
+<tr>
+<td>代码缺陷</td>
+<td>行为与已确认规则不符</td>
+<td>开发修复并补测试</td>
+</tr>
+<tr>
+<td>环境问题</td>
+<td>版本、配置或依赖异常</td>
+<td>恢复环境并记录差异</td>
+</tr>
+<tr>
+<td>数据问题</td>
+<td>测试前置状态不成立</td>
+<td>修复数据构造方式</td>
+</tr>
+<tr>
+<td>自动化问题</td>
+<td>用例假设过期或不稳定</td>
+<td>更新脚本并定位波动</td>
+</tr>
+</tbody></table>
+<p>分诊不是推卸，而是找到真正应该改变的地方。把配置错误改成一段业务兼容代码，短期能过测试，长期会让问题更隐蔽。</p>
+<p>优先级也要基于影响：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">阻塞：核心流程不可用，无替代方案</span><br><span class="line">高：重要功能错误、数据或安全风险</span><br><span class="line">中：局部功能错误，有明确绕行方式</span><br><span class="line">低：展示、文案或低频体验问题</span><br></pre></td></tr></table></figure>
+
+<p>“我提的 Bug 必须最高”会让优先级失去意义。由产品影响、用户范围、恢复成本和上线时间共同决定。</p>
+<h2 id="开发收到缺陷后的回复方式"><a href="#开发收到缺陷后的回复方式" class="headerlink" title="开发收到缺陷后的回复方式"></a>开发收到缺陷后的回复方式</h2><p>有效回复不是“不是我的问题”，而是给出当前判断和下一步：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">已在 test 1.11.3 复现。</span><br><span class="line">定位到 CouponRule 第 48 行使用了严格大于判断。</span><br><span class="line">需求确认门槛应包含等于场景。</span><br><span class="line">计划补充 99.99、100、100.01 三个单元测试后修复。</span><br><span class="line">预计 17:00 提供版本，影响所有满额券计算。</span><br></pre></td></tr></table></figure>
+
+<p>暂时无法复现时也可以明确缺什么：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当前使用相同账号和版本执行 3 次未出现。</span><br><span class="line">请补充失败时间或 traceId，以确认请求实例和当时配置。</span><br><span class="line">我会同时检查 14:30 前后的券锁定日志。</span><br></pre></td></tr></table></figure>
+
+<p>这样问题仍在向前推进。</p>
+<h2 id="修复不能只让原步骤通过"><a href="#修复不能只让原步骤通过" class="headerlink" title="修复不能只让原步骤通过"></a>修复不能只让原步骤通过</h2><p>修复完成后至少做三层验证：</p>
 <ol>
-<li>Bug 描述缺少复现步骤</li>
-<li>开发自测不足，低级问题进入测试阶段</li>
-<li>测试关注结果，开发关注实现，沟通语言不一致</li>
+<li>原失败步骤已经恢复。</li>
+<li>相邻边界没有被破坏。</li>
+<li>相同规则的其他入口保持一致。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>开发和测试对质量负责的角度不同，但目标一致。好的协作应该让问题更早暴露、更清晰流转。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Bug 单必要信息：</span><br><span class="line">- 环境</span><br><span class="line">- 账号</span><br><span class="line">- 操作步骤</span><br><span class="line">- 期望结果</span><br><span class="line">- 实际结果</span><br><span class="line">- 截图/日志</span><br><span class="line">- 接口请求参数</span><br></pre></td></tr></table></figure>
+<p>优惠券可能在下单、购物车试算和运营后台预览中分别计算。如果只改下单接口，用户会在页面看到“可用”，提交时又失败，或者相反。</p>
+<p>开发应补自动测试锁定规则；测试根据影响范围回归。两者不是重复工作：自动测试保护以后每次构建，探索性测试继续寻找未被想到的组合。</p>
+<h2 id="对环境争议建立统一答案"><a href="#对环境争议建立统一答案" class="headerlink" title="对环境争议建立统一答案"></a>对环境争议建立统一答案</h2><p>“我本地正常”通常说明环境缺少可比性。团队应让每次测试都能确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">前端与后端版本</span><br><span class="line">Git 提交或构建号</span><br><span class="line">数据库迁移版本</span><br><span class="line">关键配置版本</span><br><span class="line">依赖服务状态</span><br><span class="line">测试数据创建方式</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">提测前自检：主流程、异常参数、权限边界、兼容旧数据、日志是否充分</span><br></pre></td></tr></table></figure>
+<p>服务提供版本接口，部署系统展示变更历史，测试数据使用脚本创建。这样环境问题不再依赖逐个人询问。</p>
+<h2 id="一次缺陷的关闭标准"><a href="#一次缺陷的关闭标准" class="headerlink" title="一次缺陷的关闭标准"></a>一次缺陷的关闭标准</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 根因和影响范围已记录</span><br><span class="line">[ ] 修复提交与部署版本可追溯</span><br><span class="line">[ ] 原用例和相邻边界验证通过</span><br><span class="line">[ ] 必要自动测试已补充</span><br><span class="line">[ ] 临时数据、开关和调试日志已清理</span><br><span class="line">[ ] 需求或接口文档同步更新</span><br><span class="line">[ ] 线上观察项与负责人明确</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>开发与测试协作经验</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
-<ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
-</ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>开发和测试并不是前后两个工位。一个更关注系统如何实现，一个更关注系统如何失败，这两种视角本来就应该互相补充。当双方用版本、数据、traceId 和边界条件说话时，讨论会从“在我这里是否正常”变成“在哪个条件下不符合共同确认的规则”。</p>
 
       
     </div>
@@ -374,34 +464,88 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>线上问题最考验的不是技术点本身，而是排查顺序、信息完整度和沟通节奏。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>报警出现后先猜原因，缺少证据链</li>
-<li>日志、监控、数据库信息没有按顺序收集</li>
-<li>修复后没有复盘，问题容易重复出现</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>线上排查要避免凭经验跳结论，应该按现象、影响范围、变更记录、日志证据和恢复手段逐步推进。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看错误日志</span></span><br><span class="line">grep -n <span class="string">&quot;ERROR&quot;</span> app.log | <span class="built_in">tail</span> -50</span><br><span class="line"></span><br><span class="line"><span class="comment"># 按 requestId 追踪</span></span><br><span class="line">grep <span class="string">&quot;req-20201031001&quot;</span> app.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程资源</span></span><br><span class="line">top -Hp $(pgrep java)</span><br></pre></td></tr></table></figure>
+<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
+<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">排查顺序：现象 -&gt; 影响范围 -&gt; 最近变更 -&gt; 日志证据 -&gt; 临时恢复 -&gt; 根因复盘</span><br></pre></td></tr></table></figure>
-
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>线上问题排查记录</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
+<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
+<p>当时群里很快出现了几个猜测：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>刚发布的新版本有问题。</li>
+<li>数据库变慢。</li>
+<li>网络波动。</li>
+<li>线程池满了。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>值班负责人先把内容分成事实和假设：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
+
+<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
+<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
+
+<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
+<p>日志中的共同异常是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
+
+<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
+<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+
+<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
+<p>连接池指标显示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
+
+<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
+<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
+<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
+<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
+<ol>
+<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
+<li>摘除两个异常实例，不再接收新请求。</li>
+<li>等待和终止已确认无业务写入的导出任务。</li>
+<li>逐个重启异常实例并完成健康检查。</li>
+<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
+</ol>
+<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
+<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
+<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
+
+<p>数据库查询改为每批 500 条：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
+<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
+
+<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
+<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
+<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
+<li>导出改为异步分页任务。</li>
+<li>设置导出并发上限和单用户频率限制。</li>
+<li>补充 1 万条数据的集成测试。</li>
+<li>连接池等待数进入告警。</li>
+</ul>
+<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
+<li>建立外部调用统一超时配置。</li>
+<li>Review 清单增加“事务中是否包含远程调用”。</li>
+<li>发布看板增加连接池、线程池和下游耗时。</li>
+<li>为大批量任务建立独立执行资源。</li>
+</ul>
+<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
+<li>导出任务平均和最大处理时间。</li>
+<li>每批数据大小是否需要调整。</li>
+<li>客户批量接口的失败和限流情况。</li>
+</ul>
+<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
+<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
+
+<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
 
       
     </div>
@@ -480,34 +624,96 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>部署标准化的价值，是让上线从一次“手工冒险”变成一套可重复执行的工程动作。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>上线步骤依赖个人经验，缺少清单</li>
-<li>部署后没有验证项</li>
-<li>出现问题时没有回滚方案</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>标准化部署把个人经验转化为团队流程，让每次上线都能被复盘、复用和持续改进。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line">scp target/app.jar deploy@server:/data/app/</span><br><span class="line">ssh deploy@server <span class="string">&quot;systemctl restart app&quot;</span></span><br></pre></td></tr></table></figure>
+<p>早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。</p>
+<p>部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。</p>
+<h2 id="发布单先于操作"><a href="#发布单先于操作" class="headerlink" title="发布单先于操作"></a>发布单先于操作</h2><p>没有发布单，不开始生产操作。最小发布单包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">版本：v1.12.0</span><br><span class="line">Git 提交：3a91f2c</span><br><span class="line">构建编号：build-20201018-42</span><br><span class="line">变更范围：订单导出、支付回调幂等修复</span><br><span class="line">影响服务：order-service</span><br><span class="line">数据库变更：V20201018_01__add_payment_unique_key.sql</span><br><span class="line">配置变更：PAYMENT_READ_TIMEOUT 3s -&gt; 5s</span><br><span class="line">计划窗口：20:00-20:30</span><br><span class="line">执行人 / 复核人：</span><br><span class="line">观察指标：</span><br><span class="line">回退触发条件：</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">部署步骤：构建 -&gt; 备份 -&gt; 上传 -&gt; 停服 -&gt; 替换 -&gt; 启动 -&gt; 验证 -&gt; 观察日志</span><br></pre></td></tr></table></figure>
+<p>标题相同的 Jar 不等于同一个版本。发布单必须能对应到唯一 Git 提交和构建产物。</p>
+<h2 id="0-确认变更冻结"><a href="#0-确认变更冻结" class="headerlink" title="0. 确认变更冻结"></a>0. 确认变更冻结</h2><p>发布窗口开始前，确认待发布提交不再变化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git show --<span class="built_in">stat</span> 3a91f2c</span><br><span class="line">git tag --contains 3a91f2c</span><br><span class="line">shasum -a 256 order-service.jar</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>项目部署标准化流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>校验值应由 CI 生成，并在目标服务器再次核对。不要在服务器上临时修改 Jar、class 或配置后仍沿用原版本号，这会让后续节点无法复现。</p>
+<p>需要一起冻结的还有：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>数据库脚本内容和执行顺序。</li>
+<li>配置版本。</li>
+<li>依赖服务版本。</li>
+<li>灰度节点范围。</li>
+<li>验证用例和测试数据。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<h2 id="1-上线前检查"><a href="#1-上线前检查" class="headerlink" title="1. 上线前检查"></a>1. 上线前检查</h2><p>我把检查分成业务、系统和恢复能力三组。</p>
+<h3 id="业务条件"><a href="#业务条件" class="headerlink" title="业务条件"></a>业务条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 需求验收完成，已知问题有明确结论</span><br><span class="line">[ ] 新旧客户端兼容</span><br><span class="line">[ ] 定时任务、消息消费者和批处理影响已确认</span><br><span class="line">[ ] 数据初始化、历史迁移和权限配置已准备</span><br><span class="line">[ ] 客服或业务方知道用户可见变化</span><br></pre></td></tr></table></figure>
+
+<h3 id="系统条件"><a href="#系统条件" class="headerlink" title="系统条件"></a>系统条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] CPU、内存、磁盘和连接池处于正常水位</span><br><span class="line">[ ] 当前无未处理生产告警</span><br><span class="line">[ ] 配置项已经双人复核</span><br><span class="line">[ ] 依赖的数据库、缓存、MQ 和外部接口正常</span><br><span class="line">[ ] 监控看板与日志检索可用</span><br></pre></td></tr></table></figure>
+
+<p>不要在系统已经不稳定时叠加发布变量。必须紧急发布时，要在发布单中说明当前故障状态和额外风险。</p>
+<h3 id="恢复条件"><a href="#恢复条件" class="headerlink" title="恢复条件"></a>恢复条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 上一稳定版本产物可获取且校验通过</span><br><span class="line">[ ] 旧配置版本可恢复</span><br><span class="line">[ ] 数据库变更明确可逆或向后兼容</span><br><span class="line">[ ] 回退操作人和决策人在线</span><br><span class="line">[ ] 回退预计耗时符合业务容忍度</span><br></pre></td></tr></table></figure>
+
+<p>“保留旧 Jar”不是完整回退方案。如果新代码已经写入旧版本无法识别的数据，应用回退仍可能失败。</p>
+<h2 id="2-数据库变更先做兼容设计"><a href="#2-数据库变更先做兼容设计" class="headerlink" title="2. 数据库变更先做兼容设计"></a>2. 数据库变更先做兼容设计</h2><p>数据库变更优先使用扩展、迁移、收缩三步：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">扩展：新增可空字段、表或索引，新旧代码都能运行</span><br><span class="line">迁移：新代码双写或迁移历史数据，持续校验</span><br><span class="line">收缩：确认旧版本退出后，再删除旧字段和兼容逻辑</span><br></pre></td></tr></table></figure>
+
+<p>避免在同一个窗口直接重命名字段并立即发布只认识新字段的代码。大表 DDL 还要预估锁时间、临时空间、主从延迟和失败恢复。</p>
+<p>执行脚本前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 已在相近数据量环境验证</span><br><span class="line">[ ] 脚本带唯一版本号且不可重复修改</span><br><span class="line">[ ] 明确是否幂等</span><br><span class="line">[ ] 评估执行时间、锁和磁盘空间</span><br><span class="line">[ ] 有执行后校验 SQL</span><br><span class="line">[ ] 高风险操作得到数据库负责人授权</span><br></pre></td></tr></table></figure>
+
+<p>生产 DDL 和数据修复应由有权限的人按审批执行。不要把未经 Review 的临时 SQL 粘贴进生产终端。</p>
+<h2 id="3-先灰度一个节点"><a href="#3-先灰度一个节点" class="headerlink" title="3. 先灰度一个节点"></a>3. 先灰度一个节点</h2><p>多实例服务不要一次替换全部节点。标准顺序是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">从负载均衡摘除一个节点</span><br><span class="line">等待存量请求完成</span><br><span class="line">部署新产物和配置</span><br><span class="line">启动并通过就绪检查</span><br><span class="line">执行冒烟验证</span><br><span class="line">重新接入少量流量</span><br><span class="line">观察一个完整业务周期</span><br><span class="line">逐批替换其余节点</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会影响服务容量，必须由具备生产权限的操作人执行，并确认剩余节点能够承载当前流量。</p>
+<p>一个简单的启动检查不能只看进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl --fail --silent http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl --fail --silent http://127.0.0.1:8080/api/internal/version</span><br></pre></td></tr></table></figure>
+
+<p>版本接口应返回当前 Git 提交、构建号和启动时间，避免流量打到错误产物。</p>
+<h2 id="4-冒烟验证要覆盖写路径"><a href="#4-冒烟验证要覆盖写路径" class="headerlink" title="4. 冒烟验证要覆盖写路径"></a>4. 冒烟验证要覆盖写路径</h2><p>只打开首页不足以证明后端可用。订单服务至少验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">读：查询一条授权范围内的订单</span><br><span class="line">写：创建一笔可清理的测试订单</span><br><span class="line">改：完成一次状态变化</span><br><span class="line">依赖：数据库、缓存和下游调用成功</span><br><span class="line">异步：消息被消费且没有进入死信队列</span><br><span class="line">权限：无权限请求被正确拒绝</span><br></pre></td></tr></table></figure>
+
+<p>测试数据要有固定前缀和清理策略，不能污染报表或触发真实通知。涉及支付、短信和外部客户的流程，应使用专门沙箱或受控验证路径。</p>
+<p>每项冒烟都记录请求时间、traceId 和结果。这样失败时能直接进入日志检索，而不是重新猜测。</p>
+<h2 id="5-观察指标决定是否继续"><a href="#5-观察指标决定是否继续" class="headerlink" title="5. 观察指标决定是否继续"></a>5. 观察指标决定是否继续</h2><p>灰度后至少看四组信号：</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>关注点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流量</td>
+<td>QPS、实例流量是否符合灰度比例</td>
+</tr>
+<tr>
+<td>质量</td>
+<td>错误率、业务失败码、消息失败数</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>P95&#x2F;P99、慢 SQL、下游耗时</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>CPU、堆内存、GC、线程池、连接池</td>
+</tr>
+</tbody></table>
+<p>不能只看平均响应时间。少量长尾请求可能已经影响核心用户，但均值仍然正常。</p>
+<p>发布前应写清触发条件，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5 分钟错误率高于基线 1 个百分点：暂停扩容</span><br><span class="line">核心接口 P99 连续 3 分钟超过 2 秒：回退灰度节点</span><br><span class="line">出现数据重复或状态不可逆错误：立即停止发布并升级决策</span><br></pre></td></tr></table></figure>
+
+<p>阈值根据系统基线设定，不能把示例数字机械搬到所有服务。</p>
+<h2 id="6-回退是一项预先设计的动作"><a href="#6-回退是一项预先设计的动作" class="headerlink" title="6. 回退是一项预先设计的动作"></a>6. 回退是一项预先设计的动作</h2><p>回退判断由发布负责人根据既定条件做出，不在故障现场临时争论“再看看”。执行顺序通常是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">停止继续发布</span><br><span class="line">隔离新版本节点</span><br><span class="line">保存日志、线程和关键指标</span><br><span class="line">恢复旧产物与旧配置</span><br><span class="line">通过健康与业务验证</span><br><span class="line">逐步恢复流量</span><br><span class="line">确认数据兼容与积压任务</span><br></pre></td></tr></table></figure>
+
+<p>如果数据库变更不可逆，可能只能前向修复，不能简单回滚应用。发布前必须把这种情况写进决策记录，并准备降级开关或兼容代码。</p>
+<p>不要为了赶时间删除现场日志或覆盖旧产物。恢复业务和保留证据可以并行安排。</p>
+<h2 id="7-发布结束不是群里说一句“好了”"><a href="#7-发布结束不是群里说一句“好了”" class="headerlink" title="7. 发布结束不是群里说一句“好了”"></a>7. 发布结束不是群里说一句“好了”</h2><p>发布完成记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">实际开始与结束时间</span><br><span class="line">每批节点和当前版本</span><br><span class="line">数据库、配置的实际版本</span><br><span class="line">冒烟结果和 traceId</span><br><span class="line">核心指标与基线对比</span><br><span class="line">期间异常及处理</span><br><span class="line">遗留观察项和负责人</span><br></pre></td></tr></table></figure>
+
+<p>至少跨过一个业务高峰或约定观察期后再关闭发布单。定时任务在凌晨执行、账务在次日对账时，十分钟无告警不代表变更已经完全验证。</p>
+<h2 id="最终-Runbook"><a href="#最终-Runbook" class="headerlink" title="最终 Runbook"></a>最终 Runbook</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">发布前：范围冻结 -&gt; 产物校验 -&gt; 条件检查 -&gt; 回退演练</span><br><span class="line">发布中：兼容变更 -&gt; 单节点灰度 -&gt; 冒烟 -&gt; 指标观察 -&gt; 分批扩展</span><br><span class="line">异常时：停止扩展 -&gt; 保存证据 -&gt; 按阈值回退或前向修复</span><br><span class="line">发布后：版本核对 -&gt; 业务验证 -&gt; 持续观察 -&gt; 关闭与复盘</span><br></pre></td></tr></table></figure>
+
+<p>标准化发布的意义，是把原本藏在个人经验里的判断变成团队可以执行和复核的步骤。流程不一定让上线更快，却能让每一次快和慢都有证据，让故障发生时不用从“这次到底改了什么”开始查起。</p>
 
       
     </div>
@@ -586,34 +792,104 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/config-management-cover.svg" alt="配置管理经验封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>配置管理的目标不是把配置集中放起来，而是让不同环境的行为可预期、可追踪、可回滚。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>测试环境和生产环境配置混用</li>
-<li>配置变更没有记录，问题难以回溯</li>
-<li>敏感配置散落在代码仓库中</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>配置管理关乎环境一致性。配置应该可区分、可审计、可回滚，并避免把敏感信息写入代码。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span></span><br><span class="line"></span><br><span class="line"><span class="attr">app:</span></span><br><span class="line">  <span class="attr">upload-dir:</span> <span class="string">/data/app/uploads</span></span><br><span class="line">  <span class="attr">timeout-ms:</span> <span class="number">3000</span></span><br></pre></td></tr></table></figure>
+<p>配置问题有一个很迷惑的特点：代码、测试和构建都可能完全正常，只有到了某个环境才失败。更麻烦的是，临时在服务器上改一个值通常很快见效，却会让下次发布、扩容和故障回溯失去依据。</p>
+<p>我后来把配置看成代码之外的另一套运行逻辑。它也需要类型、边界、变更记录和回退方案，而不只是若干散落的 YAML。</p>
+<h2 id="先把配置分成四类"><a href="#先把配置分成四类" class="headerlink" title="先把配置分成四类"></a>先把配置分成四类</h2><p>不同配置应该由不同位置管理：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>示例</th>
+<th>建议归属</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>代码默认值</td>
+<td>分页上限、批次大小</td>
+<td>代码或公共配置</td>
+</tr>
+<tr>
+<td>环境差异</td>
+<td>域名、数据库地址、日志级别</td>
+<td>部署平台或环境配置</td>
+</tr>
+<tr>
+<td>敏感信息</td>
+<td>密码、Token、私钥</td>
+<td>密钥管理系统</td>
+</tr>
+<tr>
+<td>运行开关</td>
+<td>灰度比例、功能开关</td>
+<td>有审计的动态配置</td>
+</tr>
+</tbody></table>
+<p>如果一个值在所有环境都一样，而且改变它必须重新测试，通常更适合作为代码常量；如果它随部署环境变化，才属于外部配置。</p>
+<p>不要为了“灵活”把每个数字都做成配置。无边界配置会让系统组合状态急剧增加，测试无法覆盖。</p>
+<h2 id="仓库里的配置只放可公开内容"><a href="#仓库里的配置只放可公开内容" class="headerlink" title="仓库里的配置只放可公开内容"></a>仓库里的配置只放可公开内容</h2><p>一个比较清晰的 Spring Boot 结构是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">application.yml          服务名、序列化等公共行为</span><br><span class="line">application-local.yml    本地安全默认值</span><br><span class="line">application-test.yml     自动测试专用配置</span><br><span class="line">部署平台                 测试、预发、生产环境差异</span><br><span class="line">密钥系统                 密码、Token 和证书</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">配置原则：</span><br><span class="line">- 环境配置分离</span><br><span class="line">- 密码不进仓库</span><br><span class="line">- 修改要有记录</span><br><span class="line">- 默认值要保守</span><br></pre></td></tr></table></figure>
-
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>配置管理经验</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>仓库里不提交：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>真实数据库密码。</li>
+<li>云服务访问密钥。</li>
+<li>生产域名白名单和内部凭据。</li>
+<li>从服务器复制回来的完整配置。</li>
+<li>以注释方式“临时保留”的旧密码。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>即使仓库是私有的，提交历史、CI 日志和开发机副本都会扩大泄露范围。已经进入 Git 历史的密钥不能只删除当前行，必须立即轮换。</p>
+<h2 id="用占位符表达依赖"><a href="#用占位符表达依赖" class="headerlink" title="用占位符表达依赖"></a>用占位符表达依赖</h2><p><code>application.yml</code> 可以声明来源和安全默认值：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">$&#123;APP_PROFILE:local&#125;</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">$&#123;DB_URL&#125;</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">$&#123;DB_USERNAME&#125;</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">$&#123;DB_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">payment:</span></span><br><span class="line">  <span class="attr">base-url:</span> <span class="string">$&#123;PAYMENT_BASE_URL&#125;</span></span><br><span class="line">  <span class="attr">connect-timeout:</span> <span class="string">$&#123;PAYMENT_CONNECT_TIMEOUT:2s&#125;</span></span><br><span class="line">  <span class="attr">read-timeout:</span> <span class="string">$&#123;PAYMENT_READ_TIMEOUT:5s&#125;</span></span><br><span class="line">  <span class="attr">retry-count:</span> <span class="string">$&#123;PAYMENT_RETRY_COUNT:1&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>地址和账号没有默认值，是为了缺失时尽早失败；超时可以给出经过验证的默认值。生产配置里不要使用 <code>localhost</code> 作为兜底，否则依赖漏配后，应用可能启动成功却一直请求自己。</p>
+<h2 id="搞清楚覆盖优先级"><a href="#搞清楚覆盖优先级" class="headerlink" title="搞清楚覆盖优先级"></a>搞清楚覆盖优先级</h2><p>Spring Boot 支持多种配置来源。排查“明明改了却不生效”时，要先确认最终值来自哪里。常见的高优先级来源包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">命令行参数</span><br><span class="line">系统属性</span><br><span class="line">操作系统环境变量</span><br><span class="line">Profile 配置文件</span><br><span class="line">application.yml</span><br><span class="line">代码默认值</span><br></pre></td></tr></table></figure>
+
+<p>这里只表达常见理解，具体顺序应以项目使用的 Spring Boot 版本为准。配置中心、自定义启动脚本和容器注入还可能增加新的来源。</p>
+<p>我会在部署记录里保存“配置键、来源、版本”，而不是把值全部打印到日志。对于敏感项，只记录是否存在和更新时间。</p>
+<h2 id="将配置绑定为有类型的对象"><a href="#将配置绑定为有类型的对象" class="headerlink" title="将配置绑定为有类型的对象"></a>将配置绑定为有类型的对象</h2><p>在业务代码里到处写 <code>@Value</code>，会让配置关系分散，也难以统一校验。相关配置可以聚合：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Validated</span></span><br><span class="line"><span class="meta">@ConfigurationProperties(prefix = &quot;payment&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PaymentProperties</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotBlank</span></span><br><span class="line">    <span class="keyword">private</span> String baseUrl;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">Duration</span> <span class="variable">connectTimeout</span> <span class="operator">=</span> Duration.ofSeconds(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">Duration</span> <span class="variable">readTimeout</span> <span class="operator">=</span> Duration.ofSeconds(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Min(0)</span></span><br><span class="line">    <span class="meta">@Max(3)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">retryCount</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// getter 和 setter 省略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再通过配置类显式启用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableConfigurationProperties(PaymentProperties.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PaymentConfiguration</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> PaymentClient <span class="title function_">paymentClient</span><span class="params">(PaymentProperties properties)</span> &#123;</span><br><span class="line">        <span class="comment">// 客户端只依赖已经校验过的配置对象</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">PaymentClient</span>(</span><br><span class="line">                properties.getBaseUrl(),</span><br><span class="line">                properties.getConnectTimeout(),</span><br><span class="line">                properties.getReadTimeout(),</span><br><span class="line">                properties.getRetryCount()</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样配置缺失、格式错误或范围越界会在启动阶段暴露。相比运行到第一笔支付才报空指针，启动失败更容易发现和回退。</p>
+<h2 id="环境隔离不是复制四份文件"><a href="#环境隔离不是复制四份文件" class="headerlink" title="环境隔离不是复制四份文件"></a>环境隔离不是复制四份文件</h2><p>测试、预发、生产环境应该保持结构一致，只让必要值不同：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">应该相同：配置键、认证方式、协议、超时语义</span><br><span class="line">可以不同：实例地址、容量、账号、日志级别</span><br><span class="line">需要说明：为了测试而关闭的安全检查或外部依赖</span><br></pre></td></tr></table></figure>
+
+<p>如果测试环境使用内存数据库、关闭鉴权、同步执行，而生产使用 MySQL、真实鉴权、异步消息，那么测试通过只能说明另一套系统可用。</p>
+<p>本地环境可以提供简单依赖，但不能让代码依赖某位开发的绝对路径或个人账号。</p>
+<h2 id="配置变更也走一次发布流程"><a href="#配置变更也走一次发布流程" class="headerlink" title="配置变更也走一次发布流程"></a>配置变更也走一次发布流程</h2><p>一次完整变更至少包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">变更原因</span><br><span class="line">配置键与影响服务</span><br><span class="line">旧值和新值（敏感值仅保留版本）</span><br><span class="line">生效方式：重启、刷新或下一次请求</span><br><span class="line">风险与观察指标</span><br><span class="line">操作人与复核人</span><br><span class="line">执行时间</span><br><span class="line">回退条件与旧版本</span><br></pre></td></tr></table></figure>
+
+<p>先在测试或单实例验证，再逐步扩大。改变连接池、线程池、超时和重试参数时，不能只看应用是否启动，还要观察下游压力、错误率、排队和资源使用。</p>
+<p>配置变更速度快，所以更容易绕过 Review。正因为快，才更需要审计。</p>
+<h2 id="动态刷新不是免费能力"><a href="#动态刷新不是免费能力" class="headerlink" title="动态刷新不是免费能力"></a>动态刷新不是免费能力</h2><p>配置中心允许运行时刷新，但不是所有 Bean 和配置都适合热更新：</p>
+<ul>
+<li>数据源连接池可能需要重建。</li>
+<li>线程池大小变化要考虑正在执行的任务。</li>
+<li>多实例接收配置存在时间差。</li>
+<li>一组相关配置分次生效可能产生非法组合。</li>
+<li>回调过程中读取两次配置可能得到不同值。</li>
+</ul>
+<p>对于必须原子变化的一组值，应使用一个版本对象整体发布；业务处理开始时读取一次快照，不在同一请求中反复读取。</p>
+<p>核心连接、序列化协议、数据结构等高风险配置，我更倾向于随版本发布并重启，让行为边界明确。</p>
+<h2 id="功能开关要有生命周期"><a href="#功能开关要有生命周期" class="headerlink" title="功能开关要有生命周期"></a>功能开关要有生命周期</h2><p>功能开关适合灰度和紧急关闭，但每个开关必须记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">负责人</span><br><span class="line">默认值</span><br><span class="line">开启条件</span><br><span class="line">影响范围</span><br><span class="line">计划删除日期</span><br><span class="line">关闭后的行为</span><br></pre></td></tr></table></figure>
+
+<p>长期不清理的开关会在代码中形成大量分支。一次需求结束后，要么删除旧路径和开关，要么将它升级为正式业务规则并补齐测试。</p>
+<p>权限也要控制。能修改“是否校验支付金额”的配置，比修改普通日志级别风险高得多，不应使用同一审批级别。</p>
+<h2 id="启动和运行时分别验证"><a href="#启动和运行时分别验证" class="headerlink" title="启动和运行时分别验证"></a>启动和运行时分别验证</h2><p>启动时检查：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">必填配置是否存在</span><br><span class="line">地址和数值格式是否正确</span><br><span class="line">上下限关系是否合法</span><br><span class="line">互斥开关是否同时开启</span><br><span class="line">证书是否在有效期</span><br></pre></td></tr></table></figure>
+
+<p>运行时则通过健康检查和指标确认配置效果，例如连接池等待时间、外部调用超时率、线程池队列和降级次数。配置正确加载不代表参数适合当前流量。</p>
+<p>日志中可以输出脱敏摘要：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">payment_config_loaded</span><br><span class="line">baseUrlHost=pay.example</span><br><span class="line">connectTimeoutMs=2000</span><br><span class="line">readTimeoutMs=5000</span><br><span class="line">retryCount=1</span><br><span class="line">secretConfigured=true</span><br><span class="line">configVersion=20200929-03</span><br></pre></td></tr></table></figure>
+
+<p>不要直接打印完整 URL 查询参数、用户名或密钥。</p>
+<h2 id="我的配置检查表"><a href="#我的配置检查表" class="headerlink" title="我的配置检查表"></a>我的配置检查表</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ ] 每个配置都有明确语义和负责人</span><br><span class="line">[ ] 仓库不含真实凭据</span><br><span class="line">[ ] 环境差异由部署层注入</span><br><span class="line">[ ] 配置对象有类型、默认值和范围校验</span><br><span class="line">[ ] 能说明最终值的来源与优先级</span><br><span class="line">[ ] 测试环境与生产保持关键行为一致</span><br><span class="line">[ ] 变更有版本、复核、观察和回退记录</span><br><span class="line">[ ] 动态刷新考虑原子性和多实例时差</span><br><span class="line">[ ] 功能开关有删除日期</span><br><span class="line">[ ] 日志只输出脱敏摘要</span><br></pre></td></tr></table></figure>
+
+<p>配置管理真正要解决的不是“值放在哪里”，而是任何环境下都能回答：当前使用什么、为什么是这个值、谁改过、怎样验证、失败后如何恢复。做到这一点，环境差异才不会继续成为只能靠经验处理的黑盒。</p>
 
       
     </div>
@@ -692,36 +968,81 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/spring-boot-setup-cover.svg" alt="Spring Boot项目搭建封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Spring Boot 降低了项目启动门槛，但也要求我们理解默认配置背后的约定。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>依赖引入很快，但默认配置理解不足</li>
-<li>配置文件拆分不清晰</li>
-<li>项目结构没有统一约定</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Spring Boot 把大量工程默认值封装起来，成熟使用方式不是只会启动，而是知道默认值如何被覆盖。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DemoApplication</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(DemoApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用 Spring Initializr 生成一个工程只需要几分钟，但“能启动”和“能交付”之间还隔着配置、异常、日志、测试、监控和构建规则。早期项目最容易留下的债，往往不是业务代码，而是大家在没有约定的骨架上各写一套。</p>
+<p>这次不追求搭一个万能脚手架，只从一个订单查询接口出发，把空工程补到可以进入团队开发的最小状态。示例统一基于 Spring Boot 2.x 和 JDK 8。</p>
+<h2 id="先定义最小交付边界"><a href="#先定义最小交付边界" class="headerlink" title="先定义最小交付边界"></a>先定义最小交付边界</h2><p>开始引入依赖前，先写清楚本期需要什么：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">需要：</span><br><span class="line">- HTTP JSON 接口</span><br><span class="line">- 参数校验与统一错误响应</span><br><span class="line">- MySQL 访问和事务</span><br><span class="line">- 分环境配置</span><br><span class="line">- 健康检查、日志和自动测试</span><br><span class="line">- Maven 可重复构建</span><br><span class="line"></span><br><span class="line">暂时不需要：</span><br><span class="line">- 分布式事务</span><br><span class="line">- 配置中心</span><br><span class="line">- 消息队列</span><br><span class="line">- 通用代码生成平台</span><br><span class="line">- 抽象所有未来业务</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure>
+<p>边界能防止“刚创建项目就先封装一切”。没有第二个真实用例之前，很多所谓公共能力只是猜测。</p>
+<h2 id="建立可控的-Maven-依赖"><a href="#建立可控的-Maven-依赖" class="headerlink" title="建立可控的 Maven 依赖"></a>建立可控的 Maven 依赖</h2><p><code>pom.xml</code> 中只放当前需要的 Starter，并明确 Java 版本：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.4.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-validation<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-jdbc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn spring-boot:run</span><br></pre></td></tr></table></figure>
+<p>依赖版本优先交给 Spring Boot 的依赖管理，不在每个依赖上单独指定版本。额外覆盖版本时，要在提交说明里写清兼容或安全原因。</p>
+<p>构建基线先验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn -v</span><br><span class="line">mvn clean verify</span><br><span class="line">mvn dependency:tree</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>Spring Boot项目搭建</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>团队使用 IDEA 自带 Maven 时，也要确保 IDEA 的 JDK、Maven Runner JDK 和项目 <code>java.version</code> 一致，避免 IDE 能运行、命令行却失败。</p>
+<h2 id="包结构围绕业务组织"><a href="#包结构围绕业务组织" class="headerlink" title="包结构围绕业务组织"></a>包结构围绕业务组织</h2><p>我不再把所有 Controller、Service、Mapper 分别堆进三个巨型目录，而是先按业务模块分组：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">com.example.order</span><br><span class="line">├── OrderApplication.java</span><br><span class="line">├── common</span><br><span class="line">│   ├── api</span><br><span class="line">│   ├── error</span><br><span class="line">│   └── web</span><br><span class="line">└── order</span><br><span class="line">    ├── api</span><br><span class="line">    ├── application</span><br><span class="line">    ├── domain</span><br><span class="line">    └── infrastructure</span><br></pre></td></tr></table></figure>
+
+<p>模块内部仍有层次，但订单相关代码能够放在一起。以后新增支付模块，不需要在四个全局目录之间来回跳转。</p>
+<p>启动类放在根包，保证默认组件扫描覆盖业务模块：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderApplication</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(OrderApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不建议一开始添加大量 <code>@ComponentScan</code>。扫描范围异常往往说明包边界或启动类位置不合理。</p>
+<h2 id="配置只提供安全默认值"><a href="#配置只提供安全默认值" class="headerlink" title="配置只提供安全默认值"></a>配置只提供安全默认值</h2><p>公共配置放行为一致的部分，环境差异通过 Profile 或外部配置注入：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># application.yml</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">$&#123;APP_PROFILE:local&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="string">$&#123;SERVER_PORT:8080&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">health,info</span></span><br></pre></td></tr></table></figure>
+
+<p><code>application-local.yml</code> 可以指向本机数据库，但不要提交真实密码：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">url:</span> <span class="string">$&#123;DB_URL:jdbc:mysql://127.0.0.1:3306/order_demo&#125;</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">$&#123;DB_USERNAME:order_app&#125;</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">$&#123;DB_PASSWORD:&#125;</span></span><br><span class="line">    <span class="attr">hikari:</span></span><br><span class="line">      <span class="attr">maximum-pool-size:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">connection-timeout:</span> <span class="number">3000</span></span><br></pre></td></tr></table></figure>
+
+<p>生产环境必须在部署平台提供必填值。密码为空时应在启动阶段失败，而不是连库时才暴露问题。</p>
+<h2 id="请求对象承担输入约束"><a href="#请求对象承担输入约束" class="headerlink" title="请求对象承担输入约束"></a>请求对象承担输入约束</h2><p>不要让 Controller 接收一个无边界的 Map。订单查询可以使用明确的请求对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderQueryRequest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotNull(message = &quot;用户编号不能为空&quot;)</span></span><br><span class="line">    <span class="meta">@Min(value = 1, message = &quot;用户编号必须大于 0&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Long userId;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Min(value = 1, message = &quot;页码必须大于 0&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">page</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Min(value = 1, message = &quot;每页数量必须大于 0&quot;)</span></span><br><span class="line">    <span class="meta">@Max(value = 100, message = &quot;每页最多查询 100 条&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="variable">pageSize</span> <span class="operator">=</span> <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// getter 和 setter 省略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>DTO 只描述接口契约，不直接复用数据库实体。否则表字段变化可能意外改变接口，调用方也可能提交本不允许修改的字段。</p>
+<h2 id="Controller-只做协议转换"><a href="#Controller-只做协议转换" class="headerlink" title="Controller 只做协议转换"></a>Controller 只做协议转换</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/api/orders&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderQueryController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderQueryService orderQueryService;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderQueryController</span><span class="params">(OrderQueryService orderQueryService)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.orderQueryService = orderQueryService;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span></span><br><span class="line">    <span class="keyword">public</span> PageResult&lt;OrderSummary&gt; <span class="title function_">query</span><span class="params">(<span class="meta">@Valid</span> OrderQueryRequest request)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> orderQueryService.query(</span><br><span class="line">                request.getUserId(),</span><br><span class="line">                request.getPage(),</span><br><span class="line">                request.getPageSize()</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Controller 不编写 SQL，不决定事务，也不捕获所有异常后返回 <code>200</code>。它负责 HTTP 参数、认证上下文和响应状态，业务规则放进应用服务或领域对象。</p>
+<p>构造器注入能让依赖显式，也便于测试；相比字段注入，不需要通过反射才能创建对象。</p>
+<h2 id="业务服务守住事务边界"><a href="#业务服务守住事务边界" class="headerlink" title="业务服务守住事务边界"></a>业务服务守住事务边界</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderQueryService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> OrderRepository orderRepository;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderQueryService</span><span class="params">(OrderRepository orderRepository)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.orderRepository = orderRepository;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional(readOnly = true)</span></span><br><span class="line">    <span class="keyword">public</span> PageResult&lt;OrderSummary&gt; <span class="title function_">query</span><span class="params">(Long userId, <span class="type">int</span> page, <span class="type">int</span> pageSize)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">offset</span> <span class="operator">=</span> (page - <span class="number">1</span>) * pageSize;</span><br><span class="line">        List&lt;OrderSummary&gt; items =</span><br><span class="line">                orderRepository.findByUserId(userId, offset, pageSize);</span><br><span class="line">        <span class="type">long</span> <span class="variable">total</span> <span class="operator">=</span> orderRepository.countByUserId(userId);</span><br><span class="line">        <span class="keyword">return</span> PageResult.of(items, total, page, pageSize);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事务放在公共 Service 方法上，并保持范围尽可能小。不要在数据库事务中执行耗时 HTTP 调用；数据库锁会一直占用，失败语义也更难处理。</p>
+<p>示例中的分页偏移需要防止超大页码。数据量增加后，可以改成基于 <code>id</code> 或创建时间的游标分页，而不是无限增大的 <code>OFFSET</code>。</p>
+<h2 id="Repository-封装数据访问"><a href="#Repository-封装数据访问" class="headerlink" title="Repository 封装数据访问"></a>Repository 封装数据访问</h2><p>早期工程使用 <code>NamedParameterJdbcTemplate</code> 已经足够：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Repository</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JdbcOrderRepository</span> <span class="keyword">implements</span> <span class="title class_">OrderRepository</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">FIND_SQL</span> <span class="operator">=</span></span><br><span class="line">            <span class="string">&quot;SELECT id, order_no, status, amount, created_at &quot;</span> +</span><br><span class="line">            <span class="string">&quot;FROM order_info WHERE user_id = :userId &quot;</span> +</span><br><span class="line">            <span class="string">&quot;ORDER BY created_at DESC LIMIT :offset, :pageSize&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> NamedParameterJdbcTemplate jdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">JdbcOrderRepository</span><span class="params">(NamedParameterJdbcTemplate jdbcTemplate)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.jdbcTemplate = jdbcTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> List&lt;OrderSummary&gt; <span class="title function_">findByUserId</span><span class="params">(Long userId, <span class="type">int</span> offset, <span class="type">int</span> pageSize)</span> &#123;</span><br><span class="line">        <span class="type">MapSqlParameterSource</span> <span class="variable">parameters</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MapSqlParameterSource</span>()</span><br><span class="line">                .addValue(<span class="string">&quot;userId&quot;</span>, userId)</span><br><span class="line">                .addValue(<span class="string">&quot;offset&quot;</span>, offset)</span><br><span class="line">                .addValue(<span class="string">&quot;pageSize&quot;</span>, pageSize);</span><br><span class="line">        <span class="keyword">return</span> jdbcTemplate.query(FIND_SQL, parameters, <span class="keyword">new</span> <span class="title class_">OrderSummaryRowMapper</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数必须绑定，不能拼接用户输入。SQL 字段显式列出，不使用 <code>SELECT *</code>。当查询逐渐复杂，再决定是否引入 MyBatis 等框架，不必为了一个接口提前增加整套抽象。</p>
+<h2 id="错误响应要稳定"><a href="#错误响应要稳定" class="headerlink" title="错误响应要稳定"></a>错误响应要稳定</h2><p>接口错误至少包含业务码、可读消息、traceId 和时间。不要把 Java 异常类名直接暴露给调用方：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestControllerAdvice</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GlobalExceptionHandler</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(MethodArgumentNotValidException.class)</span></span><br><span class="line">    <span class="meta">@ResponseStatus(HttpStatus.BAD_REQUEST)</span></span><br><span class="line">    <span class="keyword">public</span> ApiError <span class="title function_">handleValidation</span><span class="params">(MethodArgumentNotValidException exception)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">message</span> <span class="operator">=</span> exception.getBindingResult()</span><br><span class="line">                .getFieldErrors()</span><br><span class="line">                .stream()</span><br><span class="line">                .findFirst()</span><br><span class="line">                .map(FieldError::getDefaultMessage)</span><br><span class="line">                .orElse(<span class="string">&quot;请求参数不合法&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> ApiError.of(<span class="string">&quot;INVALID_ARGUMENT&quot;</span>, message, MDC.get(<span class="string">&quot;traceId&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler(Exception.class)</span></span><br><span class="line">    <span class="meta">@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)</span></span><br><span class="line">    <span class="keyword">public</span> ApiError <span class="title function_">handleUnknown</span><span class="params">(Exception exception)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">traceId</span> <span class="operator">=</span> MDC.get(<span class="string">&quot;traceId&quot;</span>);</span><br><span class="line">        <span class="comment">// 未知异常只在统一边界记录一次完整堆栈</span></span><br><span class="line">        log.error(<span class="string">&quot;unhandled_request_error traceId=&#123;&#125;&quot;</span>, traceId, exception);</span><br><span class="line">        <span class="keyword">return</span> ApiError.of(<span class="string">&quot;INTERNAL_ERROR&quot;</span>, <span class="string">&quot;系统暂时不可用&quot;</span>, traceId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>业务异常还应单独映射合适的 HTTP 状态和业务码。前端可以根据稳定的业务码决定提示或重试，不依赖容易变化的中文消息。</p>
+<h2 id="健康检查不等于进程存在"><a href="#健康检查不等于进程存在" class="headerlink" title="健康检查不等于进程存在"></a>健康检查不等于进程存在</h2><p>引入 Actuator 后，先开放最少端点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -s http://127.0.0.1:8080/actuator/health</span><br></pre></td></tr></table></figure>
+
+<p>生产环境不要默认暴露全部管理端点，尤其是环境变量、Bean 和线程信息。管理端点应走内部网络并有访问控制。</p>
+<p>健康检查也要区分：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>存活：进程是否需要重启。</li>
+<li>就绪：是否能够接收新流量。</li>
+<li>依赖状态：数据库或外部服务是否异常。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>如果下游短暂波动就让存活检查失败，容器可能反复重启，反而放大故障。</p>
+<h2 id="至少准备三层测试"><a href="#至少准备三层测试" class="headerlink" title="至少准备三层测试"></a>至少准备三层测试</h2><p>项目骨架建立时就放入测试样例，后来的人才会沿用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">纯单元测试      业务规则和边界，不启动 Spring</span><br><span class="line">Web 层测试      参数校验、状态码、JSON 契约</span><br><span class="line">集成测试        Repository、事务和真实数据库行为</span><br></pre></td></tr></table></figure>
+
+<p>一个最小 Web 测试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith(SpringRunner.class)</span></span><br><span class="line"><span class="meta">@WebMvcTest(OrderQueryController.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderQueryControllerTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MockMvc mockMvc;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@MockBean</span></span><br><span class="line">    <span class="keyword">private</span> OrderQueryService orderQueryService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">shouldRejectInvalidUserId</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        mockMvc.perform(get(<span class="string">&quot;/api/orders&quot;</span>).param(<span class="string">&quot;userId&quot;</span>, <span class="string">&quot;0&quot;</span>))</span><br><span class="line">                .andExpect(status().isBadRequest())</span><br><span class="line">                .andExpect(jsonPath(<span class="string">&quot;$.code&quot;</span>).value(<span class="string">&quot;INVALID_ARGUMENT&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>集成测试不要长期依赖开发共享数据库，否则数据和执行顺序会互相污染。可以使用独立测试库，并通过迁移脚本初始化结构。</p>
+<h2 id="构建产物必须可以重复"><a href="#构建产物必须可以重复" class="headerlink" title="构建产物必须可以重复"></a>构建产物必须可以重复</h2><p>交付前使用同一条命令完成编译、测试和打包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mvn clean verify</span><br><span class="line">java -jar target/order-service.jar --spring.profiles.active=<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+
+<p>不要把 IDEA 输出目录、日志、上传文件或本地配置打进 Jar。版本号、Git 提交和构建时间可以写入构建信息，方便线上追溯。</p>
+<p>容器或服务器启动参数也应进入部署脚本，而不是留在某位同事的终端历史中。</p>
+<h2 id="第一个接口完成后的骨架验收"><a href="#第一个接口完成后的骨架验收" class="headerlink" title="第一个接口完成后的骨架验收"></a>第一个接口完成后的骨架验收</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[ ] JDK 8 与 Maven 构建版本一致</span><br><span class="line">[ ] 依赖最小且来源清楚</span><br><span class="line">[ ] 包结构按业务边界组织</span><br><span class="line">[ ] 配置不包含真实密钥</span><br><span class="line">[ ] 请求参数有明确校验</span><br><span class="line">[ ] Controller、事务和数据访问职责分开</span><br><span class="line">[ ] 错误码、traceId 和日志可用于排查</span><br><span class="line">[ ] 健康检查仅暴露必要信息</span><br><span class="line">[ ] 单元、Web 和集成测试各有样例</span><br><span class="line">[ ] Jar 能在 IDE 外独立启动</span><br><span class="line">[ ] 部署、验证和回退步骤已记录</span><br></pre></td></tr></table></figure>
+
+<p>Spring Boot 的价值不只是少写配置，而是让团队用约定快速建立一致基线。一个合格骨架不需要塞满技术名词，它应该让新增业务代码有位置、失败能够被看见、环境差异可控制，并且任何人都能用同一条命令得到相同产物。</p>
 
       
     </div>
@@ -800,34 +1121,114 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/logging-practice-cover.svg" alt="日志设计实践封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>好的日志不是越多越好，而是在出问题时能准确回答“发生了什么、影响了谁、下一步查哪里”。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<p>我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。</p>
+<p>从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。</p>
+<h2 id="反例一：只写一句“操作失败”"><a href="#反例一：只写一句“操作失败”" class="headerlink" title="反例一：只写一句“操作失败”"></a>反例一：只写一句“操作失败”</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(request);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;创建订单失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段日志有三个问题：</p>
 <ol>
-<li>出问题时日志里只有“失败了”，没有上下文</li>
-<li>日志级别混乱，INFO 和 ERROR 随意使用</li>
-<li>敏感信息被直接打印到日志</li>
+<li>没有业务标识，无法找到受影响订单。</li>
+<li>没有异常对象，丢失类型和调用栈。</li>
+<li>捕获后没有继续抛出，调用方可能收到成功结果。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>日志设计要面向排查场景，能串起请求、用户、业务对象、异常堆栈和关键状态变化。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;create order start, requestId=&#123;&#125;, userId=&#123;&#125;, skuId=&#123;&#125;&quot;</span>, requestId, userId, skuId);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;create order failed, requestId=&#123;&#125;, userId=&#123;&#125;, command=&#123;&#125;&quot;</span>, requestId, userId, command, e);</span><br><span class="line">    <span class="keyword">throw</span> e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>改造时先明确异常策略，再记录必要上下文：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(request);</span><br><span class="line">&#125; <span class="keyword">catch</span> (BusinessException exception) &#123;</span><br><span class="line">    log.warn(<span class="string">&quot;order_create_rejected userId=&#123;&#125; reasonCode=&#123;&#125;&quot;</span>,</span><br><span class="line">            request.getUserId(), exception.getCode());</span><br><span class="line">    <span class="keyword">throw</span> exception;</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;order_create_failed userId=&#123;&#125; requestId=&#123;&#125;&quot;</span>,</span><br><span class="line">            request.getUserId(), request.getRequestId(), exception);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">SystemException</span>(<span class="string">&quot;ORDER_CREATE_FAILED&quot;</span>, exception);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">日志字段建议：requestId、userId、bizId、action、result、cost、errorCode</span><br></pre></td></tr></table></figure>
+<p>业务拒绝是可预期结果，使用 <code>WARN</code> 并记录原因码；未知异常使用 <code>ERROR</code> 和完整堆栈。不要在每一层重复打印同一个异常，通常由最了解业务上下文的一层记录一次，再由统一异常处理转换响应。</p>
+<h2 id="反例二：把对象整体序列化"><a href="#反例二：把对象整体序列化" class="headerlink" title="反例二：把对象整体序列化"></a>反例二：把对象整体序列化</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;login request=&#123;&#125;&quot;</span>, json.toJson(loginRequest));</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>日志设计实践</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>看起来省事，实际上可能把密码、手机号、Token 和大段请求体写入日志。对象增加字段后，日志风险还会悄悄扩大。</p>
+<p>更稳妥的方式是使用字段白名单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;login_attempt accountType=&#123;&#125; tenantId=&#123;&#125; clientIp=&#123;&#125;&quot;</span>,</span><br><span class="line">        request.getAccountType(),</span><br><span class="line">        request.getTenantId(),</span><br><span class="line">        maskIp(clientIp));</span><br></pre></td></tr></table></figure>
+
+<p>默认不记录这些内容：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">密码、验证码、Cookie、Authorization</span><br><span class="line">身份证号、银行卡号、完整手机号和邮箱</span><br><span class="line">数据库连接密码、密钥、签名原文</span><br><span class="line">文件正文、二进制内容、超长 SQL 参数</span><br></pre></td></tr></table></figure>
+
+<p>确需定位单个对象时，可以记录不可逆摘要或内部业务编号，不要用敏感原文换取短期便利。</p>
+<h2 id="先定义一条业务事件"><a href="#先定义一条业务事件" class="headerlink" title="先定义一条业务事件"></a>先定义一条业务事件</h2><p>自由文本很适合阅读，但不利于检索和统计。我会让关键日志具备相对稳定的字段：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">timestamp   level   service   env</span><br><span class="line">event       traceId requestId</span><br><span class="line">userId      orderId</span><br><span class="line">result      reasonCode</span><br><span class="line">costMs      exception</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">event=order_submit</span><br><span class="line">traceId=7f94c892a0d1</span><br><span class="line">orderId=O202008230018</span><br><span class="line">userId=10027</span><br><span class="line">result=SUCCESS</span><br><span class="line">costMs=84</span><br></pre></td></tr></table></figure>
+
+<p><code>event</code> 表示稳定事件名，<code>result</code> 表示结果，<code>reasonCode</code> 表示可分类原因。人可以读懂，日志平台也能按成功率和耗时聚合。</p>
+<p>字段命名要统一。一个服务写 <code>orderNo</code>，另一个写 <code>order_id</code>，第三个放进一段中文消息，跨服务查询会非常痛苦。</p>
+<h2 id="级别是一种处置约定"><a href="#级别是一种处置约定" class="headerlink" title="级别是一种处置约定"></a>级别是一种处置约定</h2><p>我用“谁需要行动”来判断级别：</p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>含义</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ERROR</code></td>
+<td>当前请求失败，通常需要排查或告警</td>
+<td>数据库不可用、未知异常</td>
+</tr>
+<tr>
+<td><code>WARN</code></td>
+<td>可恢复或可预期异常，需要观察趋势</td>
+<td>限流、降级、业务拒绝</td>
+</tr>
+<tr>
+<td><code>INFO</code></td>
+<td>关键生命周期和业务结果</td>
+<td>服务启动、订单创建完成</td>
+</tr>
+<tr>
+<td><code>DEBUG</code></td>
+<td>开发排查细节，生产默认关闭</td>
+<td>分支判断、中间结果</td>
+</tr>
+<tr>
+<td><code>TRACE</code></td>
+<td>高频且极细粒度信息</td>
+<td>循环内部或协议细节</td>
+</tr>
+</tbody></table>
+<p>用户密码错误不应每次都打 <code>ERROR</code>；数据库连接失败也不该只打 <code>INFO</code>。级别混乱会让告警失真，最终大家只能忽略日志。</p>
+<h2 id="在入口建立-traceId"><a href="#在入口建立-traceId" class="headerlink" title="在入口建立 traceId"></a>在入口建立 traceId</h2><p>一条请求经过多个类甚至多个服务时，需要一个共同标识。Spring Boot 项目可以在过滤器中放入 MDC：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TraceIdFilter</span> <span class="keyword">extends</span> <span class="title class_">OncePerRequestFilter</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">TRACE_ID</span> <span class="operator">=</span> <span class="string">&quot;traceId&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doFilterInternal</span><span class="params">(HttpServletRequest request,</span></span><br><span class="line"><span class="params">                                    HttpServletResponse response,</span></span><br><span class="line"><span class="params">                                    FilterChain filterChain)</span></span><br><span class="line">            <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">traceId</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;X-Trace-Id&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (traceId == <span class="literal">null</span> || traceId.trim().isEmpty()) &#123;</span><br><span class="line">            traceId = UUID.randomUUID().toString().replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 放入 MDC 后，日志格式可以自动输出 traceId</span></span><br><span class="line">            MDC.put(TRACE_ID, traceId);</span><br><span class="line">            response.setHeader(<span class="string">&quot;X-Trace-Id&quot;</span>, traceId);</span><br><span class="line">            filterChain.doFilter(request, response);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 线程会被容器复用，必须清理，避免串到下一次请求</span></span><br><span class="line">            MDC.remove(TRACE_ID);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>日志格式中加入 <code>%X&#123;traceId&#125;</code> 后，同一请求的日志就能串起来。调用下游服务、发送消息时还要显式传递这个标识；仅在当前线程生成，并不能自动穿过 HTTP、MQ 和异步线程池。</p>
+<h2 id="异步任务容易丢上下文"><a href="#异步任务容易丢上下文" class="headerlink" title="异步任务容易丢上下文"></a>异步任务容易丢上下文</h2><p>MDC 基于线程上下文，提交到线程池后通常不会自动复制。可以在任务包装器中保存和恢复：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Runnable <span class="title function_">withMdc</span><span class="params">(Runnable task)</span> &#123;</span><br><span class="line">    Map&lt;String, String&gt; context = MDC.getCopyOfContextMap();</span><br><span class="line">    <span class="keyword">return</span> () -&gt; &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (context != <span class="literal">null</span>) &#123;</span><br><span class="line">                MDC.setContextMap(context);</span><br><span class="line">            &#125;</span><br><span class="line">            task.run();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            MDC.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段写法兼容 JDK 8。实际项目中可以放进统一的 <code>TaskDecorator</code> 或线程池封装，避免每个业务方法自行复制。</p>
+<h2 id="记录入口和出口，但控制粒度"><a href="#记录入口和出口，但控制粒度" class="headerlink" title="记录入口和出口，但控制粒度"></a>记录入口和出口，但控制粒度</h2><p>不是每个方法都需要“开始、结束”两条日志。适合记录的边界包括：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>外部 HTTP 请求进入和完成。</li>
+<li>消息生产、投递确认、消费和确认。</li>
+<li>定时任务开始、处理数量和结束。</li>
+<li>重要状态迁移。</li>
+<li>外部依赖调用的结果与耗时。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>一个请求结束日志可以同时承担访问审计和性能观察：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">event=http_request_completed</span><br><span class="line">method=POST</span><br><span class="line">path=/api/orders</span><br><span class="line">status=201</span><br><span class="line">costMs=126</span><br><span class="line">traceId=7f94c892a0d1</span><br></pre></td></tr></table></figure>
+
+<p>路径应使用模板 <code>/api/orders/&#123;id&#125;</code>，而不是把每个具体 ID 当成新维度，否则统计维度会无限增长。</p>
+<h2 id="异常日志保留最有用的上下文"><a href="#异常日志保留最有用的上下文" class="headerlink" title="异常日志保留最有用的上下文"></a>异常日志保留最有用的上下文</h2><p>异常堆栈说明“代码在哪里失败”，业务字段说明“谁失败”。两者缺一不可，但上下文要有限：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">log.error(</span><br><span class="line">        <span class="string">&quot;payment_callback_failed paymentNo=&#123;&#125; orderId=&#123;&#125; callbackType=&#123;&#125;&quot;</span>,</span><br><span class="line">        paymentNo,</span><br><span class="line">        orderId,</span><br><span class="line">        callbackType,</span><br><span class="line">        exception</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>不要通过字符串拼接输出异常：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：通常只得到 exception.toString()，没有完整调用栈</span></span><br><span class="line">log.error(<span class="string">&quot;callback failed: &quot;</span> + exception);</span><br></pre></td></tr></table></figure>
+
+<p>也不要既在 Repository、Service、Controller 各打一遍相同堆栈，又让全局异常处理再打一遍。重复日志会放大存储量，还会让一次故障看起来像四次。</p>
+<h2 id="日志本身也有成本"><a href="#日志本身也有成本" class="headerlink" title="日志本身也有成本"></a>日志本身也有成本</h2><p>高并发接口每次打印大对象，会消耗序列化 CPU、磁盘 IO 和网络带宽。需要关注：</p>
+<ol>
+<li>热路径是否有高频 <code>INFO</code>。</li>
+<li>参数构造是否在日志关闭时仍会执行。</li>
+<li>单行是否过大，多行堆栈是否失控。</li>
+<li>日志文件是否按大小和日期滚动。</li>
+<li>保留周期是否符合排障与合规要求。</li>
+</ol>
+<p>对高频成功事件，可以用指标统计总量，仅对失败和采样请求保留详细日志。日志、指标和链路追踪各有职责，不应让日志承担全部可观测性。</p>
+<h2 id="用反例驱动一次日志-Review"><a href="#用反例驱动一次日志-Review" class="headerlink" title="用反例驱动一次日志 Review"></a>用反例驱动一次日志 Review</h2><p>每次评审我会抽查下面几项：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 关键事件能否按 traceId 和业务编号检索</span><br><span class="line">[ ] 事件名、字段名和结果码是否稳定</span><br><span class="line">[ ] 异常是否只在合适层级记录一次</span><br><span class="line">[ ] ERROR 是否真的需要行动</span><br><span class="line">[ ] 是否泄露敏感字段或完整请求体</span><br><span class="line">[ ] 异步和跨服务场景是否传递上下文</span><br><span class="line">[ ] 高频日志是否影响性能和存储</span><br><span class="line">[ ] 滚动、保留和告警规则是否匹配</span><br></pre></td></tr></table></figure>
+
+<p>一条好日志应该像交接给值班同事的一句完整说明：哪件事失败、影响谁、证据在哪里。只有真正出问题时还能用得上的日志，才值得在正常运行的每一分钟里被写入。</p>
 
       
     </div>
@@ -905,34 +1306,139 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+          <p><img src="/images/posts/2020/git-collaboration-cover.svg" alt="Git协作开发流程封面图"></p>
+<p>一个人使用 Git，记住 <code>add</code>、<code>commit</code>、<code>push</code> 基本够用；多人协作以后，难点变成了什么时候开分支、如何保持改动足够小、冲突由谁处理，以及线上版本怎样准确追溯。</p>
+<p>下面是我逐步整理出来的一份团队运行手册。它不追求复杂的分支模型，目标只有三个：主分支随时可发布、每次改动可以审查、出现问题能够回退。</p>
+<h2 id="分支只承担清晰职责"><a href="#分支只承担清晰职责" class="headerlink" title="分支只承担清晰职责"></a>分支只承担清晰职责</h2><p>小团队可以从三类分支开始：</p>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>来源</th>
+<th>生命周期</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>main</code></td>
+<td>受保护分支</td>
+<td>长期</td>
+<td>已验证、可发布代码</td>
+</tr>
+<tr>
+<td><code>feature/*</code></td>
+<td><code>main</code></td>
+<td>数小时到数天</td>
+<td>单个需求或技术任务</td>
+</tr>
+<tr>
+<td><code>hotfix/*</code></td>
+<td>线上 Tag</td>
+<td>尽可能短</td>
+<td>生产紧急修复</td>
+</tr>
+</tbody></table>
+<p>如果团队有固定测试窗口，可以增加 <code>release/*</code>；如果没有明确收益，不必照搬完整 Git Flow。分支越多，版本流转和补丁同步成本越高。</p>
+<p>分支名要能直接关联工作：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">feature/order-export</span><br><span class="line">fix/payment-callback-idempotency</span><br><span class="line">hotfix/20200712-login-timeout</span><br></pre></td></tr></table></figure>
+
+<p><code>tmp</code>、<code>new</code>、<code>test2</code> 之类名称会让几周后的清理和追溯变得困难。</p>
+<h2 id="开始任务前"><a href="#开始任务前" class="headerlink" title="开始任务前"></a>开始任务前</h2><p>先确认工作区干净，并从最新主分支创建任务分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git fetch origin</span><br><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git switch -c feature/order-export</span><br></pre></td></tr></table></figure>
+
+<p><code>--ff-only</code> 可以阻止 <code>pull</code> 在本地悄悄生成一次合并提交。如果当前 Git 版本不支持 <code>switch</code>，可以使用 <code>checkout</code> 完成相同操作。</p>
+<p>开始编码前还应明确：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">需求或缺陷编号</span><br><span class="line">本次明确包含和不包含的范围</span><br><span class="line">数据库、接口、配置是否变化</span><br><span class="line">验证方式</span><br><span class="line">上线和回退方式</span><br></pre></td></tr></table></figure>
+
+<p>Git 能记录代码变化，却不能替代范围管理。</p>
+<h2 id="一个提交表达一个意图"><a href="#一个提交表达一个意图" class="headerlink" title="一个提交表达一个意图"></a>一个提交表达一个意图</h2><p>好的提交不是“今天写了多少”，而是一个可以独立解释、审查和撤销的变化。例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">feat(order): add paid-order export endpoint</span><br><span class="line">fix(payment): ignore duplicated callback</span><br><span class="line">test(order): cover export permission boundary</span><br><span class="line">refactor(order): extract status transition validation</span><br></pre></td></tr></table></figure>
+
+<p>提交前先检查实际内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status --short</span><br><span class="line">git diff</span><br><span class="line">git diff --cached</span><br></pre></td></tr></table></figure>
+
+<p>不要习惯性执行 <code>git add .</code>。配置、日志、IDE 文件和临时数据很容易一起进入提交。更稳妥的方式是按文件或按代码块暂存：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add src/main/java/com/example/order/OrderExportService.java</span><br><span class="line">git add -p</span><br><span class="line">git commit -m <span class="string">&quot;feat(order): add paid-order export service&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果一次提交同时包含格式化全项目、重命名、业务修改和依赖升级，Review 很难分辨真正变化。应把机械修改和行为修改拆开。</p>
+<h2 id="每天与主分支同步"><a href="#每天与主分支同步" class="headerlink" title="每天与主分支同步"></a>每天与主分支同步</h2><p>短分支能显著降低冲突。功能开发超过一天时，我会定期同步远端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin</span><br><span class="line">git rebase origin/main</span><br></pre></td></tr></table></figure>
+
+<p>适合使用 <code>rebase</code> 的前提是分支由自己维护，或者团队明确允许重写该分支历史。已经被多人共同使用的分支不要随意 rebase，否则其他人的提交基线会变化。</p>
+<p>不允许重写历史时，使用合并：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/main</span><br></pre></td></tr></table></figure>
+
+<p>团队应统一一种默认方式。混合使用并不可怕，真正麻烦的是没有约定，导致提交图无法解释。</p>
+<h2 id="冲突处理不是选择“我的”或“他的”"><a href="#冲突处理不是选择“我的”或“他的”" class="headerlink" title="冲突处理不是选择“我的”或“他的”"></a>冲突处理不是选择“我的”或“他的”</h2><p>冲突发生时先暂停自动操作，理解两边意图：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git diff --name-only --diff-filter=U</span><br><span class="line">git <span class="built_in">log</span> --oneline --left-right HEAD...origin/main</span><br></pre></td></tr></table></figure>
+
+<p>处理步骤：</p>
 <ol>
-<li>多人同时改同一模块导致冲突频繁</li>
-<li>分支长期不合并，最终集成风险很高</li>
-<li>提交信息无法说明改动目的</li>
+<li>阅读当前分支和主分支对应提交。</li>
+<li>确认两边修改解决的业务问题。</li>
+<li>手工合成最终行为，而不是直接选择一侧。</li>
+<li>删除冲突标记，重新编译并运行相关测试。</li>
+<li><code>git add</code> 已解决文件，再继续 rebase 或 commit。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>协作流程的重点不在命令本身，而在分支边界、提交粒度、合并节奏和问题回滚。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout develop</span><br><span class="line">git pull origin develop</span><br><span class="line">git checkout -b feature/order-export</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;feat: add order export&quot;</span></span><br><span class="line">git push origin feature/order-export</span><br></pre></td></tr></table></figure>
+<p>如果方向不对，可以执行 <code>git rebase --abort</code> 或 <code>git merge --abort</code> 回到操作前。中止比带着不确定结果继续提交更可靠。</p>
+<h2 id="提交合并请求前的自检"><a href="#提交合并请求前的自检" class="headerlink" title="提交合并请求前的自检"></a>提交合并请求前的自检</h2><p>合并请求不是把检查工作转交给 Reviewer。提交前至少确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 改动范围与任务一致，没有临时文件</span><br><span class="line">[ ] 编译、自动测试和静态检查通过</span><br><span class="line">[ ] 接口、数据库和配置变化有说明</span><br><span class="line">[ ] 日志不包含密码、Token 或个人敏感信息</span><br><span class="line">[ ] 新增分支和异常路径有测试</span><br><span class="line">[ ] 兼容与回退方式明确</span><br><span class="line">[ ] 分支已同步最新主分支</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">分支规则：</span><br><span class="line">feature/*  功能开发</span><br><span class="line">bugfix/*   缺陷修复</span><br><span class="line">release/*  发布准备</span><br><span class="line">hotfix/*   线上修复</span><br></pre></td></tr></table></figure>
+<p>合并请求描述建议回答四件事：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 为什么改</span></span><br><span class="line">支付回调可能重复投递，积分会重复增加。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么改</span></span><br><span class="line">以支付流水号建立唯一约束，重复请求返回原处理结果。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么验证</span></span><br><span class="line">单次、重复、并发回调测试均通过。</span><br><span class="line"></span><br><span class="line"><span class="section">## 风险与回退</span></span><br><span class="line">先上线约束与兼容代码；回退应用不删除约束。</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>Git协作开发流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>Reviewer 应重点看业务边界、数据一致性、异常处理和测试，格式问题尽量交给自动化工具。</p>
+<h2 id="主分支的合并规则"><a href="#主分支的合并规则" class="headerlink" title="主分支的合并规则"></a>主分支的合并规则</h2><p>主分支至少应有这些保护：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>禁止直接 push。</li>
+<li>必须通过合并请求。</li>
+<li>CI 检查通过后才能合并。</li>
+<li>至少一位非作者 Review。</li>
+<li>禁止提交密钥和生成物。</li>
+<li>合并后自动删除短期分支。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>是否使用 merge commit、squash 或 rebase merge，可以按团队追溯习惯选择：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>优点</th>
+<th>适合场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Merge commit</td>
+<td>保留完整分支上下文</td>
+<td>大功能、需要保留阶段提交</td>
+</tr>
+<tr>
+<td>Squash</td>
+<td>主线简洁，一个任务一个提交</td>
+<td>小而频繁的功能分支</td>
+</tr>
+<tr>
+<td>Rebase merge</td>
+<td>线性历史且保留提交</td>
+<td>提交本身已经整理良好</td>
+</tr>
+</tbody></table>
+<p>不要在同一个仓库随意切换策略，否则查找版本和回退时会增加认知成本。</p>
+<h2 id="发布必须能对应到提交"><a href="#发布必须能对应到提交" class="headerlink" title="发布必须能对应到提交"></a>发布必须能对应到提交</h2><p>每次生产发布都创建不可变 Tag：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git tag -a v1.8.0 -m <span class="string">&quot;release v1.8.0&quot;</span></span><br><span class="line">git push origin v1.8.0</span><br></pre></td></tr></table></figure>
+
+<p>发布记录至少包含 Tag、构建编号、数据库变更、配置版本和负责人。只有“周日晚上那一版”无法支持故障定位。</p>
+<p>回退前要先区分代码回退和数据回退。应用可以回到旧 Tag，但已执行的不可逆 DDL、已写入的新状态、已发送的消息不会自动恢复。</p>
+<h2 id="Hotfix-的最短闭环"><a href="#Hotfix-的最短闭环" class="headerlink" title="Hotfix 的最短闭环"></a>Hotfix 的最短闭环</h2><p>线上紧急修复从实际生产 Tag 创建，而不是从开发中的某个分支猜：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch -c hotfix/20200712-login-timeout v1.8.0</span><br><span class="line"><span class="comment"># 完成最小修改、测试和 Review</span></span><br><span class="line">git tag -a v1.8.1 -m <span class="string">&quot;hotfix login timeout&quot;</span></span><br><span class="line">git push origin v1.8.1</span><br></pre></td></tr></table></figure>
+
+<p>修复发布后，还要把对应提交合回主开发线，避免下一次发布重新带回缺陷。</p>
+<h2 id="关于强制推送和历史修改"><a href="#关于强制推送和历史修改" class="headerlink" title="关于强制推送和历史修改"></a>关于强制推送和历史修改</h2><p><code>git push --force</code> 可能覆盖远端他人的提交，受保护分支应直接禁止。确需更新自己的未合并分支时，也优先使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --force-with-lease</span><br></pre></td></tr></table></figure>
+
+<p><code>--force-with-lease</code> 会在远端已被他人更新时拒绝覆盖，但它仍然是重写历史操作，执行前必须确认分支所有者和影响范围。</p>
+<p>同样，不把 <code>reset --hard</code> 当日常清理命令。未提交文件可能永久丢失；先查看 <code>status</code>、保存必要改动，再决定恢复方式。</p>
+<h2 id="一套流程最后解决的是沟通"><a href="#一套流程最后解决的是沟通" class="headerlink" title="一套流程最后解决的是沟通"></a>一套流程最后解决的是沟通</h2><p>这套手册执行一段时间后，最明显的变化并不是提交图更漂亮，而是问题更容易回答：某行代码为什么改、谁审过、对应哪个版本、怎样验证、能否回退。</p>
+<p>Git 协作的核心不是命令数量，而是把一次改动变成边界清楚、证据完整、可被团队接住的交付单元。</p>
 
       
     </div>
@@ -1011,34 +1517,128 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/legacy-code-cover.svg" alt="如何阅读遗留代码封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>读遗留代码不能一上来就想重写，第一目标应该是建立事实，而不是表达审美。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+<p>接手老项目时，我最初做过一件效率很低的事：从包结构第一行开始逐个打开类，看到命名不顺眼就记一条“待重构”。两天后记了几十条问题，却仍然回答不了一个简单问题：用户提交订单后，系统到底经过哪些步骤？</p>
+<p>后来我把阅读遗留代码当成一次代码侦查。目的不是把每个类都看懂，而是在有限时间里建立一张可靠地图，知道入口在哪里、数据怎样变化、异常会停在哪里，以及这次修改会碰到什么。</p>
+<h2 id="先写一张侦查任务卡"><a href="#先写一张侦查任务卡" class="headerlink" title="先写一张侦查任务卡"></a>先写一张侦查任务卡</h2><p>没有具体问题，阅读很容易变成漫游。开始前先把任务压缩成一张卡：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">业务问题：已取消订单为什么还能被发货？</span><br><span class="line">本次目标：找到取消与发货的状态校验位置</span><br><span class="line">已知入口：POST /api/orders/&#123;id&#125;/cancel</span><br><span class="line">观察样本：一条脱敏后的订单号和 traceId</span><br><span class="line">时间限制：两小时先交付调用链，不立即重构</span><br><span class="line">输出：状态流转图、关键代码、风险点、待确认问题</span><br></pre></td></tr></table></figure>
+
+<p>任务卡会迫使我围绕一个可验证问题前进。读到与目标无关的工具类时，只做标记，不立刻钻进去。</p>
+<h2 id="第一条路线：先让系统可观察"><a href="#第一条路线：先让系统可观察" class="headerlink" title="第一条路线：先让系统可观察"></a>第一条路线：先让系统可观察</h2><p>能运行的项目比静态目录更诚实。第一步不是修改配置，而是记录当前基线：</p>
 <ol>
-<li>一上来就想重构，忽略现有逻辑背后的业务原因</li>
-<li>没有调用链和数据链路视角</li>
-<li>改动范围评估不充分</li>
+<li>确认 JDK、Maven、数据库和中间件版本。</li>
+<li>使用项目已有的本地配置启动，不复制生产配置。</li>
+<li>找到健康检查、启动日志和一条最小请求。</li>
+<li>记录启动命令、端口、依赖和失败信息。</li>
+<li>在任何改动前执行现有测试，保存通过和失败数量。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>遗留代码通常是历史约束下的结果。先尊重事实，再谈优化，是降低维护风险的前提。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 找入口</span></span><br><span class="line">grep -R <span class="string">&quot;OrderController&quot;</span> src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 看最近修改</span></span><br><span class="line">git <span class="built_in">log</span> --oneline -- src/main/java/com/demo/order</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查调用关系</span></span><br><span class="line"> grep -R <span class="string">&quot;createOrder&quot;</span> src/main/java</span><br></pre></td></tr></table></figure>
+<p>如果项目暂时跑不起来，也要区分“代码缺陷”和“环境缺口”。例如缺少测试库、内部依赖无法下载、初始化脚本过期，应该记录为环境事实，不能凭此判断业务代码不可用。</p>
+<p>我会先看这些文件，但不逐行精读：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pom.xml                    依赖、插件和 Java 版本</span><br><span class="line">application*.yml           外部依赖与环境差异</span><br><span class="line">启动类                     扫描范围和启动扩展</span><br><span class="line">安全配置与过滤器           身份从哪里进入</span><br><span class="line">数据库迁移脚本             表结构如何演进</span><br><span class="line">README、部署脚本、CI        项目真实运行方式</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">阅读顺序：</span><br><span class="line">入口接口 -&gt; Service 主流程 -&gt; 数据库表 -&gt; 外部依赖 -&gt; 异常分支 -&gt; 历史提交</span><br></pre></td></tr></table></figure>
+<p>这一步得到的是边界，不是结论。</p>
+<h2 id="第二条路线：从入口跟一条请求"><a href="#第二条路线：从入口跟一条请求" class="headerlink" title="第二条路线：从入口跟一条请求"></a>第二条路线：从入口跟一条请求</h2><p>阅读调用链时，我会从用户可见入口向内收缩，而不是从底层工具类向外猜。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HTTP 请求</span><br><span class="line">  -&gt; Filter / Interceptor</span><br><span class="line">  -&gt; Controller</span><br><span class="line">  -&gt; Application Service</span><br><span class="line">  -&gt; Domain / Rule</span><br><span class="line">  -&gt; Mapper / Repository</span><br><span class="line">  -&gt; 数据库、缓存或外部服务</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>如何阅读遗留代码</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>每经过一层只回答三个问题：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>输入在这里增加或丢失了什么信息？</li>
+<li>哪个条件会改变正常路径？</li>
+<li>失败后由谁捕获、转换或重试？</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>例如 Controller 只出现一个 <code>cancel(orderId)</code> 调用，我不会立刻打开 Service 中的所有公共方法，而是继续搜索这个方法、订单状态枚举和对应 SQL：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rg <span class="string">&quot;cancel\(&quot;</span> src/main/java</span><br><span class="line">rg <span class="string">&quot;CANCELLED|SHIPPED&quot;</span> src/main/java src/main/resources</span><br><span class="line">rg <span class="string">&quot;update.*order|order_info&quot;</span> src/main/resources</span><br></pre></td></tr></table></figure>
+
+<p>搜索结果要按“生产入口、定时任务、消息消费、测试”分类。同一个方法可能不只被 HTTP 调用，遗漏后台入口是遗留系统修改中常见的风险。</p>
+<h2 id="第三条路线：跟踪数据，而不是只跟方法"><a href="#第三条路线：跟踪数据，而不是只跟方法" class="headerlink" title="第三条路线：跟踪数据，而不是只跟方法"></a>第三条路线：跟踪数据，而不是只跟方法</h2><p>方法调用只能说明代码经过哪里，数据变化才能解释业务发生了什么。我会为核心对象画一条简化状态线：</p>
+<table>
+<thead>
+<tr>
+<th>时点</th>
+<th>数据状态</th>
+<th>写入位置</th>
+<th>约束</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建后</td>
+<td><code>CREATED</code></td>
+<td>订单服务</td>
+<td>订单号唯一</td>
+</tr>
+<tr>
+<td>支付后</td>
+<td><code>PAID</code></td>
+<td>支付回调</td>
+<td>回调可能重复</td>
+</tr>
+<tr>
+<td>取消后</td>
+<td><code>CANCELLED</code></td>
+<td>取消接口</td>
+<td>仅未发货可取消</td>
+</tr>
+<tr>
+<td>发货后</td>
+<td><code>SHIPPED</code></td>
+<td>消息消费者</td>
+<td>必须校验当前状态</td>
+</tr>
+</tbody></table>
+<p>接着检查四类细节：</p>
+<ol>
+<li>状态是由 Java 判断，还是直接写在 SQL 条件里。</li>
+<li>一个事务覆盖哪些写操作，外部调用是否夹在事务中间。</li>
+<li>缓存什么时候失效，失败后是否会读到旧状态。</li>
+<li>并发更新有没有版本号、条件更新或唯一约束保护。</li>
+</ol>
+<p>假设取消使用 <code>UPDATE order_info SET status = &#39;CANCELLED&#39; WHERE id = ?</code>，而发货也不带旧状态条件，那么问题不一定在某个 <code>if</code>，而在数据库没有守住状态迁移。此时重命名几个方法不会降低风险。</p>
+<h2 id="第四条路线：用历史解释奇怪代码"><a href="#第四条路线：用历史解释奇怪代码" class="headerlink" title="第四条路线：用历史解释奇怪代码"></a>第四条路线：用历史解释奇怪代码</h2><p>遗留代码里看似多余的判断，可能是一次事故留下的护栏。遇到不理解的逻辑，我会按下面顺序查历史：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> --oneline -- src/main/java/com/example/order/OrderService.java</span><br><span class="line">git blame -L 80,120 src/main/java/com/example/order/OrderService.java</span><br><span class="line">git show &lt;commit-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>git blame</code> 不是为了找责任人，而是为了找到提交上下文。提交说明、关联需求和同期测试往往能回答“为什么这里不能合并”“为什么失败也返回成功”。</p>
+<p>历史只能提供线索，不能自动证明今天仍然正确。最后仍要回到现有业务规则、线上数据和测试结果。</p>
+<h2 id="建立事实、推测和问题三栏笔记"><a href="#建立事实、推测和问题三栏笔记" class="headerlink" title="建立事实、推测和问题三栏笔记"></a>建立事实、推测和问题三栏笔记</h2><p>阅读过程中最危险的是把猜测写成事实。我使用三栏笔记强制区分：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>已验证事实</td>
+<td>发货消费者会调用 <code>ship()</code>，SQL 没有旧状态条件</td>
+</tr>
+<tr>
+<td>当前推测</td>
+<td>重复消息可能覆盖取消状态</td>
+</tr>
+<tr>
+<td>待确认问题</td>
+<td>消息是否保证同一订单有序，历史数据是否存在该情况</td>
+</tr>
+</tbody></table>
+<p>每个推测后面都补一个验证动作，例如查询脱敏数据、补测试、查看消息配置或询问业务负责人。这样即使当天没有定位完成，下一位接手的人也能沿着证据继续走。</p>
+<h2 id="修改前先写特征测试"><a href="#修改前先写特征测试" class="headerlink" title="修改前先写特征测试"></a>修改前先写特征测试</h2><p>老代码没有单元测试时，直接重构很难判断行为是否变化。特征测试先记录当前可观察行为，即使这个行为并不完美。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith(MockitoJUnitRunner.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderServiceTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Mock</span></span><br><span class="line">    <span class="keyword">private</span> OrderRepository orderRepository;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@InjectMocks</span></span><br><span class="line">    <span class="keyword">private</span> OrderService orderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">shouldRejectCancellationWhenOrderAlreadyShipped</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Order</span> <span class="variable">shippedOrder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Order</span>(<span class="number">1001L</span>, OrderStatus.SHIPPED);</span><br><span class="line">        <span class="keyword">when</span>(orderRepository.findById(<span class="number">1001L</span>)).thenReturn(shippedOrder);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            orderService.cancel(<span class="number">1001L</span>);</span><br><span class="line">            fail(<span class="string">&quot;已发货订单不应允许取消&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (BusinessException exception) &#123;</span><br><span class="line">            <span class="comment">// 先锁定现有业务语义，再调整内部实现</span></span><br><span class="line">            assertEquals(<span class="string">&quot;ORDER_ALREADY_SHIPPED&quot;</span>, exception.getCode());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        verify(orderRepository, never()).updateStatus(anyLong(), any());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于难以隔离的代码，可以先做接口级测试或固定输入输出的集成测试。测试颗粒度不是越小越好，关键是覆盖这次修改最可能破坏的行为。</p>
+<h2 id="画出影响半径"><a href="#画出影响半径" class="headerlink" title="画出影响半径"></a>画出影响半径</h2><p>找到修改点后，我会再向外搜索一次：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">直接调用者        Controller、其他 Service</span><br><span class="line">隐式调用者        Spring 事件、反射、SPI、表达式</span><br><span class="line">异步入口          MQ 消费者、定时任务、线程池任务</span><br><span class="line">数据依赖          SQL、视图、报表、缓存 key</span><br><span class="line">外部契约          API 字段、错误码、消息结构</span><br><span class="line">运维依赖          配置项、告警、脚本、日志关键字</span><br></pre></td></tr></table></figure>
+
+<p>尤其要注意字符串形式的绑定。方法名搜索不到，不代表它没有被 XML、配置或任务调度平台引用。</p>
+<h2 id="什么时候才适合重构"><a href="#什么时候才适合重构" class="headerlink" title="什么时候才适合重构"></a>什么时候才适合重构</h2><p>我给自己设置了四个前置条件：</p>
+<ol>
+<li>能用一句话说明当前行为和目标行为。</li>
+<li>已经找到主要入口、数据变化和异常路径。</li>
+<li>有测试或可重复验证步骤保护关键行为。</li>
+<li>改动可以拆成小提交，并且具备回退方式。</li>
+</ol>
+<p>如果只是命名较差但近期没有修改需求，可以先记录；如果一个十行改动要同时碰八个模块，说明真正的技术债可能是职责分散，应先缩小边界。重写通常是最后的方案，因为旧系统中最昂贵的部分不是代码行数，而是没有写下来的业务规则。</p>
+<h2 id="一页代码地图就是阶段成果"><a href="#一页代码地图就是阶段成果" class="headerlink" title="一页代码地图就是阶段成果"></a>一页代码地图就是阶段成果</h2><p>一次有效阅读不要求理解全部源码，但应该留下可复用结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">核心业务入口：</span><br><span class="line">关键调用链：</span><br><span class="line">主要数据表与状态：</span><br><span class="line">外部依赖：</span><br><span class="line">事务和异步边界：</span><br><span class="line">已验证风险：</span><br><span class="line">仍待确认的问题：</span><br><span class="line">本次修改与验证方案：</span><br></pre></td></tr></table></figure>
+
+<p>后来再接触陌生项目时，我不再把“读完代码”当目标。沿着具体问题建立证据、用数据和历史校正判断，再用测试保护修改，这张路线图比记住多少个类更有用。</p>
 
       
     </div>
@@ -1116,34 +1716,111 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>很多开发问题并不是写代码时产生的，而是在需求评审阶段就已经埋下了。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>只评估开发量，没有识别边界条件</li>
-<li>异常流程和权限规则讨论不足</li>
-<li>需求变更没有留下版本记录</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>需求评审不是确认“做不做”，而是确认“做什么、不做什么、异常情况怎么办、验收标准是什么”。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">需求评审问题清单：</span><br><span class="line">1. 目标用户是谁？</span><br><span class="line">2. 正常流程是什么？</span><br><span class="line">3. 异常流程有哪些？</span><br><span class="line">4. 权限边界是什么？</span><br><span class="line">5. 数据是否需要迁移？</span><br><span class="line">6. 验收标准如何定义？</span><br></pre></td></tr></table></figure>
+          <blockquote>
+<p>很多“开发延期”和“测试漏测”，根因在代码开始前就已经出现：目标不清、边界没讨论、异常流程无人负责。需求评审不是听产品讲一遍页面，而是把模糊描述转换成可以实现和验收的共同结论。</p>
+</blockquote>
+<h2 id="一个典型评审现场"><a href="#一个典型评审现场" class="headerlink" title="一个典型评审现场"></a>一个典型评审现场</h2><p>需求只有一句：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户可以取消未发货订单，退款原路返回。</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">结论记录格式：</span><br><span class="line">- 已确认：</span><br><span class="line">- 待产品补充：</span><br><span class="line">- 技术风险：</span><br><span class="line">- 不在本期范围：</span><br></pre></td></tr></table></figure>
+<p>听起来很简单，继续问才发现至少有这些分支：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">已支付但库存未出库</span><br><span class="line">部分商品已出库</span><br><span class="line">优惠券是否退回</span><br><span class="line">积分是否回滚</span><br><span class="line">支付渠道退款失败</span><br><span class="line">重复点击取消</span><br><span class="line">客服和用户同时操作</span><br><span class="line">订单正在状态迁移</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>需求评审中的常见问题</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>如果这些问题留到开发或测试阶段才发现，接口、表结构和排期都可能重新调整。</p>
+<h2 id="1-先问“为什么做”"><a href="#1-先问“为什么做”" class="headerlink" title="1. 先问“为什么做”"></a>1. 先问“为什么做”</h2><p>评审前先确认目标：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>当前用户痛点是什么。</li>
+<li>成功以后用什么指标判断有效。</li>
+<li>为什么必须在这个版本完成。</li>
+<li>是否有更小范围的方案。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>“增加取消按钮”是功能描述，“降低未发货订单的客服取消量”才是目标。知道目标后，才能判断是否需要自动退款、取消原因和运营后台。</p>
+<h2 id="2-把正常流程写成状态变化"><a href="#2-把正常流程写成状态变化" class="headerlink" title="2. 把正常流程写成状态变化"></a>2. 把正常流程写成状态变化</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PAID</span><br><span class="line">  -&gt; CANCEL_REQUESTED</span><br><span class="line">  -&gt; REFUNDING</span><br><span class="line">  -&gt; CANCELLED</span><br></pre></td></tr></table></figure>
+
+<p>每个箭头回答：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">谁触发</span><br><span class="line">需要什么权限</span><br><span class="line">前置状态</span><br><span class="line">写哪些数据</span><br><span class="line">调用哪些外部系统</span><br><span class="line">失败后停在哪个状态</span><br><span class="line">能否重试</span><br></pre></td></tr></table></figure>
+
+<p>页面流程可能只有三步，服务端状态通常更多。状态没有定义清楚时，不要急着估时。</p>
+<h2 id="3-用边界表发现遗漏"><a href="#3-用边界表发现遗漏" class="headerlink" title="3. 用边界表发现遗漏"></a>3. 用边界表发现遗漏</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>需要确认的问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户</td>
+<td>普通用户、客服、管理员权限是否不同</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>发货前、支付后多久允许取消</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>哪些状态允许，处理中如何展示</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>历史订单是否支持，是否需要迁移</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>重复点击、多人同时操作如何处理</td>
+</tr>
+<tr>
+<td>外部依赖</td>
+<td>支付、库存、优惠券失败怎么办</td>
+</tr>
+<tr>
+<td>通知</td>
+<td>用户、商家和客服是否收到消息</td>
+</tr>
+<tr>
+<td>审计</td>
+<td>谁在什么时候因为什么取消</td>
+</tr>
+</tbody></table>
+<p>边界表不是为了把需求无限做大，而是让产品明确哪些在本期、哪些不支持。</p>
+<h2 id="4-权限要具体到数据范围"><a href="#4-权限要具体到数据范围" class="headerlink" title="4. 权限要具体到数据范围"></a>4. 权限要具体到数据范围</h2><p>“登录用户可以取消订单”不够，需要说明：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户只能取消自己的订单</span><br><span class="line">客服需要 order:cancel 权限</span><br><span class="line">客服跨租户不可操作</span><br><span class="line">管理员强制取消必须填写原因</span><br><span class="line">敏感操作记录操作人和来源</span><br></pre></td></tr></table></figure>
+
+<p>权限遗漏常常不会在正常测试中暴露，却可能造成严重数据越权。</p>
+<h2 id="5-异常不是统一提示“失败”"><a href="#5-异常不是统一提示“失败”" class="headerlink" title="5. 异常不是统一提示“失败”"></a>5. 异常不是统一提示“失败”</h2><p>支付渠道超时有多种可能：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">请求未到达渠道</span><br><span class="line">渠道已受理但响应丢失</span><br><span class="line">渠道明确拒绝</span><br><span class="line">渠道退款成功但本地更新失败</span><br></pre></td></tr></table></figure>
+
+<p>调用超时不能直接把订单恢复原状态，因为渠道可能已经退款。需求中要定义查询、补偿和人工处理入口。</p>
+<p>对用户展示的文案、后台状态和告警负责人也要明确，不能全部留给开发“看着处理”。</p>
+<h2 id="6-数据变化提前说清楚"><a href="#6-数据变化提前说清楚" class="headerlink" title="6. 数据变化提前说清楚"></a>6. 数据变化提前说清楚</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">是否新增表或字段</span><br><span class="line">历史数据如何初始化</span><br><span class="line">报表口径是否变化</span><br><span class="line">搜索索引是否重建</span><br><span class="line">是否产生新的个人信息</span><br><span class="line">数据保留多久</span><br></pre></td></tr></table></figure>
+
+<p>数据迁移和回滚常常比接口开发耗时更长。评审只估页面和接口，会得到虚假的排期。</p>
+<h2 id="7-验收标准要能测试"><a href="#7-验收标准要能测试" class="headerlink" title="7. 验收标准要能测试"></a>7. 验收标准要能测试</h2><p>不清晰：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">取消过程要友好，退款尽快完成。</span><br></pre></td></tr></table></figure>
+
+<p>可测试：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">未发货且已支付订单允许申请取消</span><br><span class="line">重复提交同一订单只创建一笔退款</span><br><span class="line">渠道明确成功后订单进入 CANCELLED</span><br><span class="line">渠道超时后订单保持 REFUNDING，并可由任务查询</span><br><span class="line">用户能看到取消进度和失败原因分类</span><br></pre></td></tr></table></figure>
+
+<p>性能、权限、兼容和失败恢复也属于验收，不只是按钮能点击。</p>
+<h2 id="8-估时不要只报编码天数"><a href="#8-估时不要只报编码天数" class="headerlink" title="8. 估时不要只报编码天数"></a>8. 估时不要只报编码天数</h2><p>拆分为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">方案设计</span><br><span class="line">接口和数据变更</span><br><span class="line">外部依赖联调</span><br><span class="line">自动化测试</span><br><span class="line">历史数据处理</span><br><span class="line">灰度和监控</span><br><span class="line">上线验证</span><br><span class="line">风险缓冲</span><br></pre></td></tr></table></figure>
+
+<p>存在未确认项时，给区间和前提：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">支付渠道支持退款查询：预计 5 天</span><br><span class="line">若不支持查询，需要增加人工对账：另评估 2 至 3 天</span><br></pre></td></tr></table></figure>
+
+<p>这比给一个精确但没有依据的日期更负责。</p>
+<h2 id="9-会议结论怎么记录"><a href="#9-会议结论怎么记录" class="headerlink" title="9. 会议结论怎么记录"></a>9. 会议结论怎么记录</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">目标：降低未发货订单客服取消量</span><br><span class="line">本期范围：已支付、未出库的普通订单</span><br><span class="line">不在范围：部分出库、组合订单、跨境订单</span><br><span class="line">已确认：状态机、权限、退款查询方式</span><br><span class="line">待确认：优惠券退回时效，负责人产品 A，截止周二</span><br><span class="line">技术风险：渠道超时后的最终状态</span><br><span class="line">数据变更：新增退款请求表和取消原因</span><br><span class="line">验收：12 条主流程和异常用例</span><br></pre></td></tr></table></figure>
+
+<p>结论应进入需求单或共享文档，不能只留在会议录音和聊天记录中。</p>
+<h2 id="10-需求变更如何处理"><a href="#10-需求变更如何处理" class="headerlink" title="10. 需求变更如何处理"></a>10. 需求变更如何处理</h2><p>变更发生时记录：</p>
+<ul>
+<li>改了什么，为什么。</li>
+<li>影响接口、数据、测试和排期哪些部分。</li>
+<li>谁确认接受新的时间或范围。</li>
+<li>已开发内容如何处理。</li>
+</ul>
+<p>小改动积累起来同样会改变交付风险。变更记录不是为了追责，而是避免不同角色持有不同版本的需求。</p>
+<h2 id="我会带进评审的十个问题"><a href="#我会带进评审的十个问题" class="headerlink" title="我会带进评审的十个问题"></a>我会带进评审的十个问题</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. 用户问题和成功指标是什么？</span><br><span class="line">2. 本期明确不做什么？</span><br><span class="line">3. 状态如何变化？</span><br><span class="line">4. 异常和超时后停在哪里？</span><br><span class="line">5. 权限和数据范围是什么？</span><br><span class="line">6. 重复和并发操作怎么处理？</span><br><span class="line">7. 外部依赖有什么不确定性？</span><br><span class="line">8. 历史数据和兼容怎么处理？</span><br><span class="line">9. 如何测试并验收？</span><br><span class="line">10. 上线后看什么指标，失败怎么回退？</span><br></pre></td></tr></table></figure>
+
+<p>好的需求评审不会消灭所有变化，但会让重要的不确定性提前出现。开发的价值也不是在会上不断说“做不了”，而是说明风险、提出更小方案，并把模糊目标转成可以交付的边界。</p>
 
       
     </div>
@@ -1222,34 +1899,108 @@
     
     <div class="post-body" itemprop="articleBody">
           <p><img src="/images/posts/2020/api-docs-cover.svg" alt="接口文档管理实践封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口文档不是附属品，而是前后端协作、测试验证和后续维护的共同契约。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>接口实现和文档长期不一致</li>
-<li>错误码、字段含义、示例数据缺失</li>
-<li>前后端联调时大量时间浪费在口头确认</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>接口文档是协作契约，只有和代码、测试用例、版本变更绑定在一起，才不会沦为过期说明。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">GET</span> <span class="string">/api/orders/&#123;orderNo&#125;</span></span><br><span class="line"><span class="attr">response:</span></span><br><span class="line">  <span class="attr">code:</span> <span class="number">0</span></span><br><span class="line">  <span class="attr">message:</span> <span class="string">success</span></span><br><span class="line">  <span class="attr">data:</span></span><br><span class="line">    <span class="attr">orderNo:</span> <span class="string">&quot;202004190001&quot;</span></span><br><span class="line">    <span class="attr">status:</span> <span class="number">2</span></span><br><span class="line">    <span class="attr">totalAmount:</span> <span class="number">199.00</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>接口文档不是开发完成后的说明书，而是前端、后端、测试和调用方共同依赖的契约。文档与代码分离维护时，最常见的结果不是“有人忘记更新”，而是团队没有机制证明两者一致。</p>
+</blockquote>
+<h2 id="一个联调现场"><a href="#一个联调现场" class="headerlink" title="一个联调现场"></a>一个联调现场</h2><p>前端按照文档提交：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;orderNo&quot;</span><span class="punctuation">:</span> <span class="string">&quot;202004190001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;reason&quot;</span><span class="punctuation">:</span> <span class="string">&quot;地址填写错误&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">接口文档必须包含：</span><br><span class="line">- 请求方式和路径</span><br><span class="line">- 参数说明</span><br><span class="line">- 响应字段</span><br><span class="line">- 错误码</span><br><span class="line">- 示例数据</span><br><span class="line">- 变更记录</span><br></pre></td></tr></table></figure>
+<p>接口却返回：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">40013</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;reasonCode不能为空&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>接口文档管理实践</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>后端代码两天前新增了 <code>reasonCode</code>，文档没有更新，测试用例只验证了旧参数。三方花了半小时确认，真正修复只有一行字段说明。</p>
+<p>这类浪费说明接口管理要覆盖设计、实现、测试、变更和下线，而不只是生成一个 Swagger 页面。</p>
+<h2 id="1-一份完整契约包含什么"><a href="#1-一份完整契约包含什么" class="headerlink" title="1. 一份完整契约包含什么"></a>1. 一份完整契约包含什么</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用途和调用方</span><br><span class="line">HTTP 方法与路径</span><br><span class="line">认证和权限</span><br><span class="line">请求头、路径、查询和请求体参数</span><br><span class="line">字段类型、必填、长度、枚举和示例</span><br><span class="line">成功响应</span><br><span class="line">业务错误码和处理建议</span><br><span class="line">幂等、分页、限流与超时语义</span><br><span class="line">版本和变更记录</span><br><span class="line">负责人</span><br></pre></td></tr></table></figure>
+
+<p>只给一个请求 JSON 不够。调用方还需要知道字段为空、重复提交、权限不足和下游超时时会发生什么。</p>
+<h2 id="2-先写契约再实现"><a href="#2-先写契约再实现" class="headerlink" title="2. 先写契约再实现"></a>2. 先写契约再实现</h2><p>订单查询示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/api/orders/&#123;orderNo&#125;:</span></span><br><span class="line">    <span class="attr">get:</span></span><br><span class="line">      <span class="attr">summary:</span> <span class="string">查询订单详情</span></span><br><span class="line">      <span class="attr">operationId:</span> <span class="string">getOrder</span></span><br><span class="line">      <span class="attr">parameters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">orderNo</span></span><br><span class="line">          <span class="attr">in:</span> <span class="string">path</span></span><br><span class="line">          <span class="attr">required:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">schema:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">            <span class="attr">maxLength:</span> <span class="number">32</span></span><br><span class="line">      <span class="attr">responses:</span></span><br><span class="line">        <span class="attr">&#x27;200&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">查询成功</span></span><br><span class="line">        <span class="attr">&#x27;404&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">订单不存在或当前用户无权查看</span></span><br></pre></td></tr></table></figure>
+
+<p>评审阶段先确认契约，前端可以基于 Mock 开发，测试可以提前编写用例，后端实现也有清晰边界。</p>
+<p>OpenAPI 文件应进入版本库，和代码一起 Review。只存在运行时页面中的文档无法比较历史，也很难在 CI 中检查破坏性变更。</p>
+<h2 id="3-Schema-要复用但不能万能化"><a href="#3-Schema-要复用但不能万能化" class="headerlink" title="3. Schema 要复用但不能万能化"></a>3. Schema 要复用但不能万能化</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">components:</span></span><br><span class="line">  <span class="attr">schemas:</span></span><br><span class="line">    <span class="attr">OrderSummary:</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">      <span class="attr">required:</span> [<span class="string">orderNo</span>, <span class="string">status</span>, <span class="string">totalAmount</span>, <span class="string">createdAt</span>]</span><br><span class="line">      <span class="attr">properties:</span></span><br><span class="line">        <span class="attr">orderNo:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;202004190001&#x27;</span></span><br><span class="line">        <span class="attr">status:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">enum:</span> [<span class="string">CREATED</span>, <span class="string">PAID</span>, <span class="string">SHIPPED</span>, <span class="string">FINISHED</span>, <span class="string">CANCELLED</span>]</span><br><span class="line">        <span class="attr">totalAmount:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;199.00&#x27;</span></span><br><span class="line">        <span class="attr">createdAt:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">format:</span> <span class="string">date-time</span></span><br></pre></td></tr></table></figure>
+
+<p>公共分页结构、错误结构可以复用，但不要建立一个包含所有业务字段的 <code>CommonResponseData</code>。过度复用会让一个字段修改影响大量无关接口。</p>
+<p>金额是否用字符串或数字需要团队统一。JSON Number 没有十进制精度语义，跨语言调用时尤其要谨慎。</p>
+<h2 id="4-错误码必须可行动"><a href="#4-错误码必须可行动" class="headerlink" title="4. 错误码必须可行动"></a>4. 错误码必须可行动</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORDER_NOT_FOUND&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;订单不存在&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;traceId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;f4cc2b1d03b14d12&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;details&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>错误码表至少说明：</p>
+<table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>含义</th>
+<th align="right">HTTP 状态</th>
+<th>调用方动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ORDER_NOT_FOUND</code></td>
+<td>订单不存在或无权查看</td>
+<td align="right">404</td>
+<td>提示并停止重试</td>
+</tr>
+<tr>
+<td><code>ORDER_STATUS_CONFLICT</code></td>
+<td>当前状态不允许操作</td>
+<td align="right">409</td>
+<td>刷新订单状态</td>
+</tr>
+<tr>
+<td><code>RATE_LIMITED</code></td>
+<td>请求过于频繁</td>
+<td align="right">429</td>
+<td>按 <code>Retry-After</code> 重试</td>
+</tr>
+</tbody></table>
+<p>不要所有业务失败都返回 HTTP 200，也不要所有异常都返回 500。HTTP 状态表达协议层结果，业务错误码提供领域细节。</p>
+<p>错误信息不能泄露 SQL、内部 IP 和完整异常栈。<code>traceId</code> 用于关联服务端日志。</p>
+<h2 id="5-分页语义要写清楚"><a href="#5-分页语义要写清楚" class="headerlink" title="5. 分页语义要写清楚"></a>5. 分页语义要写清楚</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">page:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">size:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maximum:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">sort:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">  <span class="attr">enum:</span> [<span class="string">createdAt</span>, <span class="string">updatedAt</span>]</span><br></pre></td></tr></table></figure>
+
+<p>响应需要说明总数是否精确、排序是否稳定、同一时间新增数据是否影响翻页。大数据量使用游标分页时，游标是否过期、能否反向翻页也属于契约。</p>
+<h2 id="6-写接口说明幂等"><a href="#6-写接口说明幂等" class="headerlink" title="6. 写接口说明幂等"></a>6. 写接口说明幂等</h2><p>订单创建可以要求幂等头：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Idempotency-Key: 0fcaf3a1-4d54-4d4d-9ae2-80d99df2be5d</span><br></pre></td></tr></table></figure>
+
+<p>文档明确：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>同一个用户和 Key 在多久内有效。</li>
+<li>请求体不同时是否返回冲突。</li>
+<li>首次请求处理中再次提交返回什么。</li>
+<li>原请求成功后是否返回同一结果。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>只写“接口支持幂等”没有可执行意义。</p>
+<h2 id="7-认证和权限不是一句“需要-Token”"><a href="#7-认证和权限不是一句“需要-Token”" class="headerlink" title="7. 认证和权限不是一句“需要 Token”"></a>7. 认证和权限不是一句“需要 Token”</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">认证方式：Bearer Token</span><br><span class="line">权限：order:read</span><br><span class="line">数据范围：只能访问当前租户订单</span><br><span class="line">Token 过期：401</span><br><span class="line">权限不足：403</span><br><span class="line">资源不存在或不可见：404</span><br></pre></td></tr></table></figure>
+
+<p>上传接口还要说明文件类型、大小、病毒扫描和存储时限。Webhook 要说明签名算法、防重放时间窗口和重试策略。</p>
+<p>示例中不能放真实 Token、手机号或客户数据。</p>
+<h2 id="8-文档和代码如何保持一致"><a href="#8-文档和代码如何保持一致" class="headerlink" title="8. 文档和代码如何保持一致"></a>8. 文档和代码如何保持一致</h2><p>两种常见方式：</p>
+<h3 id="Code-First"><a href="#Code-First" class="headerlink" title="Code First"></a>Code First</h3><p>通过 Spring 注解从实现生成 OpenAPI。优点是靠近代码，缺点是设计容易滞后到实现阶段，复杂说明仍需人工维护。</p>
+<h3 id="Design-First"><a href="#Design-First" class="headerlink" title="Design First"></a>Design First</h3><p>先维护 OpenAPI，再生成服务端接口或客户端。优点是契约先行，缺点是需要处理生成代码和业务实现边界。</p>
+<p>无论选择哪种，都应该在 CI 中：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">生成最新 OpenAPI</span><br><span class="line">与仓库基线比较</span><br><span class="line">检查语法和引用</span><br><span class="line">识别删除字段、修改类型等破坏性变更</span><br><span class="line">发布带版本的文档</span><br></pre></td></tr></table></figure>
+
+<p>文档生成失败不能被静默忽略，否则线上页面可能一直停留在旧版本。</p>
+<h2 id="9-变更分类"><a href="#9-变更分类" class="headerlink" title="9. 变更分类"></a>9. 变更分类</h2><p>通常兼容的变化：</p>
+<ul>
+<li>新增可选请求字段。</li>
+<li>新增响应字段，前提是调用方能忽略未知字段。</li>
+<li>新增错误码并有默认处理。</li>
+</ul>
+<p>通常破坏兼容的变化：</p>
+<ul>
+<li>删除或重命名字段。</li>
+<li>修改字段类型、单位或含义。</li>
+<li>可选字段改为必填。</li>
+<li>修改枚举值语义。</li>
+<li>改变分页、排序或幂等行为。</li>
+</ul>
+<p>破坏性变更应通过新版本、双写兼容或迁移窗口发布，不能只在群里通知。</p>
+<h2 id="10-文档的生命周期"><a href="#10-文档的生命周期" class="headerlink" title="10. 文档的生命周期"></a>10. 文档的生命周期</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">草稿：正在评审，不允许生产调用</span><br><span class="line">已发布：与某个服务版本对应</span><br><span class="line">已废弃：标明替代接口和停止时间</span><br><span class="line">已下线：文档保留历史，但不再出现在默认入口</span><br></pre></td></tr></table></figure>
+
+<p>每个接口要有负责人。没有负责人时，文档问题、兼容问题和调用咨询都会变成公共群里的随机响应。</p>
+<h2 id="11-Review-清单"><a href="#11-Review-清单" class="headerlink" title="11. Review 清单"></a>11. Review 清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 路径和 HTTP 方法符合语义</span><br><span class="line">[ ] 请求字段包含类型、约束和示例</span><br><span class="line">[ ] 成功与失败响应都有定义</span><br><span class="line">[ ] 错误码能指导调用方动作</span><br><span class="line">[ ] 权限、数据范围和敏感字段明确</span><br><span class="line">[ ] 分页、幂等、超时和重试语义明确</span><br><span class="line">[ ] 变更兼容性经过检查</span><br><span class="line">[ ] 文档、Mock、测试和代码使用同一契约</span><br><span class="line">[ ] 负责人和下线策略明确</span><br></pre></td></tr></table></figure>
+
+<p>接口文档的最终价值不是页面好看，而是减少口头确认，让实现、测试和调用方对同一个行为达成一致。当契约可以被 Review、测试和自动比较时，文档才从附属材料变成工程资产。</p>
 
       
     </div>
@@ -1322,7 +2073,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

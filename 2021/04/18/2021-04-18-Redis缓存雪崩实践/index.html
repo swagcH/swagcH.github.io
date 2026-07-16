@@ -16,17 +16,17 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景缓存雪崩通常不是单个 key 的问题，而是一批 key 在同一时间失效。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12310:00:00 Redis key expire batch10:00:03 DB connection pool exhausted10:00:05 order-api error rate 23%  12redis-">
+    <meta name="description" content="缓存雪崩不是某一个 key 没命中，而是大量缓存同时失效，或者 Redis 整体不可用，流量在短时间内全部落到数据库。数据库一旦变慢，应用线程和连接池继续堆积，故障会从缓存层扩散到整个调用链。 为了验证系统能否扛过这种变化，我们做了一次隔离环境演练。所有流量和故障注入都只在压测集群执行，禁止用生产 Redis 做“断开看看”之类试验。 演练目标123456场景 A：10 万个商品缓存集中到期场景">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis缓存雪崩实践">
 <meta property="og:url" content="https://swagch.github.io/2021/04/18/2021-04-18-Redis%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E5%AE%9E%E8%B7%B5/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景缓存雪崩通常不是单个 key 的问题，而是一批 key 在同一时间失效。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12310:00:00 Redis key expire batch10:00:03 DB connection pool exhausted10:00:05 order-api error rate 23%  12redis-">
+<meta property="og:description" content="缓存雪崩不是某一个 key 没命中，而是大量缓存同时失效，或者 Redis 整体不可用，流量在短时间内全部落到数据库。数据库一旦变慢，应用线程和连接池继续堆积，故障会从缓存层扩散到整个调用链。 为了验证系统能否扛过这种变化，我们做了一次隔离环境演练。所有流量和故障注入都只在压测集群执行，禁止用生产 Redis 做“断开看看”之类试验。 演练目标123456场景 A：10 万个商品缓存集中到期场景">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-04-18T13:27:44.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T04:00:00.644Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="缓存设计">
@@ -53,9 +53,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%94%E7%BB%83%E7%9B%AE%E6%A0%87"><span class="nav-text">演练目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-A%EF%BC%9A%E7%BB%9F%E4%B8%80-TTL-%E5%9C%A8%E6%95%B4%E7%82%B9%E9%9B%86%E4%B8%AD%E5%88%B0%E6%9C%9F"><span class="nav-text">场景 A：统一 TTL 在整点集中到期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%B1%82%E6%94%B9%E9%80%A0%EF%BC%9A%E8%AE%A9%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4%E5%88%86%E6%95%A3"><span class="nav-text">第一层改造：让过期时间分散</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E5%B1%82%E6%94%B9%E9%80%A0%EF%BC%9A%E7%83%AD%E7%82%B9-key-%E5%8F%AA%E5%85%81%E8%AE%B8%E4%B8%80%E4%B8%AA%E8%AF%B7%E6%B1%82%E5%9B%9E%E6%BA%90"><span class="nav-text">第二层改造：热点 key 只允许一个请求回源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E5%B1%82%E6%94%B9%E9%80%A0%EF%BC%9A%E9%99%90%E5%88%B6%E5%9B%9E%E6%BA%90%E6%80%BB%E9%87%8F"><span class="nav-text">第三层改造：限制回源总量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-B%EF%BC%9ARedis-%E6%95%B4%E4%BD%93%E4%B8%8D%E5%8F%AF%E7%94%A8-60-%E7%A7%92"><span class="nav-text">场景 B：Redis 整体不可用 60 秒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E4%B8%8D%E8%83%BD%E4%BB%A3%E6%9B%BF%E5%BA%94%E7%94%A8%E4%BF%9D%E6%8A%A4"><span class="nav-text">高可用不能代替应用保护</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E7%83%AD%E5%BA%94%E8%AF%A5%E6%8C%89%E4%B8%9A%E5%8A%A1%E7%83%AD%E5%BA%A6%E6%89%A7%E8%A1%8C"><span class="nav-text">预热应该按业务热度执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%BC%94%E7%BB%83%E7%BB%93%E6%9E%9C"><span class="nav-text">第二次演练结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%94%E7%BB%83%E5%90%8E%E4%BF%9D%E7%95%99%E7%9A%84%E6%A3%80%E6%9F%A5%E9%A1%B9"><span class="nav-text">演练后保留的检查项</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -276,20 +276,135 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>缓存雪崩通常不是单个 key 的问题，而是一批 key 在同一时间失效。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><p>缓存雪崩不是某一个 key 没命中，而是大量缓存同时失效，或者 Redis 整体不可用，流量在短时间内全部落到数据库。数据库一旦变慢，应用线程和连接池继续堆积，故障会从缓存层扩散到整个调用链。</p>
+<p>为了验证系统能否扛过这种变化，我们做了一次隔离环境演练。所有流量和故障注入都只在压测集群执行，禁止用生产 Redis 做“断开看看”之类试验。</p>
+<h2 id="演练目标"><a href="#演练目标" class="headerlink" title="演练目标"></a>演练目标</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">场景 A：10 万个商品缓存集中到期</span><br><span class="line">场景 B：Redis 连接连续失败 60 秒</span><br><span class="line">入口流量：稳定 3000 req/s</span><br><span class="line">正常缓存命中率：96%</span><br><span class="line">数据库安全容量：800 query/s</span><br><span class="line">恢复目标：核心商品查询保持可用，数据库不被打满</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10:00:00 Redis key expire batch</span><br><span class="line">10:00:03 DB connection pool exhausted</span><br><span class="line">10:00:05 order-api error rate 23%</span><br></pre></td></tr></table></figure>
+<p>演练前先确认停止条件：数据库 CPU 超过 75%、连接池等待超过 20 或错误率超过 5% 时立即停止注入。压测环境也需要保护，避免影响共享测试服务。</p>
+<h2 id="场景-A：统一-TTL-在整点集中到期"><a href="#场景-A：统一-TTL-在整点集中到期" class="headerlink" title="场景 A：统一 TTL 在整点集中到期"></a>场景 A：统一 TTL 在整点集中到期</h2><p>旧的缓存预热任务每天 09:30 批量写入商品，所有 key 都使用 30 分钟 TTL：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redisTemplate.opsForValue().set(</span><br><span class="line">        key,</span><br><span class="line">        product,</span><br><span class="line">        <span class="number">30</span>,</span><br><span class="line">        TimeUnit.MINUTES</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-cli info keyspace</span><br><span class="line">redis-cli --scan --pattern <span class="string">&#x27;home:*&#x27;</span> | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+<p>结果几乎可以按秒观察：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th align="right">缓存命中率</th>
+<th align="right">DB QPS</th>
+<th align="right">DB 连接等待</th>
+<th align="right">接口错误率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>09:59:55</td>
+<td align="right">96%</td>
+<td align="right">120</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>10:00:01</td>
+<td align="right">41%</td>
+<td align="right">1,720</td>
+<td align="right">18</td>
+<td align="right">1.2%</td>
+</tr>
+<tr>
+<td>10:00:04</td>
+<td align="right">8%</td>
+<td align="right">2,640</td>
+<td align="right">54</td>
+<td align="right">17%</td>
+</tr>
+<tr>
+<td>10:00:08</td>
+<td align="right">13%</td>
+<td align="right">1,980</td>
+<td align="right">61</td>
+<td align="right">24%</td>
+</tr>
+</tbody></table>
+<p>数据库安全容量只有 800 QPS，却瞬间承接两千多查询。查询变慢后连接释放更慢，进一步放大等待。</p>
+<h2 id="第一层改造：让过期时间分散"><a href="#第一层改造：让过期时间分散" class="headerlink" title="第一层改造：让过期时间分散"></a>第一层改造：让过期时间分散</h2><p>基础 TTL 上增加随机抖动：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">long</span> <span class="title function_">calculateTtlSeconds</span><span class="params">(<span class="type">long</span> baseSeconds)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">jitter</span> <span class="operator">=</span> ThreadLocalRandom.current()</span><br><span class="line">            .nextLong(<span class="number">0</span>, <span class="number">10</span> * <span class="number">60</span>);</span><br><span class="line">    <span class="keyword">return</span> baseSeconds + jitter;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cacheProduct</span><span class="params">(String key, Product product)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">ttlSeconds</span> <span class="operator">=</span> calculateTtlSeconds(<span class="number">30</span> * <span class="number">60</span>);</span><br><span class="line">    <span class="comment">// 随机过期避免同一批数据在同一秒集中回源</span></span><br><span class="line">    redisTemplate.opsForValue().set(</span><br><span class="line">            key,</span><br><span class="line">            product,</span><br><span class="line">            ttlSeconds,</span><br><span class="line">            TimeUnit.SECONDS</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">风险点：</span><br><span class="line">1. 大量 key 使用同一过期时间</span><br><span class="line">2. 热点数据没有预热</span><br><span class="line">3. Redis 故障时没有降级策略</span><br><span class="line">4. 后端 DB 无保护</span><br></pre></td></tr></table></figure>
+<p>随机范围要结合基础 TTL 和业务新鲜度。30 秒缓存增加 10 分钟抖动显然不合理；30 分钟缓存增加 0 到 10 分钟通常更平滑。</p>
+<p>第二轮演练中，过期分散到十分钟，数据库 QPS 峰值降到 480，没有超过安全容量。</p>
+<p>随机 TTL 能解决“同时到期”，不能解决缓存节点整体不可用。</p>
+<h2 id="第二层改造：热点-key-只允许一个请求回源"><a href="#第二层改造：热点-key-只允许一个请求回源" class="headerlink" title="第二层改造：热点 key 只允许一个请求回源"></a>第二层改造：热点 key 只允许一个请求回源</h2><p>即使过期时间分散，单个热点商品到期时也可能有数百个并发请求。读取逻辑增加短锁：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">读取缓存</span><br><span class="line">  -&gt; 命中：直接返回</span><br><span class="line">  -&gt; 未命中：尝试获取 product:&#123;id&#125;:rebuild 锁</span><br><span class="line">       获取成功：查库、回填、释放锁</span><br><span class="line">       获取失败：短暂等待后重读，或返回可接受的旧值</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">baseSeconds</span> <span class="operator">=</span> <span class="number">30</span> * <span class="number">60</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">randomSeconds</span> <span class="operator">=</span> ThreadLocalRandom.current().nextInt(<span class="number">0</span>, <span class="number">10</span> * <span class="number">60</span>);</span><br><span class="line">redisTemplate.opsForValue().set(key, value, baseSeconds + randomSeconds, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
+<p>锁必须有较短过期时间，释放时校验持有者标识，避免误删其他线程后来获得的锁。不要让所有请求长时间阻塞等待同一把锁。</p>
+<p>对于允许短暂旧数据的商品详情，我们采用逻辑过期：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">value：商品数据</span><br><span class="line">logicalExpireAt：业务过期时间</span><br><span class="line">Redis TTL：更长的物理保底时间</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">处理：过期时间随机化、热点预热、限流降级、多级缓存</span><br></pre></td></tr></table></figure>
+<p>逻辑过期后，第一个请求异步刷新，其他请求在短窗口继续读取旧值。价格、库存等强一致字段不能直接套用这个策略，应按业务容忍度拆分。</p>
+<h2 id="第三层改造：限制回源总量"><a href="#第三层改造：限制回源总量" class="headerlink" title="第三层改造：限制回源总量"></a>第三层改造：限制回源总量</h2><p>如果 10 万个不同 key 同时失效，每个 key 一把锁仍可能产生 10 万次数据库查询。应用还需要全局回源预算：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">数据库安全查询容量：800/s</span><br><span class="line">正常非缓存查询保留：300/s</span><br><span class="line">缓存重建预算：最多 400/s</span><br><span class="line">预留：100/s</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>超过预算时：</p>
+<ul>
+<li>核心商品读取短期旧值。</li>
+<li>非核心推荐模块返回空集合或默认结果。</li>
+<li>后台报表暂停刷新。</li>
+<li>用户请求收到明确的繁忙响应，而不是无限等待。</li>
+</ul>
+<p>降级结果要在产品层面提前确认。返回旧价格可能造成资损，就不能为了可用性随意降级。</p>
+<h2 id="场景-B：Redis-整体不可用-60-秒"><a href="#场景-B：Redis-整体不可用-60-秒" class="headerlink" title="场景 B：Redis 整体不可用 60 秒"></a>场景 B：Redis 整体不可用 60 秒</h2><p>我们在压测集群通过网络故障注入让应用无法连接 Redis。初始版本每次缓存失败后都会立即查库，并重试 Redis 三次：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">一个用户请求</span><br><span class="line">  -&gt; Redis 连接超时 200ms</span><br><span class="line">  -&gt; 重试 3 次</span><br><span class="line">  -&gt; 查询数据库</span><br><span class="line">  -&gt; 回填 Redis 再失败</span><br></pre></td></tr></table></figure>
+
+<p>不仅数据库流量上涨，每个请求还先浪费约 600ms。错误日志以每秒数千条增长，磁盘 IO 也受到影响。</p>
+<p>改造后的策略是：</p>
+<ol>
+<li>Redis 连续失败达到阈值后快速熔断。</li>
+<li>熔断期间不为每个请求重复等待连接超时。</li>
+<li>只有核心查询在回源预算内访问数据库。</li>
+<li>本地只保留极少量、短时间、可接受旧值的热点数据。</li>
+<li>半开状态使用少量请求探测 Redis 恢复。</li>
+</ol>
+<p>Redis 恢复后不能立即让全部实例同时重建缓存。每个实例使用随机延迟进入半开，并由预热任务按优先级恢复热点。</p>
+<h2 id="高可用不能代替应用保护"><a href="#高可用不能代替应用保护" class="headerlink" title="高可用不能代替应用保护"></a>高可用不能代替应用保护</h2><p>Redis Sentinel 或 Cluster 能降低单节点故障时间，但故障转移仍有检测、选主、连接重建和数据同步窗口。客户端配置不正确时，高可用集群也可能表现为整体不可用。</p>
+<p>需要演练：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">主节点故障后客户端多久恢复</span><br><span class="line">连接池是否清理旧连接</span><br><span class="line">故障窗口是否存在写丢失风险</span><br><span class="line">只读副本和主节点切换行为</span><br><span class="line">应用熔断是否早于线程池耗尽</span><br></pre></td></tr></table></figure>
+
+<p>缓存高可用解决“尽快恢复缓存”，应用限流和降级解决“恢复前数据库不要被冲垮”，两者缺一不可。</p>
+<h2 id="预热应该按业务热度执行"><a href="#预热应该按业务热度执行" class="headerlink" title="预热应该按业务热度执行"></a>预热应该按业务热度执行</h2><p>全量数据同时预热既慢，又容易再次制造统一 TTL。我们按访问热度分层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">L1：首页和活动核心商品，发布前预热</span><br><span class="line">L2：近 24 小时高频商品，逐批预热</span><br><span class="line">L3：长尾商品，首次访问时按预算加载</span><br></pre></td></tr></table></figure>
+
+<p>预热任务本身要有限速、断点和幂等能力。执行结果包括成功数、失败数、耗时和缓存版本，不能只打印“预热完成”。</p>
+<h2 id="第二次演练结果"><a href="#第二次演练结果" class="headerlink" title="第二次演练结果"></a>第二次演练结果</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th align="right">初始版本</th>
+<th align="right">改造后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>集中过期 DB QPS 峰值</td>
+<td align="right">2,640</td>
+<td align="right">480</td>
+</tr>
+<tr>
+<td>Redis 故障 DB QPS 峰值</td>
+<td align="right">2,780</td>
+<td align="right">690</td>
+</tr>
+<tr>
+<td>Redis 故障接口错误率</td>
+<td align="right">31%</td>
+<td align="right">3.4%</td>
+</tr>
+<tr>
+<td>恢复到 90% 命中率</td>
+<td align="right">14s 后突然恢复</td>
+<td align="right">3 分钟平滑恢复</td>
+</tr>
+</tbody></table>
+<p>改造后没有追求所有请求成功。非核心推荐被降级，一部分请求快速失败，但数据库和订单核心链路保持在安全水位。可控失败比整个系统排队到崩溃更有价值。</p>
+<h2 id="演练后保留的检查项"><a href="#演练后保留的检查项" class="headerlink" title="演练后保留的检查项"></a>演练后保留的检查项</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 批量写入使用合理的 TTL 抖动</span><br><span class="line">[ ] 热点 key 有单请求重建或逻辑过期策略</span><br><span class="line">[ ] 全局数据库回源有容量预算</span><br><span class="line">[ ] 缓存超时、重试和熔断不会叠加放大延迟</span><br><span class="line">[ ] 降级结果经过业务确认</span><br><span class="line">[ ] Redis 故障转移经过真实演练</span><br><span class="line">[ ] 恢复后按热度限速预热</span><br><span class="line">[ ] 命中率、回源 QPS、连接池和降级次数有告警</span><br></pre></td></tr></table></figure>
+
+<p>缓存雪崩治理不是简单给 TTL 加一个随机数。真正要保护的是整条链路：过期时间分散，热点重建合并，数据库回源有上限，缓存故障时快速降级，恢复时也避免第二次流量冲击。</p>
 
     </div>
 
@@ -378,7 +493,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

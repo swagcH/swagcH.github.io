@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景接口超时的排查重点是确认耗时发生在入口、数据库、缓存还是下游服务。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123452021-01-17 20:18:42 WARN  order-api request timeoutpath&#x3D;&#x2F;api&#x2F;orders&#x2F;submitcost&#x3D;8123mstraceId&#x3D;adf9c0a2b1upstream">
+    <meta name="description" content="这次问题的现象是订单提交接口偶发超时。网关在 5 秒后返回 504，订单服务却经常到第 7 秒才打印结束日志。最初大家怀疑库存服务处理慢，但库存服务自己的日志显示请求只执行了 80 多毫秒。 “调用库存耗时 6 秒”和“库存只处理 80 毫秒”看起来矛盾，最后恰恰是这个差值把问题指向了 HTTP 连接池。 09:41，告警给出的第一组事实12345678接口：POST &#x2F;api&#x2F;orders&#x2F;s">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次接口超时问题排查">
 <meta property="og:url" content="https://swagch.github.io/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景接口超时的排查重点是确认耗时发生在入口、数据库、缓存还是下游服务。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123452021-01-17 20:18:42 WARN  order-api request timeoutpath&#x3D;&#x2F;api&#x2F;orders&#x2F;submitcost&#x3D;8123mstraceId&#x3D;adf9c0a2b1upstream">
+<meta property="og:description" content="这次问题的现象是订单提交接口偶发超时。网关在 5 秒后返回 504，订单服务却经常到第 7 秒才打印结束日志。最初大家怀疑库存服务处理慢，但库存服务自己的日志显示请求只执行了 80 多毫秒。 “调用库存耗时 6 秒”和“库存只处理 80 毫秒”看起来矛盾，最后恰恰是这个差值把问题指向了 HTTP 连接池。 09:41，告警给出的第一组事实12345678接口：POST &#x2F;api&#x2F;orders&#x2F;s">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2021/api-timeout-cover.svg">
 <meta property="article:published_time" content="2021-01-17T14:14:38.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.177Z">
+<meta property="article:modified_time" content="2026-07-16T04:01:35.539Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Spring Boot">
 <meta property="article:tag" content="故障排查">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#09-41%EF%BC%8C%E5%91%8A%E8%AD%A6%E7%BB%99%E5%87%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E7%BB%84%E4%BA%8B%E5%AE%9E"><span class="nav-text">09:41，告警给出的第一组事实</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-44%EF%BC%8C%E7%94%A8%E5%90%8C%E4%B8%80%E4%B8%AA-traceId-%E5%AF%B9%E9%BD%90%E6%97%B6%E9%97%B4"><span class="nav-text">09:44，用同一个 traceId 对齐时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-49%EF%BC%8C%E5%85%88%E6%8E%92%E9%99%A4-DNS%E3%80%81%E5%BB%BA%E8%BF%9E%E5%92%8C%E7%BD%91%E7%BB%9C"><span class="nav-text">09:49，先排除 DNS、建连和网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-53%EF%BC%8C%E7%BA%BF%E7%A8%8B-dump-%E5%87%BA%E7%8E%B0%E5%85%B1%E5%90%8C%E7%AD%89%E5%BE%85%E7%82%B9"><span class="nav-text">09:53，线程 dump 出现共同等待点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#09-57%EF%BC%8C%E9%85%8D%E7%BD%AE%E8%A7%A3%E9%87%8A%E4%BA%86%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8F%AA%E6%9C%89%E4%B8%A4%E6%9D%A1%E8%BF%9E%E6%8E%A5"><span class="nav-text">09:57，配置解释了为什么只有两条连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E8%B6%85%E6%97%B6%E4%B8%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="nav-text">三种超时不是一个概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-06%EF%BC%8C%E5%85%88%E5%81%9A%E6%9C%89%E8%BE%B9%E7%95%8C%E7%9A%84%E4%BF%AE%E5%A4%8D"><span class="nav-text">10:06，先做有边界的修复</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E6%B5%8B%E9%AA%8C%E8%AF%81%E4%B8%8D%E6%98%AF%E5%8F%AA%E7%9C%8B%E5%B9%B3%E5%9D%87%E5%80%BC"><span class="nav-text">压测验证不是只看平均值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%99%E6%9D%A1%E8%B0%83%E7%94%A8%E9%93%BE%E6%9C%80%E5%90%8E%E7%95%99%E4%B8%8B%E7%9A%84%E5%9B%BE"><span class="nav-text">这条调用链最后留下的图</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,22 +279,127 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2021/api-timeout-cover.svg" alt="一次接口超时问题排查技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>接口超时的排查重点是确认耗时发生在入口、数据库、缓存还是下游服务。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+<p>这次问题的现象是订单提交接口偶发超时。网关在 5 秒后返回 504，订单服务却经常到第 7 秒才打印结束日志。最初大家怀疑库存服务处理慢，但库存服务自己的日志显示请求只执行了 80 多毫秒。</p>
+<p>“调用库存耗时 6 秒”和“库存只处理 80 毫秒”看起来矛盾，最后恰恰是这个差值把问题指向了 HTTP 连接池。</p>
+<h2 id="09-41，告警给出的第一组事实"><a href="#09-41，告警给出的第一组事实" class="headerlink" title="09:41，告警给出的第一组事实"></a>09:41，告警给出的第一组事实</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">接口：POST /api/orders/submit</span><br><span class="line">QPS：18 -&gt; 52</span><br><span class="line">P50：210ms</span><br><span class="line">P99：5.2s</span><br><span class="line">网关 504：约 7%</span><br><span class="line">订单服务 CPU：38%</span><br><span class="line">订单服务堆内存：稳定</span><br><span class="line">数据库连接池：active 12 / max 40</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2021-01-17 20:18:42 WARN  order-api request timeout</span><br><span class="line">path=/api/orders/submit</span><br><span class="line">cost=8123ms</span><br><span class="line">traceId=adf9c0a2b1</span><br><span class="line">upstream=payment-service</span><br></pre></td></tr></table></figure>
+<p>CPU、堆和数据库连接没有达到上限，说明不能直接把“服务压力大”当成结论。我们先把一次请求拆成入口、数据库、缓存和下游四段。</p>
+<h2 id="09-44，用同一个-traceId-对齐时间"><a href="#09-44，用同一个-traceId-对齐时间" class="headerlink" title="09:44，用同一个 traceId 对齐时间"></a>09:44，用同一个 traceId 对齐时间</h2><p>网关日志：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">09:44:12.103 request_started</span><br><span class="line">path=/api/orders/submit</span><br><span class="line">traceId=adf9c0a2b1</span><br><span class="line"></span><br><span class="line">09:44:17.105 upstream_timeout</span><br><span class="line">status=504</span><br><span class="line">costMs=5002</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -w <span class="string">&quot;dns:%&#123;time_namelookup&#125; connect:%&#123;time_connect&#125; start:%&#123;time_starttransfer&#125; total:%&#123;time_total&#125;</span></span><br><span class="line"><span class="string">&quot;</span>   -o /dev/null -s http://localhost:8080/api/orders/submit</span><br></pre></td></tr></table></figure>
+<p>订单服务日志：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">09:44:12.109 order_submit_started traceId=adf9c0a2b1</span><br><span class="line">09:44:12.151 price_calculated costMs=32</span><br><span class="line">09:44:12.188 order_saved costMs=31</span><br><span class="line">09:44:18.374 inventory_reserved costMs=6181</span><br><span class="line">09:44:18.391 order_submit_completed costMs=6282</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&quot;adf9c0a2b1&quot;</span> app.log</span><br><span class="line"><span class="built_in">cat</span> app.log | grep <span class="string">&quot;payment-service&quot;</span> | <span class="built_in">tail</span> -100</span><br><span class="line">jstack $(pgrep java) &gt; /tmp/order-api.jstack</span><br></pre></td></tr></table></figure>
+<p>库存服务日志：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">09:44:18.277 reserve_started traceId=adf9c0a2b1</span><br><span class="line">09:44:18.362 reserve_completed costMs=85</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">排查顺序：</span><br><span class="line">1. 确认是单接口还是全站超时</span><br><span class="line">2. 对比接口入口耗时和下游调用耗时</span><br><span class="line">3. 查看线程是否阻塞在外部 HTTP 调用</span><br><span class="line">4. 检查连接池、超时参数、重试次数</span><br></pre></td></tr></table></figure>
+<p>三边时间线对齐后可以看到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">订单开始调用库存：09:44:12.188</span><br><span class="line">库存真正收到请求：09:44:18.277</span><br><span class="line">中间空白时间：约 6.1 秒</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">payment:</span></span><br><span class="line">  <span class="attr">connect-timeout-ms:</span> <span class="number">1000</span></span><br><span class="line">  <span class="attr">read-timeout-ms:</span> <span class="number">2000</span></span><br><span class="line">  <span class="attr">max-retry:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>耗时发生在请求离开订单服务之前，而不是库存业务代码内部。</p>
+<h2 id="09-49，先排除-DNS、建连和网络"><a href="#09-49，先排除-DNS、建连和网络" class="headerlink" title="09:49，先排除 DNS、建连和网络"></a>09:49，先排除 DNS、建连和网络</h2><p>从订单服务同一运行环境执行受控探测：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">getent hosts inventory.service.local</span><br><span class="line">curl --connect-timeout 1 --max-time 2 -o /dev/null -s -w <span class="string">&#x27;connect=%&#123;time_connect&#125; total=%&#123;time_total&#125;\n&#x27;</span> http://inventory.service.local/actuator/health</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">RequestConfig</span> <span class="variable">config</span> <span class="operator">=</span> RequestConfig.custom()</span><br><span class="line">    .setConnectTimeout(<span class="number">1000</span>)</span><br><span class="line">    .setSocketTimeout(<span class="number">2000</span>)</span><br><span class="line">    .setConnectionRequestTimeout(<span class="number">500</span>)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
+<p>连续请求的连接和总耗时都在几十毫秒。网络探测只能说明当时路径可用，不能完全排除瞬时问题，但与 6 秒稳定空白不符。</p>
+<p>库存实例的请求量也没有异常堆积。于是排查重点回到订单进程：线程在发出请求前做了什么。</p>
+<h2 id="09-53，线程-dump-出现共同等待点"><a href="#09-53，线程-dump-出现共同等待点" class="headerlink" title="09:53，线程 dump 出现共同等待点"></a>09:53，线程 dump 出现共同等待点</h2><p>我们连续抓取三次线程现场：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jstack &lt;order-pid&gt; &gt; /tmp/order-0953-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;order-pid&gt; &gt; /tmp/order-0953-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;order-pid&gt; &gt; /tmp/order-0953-3.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>生产线程信息可能包含业务类名和参数，应由授权人员采集并按内部规范保存。不要为了贴到公共群里直接上传完整 dump。</p>
+<p>大量请求线程停在同一位置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;http-nio-8080-exec-37&quot; WAITING</span><br><span class="line">at java.util.concurrent.locks.LockSupport.park(...)</span><br><span class="line">at org.apache.http.pool.AbstractConnPool.getPoolEntryBlocking(...)</span><br><span class="line">at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.requestConnection(...)</span><br></pre></td></tr></table></figure>
+
+<p>线程不是在等待库存响应，而是在等待从 Apache HttpClient 连接池借出一条连接。</p>
+<h2 id="09-57，配置解释了为什么只有两条连接"><a href="#09-57，配置解释了为什么只有两条连接" class="headerlink" title="09:57，配置解释了为什么只有两条连接"></a>09:57，配置解释了为什么只有两条连接</h2><p>项目创建了共享 HttpClient，却只设置了总连接数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">PoolingHttpClientConnectionManager</span> <span class="variable">manager</span> <span class="operator">=</span></span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">PoolingHttpClientConnectionManager</span>();</span><br><span class="line">manager.setMaxTotal(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">CloseableHttpClient</span> <span class="variable">httpClient</span> <span class="operator">=</span> HttpClients.custom()</span><br><span class="line">        .setConnectionManager(manager)</span><br><span class="line">        .build();</span><br></pre></td></tr></table></figure>
+
+<p><code>maxTotal=100</code> 容易让人以为每个下游都有 100 条连接，但连接池还受单路由上限控制。没有显式设置时，当前组件版本默认每个路由只有 2 条。</p>
+<p>运行指标印证了这一点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">route=inventory.service.local</span><br><span class="line">leased=2</span><br><span class="line">available=0</span><br><span class="line">pending=61</span><br><span class="line">max=2</span><br></pre></td></tr></table></figure>
+
+<p>库存调用平均耗时约 120ms，两条并发连接理论上每秒只能完成大约 16 次调用。订单提交上涨到每秒 50 多次后，请求开始在本地排队。业务日志把“借连接 + 网络 + 下游处理”合并成一个耗时，因此看起来像库存服务慢。</p>
+<h2 id="三种超时不是一个概念"><a href="#三种超时不是一个概念" class="headerlink" title="三种超时不是一个概念"></a>三种超时不是一个概念</h2><p>HTTP 客户端至少要区分：</p>
+<table>
+<thead>
+<tr>
+<th>超时</th>
+<th>等待的事情</th>
+<th>本次是否命中</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>连接池获取超时</td>
+<td>等待一条可用连接</td>
+<td>是</td>
+</tr>
+<tr>
+<td>建立连接超时</td>
+<td>TCP 与目标地址建连</td>
+<td>否</td>
+</tr>
+<tr>
+<td>读取超时</td>
+<td>连接建立后等待响应数据</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>旧配置只设置了读取超时 8 秒，没有限制连接池等待。请求可以先排队 6 秒，再等待下游 8 秒，整体时间远超网关的 5 秒。</p>
+<p>超时应从外到内逐级收紧，并为上层留出处理时间：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">网关总预算             5000ms</span><br><span class="line">订单服务业务预算       4500ms</span><br><span class="line">库存单次调用预算       800ms</span><br><span class="line">连接池获取             200ms</span><br><span class="line">建立连接               300ms</span><br><span class="line">读取响应               500ms</span><br><span class="line">失败处理和响应预留     300ms</span><br></pre></td></tr></table></figure>
+
+<p>这些数字必须根据真实基线调整，不能直接复制示例。</p>
+<h2 id="10-06，先做有边界的修复"><a href="#10-06，先做有边界的修复" class="headerlink" title="10:06，先做有边界的修复"></a>10:06，先做有边界的修复</h2><p>连接池配置改为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> RestTemplate <span class="title function_">inventoryRestTemplate</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">PoolingHttpClientConnectionManager</span> <span class="variable">manager</span> <span class="operator">=</span></span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">PoolingHttpClientConnectionManager</span>();</span><br><span class="line">    manager.setMaxTotal(<span class="number">100</span>);</span><br><span class="line">    manager.setDefaultMaxPerRoute(<span class="number">40</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">RequestConfig</span> <span class="variable">requestConfig</span> <span class="operator">=</span> RequestConfig.custom()</span><br><span class="line">            <span class="comment">// 等不到连接时尽快失败，避免请求无限堆积</span></span><br><span class="line">            .setConnectionRequestTimeout(<span class="number">200</span>)</span><br><span class="line">            .setConnectTimeout(<span class="number">300</span>)</span><br><span class="line">            .setSocketTimeout(<span class="number">500</span>)</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    <span class="type">CloseableHttpClient</span> <span class="variable">httpClient</span> <span class="operator">=</span> HttpClients.custom()</span><br><span class="line">            .setConnectionManager(manager)</span><br><span class="line">            .setDefaultRequestConfig(requestConfig)</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    <span class="type">HttpComponentsClientHttpRequestFactory</span> <span class="variable">factory</span> <span class="operator">=</span></span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">HttpComponentsClientHttpRequestFactory</span>(httpClient);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">RestTemplate</span>(factory);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>没有把单路由上限直接设成 100。连接数会同时消耗本机文件描述符、下游接入能力和网络资源，需要结合峰值并发与下游容量确定。</p>
+<p>同时增加：</p>
+<ul>
+<li>连接池 <code>leased</code>、<code>pending</code>、<code>available</code> 指标。</li>
+<li>库存调用的客户端排队耗时和服务端处理耗时。</li>
+<li>提交接口并发限制。</li>
+<li>超时后明确的订单状态与补偿任务。</li>
+</ul>
+<p>失败不能盲目重试。库存预占是写操作，只有携带幂等键且下游保证重复请求不重复扣减时，才允许有限重试。</p>
+<h2 id="压测验证不是只看平均值"><a href="#压测验证不是只看平均值" class="headerlink" title="压测验证不是只看平均值"></a>压测验证不是只看平均值</h2><p>在隔离环境使用相同数据和下游延迟进行三轮对照：</p>
+<table>
+<thead>
+<tr>
+<th align="right">并发</th>
+<th align="right">调整前 P99</th>
+<th align="right">调整后 P99</th>
+<th align="right">pending 峰值</th>
+<th align="right">错误率</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">20</td>
+<td align="right">1.6s</td>
+<td align="right">310ms</td>
+<td align="right">8</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">50</td>
+<td align="right">6.4s</td>
+<td align="right">480ms</td>
+<td align="right">19</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td align="right">80</td>
+<td align="right">超过 8s</td>
+<td align="right">760ms</td>
+<td align="right">37</td>
+<td align="right">0.4%</td>
+</tr>
+</tbody></table>
+<p>80 并发时出现少量连接获取超时，说明系统开始主动拒绝，而不是让所有请求拖到网关超时。随后根据生产峰值、实例数量和库存服务容量，将单实例并发限制设在可承受范围内。</p>
+<p>还额外验证了：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">库存响应变慢到 1 秒时是否快速失败</span><br><span class="line">库存完全不可用时线程是否持续增长</span><br><span class="line">订单超时后的状态能否被补偿</span><br><span class="line">网关断开后服务是否继续执行无意义工作</span><br><span class="line">连接释放后池指标是否恢复</span><br></pre></td></tr></table></figure>
+
+<h2 id="这条调用链最后留下的图"><a href="#这条调用链最后留下的图" class="headerlink" title="这条调用链最后留下的图"></a>这条调用链最后留下的图</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">网关 5s</span><br><span class="line">  -&gt; 参数与认证 15ms</span><br><span class="line">  -&gt; 价格计算 35ms</span><br><span class="line">  -&gt; 数据库写入 40ms</span><br><span class="line">  -&gt; HTTP 连接池排队 0~200ms</span><br><span class="line">  -&gt; 库存处理 P99 420ms</span><br><span class="line">  -&gt; 状态落库 30ms</span><br><span class="line">  -&gt; 预留异常处理时间</span><br></pre></td></tr></table></figure>
+
+<p>这次排查让我意识到，“某个下游调用耗时 6 秒”仍然是一个过粗的结论。客户端排队、DNS、建连、网络传输和服务端处理必须继续拆开。只有把不同系统的时钟、traceId、线程状态和连接池指标放在一起，消失的那 6 秒才真正有了位置。</p>
 
     </div>
 
@@ -383,7 +488,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

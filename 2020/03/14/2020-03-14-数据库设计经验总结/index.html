@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景数据库设计一旦进入线上环境，修改成本会远高于代码，因此前期设计需要更谨慎。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并">
+    <meta name="description" content="数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。  先从业务事实开始设计订单表前，不急着列字段，先确认： 12345678订单由谁创建一个订单包含哪些商品金额在哪个时间点确定状态有哪些合法流转取消、退款和删除是否保留历史订单号是否需要对外展示查询主要按用户、状态还是时间预计数">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据库设计经验总结">
 <meta property="og:url" content="https://swagch.github.io/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景数据库设计一旦进入线上环境，修改成本会远高于代码，因此前期设计需要更谨慎。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在工作中并">
+<meta property="og:description" content="数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。  先从业务事实开始设计订单表前，不急着列字段，先确认： 12345678订单由谁创建一个订单包含哪些商品金额在哪个时间点确定状态有哪些合法流转取消、退款和删除是否保留历史订单号是否需要对外展示查询主要按用户、状态还是时间预计数">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2020/db-design-cover.svg">
 <meta property="article:published_time" content="2020-03-14T12:31:55.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.176Z">
+<meta property="article:modified_time" content="2026-07-16T03:36:55.229Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="索引">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E4%BB%8E%E4%B8%9A%E5%8A%A1%E4%BA%8B%E5%AE%9E%E5%BC%80%E5%A7%8B"><span class="nav-text">先从业务事实开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BB%E9%94%AE%E5%92%8C%E4%B8%9A%E5%8A%A1%E7%BC%96%E5%8F%B7%E5%88%86%E5%BC%80"><span class="nav-text">1. 主键和业务编号分开</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%8C%89%E8%AF%AD%E4%B9%89%E9%80%89%E6%8B%A9"><span class="nav-text">2. 数据类型按语义选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%91%E9%A2%9D"><span class="nav-text">金额</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4"><span class="nav-text">时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8A%B6%E6%80%81"><span class="nav-text">状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%9C%AC"><span class="nav-text">文本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-NULL-%E5%92%8C%E9%BB%98%E8%AE%A4%E5%80%BC%E8%A6%81%E8%A1%A8%E8%BE%BE%E7%9C%9F%E5%AE%9E%E5%90%AB%E4%B9%89"><span class="nav-text">3. NULL 和默认值要表达真实含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%A2%E5%8D%95%E6%98%8E%E7%BB%86%E5%8D%95%E7%8B%AC%E5%BB%BA%E8%A1%A8"><span class="nav-text">4. 订单明细单独建表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E7%B4%A2%E5%BC%95%E4%BB%8E%E6%9F%A5%E8%AF%A2%E6%A8%A1%E5%BC%8F%E5%87%BA%E5%8F%91"><span class="nav-text">5. 索引从查询模式出发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%94%AF%E4%B8%80%E7%BA%A6%E6%9D%9F%E6%98%AF%E4%B8%9A%E5%8A%A1%E9%98%B2%E7%BA%BF"><span class="nav-text">6. 唯一约束是业务防线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%A4%96%E9%94%AE%E6%98%AF%E5%90%A6%E4%BD%BF%E7%94%A8"><span class="nav-text">7. 外键是否使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E9%80%BB%E8%BE%91%E5%88%A0%E9%99%A4%E4%B8%8D%E8%83%BD%E6%BB%A5%E7%94%A8"><span class="nav-text">8. 逻辑删除不能滥用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E5%B9%B6%E5%8F%91%E6%9B%B4%E6%96%B0"><span class="nav-text">9. 乐观锁和并发更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E8%A1%A8%E7%BB%93%E6%9E%84%E5%8F%98%E6%9B%B4%E8%A6%81%E5%8F%AF%E5%9B%9E%E9%80%80"><span class="nav-text">10. 表结构变更要可回退</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-%E8%AF%84%E5%AE%A1%E6%B8%85%E5%8D%95"><span class="nav-text">11. 评审清单</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,34 +279,75 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>数据库设计一旦进入线上环境，修改成本会远高于代码，因此前期设计需要更谨慎。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
-<ol>
-<li>字段先随手加，后续统计和查询非常痛苦</li>
-<li>索引建得过早或过多，反而增加维护成本</li>
-<li>表关系没有边界，业务变更时牵一发动全身</li>
-</ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>数据库结构承载的是业务事实，表、字段、索引和约束都应该围绕业务长期演进来设计。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> order_info (</span><br><span class="line">  id <span class="type">bigint</span> <span class="keyword">primary key</span>,</span><br><span class="line">  order_no <span class="type">varchar</span>(<span class="number">64</span>) <span class="keyword">not null</span>,</span><br><span class="line">  user_id <span class="type">bigint</span> <span class="keyword">not null</span>,</span><br><span class="line">  order_status tinyint <span class="keyword">not null</span>,</span><br><span class="line">  total_amount <span class="type">decimal</span>(<span class="number">12</span>,<span class="number">2</span>) <span class="keyword">not null</span>,</span><br><span class="line">  created_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  updated_at datetime <span class="keyword">not null</span>,</span><br><span class="line">  <span class="keyword">unique</span> key uk_order_no(order_no),</span><br><span class="line">  key idx_user_status(user_id, order_status)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。</p>
+</blockquote>
+<h2 id="先从业务事实开始"><a href="#先从业务事实开始" class="headerlink" title="先从业务事实开始"></a>先从业务事实开始</h2><p>设计订单表前，不急着列字段，先确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">订单由谁创建</span><br><span class="line">一个订单包含哪些商品</span><br><span class="line">金额在哪个时间点确定</span><br><span class="line">状态有哪些合法流转</span><br><span class="line">取消、退款和删除是否保留历史</span><br><span class="line">订单号是否需要对外展示</span><br><span class="line">查询主要按用户、状态还是时间</span><br><span class="line">预计数据量和保留年限</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">explain <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> order_info <span class="keyword">where</span> user_id <span class="operator">=</span> <span class="number">1001</span> <span class="keyword">and</span> order_status <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>“用户可以买商品”不足以支撑表设计。金额是否允许调整、订单是否拆单、退款能否部分发生，都会改变数据模型。</p>
+<h2 id="1-主键和业务编号分开"><a href="#1-主键和业务编号分开" class="headerlink" title="1. 主键和业务编号分开"></a>1. 主键和业务编号分开</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status TINYINT UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    paid_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0.00</span>,</span><br><span class="line">    version <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_user_created (user_id, created_at),</span><br><span class="line">    KEY idx_status_created (status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>数据库设计经验总结</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p><code>id</code> 是数据库内部主键，适合聚簇索引和关联；<code>order_no</code> 是稳定的业务编号，可以暴露给外部。不要把自增 ID 直接当公开订单号，也不要让一个过长随机字符串承担所有关联主键成本。</p>
+<p>业务编号生成要考虑全局唯一、趋势性、时钟回拨和信息泄露。使用雪花算法、号段或数据库序列都可以，但要明确失败和重复检测方式。</p>
+<h2 id="2-数据类型按语义选择"><a href="#2-数据类型按语义选择" class="headerlink" title="2. 数据类型按语义选择"></a>2. 数据类型按语义选择</h2><h3 id="金额"><a href="#金额" class="headerlink" title="金额"></a>金额</h3><p>使用 <code>DECIMAL</code> 或最小货币单位整数，不使用浮点数：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>同时记录币种时，金额精度不能假设永远是两位小数。跨币种系统需要专门的 Money 设计。</p>
+<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>团队必须约定数据库时区和应用转换方式。<code>TIMESTAMP</code> 与 <code>DATETIME</code> 的范围、时区行为不同，不能只因为示例常见就随意选择。</p>
+<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p><code>TINYINT</code> 节省空间，但数据库里看到 <code>3</code> 不直观。需要在代码、文档和数据字典中维护同一映射：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">10 CREATED</span><br><span class="line">20 PAID</span><br><span class="line">30 SHIPPED</span><br><span class="line">40 FINISHED</span><br><span class="line">90 CANCELLED</span><br></pre></td></tr></table></figure>
+
+<p>给状态值留间隔，后续可以插入中间状态。不要复用已经废弃的数字表示新含义，否则历史数据会被重新解释。</p>
+<h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>字段长度来自业务约束，而不是统一写 <code>VARCHAR(255)</code>。手机号、订单号、外部流水号的长度和字符集不同。超长正文放 <code>TEXT</code> 时，也要考虑是否真的需要频繁查询和索引。</p>
+<h2 id="3-NULL-和默认值要表达真实含义"><a href="#3-NULL-和默认值要表达真实含义" class="headerlink" title="3. NULL 和默认值要表达真实含义"></a>3. NULL 和默认值要表达真实含义</h2><p><code>NULL</code> 应该表示“未知或不存在”，不是“开发暂时没想好”。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">paid_at = NULL：尚未支付</span><br><span class="line">cancel_reason = NULL：没有取消</span><br><span class="line">paid_amount = 0.00：已知支付金额为零</span><br></pre></td></tr></table></figure>
+
+<p>把所有字符串默认成空串，会让“未填写”和“明确为空”无法区分。反过来，所有字段都允许 NULL 也会把校验压力推给每个查询。</p>
+<h2 id="4-订单明细单独建表"><a href="#4-订单明细单独建表" class="headerlink" title="4. 订单明细单独建表"></a>4. 订单明细单独建表</h2><p>不要把商品列表保存成逗号字符串：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_item (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_name <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    unit_price <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    quantity <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    KEY idx_order_id (order_id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
+
+<p><code>sku_name</code> 和成交单价是下单时快照。商品后来改名或改价，历史订单仍应保持当时事实。是否同时保存规格、图片和税费，要根据展示和对账需求决定。</p>
+<h2 id="5-索引从查询模式出发"><a href="#5-索引从查询模式出发" class="headerlink" title="5. 索引从查询模式出发"></a>5. 索引从查询模式出发</h2><p>先列高频查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 用户订单列表</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, status, total_amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 待处理订单扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at</span><br><span class="line">LIMIT <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对应索引 <code>(user_id, created_at)</code> 和 <code>(status, created_at)</code>。索引字段顺序要匹配过滤和排序，不是简单把区分度最高的字段放最前面。</p>
+<p>每个二级索引都会保存主键，并增加写入、存储和维护成本。下面几类索引需要重点检查：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>被联合索引前缀覆盖的重复索引。</li>
+<li>低区分度单列索引。</li>
+<li>为一次临时报表增加、长期无人使用的索引。</li>
+<li>包含过多长字符串的“万能覆盖索引”。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>上线前使用真实数据量查看执行计划，不能只在几十行测试数据上验证。</p>
+<h2 id="6-唯一约束是业务防线"><a href="#6-唯一约束是业务防线" class="headerlink" title="6. 唯一约束是业务防线"></a>6. 唯一约束是业务防线</h2><p>应用先查询“订单号是否存在”再插入，在并发下仍可能重复。数据库唯一索引提供最终保证：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_order_no (order_no)</span><br></pre></td></tr></table></figure>
+
+<p>幂等请求也可以建立唯一约束：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_user_request (user_id, request_id)</span><br></pre></td></tr></table></figure>
+
+<p>捕获唯一键冲突后，要查询并返回原业务结果，而不是统一转换成“系统异常”。</p>
+<h2 id="7-外键是否使用"><a href="#7-外键是否使用" class="headerlink" title="7. 外键是否使用"></a>7. 外键是否使用</h2><p>外键能保护引用完整性，但会增加迁移、写入和跨表操作约束。单体且表关系稳定时可以使用；高并发、分库分表或跨服务数据所有权场景通常由应用和对账保证。</p>
+<p>无论是否创建数据库外键，关系都必须明确：删除用户后订单如何保留，删除商品后订单快照是否还可展示。没有外键不代表没有约束。</p>
+<h2 id="8-逻辑删除不能滥用"><a href="#8-逻辑删除不能滥用" class="headerlink" title="8. 逻辑删除不能滥用"></a>8. 逻辑删除不能滥用</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deleted TINYINT <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>逻辑删除方便恢复和审计，但会影响唯一索引、所有查询条件和数据量。订单通常不是“删除”，而是取消或关闭；用业务状态表达比统一 <code>deleted=1</code> 更准确。</p>
+<p>真正需要删除的临时数据，应有明确生命周期和归档任务。不要让所有表永久增长。</p>
+<h2 id="9-乐观锁和并发更新"><a href="#9-乐观锁和并发更新" class="headerlink" title="9. 乐观锁和并发更新"></a>9. 乐观锁和并发更新</h2><p>订单状态更新可以带版本号：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> order_info</span><br><span class="line"><span class="keyword">SET</span> status <span class="operator">=</span> ?, version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span>, updated_at <span class="operator">=</span> NOW(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
+
+<p>检查受影响行数，零行表示状态已变化或版本冲突。这样比先查后改更能保护合法状态流转。</p>
+<p>乐观锁不适合所有高冲突场景。冲突频繁时要重新审视业务串行化、队列或数据库锁策略。</p>
+<h2 id="10-表结构变更要可回退"><a href="#10-表结构变更要可回退" class="headerlink" title="10. 表结构变更要可回退"></a>10. 表结构变更要可回退</h2><p>开发环境能瞬间执行的 DDL，在线上大表可能锁表、占满磁盘或造成复制延迟。</p>
+<p>变更前确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">表大小和增长速度</span><br><span class="line">MySQL 版本及 Online DDL 能力</span><br><span class="line">新增索引的磁盘空间</span><br><span class="line">主从复制和延迟</span><br><span class="line">应用新旧版本兼容窗口</span><br><span class="line">失败后的回退方式</span><br></pre></td></tr></table></figure>
+
+<p>新增字段优先做到新旧代码都能运行：先加可兼容字段，再发布写入，再迁移历史数据，最后切换读取。不要把表变更和代码行为切换压在同一秒完成。</p>
+<h2 id="11-评审清单"><a href="#11-评审清单" class="headerlink" title="11. 评审清单"></a>11. 评审清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ ] 表名和字段使用统一业务术语</span><br><span class="line">[ ] 主键与公开业务编号分离</span><br><span class="line">[ ] 金额、时间、状态类型符合语义</span><br><span class="line">[ ] NULL 与默认值有明确含义</span><br><span class="line">[ ] 唯一约束覆盖并发重复风险</span><br><span class="line">[ ] 索引来自真实查询和排序</span><br><span class="line">[ ] 历史快照不会被主数据变化污染</span><br><span class="line">[ ] 状态迁移和并发更新有保护</span><br><span class="line">[ ] 数据保留、归档和删除策略明确</span><br><span class="line">[ ] DDL 有容量评估和回退方案</span><br></pre></td></tr></table></figure>
+
+<p>好的数据库设计不是一次把未来所有字段都猜出来，而是准确表达当前业务事实，同时为常见演进保留空间。表结构越接近业务语言，后续查询、接口和故障排查就越少依赖口头解释。</p>
 
     </div>
 
@@ -395,7 +436,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

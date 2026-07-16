@@ -16,17 +16,17 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景线程池问题往往不是线程不够，而是队列、任务耗时和拒绝策略设计不合理。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123active&#x3D;32 poolSize&#x3D;32 queueSize&#x3D;10000 completed&#x3D;1200接口响应时间从 200ms 上升到 6sCPU 不高，任务堆积明显  1Executors.newFixedThreadP">
+    <meta name="description" content="一次批量通知功能上线后，接口响应从 200ms 涨到 6s，CPU 却只有 30%。线程池监控看起来也没有报错： 12345poolSize&#x3D;32active&#x3D;32queueSize&#x3D;10000completedTaskCount&#x3D;1200rejected&#x3D;0  后来才明白，“没有拒绝”并不是健康信号。容量一万的队列把压力藏了起来，任务已经要排几分钟，调用方却仍然成功提交。 这篇不直接给一组万能参">
 <meta property="og:type" content="article">
 <meta property="og:title" content="线程池使用踩坑记录">
 <meta property="og:url" content="https://swagch.github.io/2021/08/15/2021-08-15-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%BD%BF%E7%94%A8%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景线程池问题往往不是线程不够，而是队列、任务耗时和拒绝策略设计不合理。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题123active&#x3D;32 poolSize&#x3D;32 queueSize&#x3D;10000 completed&#x3D;1200接口响应时间从 200ms 上升到 6sCPU 不高，任务堆积明显  1Executors.newFixedThreadP">
+<meta property="og:description" content="一次批量通知功能上线后，接口响应从 200ms 涨到 6s，CPU 却只有 30%。线程池监控看起来也没有报错： 12345poolSize&#x3D;32active&#x3D;32queueSize&#x3D;10000completedTaskCount&#x3D;1200rejected&#x3D;0  后来才明白，“没有拒绝”并不是健康信号。容量一万的队列把压力藏了起来，任务已经要排几分钟，调用方却仍然成功提交。 这篇不直接给一组万能参">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-08-15T15:09:21.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T04:04:01.620Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="线程池">
@@ -53,9 +53,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%BF%98%E5%8E%9F%E4%BB%BB%E5%8A%A1%E5%9C%A8%E5%81%9A%E4%BB%80%E4%B9%88"><span class="nav-text">先还原任务在做什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%9D%91%EF%BC%9A%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8-Executors"><span class="nav-text">第一个坑：直接使用 Executors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%95%B0%E4%BB%8E%E5%B9%B6%E5%8F%91%E9%9C%80%E6%B1%82%E5%BC%80%E5%A7%8B%E4%BC%B0%E7%AE%97"><span class="nav-text">线程数从并发需求开始估算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%9F%E5%88%97%E5%AE%B9%E9%87%8F%E4%BB%8E%E5%8F%AF%E7%AD%89%E5%BE%85%E6%97%B6%E9%97%B4%E5%8F%8D%E6%8E%A8"><span class="nav-text">队列容量从可等待时间反推</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%8A%E6%89%80%E6%9C%89%E5%85%B3%E9%94%AE%E5%8F%82%E6%95%B0%E5%86%99%E5%87%BA%E6%9D%A5"><span class="nav-text">把所有关键参数写出来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5%E5%BF%85%E9%A1%BB%E5%AF%B9%E5%BA%94%E4%B8%9A%E5%8A%A1%E8%AF%AD%E4%B9%89"><span class="nav-text">拒绝策略必须对应业务语义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%9D%91%EF%BC%9Asubmit-%E5%90%8E%E5%BF%BD%E7%95%A5-Future"><span class="nav-text">第二个坑：submit 后忽略 Future</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%92%8C%E8%B5%84%E6%BA%90%E4%B9%9F%E8%A6%81%E8%B7%A8%E8%BF%87%E5%BC%82%E6%AD%A5%E8%BE%B9%E7%95%8C"><span class="nav-text">上下文和资源也要跨过异步边界</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E6%B5%8B%E5%AF%B9%E7%85%A7"><span class="nav-text">压测对照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%97%AD%E6%97%B6%E4%B8%8D%E8%A6%81%E7%9B%B4%E6%8E%A5%E4%B8%A2%E6%8E%89%E9%98%9F%E5%88%97"><span class="nav-text">关闭时不要直接丢掉队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%8E%B0%E5%9C%A8%E4%BC%9A%E7%9C%8B%E8%BF%99%E4%BA%9B%E6%8C%87%E6%A0%87"><span class="nav-text">我现在会看这些指标</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -276,20 +276,158 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>线程池问题往往不是线程不够，而是队列、任务耗时和拒绝策略设计不合理。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><p>一次批量通知功能上线后，接口响应从 200ms 涨到 6s，CPU 却只有 30%。线程池监控看起来也没有报错：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">poolSize=32</span><br><span class="line">active=32</span><br><span class="line">queueSize=10000</span><br><span class="line">completedTaskCount=1200</span><br><span class="line">rejected=0</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">active=32 poolSize=32 queueSize=10000 completed=1200</span><br><span class="line">接口响应时间从 200ms 上升到 6s</span><br><span class="line">CPU 不高，任务堆积明显</span><br></pre></td></tr></table></figure>
+<p>后来才明白，“没有拒绝”并不是健康信号。容量一万的队列把压力藏了起来，任务已经要排几分钟，调用方却仍然成功提交。</p>
+<p>这篇不直接给一组万能参数，而是从任务耗时和下游容量推导线程数、队列和拒绝策略，再用压测验证。</p>
+<h2 id="先还原任务在做什么"><a href="#先还原任务在做什么" class="headerlink" title="先还原任务在做什么"></a>先还原任务在做什么</h2><p>通知任务包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">读取一条业务数据：约 20ms</span><br><span class="line">调用外部通知接口：P50 700ms，P99 1.8s</span><br><span class="line">更新发送结果：约 30ms</span><br><span class="line">平均总耗时：约 1.2s</span><br><span class="line">入口提交速度：峰值 40 tasks/s</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Executors.newFixedThreadPool(<span class="number">32</span>);</span><br></pre></td></tr></table></figure>
+<p>这是 IO 等待为主的任务。32 个线程在理想情况下每秒处理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">32 / 1.2 ≈ 26.7 tasks/s</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">问题：</span><br><span class="line">1. 队列过大，流量尖峰时延迟被隐藏</span><br><span class="line">2. 无拒绝策略监控</span><br><span class="line">3. 任务内部还有远程调用</span><br><span class="line">4. 线程池参数没有按业务隔离</span><br></pre></td></tr></table></figure>
+<p>入口每秒 40 个，处理每秒约 27 个，队列每秒增长约 13 个。十分钟后就是近 8,000 个任务。CPU 不高，只说明线程大部分在等待网络，不说明系统有余量。</p>
+<h2 id="第一个坑：直接使用-Executors"><a href="#第一个坑：直接使用-Executors" class="headerlink" title="第一个坑：直接使用 Executors"></a>第一个坑：直接使用 Executors</h2><p>旧代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span></span><br><span class="line">        Executors.newFixedThreadPool(<span class="number">32</span>);</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ThreadPoolExecutor</span> <span class="variable">executor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">    <span class="number">16</span>,</span><br><span class="line">    <span class="number">32</span>,</span><br><span class="line">    <span class="number">60</span>,</span><br><span class="line">    TimeUnit.SECONDS,</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">500</span>),</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.CallerRunsPolicy()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><code>newFixedThreadPool</code> 内部使用近似无界的 <code>LinkedBlockingQueue</code>。任务持续堆积时：</p>
+<ul>
+<li>排队时间没有上限。</li>
+<li>请求携带的对象长期占用堆内存。</li>
+<li>已经过期的任务仍然执行。</li>
+<li>拒绝策略很晚才有机会生效。</li>
+<li>服务关闭时需要处理大量积压。</li>
+</ul>
+<p>问题不是 <code>Executors</code> 这个类不能用，而是便捷工厂隐藏了影响容量的关键参数。生产线程池应该把边界显式写出来。</p>
+<h2 id="线程数从并发需求开始估算"><a href="#线程数从并发需求开始估算" class="headerlink" title="线程数从并发需求开始估算"></a>线程数从并发需求开始估算</h2><p>Little 定律可以提供一个起点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在途任务数 ≈ 到达速率 × 平均处理时间</span><br><span class="line">              40/s × 1.2s</span><br><span class="line">              ≈ 48</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">监控指标：activeCount、queueSize、completedTaskCount、rejectCount</span><br></pre></td></tr></table></figure>
+<p>要在稳定状态处理 40 tasks&#x2F;s，大约需要 48 个同时在途任务。但这不等于线程数直接设 48，还要问：</p>
+<ol>
+<li>通知服务允许我们并发多少请求。</li>
+<li>当前实例数量是多少。</li>
+<li>数据库连接池能否支撑每个任务的读写。</li>
+<li>P99 耗时上升时会增加多少在途任务。</li>
+<li>机器线程栈和上下文切换成本是多少。</li>
+</ol>
+<p>通知服务给出的租户并发上限是 120，订单服务有 4 个实例，因此单实例最多使用约 30 个并发。把线程池增到 48 会越过下游限制，换来 429 和更多重试。</p>
+<p>最终决策不是“本地每秒处理 40 个”，而是入口也限制到全局可承受速度，超出部分进入可靠消息队列，而不是堆在 JVM 内存。</p>
+<h2 id="队列容量从可等待时间反推"><a href="#队列容量从可等待时间反推" class="headerlink" title="队列容量从可等待时间反推"></a>队列容量从可等待时间反推</h2><p>假设单实例稳定处理能力约 25 tasks&#x2F;s，业务允许任务最多在本地排队 2 秒：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">队列容量 ≈ 25 tasks/s × 2s = 50</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>可以预留波动，将容量设为 100，但没有理由设成 10,000。队列越大，拒绝发生越晚，用户看到的“提交成功”和真实执行时间差得越远。</p>
+<p>如果业务允许几小时后完成，正确容器通常是持久化任务表或消息队列，不是把线程池队列调得无限大。</p>
+<h2 id="把所有关键参数写出来"><a href="#把所有关键参数写出来" class="headerlink" title="把所有关键参数写出来"></a>把所有关键参数写出来</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">NotificationExecutorFactory</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">NotificationExecutorFactory</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ThreadPoolExecutor <span class="title function_">create</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">AtomicInteger</span> <span class="variable">sequence</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AtomicInteger</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="type">ThreadFactory</span> <span class="variable">threadFactory</span> <span class="operator">=</span> runnable -&gt; &#123;</span><br><span class="line">            <span class="type">Thread</span> <span class="variable">thread</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(</span><br><span class="line">                    runnable,</span><br><span class="line">                    <span class="string">&quot;notification-&quot;</span> + sequence.getAndIncrement()</span><br><span class="line">            );</span><br><span class="line">            <span class="comment">// 未捕获异常必须进入统一日志</span></span><br><span class="line">            thread.setUncaughtExceptionHandler((current, throwable) -&gt;</span><br><span class="line">                    log.error(<span class="string">&quot;notification_task_crashed thread=&#123;&#125;&quot;</span>,</span><br><span class="line">                            current.getName(), throwable));</span><br><span class="line">            <span class="keyword">return</span> thread;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">                <span class="number">20</span>,</span><br><span class="line">                <span class="number">30</span>,</span><br><span class="line">                <span class="number">60</span>,</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">100</span>),</span><br><span class="line">                threadFactory,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.AbortPolicy()</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数含义：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">corePoolSize=20       普通流量下保留的工作线程</span><br><span class="line">maximumPoolSize=30    不超过单实例下游并发预算</span><br><span class="line">keepAlive=60s         波峰线程空闲后的回收时间</span><br><span class="line">queue=100             本地最多约数秒缓冲</span><br><span class="line">AbortPolicy           满载时明确失败，不静默丢任务</span><br></pre></td></tr></table></figure>
+
+<p>核心线程、最大线程和队列之间的调度顺序也要理解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">线程少于 core -&gt; 创建线程</span><br><span class="line">达到 core      -&gt; 先进入队列</span><br><span class="line">队列已满       -&gt; 继续创建到 max</span><br><span class="line">达到 max       -&gt; 执行拒绝策略</span><br></pre></td></tr></table></figure>
+
+<p>因此使用很大的队列时，<code>maximumPoolSize</code> 可能永远不会生效。</p>
+<h2 id="拒绝策略必须对应业务语义"><a href="#拒绝策略必须对应业务语义" class="headerlink" title="拒绝策略必须对应业务语义"></a>拒绝策略必须对应业务语义</h2><p>JDK 自带策略：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>行为</th>
+<th>风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>AbortPolicy</code></td>
+<td>抛出异常</td>
+<td>调用方必须处理</td>
+</tr>
+<tr>
+<td><code>CallerRunsPolicy</code></td>
+<td>提交线程执行</td>
+<td>可能拖慢 HTTP 或 MQ 线程</td>
+</tr>
+<tr>
+<td><code>DiscardPolicy</code></td>
+<td>静默丢弃</td>
+<td>业务任务不可追溯</td>
+</tr>
+<tr>
+<td><code>DiscardOldestPolicy</code></td>
+<td>丢最旧任务后重试</td>
+<td>可能丢掉更重要任务</td>
+</tr>
+</tbody></table>
+<p>通知任务需要可追踪，不能静默丢弃。我们使用 <code>AbortPolicy</code>，在提交边界捕获：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">submit</span><span class="params">(NotificationTask task)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        executor.execute(() -&gt; notificationService.send(task));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RejectedExecutionException exception) &#123;</span><br><span class="line">        <span class="comment">// JVM 已满时写入持久化补偿队列，避免任务消失</span></span><br><span class="line">        retryTaskRepository.save(task, <span class="string">&quot;LOCAL_EXECUTOR_FULL&quot;</span>);</span><br><span class="line">        meterRegistry.counter(<span class="string">&quot;notification.rejected&quot;</span>).increment();</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;NOTIFICATION_BUSY&quot;</span>, exception);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>持久化补偿也可能失败，需要唯一任务号、数据库约束和告警。若提交本身属于事务，要明确任务记录与业务状态的一致性，不能只在内存里重试。</p>
+<p><code>CallerRunsPolicy</code> 能给生产者施加反压，但如果生产者是 Tomcat 请求线程，外部调用会占住请求线程；如果是 RabbitMQ 消费线程，会拖慢确认。使用前必须验证这种反压正是想要的效果。</p>
+<h2 id="第二个坑：submit-后忽略-Future"><a href="#第二个坑：submit-后忽略-Future" class="headerlink" title="第二个坑：submit 后忽略 Future"></a>第二个坑：submit 后忽略 Future</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">executor.submit(() -&gt; notificationService.send(task));</span><br></pre></td></tr></table></figure>
+
+<p><code>submit</code> 会把异常放进 <code>Future</code>。调用方不执行 <code>get()</code>，也没有包装任务时，异常可能没有进入预期日志。</p>
+<p>异步边界统一包装：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Runnable <span class="title function_">observed</span><span class="params">(NotificationTask task)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> () -&gt; &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">startedAt</span> <span class="operator">=</span> System.nanoTime();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            notificationService.send(task);</span><br><span class="line">            metrics.recordSuccess(elapsedMillis(startedAt));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">            metrics.recordFailure(elapsedMillis(startedAt));</span><br><span class="line">            log.error(<span class="string">&quot;notification_send_failed taskId=&#123;&#125; receiverId=&#123;&#125;&quot;</span>,</span><br><span class="line">                    task.getTaskId(), task.getReceiverId(), exception);</span><br><span class="line">            retryTaskRepository.save(task, <span class="string">&quot;SEND_FAILED&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            MDC.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关键任务不能只靠日志补偿。异常结果需要写入可查询状态，并由重试任务按次数和退避策略处理。</p>
+<h2 id="上下文和资源也要跨过异步边界"><a href="#上下文和资源也要跨过异步边界" class="headerlink" title="上下文和资源也要跨过异步边界"></a>上下文和资源也要跨过异步边界</h2><p>线程池复用线程，ThreadLocal、MDC 和用户上下文不会自动安全传递。提交时只复制必要的 traceId 和业务编号，执行完必须清理。</p>
+<p>不要把完整 HTTP Request 或大对象捕获进 Lambda。任务在队列等待期间，这些对象无法回收，也可能包含失效连接和敏感信息。</p>
+<p>异步任务参数应是小而稳定的值对象：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">taskId</span><br><span class="line">businessId</span><br><span class="line">receiverId</span><br><span class="line">templateCode</span><br><span class="line">traceId</span><br></pre></td></tr></table></figure>
+
+<p>执行时根据 ID 获取所需数据，并处理数据已变化或任务已取消的情况。</p>
+<h2 id="压测对照"><a href="#压测对照" class="headerlink" title="压测对照"></a>压测对照</h2><p>压测固定下游平均耗时 1.2 秒，并逐步增加入口：</p>
+<table>
+<thead>
+<tr>
+<th align="right">入口速率</th>
+<th align="right">旧池队列峰值</th>
+<th align="right">新方案本地队列</th>
+<th align="right">拒绝&#x2F;持久化</th>
+<th align="right">P99</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">15&#x2F;s</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1.9s</td>
+</tr>
+<tr>
+<td align="right">25&#x2F;s</td>
+<td align="right">620</td>
+<td align="right">36</td>
+<td align="right">0</td>
+<td align="right">3.1s</td>
+</tr>
+<tr>
+<td align="right">40&#x2F;s</td>
+<td align="right">4,780</td>
+<td align="right">100</td>
+<td align="right">约 15&#x2F;s</td>
+<td align="right">4.8s</td>
+</tr>
+<tr>
+<td align="right">60&#x2F;s</td>
+<td align="right">10,000</td>
+<td align="right">100</td>
+<td align="right">约 35&#x2F;s</td>
+<td align="right">4.9s</td>
+</tr>
+</tbody></table>
+<p>新方案在超载时不会无限增加本地等待，额外任务进入持久化补偿。下游恢复后，补偿消费者以受控速度追赶。</p>
+<p>还要注入这些异常：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">下游 P99 从 1.8s 上升到 5s</span><br><span class="line">连接超时持续 30 秒</span><br><span class="line">数据库写结果失败</span><br><span class="line">任务执行抛出运行时异常</span><br><span class="line">应用接到关闭信号</span><br></pre></td></tr></table></figure>
+
+<p>正常流量压测只能证明吞吐，异常注入才能证明边界。</p>
+<h2 id="关闭时不要直接丢掉队列"><a href="#关闭时不要直接丢掉队列" class="headerlink" title="关闭时不要直接丢掉队列"></a>关闭时不要直接丢掉队列</h2><p>服务停止流程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">shutdown</span><span class="params">()</span> &#123;</span><br><span class="line">    executor.shutdown();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!executor.awaitTermination(<span class="number">30</span>, TimeUnit.SECONDS)) &#123;</span><br><span class="line">            List&lt;Runnable&gt; notStarted = executor.shutdownNow();</span><br><span class="line">            <span class="comment">// 未开始任务必须转存，不能只打印数量</span></span><br><span class="line">            retryTaskRepository.saveAll(convert(notStarted));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException exception) &#123;</span><br><span class="line">        Thread.currentThread().interrupt();</span><br><span class="line">        retryTaskRepository.saveAll(convert(executor.shutdownNow()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>真实实现不应依赖从任意 <code>Runnable</code> 反向解析业务任务，可以使用自定义任务类型或在提交前先持久化。示例重点是：关闭超时后仍要明确处理未开始任务。</p>
+<h2 id="我现在会看这些指标"><a href="#我现在会看这些指标" class="headerlink" title="我现在会看这些指标"></a>我现在会看这些指标</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">active / poolSize / max</span><br><span class="line">queueSize / remainingCapacity</span><br><span class="line">submitted / completed / rejected</span><br><span class="line">任务排队时间</span><br><span class="line">任务执行时间</span><br><span class="line">下游成功率与限流数</span><br><span class="line">补偿任务数量与最老等待时间</span><br></pre></td></tr></table></figure>
+
+<p>线程池参数不是一次配置后永久有效。任务耗时、实例数量和下游容量变化时，稳定处理能力也会变化。</p>
+<p>这次踩坑最大的收获是：线程池本质上是一套容量控制。线程决定同时做多少，队列决定愿意等多久，拒绝策略决定超载后谁承担结果。三者都没有业务边界时，所谓异步只是在把故障推迟到几分钟以后。</p>
 
     </div>
 
@@ -378,7 +516,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

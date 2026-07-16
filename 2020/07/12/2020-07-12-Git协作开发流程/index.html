@@ -16,23 +16,25 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在">
+    <meta name="description" content="一个人使用 Git，记住 add、commit、push 基本够用；多人协作以后，难点变成了什么时候开分支、如何保持改动足够小、冲突由谁处理，以及线上版本怎样准确追溯。 下面是我逐步整理出来的一份团队运行手册。它不追求复杂的分支模型，目标只有三个：主分支随时可发布、每次改动可以审查、出现问题能够回退。 分支只承担清晰职责小团队可以从三类分支开始：    分支 来源 生命周期 用途    main">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Git协作开发流程">
 <meta property="og:url" content="https://swagch.github.io/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。 如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。 这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。 问题这类问题在">
+<meta property="og:description" content="一个人使用 Git，记住 add、commit、push 基本够用；多人协作以后，难点变成了什么时候开分支、如何保持改动足够小、冲突由谁处理，以及线上版本怎样准确追溯。 下面是我逐步整理出来的一份团队运行手册。它不追求复杂的分支模型，目标只有三个：主分支随时可发布、每次改动可以审查、出现问题能够回退。 分支只承担清晰职责小团队可以从三类分支开始：    分支 来源 生命周期 用途    main">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2020/git-collaboration-cover.svg">
 <meta property="article:published_time" content="2020-07-12T10:20:53.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.177Z">
+<meta property="article:modified_time" content="2026-07-16T03:42:44.474Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Git">
 <meta property="article:tag" content="分支管理">
 <meta property="article:tag" content="协作流程">
 <meta property="article:tag" content="代码合并">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2020/git-collaboration-cover.svg">
 
 
 <link rel="canonical" href="https://swagch.github.io/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/">
@@ -53,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -161,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E5%8F%AA%E6%89%BF%E6%8B%85%E6%B8%85%E6%99%B0%E8%81%8C%E8%B4%A3"><span class="nav-text">分支只承担清晰职责</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%BB%BB%E5%8A%A1%E5%89%8D"><span class="nav-text">开始任务前</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E6%8F%90%E4%BA%A4%E8%A1%A8%E8%BE%BE%E4%B8%80%E4%B8%AA%E6%84%8F%E5%9B%BE"><span class="nav-text">一个提交表达一个意图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%8F%E5%A4%A9%E4%B8%8E%E4%B8%BB%E5%88%86%E6%94%AF%E5%90%8C%E6%AD%A5"><span class="nav-text">每天与主分支同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86%E4%B8%8D%E6%98%AF%E9%80%89%E6%8B%A9%E2%80%9C%E6%88%91%E7%9A%84%E2%80%9D%E6%88%96%E2%80%9C%E4%BB%96%E7%9A%84%E2%80%9D"><span class="nav-text">冲突处理不是选择“我的”或“他的”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E4%BA%A4%E5%90%88%E5%B9%B6%E8%AF%B7%E6%B1%82%E5%89%8D%E7%9A%84%E8%87%AA%E6%A3%80"><span class="nav-text">提交合并请求前的自检</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E5%88%86%E6%94%AF%E7%9A%84%E5%90%88%E5%B9%B6%E8%A7%84%E5%88%99"><span class="nav-text">主分支的合并规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E5%BF%85%E9%A1%BB%E8%83%BD%E5%AF%B9%E5%BA%94%E5%88%B0%E6%8F%90%E4%BA%A4"><span class="nav-text">发布必须能对应到提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hotfix-%E7%9A%84%E6%9C%80%E7%9F%AD%E9%97%AD%E7%8E%AF"><span class="nav-text">Hotfix 的最短闭环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%BC%BA%E5%88%B6%E6%8E%A8%E9%80%81%E5%92%8C%E5%8E%86%E5%8F%B2%E4%BF%AE%E6%94%B9"><span class="nav-text">关于强制推送和历史修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%A5%97%E6%B5%81%E7%A8%8B%E6%9C%80%E5%90%8E%E8%A7%A3%E5%86%B3%E7%9A%84%E6%98%AF%E6%B2%9F%E9%80%9A"><span class="nav-text">一套流程最后解决的是沟通</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -276,34 +278,139 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>个人使用 Git 和团队协作使用 Git 是两回事，真正的难点在分支策略和冲突管理。</p>
-<p>如果说 2019 年的重点是把项目做出来，那么 2020 年更像是开始理解“项目为什么要这样做”。很多问题表面上是技术问题，往深处看其实是规范、协作、边界和长期维护的问题。</p>
-<p>这一年我逐渐意识到，成熟的开发不是写出更复杂的代码，而是在合适的约束下，把问题拆清楚，把风险讲明白，把结果稳定交付出去。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>这类问题在工作中并不少见，当时我主要遇到下面几个情况：</p>
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2020/git-collaboration-cover.svg" alt="Git协作开发流程封面图"></p>
+<p>一个人使用 Git，记住 <code>add</code>、<code>commit</code>、<code>push</code> 基本够用；多人协作以后，难点变成了什么时候开分支、如何保持改动足够小、冲突由谁处理，以及线上版本怎样准确追溯。</p>
+<p>下面是我逐步整理出来的一份团队运行手册。它不追求复杂的分支模型，目标只有三个：主分支随时可发布、每次改动可以审查、出现问题能够回退。</p>
+<h2 id="分支只承担清晰职责"><a href="#分支只承担清晰职责" class="headerlink" title="分支只承担清晰职责"></a>分支只承担清晰职责</h2><p>小团队可以从三类分支开始：</p>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>来源</th>
+<th>生命周期</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>main</code></td>
+<td>受保护分支</td>
+<td>长期</td>
+<td>已验证、可发布代码</td>
+</tr>
+<tr>
+<td><code>feature/*</code></td>
+<td><code>main</code></td>
+<td>数小时到数天</td>
+<td>单个需求或技术任务</td>
+</tr>
+<tr>
+<td><code>hotfix/*</code></td>
+<td>线上 Tag</td>
+<td>尽可能短</td>
+<td>生产紧急修复</td>
+</tr>
+</tbody></table>
+<p>如果团队有固定测试窗口，可以增加 <code>release/*</code>；如果没有明确收益，不必照搬完整 Git Flow。分支越多，版本流转和补丁同步成本越高。</p>
+<p>分支名要能直接关联工作：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">feature/order-export</span><br><span class="line">fix/payment-callback-idempotency</span><br><span class="line">hotfix/20200712-login-timeout</span><br></pre></td></tr></table></figure>
+
+<p><code>tmp</code>、<code>new</code>、<code>test2</code> 之类名称会让几周后的清理和追溯变得困难。</p>
+<h2 id="开始任务前"><a href="#开始任务前" class="headerlink" title="开始任务前"></a>开始任务前</h2><p>先确认工作区干净，并从最新主分支创建任务分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git fetch origin</span><br><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git switch -c feature/order-export</span><br></pre></td></tr></table></figure>
+
+<p><code>--ff-only</code> 可以阻止 <code>pull</code> 在本地悄悄生成一次合并提交。如果当前 Git 版本不支持 <code>switch</code>，可以使用 <code>checkout</code> 完成相同操作。</p>
+<p>开始编码前还应明确：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">需求或缺陷编号</span><br><span class="line">本次明确包含和不包含的范围</span><br><span class="line">数据库、接口、配置是否变化</span><br><span class="line">验证方式</span><br><span class="line">上线和回退方式</span><br></pre></td></tr></table></figure>
+
+<p>Git 能记录代码变化，却不能替代范围管理。</p>
+<h2 id="一个提交表达一个意图"><a href="#一个提交表达一个意图" class="headerlink" title="一个提交表达一个意图"></a>一个提交表达一个意图</h2><p>好的提交不是“今天写了多少”，而是一个可以独立解释、审查和撤销的变化。例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">feat(order): add paid-order export endpoint</span><br><span class="line">fix(payment): ignore duplicated callback</span><br><span class="line">test(order): cover export permission boundary</span><br><span class="line">refactor(order): extract status transition validation</span><br></pre></td></tr></table></figure>
+
+<p>提交前先检查实际内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status --short</span><br><span class="line">git diff</span><br><span class="line">git diff --cached</span><br></pre></td></tr></table></figure>
+
+<p>不要习惯性执行 <code>git add .</code>。配置、日志、IDE 文件和临时数据很容易一起进入提交。更稳妥的方式是按文件或按代码块暂存：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add src/main/java/com/example/order/OrderExportService.java</span><br><span class="line">git add -p</span><br><span class="line">git commit -m <span class="string">&quot;feat(order): add paid-order export service&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果一次提交同时包含格式化全项目、重命名、业务修改和依赖升级，Review 很难分辨真正变化。应把机械修改和行为修改拆开。</p>
+<h2 id="每天与主分支同步"><a href="#每天与主分支同步" class="headerlink" title="每天与主分支同步"></a>每天与主分支同步</h2><p>短分支能显著降低冲突。功能开发超过一天时，我会定期同步远端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin</span><br><span class="line">git rebase origin/main</span><br></pre></td></tr></table></figure>
+
+<p>适合使用 <code>rebase</code> 的前提是分支由自己维护，或者团队明确允许重写该分支历史。已经被多人共同使用的分支不要随意 rebase，否则其他人的提交基线会变化。</p>
+<p>不允许重写历史时，使用合并：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/main</span><br></pre></td></tr></table></figure>
+
+<p>团队应统一一种默认方式。混合使用并不可怕，真正麻烦的是没有约定，导致提交图无法解释。</p>
+<h2 id="冲突处理不是选择“我的”或“他的”"><a href="#冲突处理不是选择“我的”或“他的”" class="headerlink" title="冲突处理不是选择“我的”或“他的”"></a>冲突处理不是选择“我的”或“他的”</h2><p>冲突发生时先暂停自动操作，理解两边意图：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git diff --name-only --diff-filter=U</span><br><span class="line">git <span class="built_in">log</span> --oneline --left-right HEAD...origin/main</span><br></pre></td></tr></table></figure>
+
+<p>处理步骤：</p>
 <ol>
-<li>多人同时改同一模块导致冲突频繁</li>
-<li>分支长期不合并，最终集成风险很高</li>
-<li>提交信息无法说明改动目的</li>
+<li>阅读当前分支和主分支对应提交。</li>
+<li>确认两边修改解决的业务问题。</li>
+<li>手工合成最终行为，而不是直接选择一侧。</li>
+<li>删除冲突标记，重新编译并运行相关测试。</li>
+<li><code>git add</code> 已解决文件，再继续 rebase 或 commit。</li>
 </ol>
-<p>这些问题的共同点是：短期看只是效率问题，长期看会逐渐变成质量问题。它们不会立刻让系统崩掉，但会在需求迭代、人员交接、线上排查时持续放大成本。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>协作流程的重点不在命令本身，而在分支边界、提交粒度、合并节奏和问题回滚。</p>
-<p>我后来总结出一个判断标准：凡是需要多人长期参与的事情，都不能只依赖个人经验。经验如果不能被记录、复用和检查，就很难成为团队能力。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式不是追求一步到位，而是先把最容易失控的部分标准化，再逐步优化细节。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout develop</span><br><span class="line">git pull origin develop</span><br><span class="line">git checkout -b feature/order-export</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;feat: add order export&quot;</span></span><br><span class="line">git push origin feature/order-export</span><br></pre></td></tr></table></figure>
+<p>如果方向不对，可以执行 <code>git rebase --abort</code> 或 <code>git merge --abort</code> 回到操作前。中止比带着不确定结果继续提交更可靠。</p>
+<h2 id="提交合并请求前的自检"><a href="#提交合并请求前的自检" class="headerlink" title="提交合并请求前的自检"></a>提交合并请求前的自检</h2><p>合并请求不是把检查工作转交给 Reviewer。提交前至少确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 改动范围与任务一致，没有临时文件</span><br><span class="line">[ ] 编译、自动测试和静态检查通过</span><br><span class="line">[ ] 接口、数据库和配置变化有说明</span><br><span class="line">[ ] 日志不包含密码、Token 或个人敏感信息</span><br><span class="line">[ ] 新增分支和异常路径有测试</span><br><span class="line">[ ] 兼容与回退方式明确</span><br><span class="line">[ ] 分支已同步最新主分支</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">分支规则：</span><br><span class="line">feature/*  功能开发</span><br><span class="line">bugfix/*   缺陷修复</span><br><span class="line">release/*  发布准备</span><br><span class="line">hotfix/*   线上修复</span><br></pre></td></tr></table></figure>
+<p>合并请求描述建议回答四件事：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 为什么改</span></span><br><span class="line">支付回调可能重复投递，积分会重复增加。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么改</span></span><br><span class="line">以支付流水号建立唯一约束，重复请求返回原处理结果。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么验证</span></span><br><span class="line">单次、重复、并发回调测试均通过。</span><br><span class="line"></span><br><span class="line"><span class="section">## 风险与回退</span></span><br><span class="line">先上线约束与兼容代码；回退应用不删除约束。</span><br></pre></td></tr></table></figure>
 
-<p>具体落地时，我更倾向于采用“小步治理”的方式：先让流程可见，再让责任明确，最后再谈自动化或平台化。这样推进阻力会小很多，也更容易让团队接受。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>关于 <strong>Git协作开发流程</strong>，我这一阶段最大的收获是：成熟的工程经验往往不是某个技巧，而是一套稳定处理问题的方式。</p>
-<p>这篇文章可以沉淀为几条原则：</p>
+<p>Reviewer 应重点看业务边界、数据一致性、异常处理和测试，格式问题尽量交给自动化工具。</p>
+<h2 id="主分支的合并规则"><a href="#主分支的合并规则" class="headerlink" title="主分支的合并规则"></a>主分支的合并规则</h2><p>主分支至少应有这些保护：</p>
 <ul>
-<li>先明确问题边界，再讨论技术方案；</li>
-<li>能形成清单的事情，不要只靠记忆；</li>
-<li>能通过规范减少沟通的地方，就不要反复口头确认；</li>
-<li>重要结论要留痕，方便后续追溯；</li>
-<li>技术方案要服务于交付质量，而不是只追求形式上的先进。</li>
+<li>禁止直接 push。</li>
+<li>必须通过合并请求。</li>
+<li>CI 检查通过后才能合并。</li>
+<li>至少一位非作者 Review。</li>
+<li>禁止提交密钥和生成物。</li>
+<li>合并后自动删除短期分支。</li>
 </ul>
-<p>2020 年以后，我对“经验”的理解发生了变化：经验不是踩过坑之后说一句“下次注意”，而是把坑转化为规范、流程、工具或文档，让后面的人少踩一次。</p>
+<p>是否使用 merge commit、squash 或 rebase merge，可以按团队追溯习惯选择：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>优点</th>
+<th>适合场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Merge commit</td>
+<td>保留完整分支上下文</td>
+<td>大功能、需要保留阶段提交</td>
+</tr>
+<tr>
+<td>Squash</td>
+<td>主线简洁，一个任务一个提交</td>
+<td>小而频繁的功能分支</td>
+</tr>
+<tr>
+<td>Rebase merge</td>
+<td>线性历史且保留提交</td>
+<td>提交本身已经整理良好</td>
+</tr>
+</tbody></table>
+<p>不要在同一个仓库随意切换策略，否则查找版本和回退时会增加认知成本。</p>
+<h2 id="发布必须能对应到提交"><a href="#发布必须能对应到提交" class="headerlink" title="发布必须能对应到提交"></a>发布必须能对应到提交</h2><p>每次生产发布都创建不可变 Tag：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git tag -a v1.8.0 -m <span class="string">&quot;release v1.8.0&quot;</span></span><br><span class="line">git push origin v1.8.0</span><br></pre></td></tr></table></figure>
+
+<p>发布记录至少包含 Tag、构建编号、数据库变更、配置版本和负责人。只有“周日晚上那一版”无法支持故障定位。</p>
+<p>回退前要先区分代码回退和数据回退。应用可以回到旧 Tag，但已执行的不可逆 DDL、已写入的新状态、已发送的消息不会自动恢复。</p>
+<h2 id="Hotfix-的最短闭环"><a href="#Hotfix-的最短闭环" class="headerlink" title="Hotfix 的最短闭环"></a>Hotfix 的最短闭环</h2><p>线上紧急修复从实际生产 Tag 创建，而不是从开发中的某个分支猜：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch -c hotfix/20200712-login-timeout v1.8.0</span><br><span class="line"><span class="comment"># 完成最小修改、测试和 Review</span></span><br><span class="line">git tag -a v1.8.1 -m <span class="string">&quot;hotfix login timeout&quot;</span></span><br><span class="line">git push origin v1.8.1</span><br></pre></td></tr></table></figure>
+
+<p>修复发布后，还要把对应提交合回主开发线，避免下一次发布重新带回缺陷。</p>
+<h2 id="关于强制推送和历史修改"><a href="#关于强制推送和历史修改" class="headerlink" title="关于强制推送和历史修改"></a>关于强制推送和历史修改</h2><p><code>git push --force</code> 可能覆盖远端他人的提交，受保护分支应直接禁止。确需更新自己的未合并分支时，也优先使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --force-with-lease</span><br></pre></td></tr></table></figure>
+
+<p><code>--force-with-lease</code> 会在远端已被他人更新时拒绝覆盖，但它仍然是重写历史操作，执行前必须确认分支所有者和影响范围。</p>
+<p>同样，不把 <code>reset --hard</code> 当日常清理命令。未提交文件可能永久丢失；先查看 <code>status</code>、保存必要改动，再决定恢复方式。</p>
+<h2 id="一套流程最后解决的是沟通"><a href="#一套流程最后解决的是沟通" class="headerlink" title="一套流程最后解决的是沟通"></a>一套流程最后解决的是沟通</h2><p>这套手册执行一段时间后，最明显的变化并不是提交图更漂亮，而是问题更容易回答：某行代码为什么改、谁审过、对应哪个版本、怎样验证、能否回退。</p>
+<p>Git 协作的核心不是命令数量，而是把一次改动变成边界清楚、证据完整、可被团队接住的交付单元。</p>
 
     </div>
 
@@ -392,7 +499,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

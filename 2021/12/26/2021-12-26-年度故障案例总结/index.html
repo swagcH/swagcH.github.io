@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景年度故障总结的重点不是罗列事故，而是把重复问题转成规范和工具。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题1234562021 故障分类：- 慢 SQL：3 起- 缓存问题：2 起- 部署配置：2 起- 并发问题：2 起- 消息可靠性：1 起  分析12345678复盘模板：1. 故障时间线2. 影响范围3. 直接原因4. 根本原因5. 恢">
+    <meta name="description" content="2021 年写了不少故障记录。单篇看，原因分散在慢 SQL、缓存、磁盘、线程池和消息队列；放到一整年再看，会发现多数事故都不是某个技术点突然失效，而是容量边界没有被看见、失败结果没有出口、变更缺少验证。 这篇不再复述每条命令，只做一次稳定性账本。 全年故障画像团队登记的有效生产事件按主因分类：    类别 数量 典型表现 主要缺口    数据库 3 慢 SQL、连接等待 查询基线和索引评审">
 <meta property="og:type" content="article">
 <meta property="og:title" content="年度故障案例总结">
 <meta property="og:url" content="https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景年度故障总结的重点不是罗列事故，而是把重复问题转成规范和工具。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题1234562021 故障分类：- 慢 SQL：3 起- 缓存问题：2 起- 部署配置：2 起- 并发问题：2 起- 消息可靠性：1 起  分析12345678复盘模板：1. 故障时间线2. 影响范围3. 直接原因4. 根本原因5. 恢">
+<meta property="og:description" content="2021 年写了不少故障记录。单篇看，原因分散在慢 SQL、缓存、磁盘、线程池和消息队列；放到一整年再看，会发现多数事故都不是某个技术点突然失效，而是容量边界没有被看见、失败结果没有出口、变更缺少验证。 这篇不再复述每条命令，只做一次稳定性账本。 全年故障画像团队登记的有效生产事件按主因分类：    类别 数量 典型表现 主要缺口    数据库 3 慢 SQL、连接等待 查询基线和索引评审">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2021/incident-review-2021-cover.svg">
 <meta property="article:published_time" content="2021-12-26T15:41:09.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T04:07:29.236Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="年度总结">
 <meta property="article:tag" content="故障复盘">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E5%B9%B4%E6%95%85%E9%9A%9C%E7%94%BB%E5%83%8F"><span class="nav-text">全年故障画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E5%87%BA%E7%8E%B0%E7%9A%84%E6%A8%A1%E5%BC%8F%E4%B8%80%EF%BC%9A%E7%B3%BB%E7%BB%9F%E6%B2%A1%E6%9C%89%E4%B8%BB%E5%8A%A8%E8%AF%B4%E2%80%9C%E6%BB%A1%E4%BA%86%E2%80%9D"><span class="nav-text">重复出现的模式一：系统没有主动说“满了”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E5%87%BA%E7%8E%B0%E7%9A%84%E6%A8%A1%E5%BC%8F%E4%BA%8C%EF%BC%9A%E6%88%90%E5%8A%9F%E6%97%A5%E5%BF%97%E5%87%BA%E7%8E%B0%E5%BE%97%E5%A4%AA%E6%97%A9"><span class="nav-text">重复出现的模式二：成功日志出现得太早</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E5%87%BA%E7%8E%B0%E7%9A%84%E6%A8%A1%E5%BC%8F%E4%B8%89%EF%BC%9A%E6%81%A2%E5%A4%8D%E4%BA%86%EF%BC%8C%E4%BD%86%E6%B2%A1%E6%9C%89%E9%99%8D%E4%BD%8E%E5%A4%8D%E5%8F%91%E6%A6%82%E7%8E%87"><span class="nav-text">重复出现的模式三：恢复了，但没有降低复发概率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8A%E5%B9%B4%E7%9C%9F%E6%AD%A3%E8%90%BD%E5%9C%B0%E7%9A%84%E5%8F%98%E5%8C%96"><span class="nav-text">今年真正落地的变化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8D%E7%84%B6%E6%AC%A0%E7%BC%BA%E7%9A%84%E9%83%A8%E5%88%86"><span class="nav-text">仍然欠缺的部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%8E%E5%B9%B4%E7%9A%84%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9B%AE%E6%A0%87"><span class="nav-text">明年的稳定性目标</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,16 +279,124 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2021/incident-review-2021-cover.svg" alt="年度故障案例总结技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>年度故障总结的重点不是罗列事故，而是把重复问题转成规范和工具。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+<p>2021 年写了不少故障记录。单篇看，原因分散在慢 SQL、缓存、磁盘、线程池和消息队列；放到一整年再看，会发现多数事故都不是某个技术点突然失效，而是容量边界没有被看见、失败结果没有出口、变更缺少验证。</p>
+<p>这篇不再复述每条命令，只做一次稳定性账本。</p>
+<h2 id="全年故障画像"><a href="#全年故障画像" class="headerlink" title="全年故障画像"></a>全年故障画像</h2><p>团队登记的有效生产事件按主因分类：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th align="right">数量</th>
+<th>典型表现</th>
+<th>主要缺口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库</td>
+<td align="right">3</td>
+<td>慢 SQL、连接等待</td>
+<td>查询基线和索引评审</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td align="right">2</td>
+<td>回源突增、命中率下降</td>
+<td>容量保护和演练</td>
+</tr>
+<tr>
+<td>应用并发</td>
+<td align="right">2</td>
+<td>线程排队、死锁</td>
+<td>有界资源与线程取证</td>
+</tr>
+<tr>
+<td>部署配置</td>
+<td align="right">2</td>
+<td>路由错误、环境差异</td>
+<td>自动校验和灰度</td>
+</tr>
+<tr>
+<td>消息</td>
+<td align="right">1</td>
+<td>业务状态不一致</td>
+<td>端到端轨迹和幂等</td>
+</tr>
+<tr>
+<td>系统资源</td>
+<td align="right">1</td>
+<td>磁盘写满</td>
+<td>趋势告警和滚动策略</td>
+</tr>
+</tbody></table>
+<p>数量不用于比较谁出了更多问题，而是决定下一笔稳定性投入放在哪里。</p>
+<p>有两个指标变化比较明显：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">告警到确认影响范围：平均 18 分钟 -&gt; 7 分钟</span><br><span class="line">确认故障到恢复业务：平均 42 分钟 -&gt; 24 分钟</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">2021 故障分类：</span><br><span class="line">- 慢 SQL：3 起</span><br><span class="line">- 缓存问题：2 起</span><br><span class="line">- 部署配置：2 起</span><br><span class="line">- 并发问题：2 起</span><br><span class="line">- 消息可靠性：1 起</span><br></pre></td></tr></table></figure>
+<p>恢复变快，不是因为大家更会猜，而是日志开始有 traceId，服务有版本和健康接口，值班手册也明确了先看什么。</p>
+<h2 id="重复出现的模式一：系统没有主动说“满了”"><a href="#重复出现的模式一：系统没有主动说“满了”" class="headerlink" title="重复出现的模式一：系统没有主动说“满了”"></a>重复出现的模式一：系统没有主动说“满了”</h2><p>线程池队列一万、HTTP 连接池单路由两条、数据库连接等待、磁盘 100%，这些问题表面不同，本质上都是资源有边界，但系统没有在接近边界时给出可行动信号。</p>
+<p>年初我们常看的指标是 CPU 和内存。年底的基础看板增加了：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HTTP 客户端 leased / pending</span><br><span class="line">数据库连接 active / pending</span><br><span class="line">线程池 active / queue / rejected</span><br><span class="line">RabbitMQ ready / unacked / dead letter</span><br><span class="line">缓存命中率 / 回源 QPS</span><br><span class="line">磁盘增长速度 / inode</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">复盘模板：</span><br><span class="line">1. 故障时间线</span><br><span class="line">2. 影响范围</span><br><span class="line">3. 直接原因</span><br><span class="line">4. 根本原因</span><br><span class="line">5. 恢复动作</span><br><span class="line">6. 后续改进</span><br><span class="line">7. 责任人和截止时间</span><br></pre></td></tr></table></figure>
+<p>指标不是越多越好。每个告警都要对应一个负责人、一条判断路径和一个处置动作。连续几个月无人处理的告警，应调整阈值或删除，而不是继续制造噪声。</p>
+<h2 id="重复出现的模式二：成功日志出现得太早"><a href="#重复出现的模式二：成功日志出现得太早" class="headerlink" title="重复出现的模式二：成功日志出现得太早"></a>重复出现的模式二：成功日志出现得太早</h2><p>“消息已发送”只代表调用了客户端方法；“任务已提交”只代表进入线程池；“发布完成”有时只代表进程启动。很多误判来自成功定义停在了中间步骤。</p>
+<p>今年重新定义了几个完成条件：</p>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>过去</th>
+<th>现在</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>发消息</td>
+<td>Producer 方法返回</td>
+<td>Broker confirm，消费结果可追踪</td>
+</tr>
+<tr>
+<td>异步任务</td>
+<td>放入内存队列</td>
+<td>持久化状态，可拒绝、可补偿</td>
+</tr>
+<tr>
+<td>上线</td>
+<td>实例启动</td>
+<td>冒烟、指标和版本核对通过</td>
+</tr>
+<tr>
+<td>SQL 优化</td>
+<td>单次查询变快</td>
+<td>扫描量下降，写入与复制正常</td>
+</tr>
+</tbody></table>
+<p>稳定性很多时候是语义问题。只要团队对“成功”理解不同，监控和沟通就会产生空白。</p>
+<h2 id="重复出现的模式三：恢复了，但没有降低复发概率"><a href="#重复出现的模式三：恢复了，但没有降低复发概率" class="headerlink" title="重复出现的模式三：恢复了，但没有降低复发概率"></a>重复出现的模式三：恢复了，但没有降低复发概率</h2><p>重启确实解决过连接池耗尽、死锁和文件句柄占用。如果复盘只写“重启恢复”，下一次仍会按相同方式出现。</p>
+<p>现在复盘至少分三层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">直接原因：哪个资源或代码路径失败</span><br><span class="line">触发条件：为什么在这个时间暴露</span><br><span class="line">系统缺口：为什么没有提前发现、隔离或阻止</span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">沉淀项：</span><br><span class="line">- 慢查询巡检脚本</span><br><span class="line">- Redis key 过期时间规范</span><br><span class="line">- 线程池监控指标</span><br><span class="line">- 发布前配置检查清单</span><br><span class="line">- MQ 可靠投递模板</span><br></pre></td></tr></table></figure>
+<p>对应行动也分层：</p>
+<ul>
+<li>恢复动作：让业务尽快可用。</li>
+<li>修复动作：消除当前缺陷。</li>
+<li>预防动作：测试、监控、流程或架构改进。</li>
+</ul>
+<p>每项行动必须有负责人、截止时间和验收证据。“加强意识”“持续关注”无法关闭。</p>
+<h2 id="今年真正落地的变化"><a href="#今年真正落地的变化" class="headerlink" title="今年真正落地的变化"></a>今年真正落地的变化</h2><p><strong>调用链可追踪。</strong> 网关、服务和消息开始传递 traceId 与 messageId。跨系统耗时可以对齐，不再只凭单侧日志判断下游慢。</p>
+<p><strong>资源显式有界。</strong> 新线程池使用有界队列和明确拒绝策略；客户端连接池配置单路由上限与获取超时；批处理有并发预算。</p>
+<p><strong>变更逐步放量。</strong> 发布先单实例灰度，检查错误率、P99、连接池和业务结果后再扩展。数据库和配置也进入发布单。</p>
+<p><strong>故障先留现场。</strong> 对 CPU、内存、死锁和磁盘问题，Runbook 写清了重启前最小证据集。现场不再完全依赖某一位熟悉系统的人。</p>
+<p><strong>可靠性进入代码。</strong> 消息使用 Confirm、Return、Outbox 和消费幂等；缓存回源有 TTL 抖动、限流和降级，而不是只靠人工盯盘。</p>
+<p>这些改变没有让故障消失，但让影响更小、原因更容易确认。</p>
+<h2 id="仍然欠缺的部分"><a href="#仍然欠缺的部分" class="headerlink" title="仍然欠缺的部分"></a>仍然欠缺的部分</h2><p>第一，容量数据仍然零散。很多参数来自一次压测，没有持续根据真实峰值和任务耗时更新。系统扩容后，单实例和下游预算也没有自动重新计算。</p>
+<p>第二，演练覆盖不足。Redis 故障做过演练，但数据库只读、消息积压、配置中心不可用等场景仍停留在文档。</p>
+<p>第三，业务降级不够明确。技术上可以返回缓存旧值或关闭推荐，业务上是否可接受，需要产品、研发和测试共同确认。</p>
+<p>第四，复盘行动偶尔延期。写出行动项不等于完成，需要在迭代和季度盘点中持续追踪。</p>
+<h2 id="明年的稳定性目标"><a href="#明年的稳定性目标" class="headerlink" title="明年的稳定性目标"></a>明年的稳定性目标</h2><p>我给下一年保留四个可验证目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 核心接口有延迟、错误率和容量基线</span><br><span class="line">2. 高风险依赖每季度至少完成一次故障演练</span><br><span class="line">3. 生产事件都能在 10 分钟内确定影响范围</span><br><span class="line">4. 复盘行动按期完成率达到 90%</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>技术指标之外，还要追踪重复故障率。如果相同原因连续发生，说明复盘没有进入系统。</p>
+<p>这一年的排查经验可以压缩成一句话：先建立证据，再缩小范围；先保护系统边界，再追求单点性能；恢复业务以后，还要把现场经验变成下一次自动生效的保护。</p>
+<p>稳定性并不是某个季度的专项，它更像每天写代码、配参数、做 Review 和发布时不断累积的结果。</p>
 
     </div>
 
@@ -377,7 +485,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

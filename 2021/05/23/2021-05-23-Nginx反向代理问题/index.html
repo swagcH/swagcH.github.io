@@ -16,18 +16,18 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="背景反向代理问题需要同时看 Nginx、上游服务和网络连通性。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12upstream timed out (110: Connection timed out) while reading response header from upstreamclient: 10.0.1.24, server: a">
+    <meta name="description" content="Nginx 出现 502 或 404 时，我以前习惯先打开配置文件改 proxy_pass。后来发现，状态码相同并不代表原因相同：502 可能是上游端口没监听、连接被拒绝或响应头非法；404 既可能由 Nginx 返回，也可能是后端正常返回。 下面这份分支手册先判断错误来自哪一层，再进入对应路径。 总入口：四步确定责任边界123456789客户端请求  |  +-- 1. 域名、TCP、TLS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx反向代理问题">
 <meta property="og:url" content="https://swagch.github.io/2021/05/23/2021-05-23-Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E9%97%AE%E9%A2%98/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="背景反向代理问题需要同时看 Nginx、上游服务和网络连通性。 123记录类型：故障排查记录年份：2021记录方式：现象、命令、日志、代码、配置、结论  问题12upstream timed out (110: Connection timed out) while reading response header from upstreamclient: 10.0.1.24, server: a">
+<meta property="og:description" content="Nginx 出现 502 或 404 时，我以前习惯先打开配置文件改 proxy_pass。后来发现，状态码相同并不代表原因相同：502 可能是上游端口没监听、连接被拒绝或响应头非法；404 既可能由 Nginx 返回，也可能是后端正常返回。 下面这份分支手册先判断错误来自哪一层，再进入对应路径。 总入口：四步确定责任边界123456789客户端请求  |  +-- 1. 域名、TCP、TLS">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2021/nginx-proxy-cover.svg">
 <meta property="article:published_time" content="2021-05-23T07:55:12.000Z">
-<meta property="article:modified_time" content="2026-07-14T08:20:20.178Z">
+<meta property="article:modified_time" content="2026-07-16T04:01:35.539Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="部署">
 <meta property="article:tag" content="Nginx">
@@ -55,9 +55,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -163,7 +163,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-text">问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-text">分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E5%85%A5%E5%8F%A3%EF%BC%9A%E5%9B%9B%E6%AD%A5%E7%A1%AE%E5%AE%9A%E8%B4%A3%E4%BB%BB%E8%BE%B9%E7%95%8C"><span class="nav-text">总入口：四步确定责任边界</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#502-%E5%88%86%E6%94%AF%E4%B8%80%EF%BC%9AConnection-refused"><span class="nav-text">502 分支一：Connection refused</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#502-%E5%88%86%E6%94%AF%E4%BA%8C%EF%BC%9ANo-route-%E6%88%96%E8%BF%9E%E6%8E%A5%E8%B6%85%E6%97%B6"><span class="nav-text">502 分支二：No route 或连接超时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#502-504-%E5%88%86%E6%94%AF%E4%B8%89%EF%BC%9A%E4%B8%8A%E6%B8%B8%E5%A4%84%E7%90%86%E5%A4%AA%E6%85%A2"><span class="nav-text">502&#x2F;504 分支三：上游处理太慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#502-%E5%88%86%E6%94%AF%E5%9B%9B%EF%BC%9A%E4%B8%8A%E6%B8%B8%E5%93%8D%E5%BA%94%E4%B8%8D%E7%AC%A6%E5%90%88%E5%8D%8F%E8%AE%AE"><span class="nav-text">502 分支四：上游响应不符合协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#404-%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98%EF%BC%9A%E8%B0%81%E8%BF%94%E5%9B%9E%E7%9A%84"><span class="nav-text">404 的第一个问题：谁返回的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#404-%E5%88%86%E6%94%AF%E4%B8%80%EF%BC%9Alocation-%E5%8C%B9%E9%85%8D%E9%94%99%E8%AF%AF"><span class="nav-text">404 分支一：location 匹配错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#404-%E5%88%86%E6%94%AF%E4%BA%8C%EF%BC%9Aproxy-pass-%E5%B0%BE%E6%96%9C%E6%9D%A0%E6%94%B9%E5%8F%98%E8%B7%AF%E5%BE%84"><span class="nav-text">404 分支二：proxy_pass 尾斜杠改变路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#404-%E5%88%86%E6%94%AF%E4%B8%89%EF%BC%9AHost-%E5%92%8C%E8%BD%AC%E5%8F%91%E5%A4%B4%E4%B8%8D%E7%AC%A6%E5%90%88%E5%90%8E%E7%AB%AF%E8%B7%AF%E7%94%B1"><span class="nav-text">404 分支三：Host 和转发头不符合后端路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E7%9A%84%E5%AE%89%E5%85%A8%E9%97%AD%E7%8E%AF"><span class="nav-text">修改配置的安全闭环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%9F%AD%E5%86%B3%E7%AD%96%E8%A1%A8"><span class="nav-text">最短决策表</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -279,20 +279,145 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2021/nginx-proxy-cover.svg" alt="Nginx反向代理问题技术图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>反向代理问题需要同时看 Nginx、上游服务和网络连通性。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">记录类型：故障排查</span><br><span class="line">记录年份：2021</span><br><span class="line">记录方式：现象、命令、日志、代码、配置、结论</span><br></pre></td></tr></table></figure>
+<p>Nginx 出现 502 或 404 时，我以前习惯先打开配置文件改 <code>proxy_pass</code>。后来发现，状态码相同并不代表原因相同：502 可能是上游端口没监听、连接被拒绝或响应头非法；404 既可能由 Nginx 返回，也可能是后端正常返回。</p>
+<p>下面这份分支手册先判断错误来自哪一层，再进入对应路径。</p>
+<h2 id="总入口：四步确定责任边界"><a href="#总入口：四步确定责任边界" class="headerlink" title="总入口：四步确定责任边界"></a>总入口：四步确定责任边界</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">客户端请求</span><br><span class="line">  |</span><br><span class="line">  +-- 1. 域名、TCP、TLS 是否成功</span><br><span class="line">  |</span><br><span class="line">  +-- 2. Nginx access log 是否收到请求</span><br><span class="line">  |</span><br><span class="line">  +-- 3. Nginx 实际匹配哪个 location</span><br><span class="line">  |</span><br><span class="line">  +-- 4. 从 Nginx 所在机器直连 upstream 是否正常</span><br></pre></td></tr></table></figure>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">upstream timed out (110: Connection timed out) while reading response header from upstream</span><br><span class="line">client: 10.0.1.24, server: api.demo.com, request: &quot;POST /api/upload HTTP/1.1&quot;</span><br></pre></td></tr></table></figure>
+<p>先保留一个带时间和请求 ID 的样本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -v --max-time 5 -H <span class="string">&#x27;X-Request-Id: nginx-debug-20210523-01&#x27;</span> https://api.example.com/api/orders/1001</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">tail</span> -f /var/log/nginx/error.log</span><br><span class="line">curl -I https://api.demo.com/api/health</span><br></pre></td></tr></table></figure>
+<p>调试生产域名时不要在命令历史里写真实 Token。需要认证的请求使用受控测试凭证，并按安全规范处理 <code>-v</code> 输出。</p>
+<p>同时查看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Nginx access log：请求是否进入、状态码、upstream 地址与耗时</span><br><span class="line">Nginx error log：连接和代理错误</span><br><span class="line">后端 access log：后端是否真正收到相同 requestId</span><br></pre></td></tr></table></figure>
 
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://backend;</span><br><span class="line">    <span class="attribute">proxy_connect_timeout</span> <span class="number">3s</span>;</span><br><span class="line">    <span class="attribute">proxy_read_timeout</span> <span class="number">3s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果 Nginx 没有 access log，请先查 DNS、负载均衡、TLS 或请求是否到了另一台机器，不要急着改后端。</p>
+<h2 id="502-分支一：Connection-refused"><a href="#502-分支一：Connection-refused" class="headerlink" title="502 分支一：Connection refused"></a>502 分支一：Connection refused</h2><p>典型错误：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">connect() failed (111: Connection refused) while connecting to upstream</span><br><span class="line">upstream: &quot;http://127.0.0.1:8080/api/orders/1001&quot;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx -t</span><br><span class="line">curl http://127.0.0.1:8080/api/health</span><br></pre></td></tr></table></figure>
+<p>它表示 Nginx 已经找到目标 IP，但对应端口没有接受连接。按顺序检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ss -lntp</span><br><span class="line">curl --max-time 2 http://127.0.0.1:8080/actuator/health</span><br><span class="line">ps -ef | rg <span class="string">&#x27;order-service&#x27;</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> backend &#123;</span><br><span class="line">    <span class="attribute">server</span> <span class="number">127.0.0.1:8080</span> max_fails=<span class="number">3</span> fail_timeout=<span class="number">30s</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://backend;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> Host <span class="variable">$host</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">    <span class="attribute">proxy_connect_timeout</span> <span class="number">2s</span>;</span><br><span class="line">    <span class="attribute">proxy_read_timeout</span> <span class="number">30s</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>常见原因：</p>
+<ul>
+<li>后端进程没有启动或启动后退出。</li>
+<li>服务实际监听 8081，Nginx 配成 8080。</li>
+<li>服务只监听特定网卡。</li>
+<li>容器端口与宿主机映射不一致。</li>
+<li>upstream 配置仍指向已下线实例。</li>
+</ul>
+<p>不要看到连接拒绝就延长超时。对方没有监听，等更久也不会成功。</p>
+<h2 id="502-分支二：No-route-或连接超时"><a href="#502-分支二：No-route-或连接超时" class="headerlink" title="502 分支二：No route 或连接超时"></a>502 分支二：No route 或连接超时</h2><p>错误可能是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">connect() failed (113: No route to host) while connecting to upstream</span><br><span class="line">upstream timed out while connecting to upstream</span><br></pre></td></tr></table></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘要点：</span><br><span class="line">1. 先保留现场，再尝试恢复</span><br><span class="line">2. 先确认影响范围，再判断根因</span><br><span class="line">3. 日志、监控、配置、代码需要串起来看</span><br><span class="line">4. 修复动作必须可验证</span><br><span class="line">5. 故障结束后补充检查项和自动化规则</span><br></pre></td></tr></table></figure>
+<p>这类问题发生在建连阶段，重点是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream IP 是否正确</span><br><span class="line">路由和安全组是否允许</span><br><span class="line">容器或集群网络是否连通</span><br><span class="line">目标端口是否被防火墙拦截</span><br><span class="line">域名解析结果是否过期</span><br></pre></td></tr></table></figure>
+
+<p>从 Nginx 所在网络命名空间测试比从个人电脑测试更有意义。个人电脑能访问，不代表 Nginx 节点到上游可达。</p>
+<p>网络策略和防火墙变更应由有权限的运维人员执行。不要为验证问题临时关闭整机防火墙。</p>
+<h2 id="502-504-分支三：上游处理太慢"><a href="#502-504-分支三：上游处理太慢" class="headerlink" title="502&#x2F;504 分支三：上游处理太慢"></a>502&#x2F;504 分支三：上游处理太慢</h2><p>错误日志：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">upstream timed out (110: Connection timed out)</span><br><span class="line">while reading response header from upstream</span><br></pre></td></tr></table></figure>
+
+<p>这里 TCP 已经连接成功，Nginx 在等待响应头。检查 access log 中两个时间：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">log_format</span> upstream_timing</span><br><span class="line">  <span class="string">&#x27;<span class="variable">$request_id</span> status=<span class="variable">$status</span> request_time=<span class="variable">$request_time</span> &#x27;</span></span><br><span class="line">  <span class="string">&#x27;upstream_addr=<span class="variable">$upstream_addr</span> &#x27;</span></span><br><span class="line">  <span class="string">&#x27;upstream_status=<span class="variable">$upstream_status</span> &#x27;</span></span><br><span class="line">  <span class="string">&#x27;connect=<span class="variable">$upstream_connect_time</span> &#x27;</span></span><br><span class="line">  <span class="string">&#x27;header=<span class="variable">$upstream_header_time</span> &#x27;</span></span><br><span class="line">  <span class="string">&#x27;response=<span class="variable">$upstream_response_time</span>&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>connect</code> 很小、<code>header</code> 很大，通常说明后端处理慢或后端内部排队。继续用 requestId 查后端日志、线程池、数据库和下游，不要只在 Nginx 增加 <code>proxy_read_timeout</code>。</p>
+<p>超时必须符合整体预算：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_connect_timeout</span> 300ms;</span><br><span class="line"><span class="attribute">proxy_send_timeout</span> <span class="number">2s</span>;</span><br><span class="line"><span class="attribute">proxy_read_timeout</span> <span class="number">3s</span>;</span><br></pre></td></tr></table></figure>
+
+<p>语法和单位应在当前 Nginx 版本验证。长文件下载、普通 API 和异步回调不一定使用同一超时。</p>
+<h2 id="502-分支四：上游响应不符合协议"><a href="#502-分支四：上游响应不符合协议" class="headerlink" title="502 分支四：上游响应不符合协议"></a>502 分支四：上游响应不符合协议</h2><p>如果 error log 出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">upstream sent too big header</span><br><span class="line">upstream sent invalid header</span><br><span class="line">upstream prematurely closed connection</span><br></pre></td></tr></table></figure>
+
+<p>分别考虑：</p>
+<ul>
+<li>Cookie 或响应头过大。</li>
+<li>后端把非 HTTP 内容发到 HTTP 端口。</li>
+<li>应用崩溃、被 OOM Kill 或主动关闭连接。</li>
+<li>代理协议 HTTP&#x2F;HTTPS 配反。</li>
+</ul>
+<p>“响应头过大”不能立即通过无限增大 buffer 解决。先确认是异常 Cookie、重复 Header 还是确有业务需要，并评估内存成本。</p>
+<p>应用提前断开时，查看同一时刻的应用退出日志、容器事件和系统 OOM 记录。Nginx 只能看到连接结束，无法替后端说明为什么结束。</p>
+<h2 id="404-的第一个问题：谁返回的"><a href="#404-的第一个问题：谁返回的" class="headerlink" title="404 的第一个问题：谁返回的"></a>404 的第一个问题：谁返回的</h2><p>在 access log 同时记录 <code>status</code> 和 <code>upstream_status</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">status=404 upstream_status=-</span><br></pre></td></tr></table></figure>
+
+<p>横线表示没有请求上游，404 多半由 Nginx 的静态文件或 location 规则产生。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">status=404 upstream_status=404</span><br></pre></td></tr></table></figure>
+
+<p>说明请求已经代理，后端返回 404。此时应核对后端路径、Context Path、HTTP 方法和版本。</p>
+<p>响应页面样式只能作为线索，不能当证据。统一错误页可能覆盖后端原始响应。</p>
+<h2 id="404-分支一：location-匹配错误"><a href="#404-分支一：location-匹配错误" class="headerlink" title="404 分支一：location 匹配错误"></a>404 分支一：location 匹配错误</h2><p>配置中可能同时存在：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> / &#123;</span><br><span class="line">    <span class="attribute">try_files</span> <span class="variable">$uri</span> <span class="variable">$uri</span>/ /index.html;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://order_backend;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果写成 <code>location /api</code> 或被正则 location 抢先处理，路径可能落入前端静态规则。排查时查看完整生效配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -T</span><br></pre></td></tr></table></figure>
+
+<p><code>nginx -T</code> 可能输出证书路径、内部域名或其他敏感配置，只在授权服务器查看，不把完整结果发到公开位置。</p>
+<p>需要理解基本匹配：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">=       精确匹配</span><br><span class="line">普通前缀  选择最长前缀</span><br><span class="line">^~      命中后不再检查正则</span><br><span class="line">~ / ~*  正则匹配</span><br></pre></td></tr></table></figure>
+
+<p>配置复杂时，通过一个最小测试路径验证，而不是凭肉眼猜最终 location。</p>
+<h2 id="404-分支二：proxy-pass-尾斜杠改变路径"><a href="#404-分支二：proxy-pass-尾斜杠改变路径" class="headerlink" title="404 分支二：proxy_pass 尾斜杠改变路径"></a>404 分支二：proxy_pass 尾斜杠改变路径</h2><p>这两个配置转发结果不同。</p>
+<p>保留原始 URI：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://order_backend;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>/api/orders/1001</code> 转发为 <code>/api/orders/1001</code>。</p>
+<p>替换匹配前缀：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://order_backend/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>/api/orders/1001</code> 转发为 <code>/orders/1001</code>。</p>
+<p>哪种正确取决于后端真实路径。修改前直接从 Nginx 节点请求 upstream 的两个候选路径，确认后再调整。</p>
+<h2 id="404-分支三：Host-和转发头不符合后端路由"><a href="#404-分支三：Host-和转发头不符合后端路由" class="headerlink" title="404 分支三：Host 和转发头不符合后端路由"></a>404 分支三：Host 和转发头不符合后端路由</h2><p>部分后端按 Host、协议或前缀生成路由：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">location</span> /api/ &#123;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> Host <span class="variable">$host</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Forwarded-For <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Forwarded-Proto <span class="variable">$scheme</span>;</span><br><span class="line">    <span class="attribute">proxy_set_header</span> X-Request-Id <span class="variable">$request_id</span>;</span><br><span class="line">    <span class="attribute">proxy_pass</span> http://order_backend;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Header 名称和信任边界要与后端约定。后端不能无条件信任任何客户端传来的 <code>X-Forwarded-For</code>，应该只信任受控代理链。</p>
+<p>如果 upstream 是虚拟主机，可能需要将 <code>Host</code> 设置为上游约定域名，而不是外部域名。</p>
+<h2 id="修改配置的安全闭环"><a href="#修改配置的安全闭环" class="headerlink" title="修改配置的安全闭环"></a>修改配置的安全闭环</h2><p>每次修改按固定顺序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 检查语法和引用文件</span></span><br><span class="line">nginx -t</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 由有权限的操作人平滑重载</span></span><br><span class="line">nginx -s reload</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 立即验证目标路径、旧路径和错误日志</span></span><br></pre></td></tr></table></figure>
+
+<p>重载会影响生产流量，应通过发布或变更流程执行。语法通过只说明配置可解析，不说明转发行为正确。</p>
+<p>验证至少包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">目标接口成功</span><br><span class="line">不存在路径仍正确返回 404</span><br><span class="line">认证 Header 未丢失</span><br><span class="line">请求体和文件上传正常</span><br><span class="line">WebSocket 或流式接口未被普通超时影响</span><br><span class="line">access log 的 upstream 地址、状态和耗时正确</span><br></pre></td></tr></table></figure>
+
+<h2 id="最短决策表"><a href="#最短决策表" class="headerlink" title="最短决策表"></a>最短决策表</h2><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>先看</th>
+<th>典型方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无 access log</td>
+<td>DNS、LB、TLS</td>
+<td>请求未到当前 Nginx</td>
+</tr>
+<tr>
+<td>502 + refused</td>
+<td>监听端口、进程</td>
+<td>上游未启动或端口错误</td>
+</tr>
+<tr>
+<td>502 + connect timeout</td>
+<td>路由、网络策略</td>
+<td>Nginx 到上游不可达</td>
+</tr>
+<tr>
+<td>504&#x2F;read timeout</td>
+<td>upstream 时间</td>
+<td>后端处理或内部排队</td>
+</tr>
+<tr>
+<td>404 + upstream&#x3D;-</td>
+<td>location、静态规则</td>
+<td>Nginx 返回</td>
+</tr>
+<tr>
+<td>404 + upstream&#x3D;404</td>
+<td>转发 URI、Host</td>
+<td>后端返回</td>
+</tr>
+</tbody></table>
+<p>Nginx 排查最有效的方式不是记住更多配置项，而是始终回答两个问题：请求目前到哪一层，最后一次成功动作是什么。access log、error log、直连上游和生效配置一旦能够互相印证，502 与 404 就不再是只能靠试改配置解决的黑盒。</p>
 
     </div>
 
@@ -381,7 +506,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>

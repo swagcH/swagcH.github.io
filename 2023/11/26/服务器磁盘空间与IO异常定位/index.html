@@ -16,14 +16,14 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":true,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="写在前面：磁盘问题不只有“空间满了”。空间还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍然占着文件句柄。  这篇把磁盘空间、inode 和 IO 延迟放在一条排查链路里。遇到告警时先判断是哪一类问题，再决定能不能清理文件，不要上来就对 &#x2F;var&#x2F;log 执行删除命令。 1. 先判断空间还是 inode12">
+    <meta name="description" content="写在前面：磁盘问题不只有“空间满了”。容量还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍持有句柄；文件系统变成只读，则可能涉及底层错误。  这篇整理成一份值班口袋手册。先分级和保留证据，再进入容量、inode、删除文件、IO 延迟或只读文件系统分支。涉及删除、重启、数据库和文件系统修复的操作必须由对应负责">
 <meta property="og:type" content="article">
 <meta property="og:title" content="服务器磁盘空间与IO异常定位">
 <meta property="og:url" content="https://swagch.github.io/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="写在前面：磁盘问题不只有“空间满了”。空间还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍然占着文件句柄。  这篇把磁盘空间、inode 和 IO 延迟放在一条排查链路里。遇到告警时先判断是哪一类问题，再决定能不能清理文件，不要上来就对 &#x2F;var&#x2F;log 执行删除命令。 1. 先判断空间还是 inode12">
+<meta property="og:description" content="写在前面：磁盘问题不只有“空间满了”。容量还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍持有句柄；文件系统变成只读，则可能涉及底层错误。  这篇整理成一份值班口袋手册。先分级和保留证据，再进入容量、inode、删除文件、IO 延迟或只读文件系统分支。涉及删除、重启、数据库和文件系统修复的操作必须由对应负责">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-11-26T05:50:00.000Z">
 <meta property="article:modified_time" content="2023-11-27T14:05:00.000Z">
@@ -53,9 +53,9 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script><script src="/js/bookmark.js" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.5.0/dist/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+  <script src="/js/local-search-engine.js" defer></script>
 <script src="/js/third-party/search/local-search.js" defer></script>
 
 
@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%88%E5%88%A4%E6%96%AD%E7%A9%BA%E9%97%B4%E8%BF%98%E6%98%AF-inode"><span class="nav-text">1. 先判断空间还是 inode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BB%8E%E6%8C%82%E8%BD%BD%E7%82%B9%E5%90%91%E4%B8%8B%E6%89%BE%E5%A4%A7%E7%9B%AE%E5%BD%95"><span class="nav-text">2. 从挂载点向下找大目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-df-%E5%92%8C-du-%E5%AF%B9%E4%B8%8D%E4%B8%8A%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="nav-text">3. df 和 du 对不上怎么办</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A9%BA%E9%97%B4%E6%B2%A1%E6%BB%A1%EF%BC%8C%E4%BD%86%E6%8E%A5%E5%8F%A3%E8%BF%98%E6%98%AF%E5%BE%88%E6%85%A2"><span class="nav-text">4. 空间没满，但接口还是很慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%B8%B8%E8%A7%81%E7%9A%84%E7%A3%81%E7%9B%98%E5%8D%A0%E7%94%A8%E6%9D%A5%E6%BA%90"><span class="nav-text">5. 常见的磁盘占用来源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%BA%94%E7%94%A8%E6%97%A5%E5%BF%97"><span class="nav-text">5.1 应用日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-Docker-%E6%97%A5%E5%BF%97%E4%B8%8E%E9%95%9C%E5%83%8F"><span class="nav-text">5.2 Docker 日志与镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-MySQL-Binlog-%E5%92%8C%E4%B8%B4%E6%97%B6%E6%96%87%E4%BB%B6"><span class="nav-text">5.3 MySQL Binlog 和临时文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-%E4%B8%B4%E6%97%B6%E6%96%87%E4%BB%B6%E5%92%8C-Core-Dump"><span class="nav-text">5.4 临时文件和 Core Dump</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E4%BD%BF%E7%94%A8-logrotate-%E6%8E%A7%E5%88%B6%E6%97%A5%E5%BF%97"><span class="nav-text">6. 使用 logrotate 控制日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%BA%94%E6%80%A5%E6%B8%85%E7%90%86%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="nav-text">7. 应急清理的顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%8E%92%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-text">8. 排查清单</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E6%8C%89%E9%A3%8E%E9%99%A9%E5%88%86%E7%BA%A7"><span class="nav-text">先按风险分级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E4%BA%94%E5%88%86%E9%92%9F%E5%8F%AA%E5%81%9A%E5%8F%AA%E8%AF%BB%E6%A3%80%E6%9F%A5"><span class="nav-text">前五分钟只做只读检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF-A%EF%BC%9A%E5%AE%B9%E9%87%8F%E4%BD%BF%E7%94%A8%E7%8E%87%E9%AB%98"><span class="nav-text">分支 A：容量使用率高</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF-B%EF%BC%9Adf-%E5%BE%88%E9%AB%98%EF%BC%8Cdu-%E5%8D%B4%E5%BE%88%E5%B0%8F"><span class="nav-text">分支 B：df 很高，du 却很小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF-C%EF%BC%9Ainode-%E7%94%A8%E5%B0%BD"><span class="nav-text">分支 C：inode 用尽</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF-D%EF%BC%9A%E7%A9%BA%E9%97%B4%E6%AD%A3%E5%B8%B8%E4%BD%86-IO-%E5%BB%B6%E8%BF%9F%E9%AB%98"><span class="nav-text">分支 D：空间正常但 IO 延迟高</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF-E%EF%BC%9A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%8F%98%E6%88%90%E5%8F%AA%E8%AF%BB"><span class="nav-text">分支 E：文件系统变成只读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%8D%A0%E7%94%A8%E6%9D%A5%E6%BA%90%E4%B8%8E%E6%AD%A3%E7%A1%AE%E8%B4%9F%E8%B4%A3%E4%BA%BA"><span class="nav-text">常见占用来源与正确负责人</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E6%97%A5%E5%BF%97"><span class="nav-text">应用日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-%E6%88%96%E5%AE%B9%E5%99%A8%E6%95%B0%E6%8D%AE"><span class="nav-text">Docker 或容器数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL-Binlog%E3%80%81Redo%E3%80%81%E4%B8%B4%E6%97%B6%E6%96%87%E4%BB%B6"><span class="nav-text">MySQL Binlog、Redo、临时文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Heap-Dump-%E4%B8%8E-Core-Dump"><span class="nav-text">Heap Dump 与 Core Dump</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6%E6%96%87%E4%BB%B6"><span class="nav-text">临时文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%8E%88%E6%9D%83%E7%9F%A9%E9%98%B5"><span class="nav-text">操作授权矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%81%A2%E5%A4%8D%E9%AA%8C%E8%AF%81"><span class="nav-text">恢复验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E9%98%B2%E6%AF%94%E5%BA%94%E6%80%A5%E6%B8%85%E7%90%86%E6%9B%B4%E4%BE%BF%E5%AE%9C"><span class="nav-text">预防比应急清理更便宜</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -277,92 +277,192 @@
     
     
     <div class="post-body" itemprop="articleBody"><blockquote>
-<p>写在前面：磁盘问题不只有“空间满了”。空间还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍然占着文件句柄。</p>
+<p>写在前面：磁盘问题不只有“空间满了”。容量还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍持有句柄；文件系统变成只读，则可能涉及底层错误。</p>
 </blockquote>
-<p>这篇把磁盘空间、inode 和 IO 延迟放在一条排查链路里。遇到告警时先判断是哪一类问题，再决定能不能清理文件，不要上来就对 <code>/var/log</code> 执行删除命令。</p>
-<h2 id="1-先判断空间还是-inode"><a href="#1-先判断空间还是-inode" class="headerlink" title="1. 先判断空间还是 inode"></a>1. 先判断空间还是 inode</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br><span class="line">lsblk -f</span><br></pre></td></tr></table></figure>
+<p>这篇整理成一份值班口袋手册。先分级和保留证据，再进入容量、inode、删除文件、IO 延迟或只读文件系统分支。涉及删除、重启、数据库和文件系统修复的操作必须由对应负责人授权。</p>
+<h2 id="先按风险分级"><a href="#先按风险分级" class="headerlink" title="先按风险分级"></a>先按风险分级</h2><table>
+<thead>
+<tr>
+<th>等级</th>
+<th>典型现象</th>
+<th>首要目标</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P0</td>
+<td>文件系统只读、数据库写失败、核心服务不可用</td>
+<td>隔离风险，保护数据</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>使用率超过 95%、inode 耗尽、IO 延迟持续影响业务</td>
+<td>停止增长，恢复余量</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>使用率或延迟持续上升，预计 24 小时内越线</td>
+<td>定位来源，计划处置</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>单次波动，无业务影响</td>
+<td>记录基线，观察趋势</td>
+</tr>
+</tbody></table>
+<p>同样 90% 使用率，20G 根分区和 10TB 数据盘的剩余时间完全不同。分级要结合增长速度、剩余容量和业务用途，不只看百分比。</p>
+<h2 id="前五分钟只做只读检查"><a href="#前五分钟只做只读检查" class="headerlink" title="前五分钟只做只读检查"></a>前五分钟只做只读检查</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">date</span> -Is</span><br><span class="line">hostname</span><br><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br><span class="line">findmnt</span><br><span class="line">lsblk -f</span><br><span class="line">vmstat 1 5</span><br><span class="line">iostat -xz 1 5</span><br></pre></td></tr></table></figure>
 
-<p>三个命令分别回答：</p>
-<ol>
-<li>哪个文件系统的容量用完了。</li>
-<li>哪个文件系统的 inode 用完了。</li>
-<li>分区、文件系统类型和挂载点是什么。</li>
-</ol>
-<p>典型空间告警：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filesystem     Type  Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1      xfs    80G   77G  3.0G  97% /</span><br></pre></td></tr></table></figure>
+<p>这组命令回答：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">哪个挂载点容量用尽</span><br><span class="line">哪个挂载点 inode 用尽</span><br><span class="line">设备与挂载点如何对应</span><br><span class="line">文件系统类型和挂载选项</span><br><span class="line">是否存在 IO 等待</span><br><span class="line">哪个块设备延迟异常</span><br></pre></td></tr></table></figure>
 
-<p>典型 inode 告警：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Filesystem     Inodes IUsed IFree IUse% Mounted on</span><br><span class="line">/dev/vda1        40M   40M     0  100% /</span><br></pre></td></tr></table></figure>
+<p>先记录时间和输出，再做清理。恢复后才能与同一组基线比较。</p>
+<p><code>iostat</code> 需要 <code>sysstat</code> 工具包，缺失时不要在故障现场临时安装未知软件；使用已有监控替代。</p>
+<h2 id="分支-A：容量使用率高"><a href="#分支-A：容量使用率高" class="headerlink" title="分支 A：容量使用率高"></a>分支 A：容量使用率高</h2><p>从告警挂载点逐层向下，<code>-x</code> 避免跨文件系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var/log 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
 
-<p>inode 用完通常是产生了海量小文件，例如临时文件、会话文件、消息落盘或日志分片。此时 <code>du</code> 看到的总容量可能不大，但系统已经无法创建新文件。</p>
-<h2 id="2-从挂载点向下找大目录"><a href="#2-从挂载点向下找大目录" class="headerlink" title="2. 从挂载点向下找大目录"></a>2. 从挂载点向下找大目录</h2><p>确认是根分区以后，使用 <code>-x</code> 限制在当前文件系统，避免把其他挂载盘也统计进去：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 / 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var/log 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
+<p>不要从根目录无差别执行高开销扫描。大目录 <code>du</code> 会产生大量 IO，业务已经抖动时应缩小路径、降低执行频率，必要时参考文件系统或监控平台已有统计。</p>
+<p>定位大文件可以在明确目录中执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/log -xdev -<span class="built_in">type</span> f -size +500M -<span class="built_in">printf</span> <span class="string">&#x27;%s %p\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> -n</span><br></pre></td></tr></table></figure>
 
-<p>查找大文件时可以使用：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">find /var -xdev -<span class="built_in">type</span> f -size +1G -<span class="built_in">printf</span> <span class="string">&#x27;%s %p\n&#x27;</span> 2&gt;/dev/null \</span><br><span class="line">  | <span class="built_in">sort</span> -nr \</span><br><span class="line">  | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
-
-<p><code>-printf</code> 是 GNU <code>find</code> 的能力，部分精简系统不支持。命令只用于定位，找到文件以后还要确认文件归属、写入进程和保留策略，不能根据大小直接删除。</p>
-<p>如果 inode 用完，可以按目录统计文件数量：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">find /var -xdev -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&#x27;%h\n&#x27;</span> 2&gt;/dev/null \</span><br><span class="line">  | <span class="built_in">sort</span> \</span><br><span class="line">  | <span class="built_in">uniq</span> -c \</span><br><span class="line">  | <span class="built_in">sort</span> -nr \</span><br><span class="line">  | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-df-和-du-对不上怎么办"><a href="#3-df-和-du-对不上怎么办" class="headerlink" title="3. df 和 du 对不上怎么办"></a>3. df 和 du 对不上怎么办</h2><p>常见现象是 <code>df</code> 显示磁盘使用了 70 GB，<code>du</code> 加起来却只有 40 GB。一个高频原因是文件已经被删除，但进程仍然打开着文件描述符。</p>
+<p><code>find</code> 同样需要遍历目录。命中后先确认文件归属、是否正在写、保留要求和是否已采集，不能看到大文件就删除。</p>
+<h2 id="分支-B：df-很高，du-却很小"><a href="#分支-B：df-很高，du-却很小" class="headerlink" title="分支 B：df 很高，du 却很小"></a>分支 B：df 很高，du 却很小</h2><p><code>df</code> 统计文件系统已占用块，<code>du</code> 遍历仍有目录项的文件。差值很大时检查已删除但仍被进程持有的文件：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
 
-<p>输出中 <code>NLINK</code> 为 0 的文件已经从目录结构删除，但只要进程没有关闭句柄，空间就不会真正释放：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">COMMAND   PID USER   FD   TYPE DEVICE  SIZE/OFF NLINK NAME</span><br><span class="line">java    18342 app   12w   REG  253,1 21474836480     0 /var/log/app.log (deleted)</span><br></pre></td></tr></table></figure>
+<p>典型输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java  1842  app  17w  REG  253,1  18G  /var/log/order/app.log (deleted)</span><br></pre></td></tr></table></figure>
 
-<p>最稳妥的处理方式是让应用正常重新打开日志文件，或者在可控窗口重启对应进程。直接清空 <code>/proc/&lt;PID&gt;/fd/&lt;FD&gt;</code> 指向的内容风险很高，可能破坏正在写入的数据，只能在确认文件用途并获得操作许可后作为应急方案。</p>
-<p>这也是为什么删除正在写入的大日志以后，磁盘空间有时完全没有下降。日志轮转应该通知进程重新打开文件，而不是只执行 <code>rm</code>。</p>
-<h2 id="4-空间没满，但接口还是很慢"><a href="#4-空间没满，但接口还是很慢" class="headerlink" title="4. 空间没满，但接口还是很慢"></a>4. 空间没满，但接口还是很慢</h2><p>先看系统是不是在等待 IO：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vmstat 1 5</span><br><span class="line">iostat -xz 1 5</span><br></pre></td></tr></table></figure>
+<p>处理优先级：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">让应用日志框架滚动并重开</span><br><span class="line">使用服务支持的平滑重载</span><br><span class="line">摘流后正常重启单个实例</span><br><span class="line">最后才评估是否操作具体文件描述符</span><br></pre></td></tr></table></figure>
 
-<p><code>iostat</code> 重点关注：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r/s、w/s：每秒读写请求数</span><br><span class="line">rkB/s、wkB/s：每秒读写数据量</span><br><span class="line">await：IO 请求平均等待时间</span><br><span class="line">aqu-sz：平均队列长度</span><br><span class="line">%util：设备忙碌时间比例</span><br></pre></td></tr></table></figure>
+<p>直接终止进程或截断描述符都有业务风险。执行前确认文件类型、进程职责、事务和剩余实例容量，由应用负责人操作。</p>
+<p>空间释放后再次运行 <code>df</code> 和 <code>lsof +L1</code>，证明句柄已经消失，而不是只看命令返回成功。</p>
+<h2 id="分支-C：inode-用尽"><a href="#分支-C：inode-用尽" class="headerlink" title="分支 C：inode 用尽"></a>分支 C：inode 用尽</h2><p><code>df -h</code> 可能还有大量空间，<code>df -i</code> 却达到 100%。一个空文件也需要 inode，海量小日志、缓存或临时文件会导致无法创建新文件。</p>
+<p>先从已知高风险路径估算文件数量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/tmp -xdev -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&#x27;%h\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -n | <span class="built_in">tail</span></span><br></pre></td></tr></table></figure>
 
-<p>机械盘上 <code>%util</code> 长期接近 100% 往往表示设备饱和，但在 SSD、NVMe 和云盘环境里，不能只靠 <code>%util</code> 判断性能上限。还要结合 <code>await</code>、队列长度、吞吐、IOPS 和云平台磁盘配额。</p>
-<p>继续定位到进程：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d -p ALL 1 5</span><br></pre></td></tr></table></figure>
+<p>在百万级目录执行 <code>find</code> 可能很慢，应先结合应用配置、目录更新时间和监控缩小范围。</p>
+<p>常见来源：</p>
+<ul>
+<li>每次请求创建独立临时文件但不清理。</li>
+<li>日志按请求或任务拆成小文件。</li>
+<li>Session、缓存落盘无过期。</li>
+<li>邮件队列、爬虫或批处理产生大量碎片。</li>
+<li>容器存储层残留。</li>
+</ul>
+<p>处理时优先暂停继续产生文件的任务，再按应用定义的生命周期清理。只删当前文件、不修复生产逻辑，inode 很快再次耗尽。</p>
+<h2 id="分支-D：空间正常但-IO-延迟高"><a href="#分支-D：空间正常但-IO-延迟高" class="headerlink" title="分支 D：空间正常但 IO 延迟高"></a>分支 D：空间正常但 IO 延迟高</h2><p><code>iostat -xz</code> 常看：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>含义</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>r/s w/s</code></td>
+<td>每秒读写请求</td>
+<td>与业务基线比较</td>
+</tr>
+<tr>
+<td><code>rkB/s wkB/s</code></td>
+<td>吞吐</td>
+<td>高吞吐不一定高延迟</td>
+</tr>
+<tr>
+<td><code>await</code></td>
+<td>请求平均等待时间</td>
+<td>读写混合值可能掩盖差异</td>
+</tr>
+<tr>
+<td><code>aqu-sz</code></td>
+<td>平均队列长度</td>
+<td>持续增长表示积压</td>
+</tr>
+<tr>
+<td><code>%util</code></td>
+<td>设备忙碌程度</td>
+<td>SSD、RAID、云盘不能单独解读</td>
+</tr>
+</tbody></table>
+<p>不要使用“<code>%util=100%</code> 就一定是磁盘极限”的单一规则。并行设备和虚拟块存储的含义不同，延迟、队列、吞吐和云盘额度要一起看。</p>
+<p>定位进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d 1 5</span><br><span class="line">iotop -oPa</span><br></pre></td></tr></table></figure>
 
-<p>服务器安装了 <code>iotop</code> 且具备权限时，可以查看实时 IO：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iotop -oPa</span><br></pre></td></tr></table></figure>
+<p><code>iotop</code> 需要权限并可能未安装。使用前确认生产诊断规范。</p>
+<p>把高 IO 进程对应到行为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Java：日志暴增、Heap Dump、文件导出</span><br><span class="line">MySQL：慢查询、刷脏页、备份、索引构建</span><br><span class="line">容器运行时：镜像拉取、日志、层清理</span><br><span class="line">系统任务：压缩、备份、病毒扫描</span><br><span class="line">未知进程：先确认来源，不直接终止</span><br></pre></td></tr></table></figure>
 
-<p><code>-o</code> 只显示正在产生 IO 的进程，<code>-P</code> 按进程聚合，<code>-a</code> 显示累计值。短时间突发任务可能一闪而过，因此最好和监控上的告警时间点对齐。</p>
-<h2 id="5-常见的磁盘占用来源"><a href="#5-常见的磁盘占用来源" class="headerlink" title="5. 常见的磁盘占用来源"></a>5. 常见的磁盘占用来源</h2><h3 id="5-1-应用日志"><a href="#5-1-应用日志" class="headerlink" title="5.1 应用日志"></a>5.1 应用日志</h3><p>检查日志目录和 systemd journal：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -sh /var/log/* 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line">journalctl --disk-usage</span><br></pre></td></tr></table></figure>
+<p>还要看 <code>vmstat</code> 的 <code>si/so</code>。内存不足导致 swap 时，磁盘忙只是第二现场。</p>
+<h2 id="分支-E：文件系统变成只读"><a href="#分支-E：文件系统变成只读" class="headerlink" title="分支 E：文件系统变成只读"></a>分支 E：文件系统变成只读</h2><p>应用日志可能出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Read-only file system</span><br><span class="line">Input/output error</span><br><span class="line">EXT4-fs error</span><br><span class="line">XFS metadata I/O error</span><br></pre></td></tr></table></figure>
 
-<p>应用日志需要同时限制单文件大小、保留天数和总文件数。只配置按天切割，如果某天流量异常，单个文件仍然可能把磁盘写满。</p>
-<h3 id="5-2-Docker-日志与镜像"><a href="#5-2-Docker-日志与镜像" class="headerlink" title="5.2 Docker 日志与镜像"></a>5.2 Docker 日志与镜像</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker system <span class="built_in">df</span></span><br><span class="line">find /var/lib/docker/containers -name <span class="string">&#x27;*-json.log&#x27;</span> -size +500M -<span class="built_in">print</span></span><br></pre></td></tr></table></figure>
+<p>先保存：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS</span><br><span class="line">journalctl -k --since <span class="string">&#x27;30 minutes ago&#x27;</span></span><br><span class="line">dmesg -T | <span class="built_in">tail</span> -200</span><br></pre></td></tr></table></figure>
 
-<p>不要直接删除 Docker 存储目录里的未知文件。镜像和构建缓存可以先通过 <code>docker system df</code> 确认，再使用明确的清理命令；正在运行容器的 JSON 日志应该通过日志驱动设置轮转。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;log-driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;json-file&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;log-opts&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;max-size&quot;</span><span class="punctuation">:</span> <span class="string">&quot;100m&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;max-file&quot;</span><span class="punctuation">:</span> <span class="string">&quot;5&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>这可能是文件系统为了保护数据在检测到错误后切换只读，也可能是挂载配置本来如此。不要直接 <code>mount -o remount,rw</code> 掩盖问题，更不能在已挂载生产文件系统上随意执行 <code>fsck</code>。</p>
+<p>正确动作通常需要：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">停止或迁移写入流量</span><br><span class="line">保存内核与存储事件</span><br><span class="line">联系系统和存储负责人</span><br><span class="line">确认备份与副本</span><br><span class="line">在维护窗口离线检查或修复</span><br><span class="line">恢复后做数据一致性验证</span><br></pre></td></tr></table></figure>
 
-<p>修改 Docker daemon 配置会影响后续创建的容器，生产操作前要验证配置并安排维护窗口。</p>
-<h3 id="5-3-MySQL-Binlog-和临时文件"><a href="#5-3-MySQL-Binlog-和临时文件" class="headerlink" title="5.3 MySQL Binlog 和临时文件"></a>5.3 MySQL Binlog 和临时文件</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="type">BINARY</span> LOGS;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;binlog_expire_logs_seconds&#x27;</span>;</span><br><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;expire_logs_days&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>P0 场景优先保护数据，不能为了让应用尽快写入而跳过文件系统判断。</p>
+<h2 id="常见占用来源与正确负责人"><a href="#常见占用来源与正确负责人" class="headerlink" title="常见占用来源与正确负责人"></a>常见占用来源与正确负责人</h2><h3 id="应用日志"><a href="#应用日志" class="headerlink" title="应用日志"></a>应用日志</h3><p>由应用或统一日志策略滚动，设置单文件大小、保留天数和总量上限。确认采集成功后再删除归档。不能同时让 Logback 和 <code>logrotate</code> 无协调地管理同一文件。</p>
+<h3 id="Docker-或容器数据"><a href="#Docker-或容器数据" class="headerlink" title="Docker 或容器数据"></a>Docker 或容器数据</h3><p>先区分容器日志、镜像、可写层和 Volume。清理由平台负责人通过容器运行时机制执行，不能手工删除 <code>/var/lib/docker</code> 下的文件。</p>
+<h3 id="MySQL-Binlog、Redo、临时文件"><a href="#MySQL-Binlog、Redo、临时文件" class="headerlink" title="MySQL Binlog、Redo、临时文件"></a>MySQL Binlog、Redo、临时文件</h3><p>由 DBA 使用数据库命令、保留策略和复制状态处理。手工删除数据库目录中的 binlog 或表文件可能破坏恢复与复制。</p>
+<h3 id="Heap-Dump-与-Core-Dump"><a href="#Heap-Dump-与-Core-Dump" class="headerlink" title="Heap Dump 与 Core Dump"></a>Heap Dump 与 Core Dump</h3><p>确认是否已安全转存并仍有排障价值，再按事件保留策略清理。Dump 可能包含敏感数据，不传到个人存储。</p>
+<h3 id="临时文件"><a href="#临时文件" class="headerlink" title="临时文件"></a>临时文件</h3><p>确认创建进程、有效期和是否仍打开。修复清理任务与命名规则，避免只做一次人工删除。</p>
+<h2 id="操作授权矩阵"><a href="#操作授权矩阵" class="headerlink" title="操作授权矩阵"></a>操作授权矩阵</h2><table>
+<thead>
+<tr>
+<th>动作</th>
+<th>风险</th>
+<th>执行要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>df</code>、<code>findmnt</code>、受控 <code>du</code></td>
+<td>低到中</td>
+<td>值班人员，注意 IO 开销</td>
+</tr>
+<tr>
+<td>暂停日志或批任务</td>
+<td>中</td>
+<td>应用负责人确认影响</td>
+</tr>
+<tr>
+<td>日志滚动、单实例摘流重启</td>
+<td>中</td>
+<td>发布&#x2F;值班流程与容量确认</td>
+</tr>
+<tr>
+<td>数据库日志清理</td>
+<td>高</td>
+<td>DBA 审核复制与恢复策略</td>
+</tr>
+<tr>
+<td>容器存储清理</td>
+<td>高</td>
+<td>平台负责人使用正式工具</td>
+</tr>
+<tr>
+<td>文件系统修复、重新挂载</td>
+<td>很高</td>
+<td>系统&#x2F;存储负责人，维护窗口</td>
+</tr>
+<tr>
+<td>盲删未知文件、底层数据库文件</td>
+<td>不可接受</td>
+<td>禁止</td>
+</tr>
+</tbody></table>
+<p>高风险命令不应该出现在“通用一键清理脚本”里。脚本不知道当前目录属于数据库、容器、正在运行的任务，还是唯一一份故障证据。</p>
+<h2 id="恢复验证"><a href="#恢复验证" class="headerlink" title="恢复验证"></a>恢复验证</h2><p>释放空间或降低 IO 后，至少验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] df 容量与 inode 回到安全线</span><br><span class="line">[ ] 增长来源已经停止或受控</span><br><span class="line">[ ] lsof 不再存在异常 deleted 大文件</span><br><span class="line">[ ] iostat 的 await 和队列回到基线</span><br><span class="line">[ ] 文件系统保持预期读写状态</span><br><span class="line">[ ] 应用日志、临时文件和数据库可以正常写</span><br><span class="line">[ ] 核心接口 P95/P99 与错误率恢复</span><br><span class="line">[ ] 消息、任务和复制积压开始下降</span><br><span class="line">[ ] 清理没有破坏审计、备份和回退能力</span><br></pre></td></tr></table></figure>
 
-<p>MySQL 8.0 优先使用 <code>binlog_expire_logs_seconds</code>，MySQL 5.7 常见 <code>expire_logs_days</code>。清理 Binlog 要结合主从复制、备份和时间点恢复要求，不能直接从文件系统删除。应使用 MySQL 提供的过期策略或 <code>PURGE BINARY LOGS</code>，并确认从库已经消费。</p>
-<h3 id="5-4-临时文件和-Core-Dump"><a href="#5-4-临时文件和-Core-Dump" class="headerlink" title="5.4 临时文件和 Core Dump"></a>5.4 临时文件和 Core Dump</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 /tmp /var/tmp 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line">find / -xdev -<span class="built_in">type</span> f -name <span class="string">&#x27;core.*&#x27;</span> -size +100M -<span class="built_in">print</span> 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+<p>业务恢复后继续观察一个完整高峰或任务周期。磁盘指标下降不代表上层数据已经自动补齐。</p>
+<h2 id="预防比应急清理更便宜"><a href="#预防比应急清理更便宜" class="headerlink" title="预防比应急清理更便宜"></a>预防比应急清理更便宜</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">容量：使用率 + 剩余 GiB + 预计耗尽时间</span><br><span class="line">inode：使用率与文件创建速率</span><br><span class="line">IO：await、队列、吞吐和云盘额度</span><br><span class="line">日志：写入速率、滚动失败、采集延迟</span><br><span class="line">容器：镜像、日志和 Volume 配额</span><br><span class="line">数据库：binlog 保留、备份和临时空间</span><br><span class="line">Dump：独立目录、容量上限和保留流程</span><br></pre></td></tr></table></figure>
 
-<p>临时目录也不能按文件年龄盲删，需要确认是否仍被运行中的任务使用。Core Dump 可能是定位崩溃的唯一证据，转移或分析后再按保留策略清理。</p>
-<h2 id="6-使用-logrotate-控制日志"><a href="#6-使用-logrotate-控制日志" class="headerlink" title="6. 使用 logrotate 控制日志"></a>6. 使用 logrotate 控制日志</h2><p>一个基础配置示例：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/var/log/myapp/*.log &#123;</span><br><span class="line">    daily</span><br><span class="line">    rotate 14</span><br><span class="line">    maxsize 200M</span><br><span class="line">    compress</span><br><span class="line">    delaycompress</span><br><span class="line">    missingok</span><br><span class="line">    notifempty</span><br><span class="line">    copytruncate</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>copytruncate</code> 不需要应用重新打开文件，但复制和截断之间可能丢少量日志，大文件复制时也会产生额外 IO。更推荐应用支持滚动日志，或者在 <code>postrotate</code> 中发送信号让进程重新打开文件。具体方式要根据应用日志框架选择。</p>
-<p>配置后先做调试检查：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logrotate -d /etc/logrotate.d/myapp</span><br></pre></td></tr></table></figure>
-
-<p><code>-d</code> 只输出调试信息，不真正轮转。确认结果以后再交给系统定时任务执行。</p>
-<h2 id="7-应急清理的顺序"><a href="#7-应急清理的顺序" class="headerlink" title="7. 应急清理的顺序"></a>7. 应急清理的顺序</h2><ol>
-<li>确认是容量、inode 还是 IO 性能问题。</li>
-<li>找出增长最快的目录和对应写入进程。</li>
-<li>优先清理明确可再生、已过期且没有被占用的文件。</li>
-<li>需要删除业务文件时，先确认备份和恢复要求。</li>
-<li>清理后再次检查 <code>df -h</code>、<code>df -i</code> 和应用状态。</li>
-<li>如果空间仍未释放，使用 <code>lsof +L1</code> 检查已删除文件句柄。</li>
-<li>恢复后补上轮转、容量告警和增长趋势监控。</li>
-</ol>
-<h2 id="8-排查清单"><a href="#8-排查清单" class="headerlink" title="8. 排查清单"></a>8. 排查清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">容量：df -hT、du -xhd1、find 大文件</span><br><span class="line">inode：df -ih、按目录统计文件数量</span><br><span class="line">删除未释放：lsof +L1</span><br><span class="line">IO 延迟：vmstat、iostat -xz</span><br><span class="line">进程 IO：pidstat -d、iotop</span><br><span class="line">常见来源：应用日志、Docker、Binlog、临时文件、Core Dump</span><br></pre></td></tr></table></figure>
-
-<p>磁盘告警处理完以后，最好不要只把阈值从 80% 改到 90%。真正有效的复盘是找到增长来源，为它设置保留上限，并保证告警能在磁盘还有足够处理空间时提前触发。</p>
+<p>告警应在还有选择时触发。剩余 15% 但预计两小时耗尽，比使用率 95% 且三个月不增长更紧急。</p>
+<p>这份口袋手册的核心只有三句话：先确认是空间、inode、IO 还是文件系统错误；先阻止继续增长，再由资源所有者释放；恢复后同时验证底层指标和业务结果。磁盘故障真正危险的不是命令不会用，而是在压力下执行了一个无法撤销的错误动作。</p>
 
     </div>
 
@@ -451,7 +551,6 @@
     <span>0%</span>
   </div>
   <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
