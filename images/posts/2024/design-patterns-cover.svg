@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#111018"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#1b1924" stroke="#443d59"/>
+  <text x="112" y="126" fill="#c084fc" font-family="Menlo,Consolas,monospace" font-size="22">JAVA DESIGN / NOTES 01</text>
+  <text x="112" y="212" fill="#faf7ff" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="50" font-weight="700">从零开始学习设计模式</text>
+  <text x="112" y="266" fill="#b6adbf" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">让变化发生在正确的边界里</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="18">
+    <rect x="112" y="340" width="250" height="100" rx="8" fill="#111018" stroke="#c084fc"/>
+    <text x="167" y="399" fill="#ead7fa">interface</text>
+    <rect x="515" y="318" width="250" height="100" rx="8" fill="#111018" stroke="#2dd4bf"/>
+    <text x="574" y="377" fill="#caf8ef">strategy</text>
+    <rect x="515" y="466" width="250" height="100" rx="8" fill="#111018" stroke="#fbbf24"/>
+    <text x="579" y="525" fill="#f7e3a5">adapter</text>
+    <rect x="868" y="340" width="236" height="100" rx="8" fill="#111018" stroke="#60a5fa"/>
+    <text x="923" y="399" fill="#d4e7fd">context</text>
+  </g>
+  <path d="M362 390L515 368M362 390L515 516M765 368L868 390M765 516L868 390" stroke="#6d6576" stroke-width="2"/>
+  <text x="112" y="596" fill="#938a9b" font-family="Menlo,Consolas,monospace" font-size="18">intent · boundary · collaboration</text>
+</svg>

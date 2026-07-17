@@ -81,7 +81,7 @@
   function markPageType() {
     var pageConfig = readPageConfig();
     var body = document.body;
-    var pageClasses = ['editorial-home-page', 'editorial-post-page', 'editorial-about-page', 'editorial-category-page', 'editorial-archive-page'];
+    var pageClasses = ['editorial-home-page', 'editorial-post-page', 'editorial-about-page', 'editorial-category-page', 'editorial-archive-page', 'editorial-series-page'];
     pageClasses.forEach(function(className) { body.classList.remove(className); });
 
     if (pageConfig.isHome || query('.main-inner.index')) body.classList.add('editorial-home-page');
@@ -89,6 +89,7 @@
     if (query('.about-page') || normalizePath(location.pathname) === '/about/') body.classList.add('editorial-about-page');
     if (query('.category-all-page') || normalizePath(location.pathname) === '/categories/') body.classList.add('editorial-category-page');
     if (query('.main-inner.archive')) body.classList.add('editorial-archive-page');
+    if (query('.series-page') || normalizePath(location.pathname) === '/series/') body.classList.add('editorial-series-page');
   }
 
   function createPageHero(title, subtitle, className) {
@@ -131,6 +132,15 @@
     if (!footerInner || query('.editorial-footer-brand', footerInner)) return;
     var brand = createLink('editorial-footer-brand', '/', '杰尼龟的笔记');
     footerInner.insertBefore(brand, footerInner.firstChild);
+
+    var links = createElement('nav', 'editorial-footer-links');
+    links.setAttribute('aria-label', '页脚导航');
+    links.appendChild(createLink('', '/series/', '专题'));
+    links.appendChild(createLink('', 'https://github.com/swagcH', 'GitHub'));
+    links.lastChild.target = '_blank';
+    links.lastChild.rel = 'noopener';
+    links.appendChild(createLink('', '/atom.xml', 'RSS'));
+    footerInner.insertBefore(links, query('.copyright', footerInner));
   }
 
   function installSearchLayout() {
@@ -166,16 +176,16 @@
     intro.appendChild(avatar);
 
     var copy = createElement('div', 'home-intro-copy');
-    copy.appendChild(createElement('p', 'home-kicker', 'JAVA · BACKEND · ENGINEERING'));
+    copy.appendChild(createElement('p', 'home-kicker', 'JAVA BACKEND · RELIABILITY · AI CODING'));
     copy.appendChild(createElement('h1', '', '杰尼龟的笔记'));
     copy.appendChild(createElement('span', 'page-hero-line'));
-    copy.appendChild(createElement('p', 'home-description', '记录后端开发、架构演进与线上问题排查，把真实经验整理成可以再次使用的答案。'));
+    copy.appendChild(createElement('p', 'home-description', 'Java 后端工程师的实践笔记，聚焦可维护代码、系统稳定性与 AI 编程工作流。'));
 
     var actions = createElement('div', 'home-actions');
-    var archiveLink = createLink('home-primary-link', '/archives/', '浏览全部文章');
-    archiveLink.appendChild(createIcon('fa fa-arrow-right'));
-    actions.appendChild(archiveLink);
-    actions.appendChild(createLink('', '/about/', '关于作者'));
+    var seriesLink = createLink('home-primary-link', '/series/', '查看代表专题');
+    seriesLink.appendChild(createIcon('fa fa-arrow-right'));
+    actions.appendChild(seriesLink);
+    actions.appendChild(createLink('', '/about/', '了解我与职业方向'));
     copy.appendChild(actions);
     intro.appendChild(copy);
 
@@ -191,17 +201,32 @@
 
   function applyHomeData(data) {
     var intro = query('.editorial-home-intro');
-    if (!intro || query('.home-stats', intro)) return;
+    if (!intro || intro.dataset.brandReady) return;
+    intro.dataset.brandReady = 'true';
 
-    var tags = {};
-    data.posts.forEach(function(post) {
-      post.tags.forEach(function(tag) { tags[tag] = true; });
-    });
+    var brand = data.brand || {};
+    var profile = brand.profile || {};
+    var kicker = query('.home-kicker', intro);
+    var heading = query('h1', intro);
+    var description = query('.home-description', intro);
+    if (profile.eyebrow) kicker.textContent = profile.eyebrow;
+    if (profile.title) heading.textContent = profile.title;
+    if (profile.description) description.textContent = profile.description;
+
+    var actions = query('.home-actions', intro);
+    if (actions && profile.primary_action && profile.secondary_action) {
+      actions.textContent = '';
+      var primary = createLink('home-primary-link', profile.primary_action.url, profile.primary_action.label);
+      primary.appendChild(createIcon('fa fa-arrow-right'));
+      actions.appendChild(primary);
+      actions.appendChild(createLink('', profile.secondary_action.url, profile.secondary_action.label));
+    }
+
     var stats = createElement('div', 'home-stats');
     [
-      [data.posts.length, '篇文章'],
-      [data.categories.length, '个分类'],
-      [Object.keys(tags).length, '个标签']
+      [profile.start_year || '2018', '记录至今'],
+      [data.posts.length, '篇实践文章'],
+      [(brand.series || []).length || profile.core_tracks || 3, '条代表专题']
     ].forEach(function(item) {
       var stat = createElement('span');
       stat.appendChild(createElement('strong', '', String(item[0])));
@@ -210,7 +235,18 @@
     });
     query('.home-intro-copy', intro).appendChild(stats);
 
-    queryAll('.main-inner.index .post-block').forEach(function(block, index) {
+    var listHeading = query('.home-list-heading');
+    if (listHeading && brand.series && brand.series.length) {
+      listHeading.parentNode.insertBefore(createHomeSeriesSection(brand.series), listHeading);
+    }
+    if (listHeading && brand.featured && brand.featured.length) {
+      listHeading.parentNode.insertBefore(createFeaturedSection(brand.featured), listHeading);
+    }
+
+    separateHomeAnnouncement(profile.announcement, listHeading, data.posts);
+
+    var visibleBlocks = queryAll('.main-inner.index .post-block');
+    visibleBlocks.forEach(function(block, index) {
       var titleLink = query('.post-title-link', block);
       if (!titleLink) return;
       var post = findPostByUrl(data.posts, titleLink.getAttribute('href'));
@@ -238,6 +274,78 @@
     });
   }
 
+  function createHomeSeriesSection(series) {
+    var section = createElement('section', 'home-brand-section home-series-section');
+    var heading = createElement('header', 'home-section-heading');
+    var titleGroup = createElement('div');
+    titleGroup.appendChild(createElement('p', 'home-section-kicker', 'START HERE'));
+    titleGroup.appendChild(createElement('h2', '', '代表专题'));
+    heading.appendChild(titleGroup);
+    heading.appendChild(createLink('', '/series/', '浏览全部专题'));
+    section.appendChild(heading);
+
+    var grid = createElement('div', 'home-series-grid');
+    series.slice(0, 3).forEach(function(item, index) {
+      var card = createLink('home-series-card tone-' + item.tone, '/series/#' + item.slug, '');
+      card.appendChild(createElement('span', 'series-card-index', '0' + (index + 1)));
+      card.appendChild(createElement('p', 'series-card-eyebrow', item.eyebrow));
+      card.appendChild(createElement('h3', '', item.title));
+      card.appendChild(createElement('p', 'series-card-description', item.description));
+      card.appendChild(createElement('span', 'series-card-meta', item.posts.length + ' 篇 · ' + item.readingMinutes + ' 分钟'));
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    return section;
+  }
+
+  function createFeaturedSection(posts) {
+    var section = createElement('section', 'home-brand-section home-featured-section');
+    var heading = createElement('header', 'home-section-heading');
+    var titleGroup = createElement('div');
+    titleGroup.appendChild(createElement('p', 'home-section-kicker', 'SELECTED WORK'));
+    titleGroup.appendChild(createElement('h2', '', '精选文章'));
+    heading.appendChild(titleGroup);
+    heading.appendChild(createLink('', '/archives/', '查看全部文章'));
+    section.appendChild(heading);
+
+    var list = createElement('div', 'home-featured-list');
+    posts.slice(0, 4).forEach(function(post, index) {
+      var item = createElement('article', 'home-featured-item');
+      item.appendChild(createElement('span', 'featured-index', String(index + 1).padStart(2, '0')));
+      var content = createElement('div');
+      content.appendChild(createElement('p', 'featured-meta', (post.categories[0] || '技术文章') + ' · ' + post.readingMinutes + ' 分钟'));
+      content.appendChild(createLink('', post.url, post.title));
+      content.appendChild(createElement('p', 'featured-excerpt', post.excerpt));
+      item.appendChild(content);
+      var arrow = createLink('featured-arrow', post.url, '');
+      arrow.title = '阅读《' + post.title + '》';
+      arrow.setAttribute('aria-label', arrow.title);
+      arrow.appendChild(createIcon('fa fa-arrow-right'));
+      item.appendChild(arrow);
+      list.appendChild(item);
+    });
+    section.appendChild(list);
+    return section;
+  }
+
+  function separateHomeAnnouncement(announcement, listHeading, posts) {
+    if (!announcement || !listHeading) return;
+    var targetPost = findPostByUrl(posts, announcement.url);
+    var targetBlock = queryAll('.main-inner.index .post-block').find(function(block) {
+      var link = query('.post-title-link', block);
+      return link && normalizePath(link.getAttribute('href')) === normalizePath(announcement.url);
+    });
+    if (!targetPost || !targetBlock) return;
+
+    var notice = createLink('home-announcement', targetPost.url, '');
+    notice.appendChild(createElement('span', '', announcement.label || '站点更新'));
+    notice.appendChild(createElement('strong', '', announcement.title || targetPost.title));
+    notice.appendChild(createElement('small', '', targetPost.excerpt));
+    notice.appendChild(createIcon('fa fa-arrow-right'));
+    listHeading.parentNode.insertBefore(notice, listHeading);
+    targetBlock.remove();
+  }
+
   function categoryDetail(name) {
     for (var index = 0; index < CATEGORY_DETAILS.length; index += 1) {
       if (CATEGORY_DETAILS[index].test.test(name)) return CATEGORY_DETAILS[index];
@@ -254,12 +362,12 @@
     if (!block || !categoryPage) return;
 
     if (!query('.page-hero', block)) {
-      block.insertBefore(createPageHero('分类', '按技术领域浏览文章', 'category-hero'), block.firstChild);
+      block.insertBefore(createPageHero('能力方向', '从职业能力与工程问题出发浏览文章', 'category-hero'), block.firstChild);
     }
 
     var list = query('.category-list', categoryPage);
     if (!list || list.classList.contains('category-grid')) return;
-    list.classList.add('category-grid');
+    list.classList.add('category-grid', 'is-legacy-directory');
 
     var items = queryAll('.category-list-item', list);
     items.sort(function(left, right) {
@@ -275,37 +383,44 @@
       list.appendChild(item);
     });
 
-    if (items.length > 6 && !query('.category-expand', categoryPage)) {
-      var expandButton = createElement('button', 'category-expand', '展开全部分类');
+    var categoryAll = query('.category-all', categoryPage);
+    if (categoryAll && !query('.legacy-category-heading', categoryAll)) {
+      var historyHeading = createElement('header', 'section-heading legacy-category-heading');
+      historyHeading.appendChild(createElement('h2', '', '历史分类索引'));
+      historyHeading.appendChild(createElement('span'));
+      categoryAll.insertBefore(historyHeading, list);
+    }
+
+    if (items.length && !query('.category-expand', categoryPage)) {
+      var expandButton = createElement('button', 'category-expand', '查看 ' + items.length + ' 个历史分类');
       expandButton.type = 'button';
       expandButton.setAttribute('aria-expanded', 'false');
       expandButton.addEventListener('click', function() {
         var expanded = list.classList.toggle('is-expanded');
-        expandButton.textContent = expanded ? '收起分类' : '展开全部分类';
+        expandButton.textContent = expanded ? '收起历史分类' : '查看 ' + items.length + ' 个历史分类';
         expandButton.setAttribute('aria-expanded', String(expanded));
       });
-      query('.category-all', categoryPage).appendChild(expandButton);
+      categoryAll.appendChild(expandButton);
     }
   }
 
   function applyCategoryData(data) {
     var categoryPage = query('.category-all-page');
-    if (!categoryPage || query('.category-featured')) return;
+    if (!categoryPage || categoryPage.dataset.brandReady) return;
+    categoryPage.dataset.brandReady = 'true';
+
+    var tracks = data.brand && data.brand.tracks ? data.brand.tracks : [];
+    if (tracks.length) {
+      categoryPage.parentNode.insertBefore(createCareerTrackSection(tracks), categoryPage);
+    }
 
     var section = createElement('section', 'category-featured');
     var heading = createElement('header', 'section-heading');
-    heading.appendChild(createElement('h2', '', '分类精选文章'));
+    heading.appendChild(createElement('h2', '', '代表内容'));
     heading.appendChild(createElement('span'));
     section.appendChild(heading);
 
-    var selected = [];
-    data.categories.slice(0, 8).some(function(category) {
-      var post = data.posts.find(function(item) {
-        return item.categories.indexOf(category.name) > -1 && selected.indexOf(item) === -1;
-      });
-      if (post) selected.push(post);
-      return selected.length === 3;
-    });
+    var selected = data.brand && data.brand.featured ? data.brand.featured.slice(0, 3) : data.posts.slice(0, 3);
 
     var list = createElement('div', 'category-featured-list');
     selected.forEach(function(post) {
@@ -319,6 +434,89 @@
     });
     section.appendChild(list);
     categoryPage.parentNode.appendChild(section);
+  }
+
+  function createCareerTrackSection(tracks) {
+    var section = createElement('section', 'career-track-section');
+    var heading = createElement('header', 'section-heading');
+    heading.appendChild(createElement('h2', '', '七个能力方向'));
+    heading.appendChild(createElement('span'));
+    section.appendChild(heading);
+
+    var grid = createElement('div', 'career-track-grid');
+    tracks.forEach(function(track) {
+      var card = createElement('article', 'career-track-card');
+      var cardHeader = createElement('header');
+      var icon = createElement('span', 'career-track-icon');
+      icon.appendChild(createIcon(track.icon || 'fa fa-code'));
+      cardHeader.appendChild(icon);
+      cardHeader.appendChild(createElement('span', 'career-track-count', track.count + ' 篇相关内容'));
+      card.appendChild(cardHeader);
+      card.appendChild(createLink('career-track-title', '/archives/?track=' + encodeURIComponent(track.slug), track.title));
+      card.appendChild(createElement('p', 'career-track-description', track.description));
+      card.appendChild(createElement('p', 'career-track-keywords', track.keywords));
+
+      var posts = createElement('div', 'career-track-posts');
+      track.posts.slice(0, 2).forEach(function(post) {
+        posts.appendChild(createLink('', post.url, post.title));
+      });
+      card.appendChild(posts);
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    return section;
+  }
+
+  function renderSeriesPage(data) {
+    var page = query('.series-page');
+    var series = data.brand && data.brand.series ? data.brand.series : [];
+    if (!page || page.dataset.brandReady || !series.length) return;
+    page.dataset.brandReady = 'true';
+    page.textContent = '';
+    page.appendChild(createPageHero('代表专题', '沿着完整路径阅读，而不是在标签之间来回跳转', 'series-hero'));
+
+    var overview = createElement('section', 'series-overview');
+    overview.appendChild(createElement('p', 'series-overview-kicker', 'CURATED LEARNING PATHS'));
+    overview.appendChild(createElement('h2', '', '三条路径，呈现完整的工程能力'));
+    overview.appendChild(createElement('p', '', '每条专题都从基础认知走向真实案例与复盘，适合招聘方快速了解技术判断，也适合开发者按顺序系统阅读。'));
+    page.appendChild(overview);
+
+    series.forEach(function(item, seriesIndex) {
+      var section = createElement('section', 'series-detail tone-' + item.tone);
+      section.id = item.slug;
+      var header = createElement('header', 'series-detail-header');
+      header.appendChild(createElement('span', 'series-detail-index', '0' + (seriesIndex + 1)));
+      var copy = createElement('div', 'series-detail-copy');
+      copy.appendChild(createElement('p', 'series-detail-eyebrow', item.eyebrow));
+      copy.appendChild(createElement('h2', '', item.title));
+      copy.appendChild(createElement('p', 'series-detail-description', item.description));
+      copy.appendChild(createElement('p', 'series-detail-outcome', '完成这条路径：' + item.outcome));
+      header.appendChild(copy);
+      var metrics = createElement('div', 'series-detail-metrics');
+      metrics.appendChild(createElement('strong', '', item.posts.length + ' 篇'));
+      metrics.appendChild(createElement('span', '', item.readingMinutes + ' 分钟'));
+      header.appendChild(metrics);
+      section.appendChild(header);
+
+      var list = createElement('div', 'series-reading-list');
+      item.posts.forEach(function(post, postIndex) {
+        var row = createElement('article', 'series-reading-item');
+        row.appendChild(createElement('span', 'series-reading-index', String(postIndex + 1).padStart(2, '0')));
+        var content = createElement('div');
+        content.appendChild(createLink('', post.url, post.title));
+        content.appendChild(createElement('p', '', post.excerpt));
+        content.appendChild(createElement('small', '', post.date + ' · ' + post.readingMinutes + ' 分钟阅读'));
+        row.appendChild(content);
+        var arrow = createLink('series-reading-arrow', post.url, '');
+        arrow.title = '阅读《' + post.title + '》';
+        arrow.setAttribute('aria-label', arrow.title);
+        arrow.appendChild(createIcon('fa fa-arrow-right'));
+        row.appendChild(arrow);
+        list.appendChild(row);
+      });
+      section.appendChild(list);
+      page.appendChild(section);
+    });
   }
 
   function installArchiveFallback() {
@@ -336,11 +534,12 @@
     var page = createElement('div', 'archive-page');
     page.appendChild(createPageHero('归档', '按时间线浏览所有文章', 'archive-hero'));
     var filterBar = createElement('div', 'archive-filters');
-    var categories = ['全部'].concat(data.categories.slice(0, 7).map(function(category) { return category.name; }));
-    categories.forEach(function(name, index) {
-      var button = createElement('button', index === 0 ? 'is-active' : '', name);
+    var tracks = data.brand && data.brand.tracks ? data.brand.tracks : [];
+    var filters = [{ slug: 'all', title: '全部', posts: data.posts }].concat(tracks);
+    filters.forEach(function(item, index) {
+      var button = createElement('button', index === 0 ? 'is-active' : '', item.title);
       button.type = 'button';
-      button.dataset.category = name;
+      button.dataset.track = item.slug;
       button.setAttribute('aria-pressed', String(index === 0));
       filterBar.appendChild(button);
     });
@@ -350,23 +549,26 @@
     page.appendChild(list);
     container.appendChild(page);
 
-    function updateArchive(category) {
-      var posts = category === '全部' ? data.posts : data.posts.filter(function(post) {
-        return post.categories.indexOf(category) > -1;
-      });
-      renderArchiveGroups(list, posts);
+    function updateArchive(trackSlug, updateUrl) {
+      var selected = filters.find(function(item) { return item.slug === trackSlug; }) || filters[0];
+      renderArchiveGroups(list, selected.posts);
       queryAll('button', filterBar).forEach(function(button) {
-        var active = button.dataset.category === category;
+        var active = button.dataset.track === selected.slug;
         button.classList.toggle('is-active', active);
         button.setAttribute('aria-pressed', String(active));
       });
+      if (updateUrl && window.history && window.history.replaceState) {
+        var nextUrl = selected.slug === 'all' ? '/archives/' : '/archives/?track=' + encodeURIComponent(selected.slug);
+        window.history.replaceState({}, '', nextUrl);
+      }
     }
 
     filterBar.addEventListener('click', function(event) {
       var button = event.target.closest('button');
-      if (button) updateArchive(button.dataset.category);
+      if (button) updateArchive(button.dataset.track, true);
     });
-    updateArchive('全部');
+    var requestedTrack = new URLSearchParams(location.search).get('track') || 'all';
+    updateArchive(requestedTrack, false);
   }
 
   function renderArchiveGroups(container, posts) {
@@ -447,7 +649,63 @@
       header.appendChild(createElement('p', 'post-deck', summary.slice(0, 128) + (summary.length > 128 ? '…' : '')));
     }
 
+    installArticleToc(article, body);
     installShareActions(article, title.textContent.trim());
+  }
+
+  function installArticleToc(article, body) {
+    var headings = queryAll('h2, h3', body).filter(function(heading) {
+      return heading.textContent.trim().length > 0;
+    });
+    if (headings.length < 2 || query('.post-reading-layout', article)) return;
+
+    headings.forEach(function(heading, index) {
+      if (!heading.id) heading.id = 'section-' + (index + 1);
+      heading.style.scrollMarginTop = '24px';
+    });
+
+    var layout = createElement('div', 'post-reading-layout');
+    body.parentNode.insertBefore(layout, body);
+
+    var inlineToc = createElement('details', 'post-inline-toc');
+    inlineToc.appendChild(createElement('summary', '', '本文目录 · ' + headings.length + ' 节'));
+    inlineToc.appendChild(createTocList(headings, 'post-inline-toc-list'));
+    layout.appendChild(inlineToc);
+    layout.appendChild(body);
+
+    var aside = createElement('aside', 'post-toc-rail');
+    aside.setAttribute('aria-label', '文章目录');
+    var asideInner = createElement('div', 'post-toc-inner');
+    asideInner.appendChild(createElement('p', 'post-toc-label', 'ON THIS PAGE'));
+    asideInner.appendChild(createTocList(headings, 'post-toc-list'));
+    aside.appendChild(asideInner);
+    layout.appendChild(aside);
+
+    if ('IntersectionObserver' in window) {
+      var links = queryAll('a', aside);
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          links.forEach(function(link) {
+            link.classList.toggle('is-active', link.getAttribute('href') === '#' + entry.target.id);
+          });
+        });
+      }, { rootMargin: '-18% 0px -70% 0px' });
+      headings.forEach(function(heading) { observer.observe(heading); });
+    }
+  }
+
+  function createTocList(headings, className) {
+    var list = createElement('ol', className);
+    headings.forEach(function(heading, index) {
+      var item = createElement('li', heading.tagName === 'H3' ? 'depth-3' : 'depth-2');
+      var link = createLink('', '#' + heading.id, '');
+      link.appendChild(createElement('span', '', String(index + 1).padStart(2, '0')));
+      link.appendChild(document.createTextNode(heading.textContent.trim()));
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    return list;
   }
 
   function installShareActions(article, title) {
@@ -477,19 +735,39 @@
           copyButton.classList.remove('is-copied');
           copyButton.title = '复制文章链接';
         }, 1600);
+      }).catch(function() {
+        copyButton.title = '复制失败，请手动复制地址栏链接';
       });
     });
     actions.appendChild(copyButton);
+
+    var issueTitle = '文章纠错：' + title;
+    var issueBody = '文章地址：' + location.href + '\n\n问题描述：\n';
+    var issueLink = createLink(
+      'post-share-icon',
+      'https://github.com/swagcH/swagcH.github.io/issues/new?title=' + encodeURIComponent(issueTitle) + '&body=' + encodeURIComponent(issueBody),
+      ''
+    );
+    issueLink.target = '_blank';
+    issueLink.rel = 'noopener';
+    issueLink.title = '反馈文章问题';
+    issueLink.setAttribute('aria-label', '反馈文章问题');
+    issueLink.appendChild(createIcon('fa fa-bug'));
+    actions.appendChild(issueLink);
     footer.insertBefore(actions, query('.post-nav', footer));
   }
 
   function applyPostData(data) {
     var article = query('.main-inner.post article.post-content');
     var block = article && article.parentNode;
-    if (!article || !block || query('.related-reading', block)) return;
+    if (!article || !block) return;
 
     var current = findPostByUrl(data.posts, location.pathname);
     if (!current) return;
+    installPostProof(article, current);
+    installSeriesNavigation(block, current, data.brand && data.brand.series ? data.brand.series : []);
+    if (query('.related-reading', block)) return;
+
     var related = data.posts.filter(function(post) {
       return normalizePath(post.url) !== normalizePath(current.url);
     }).map(function(post) {
@@ -509,6 +787,75 @@
     related.forEach(function(post) { grid.appendChild(createRelatedCard(post)); });
     section.appendChild(grid);
     block.appendChild(section);
+  }
+
+  function installPostProof(article, post) {
+    if (query('.post-proof-strip', article)) return;
+    var hasSeries = post.series && post.series.length;
+    if (!post.verified && !post.environment.length && !hasSeries) return;
+
+    var strip = createElement('section', 'post-proof-strip');
+    strip.setAttribute('aria-label', '文章校验信息');
+    if (hasSeries) {
+      var membership = post.series[0];
+      var seriesLink = createLink('post-proof-series', '/series/#' + membership.slug, '');
+      seriesLink.appendChild(createIcon('fa fa-layer-group'));
+      seriesLink.appendChild(document.createTextNode(membership.title + ' · ' + membership.index + '/' + membership.total));
+      strip.appendChild(seriesLink);
+    }
+    if (post.verified) {
+      var verified = createElement('span', 'post-proof-verified');
+      verified.appendChild(createIcon('fa fa-check-circle'));
+      verified.appendChild(document.createTextNode('校验于 ' + post.verified));
+      strip.appendChild(verified);
+    }
+    post.environment.forEach(function(item) {
+      strip.appendChild(createElement('span', 'post-proof-environment', item));
+    });
+
+    var layout = query('.post-reading-layout', article) || query('.post-body', article);
+    article.insertBefore(strip, layout);
+  }
+
+  function installSeriesNavigation(block, post, seriesList) {
+    if (query('.post-series-navigation', block) || !post.series || !post.series.length) return;
+    var membership = post.series[0];
+    var series = seriesList.find(function(item) { return item.slug === membership.slug; });
+    if (!series) return;
+
+    var currentIndex = series.posts.findIndex(function(item) {
+      return normalizePath(item.url) === normalizePath(post.url);
+    });
+    if (currentIndex < 0) return;
+
+    var section = createElement('section', 'post-series-navigation');
+    var header = createElement('header');
+    var label = createElement('div');
+    label.appendChild(createElement('p', '', '继续阅读专题'));
+    label.appendChild(createLink('', '/series/#' + series.slug, series.title));
+    header.appendChild(label);
+    header.appendChild(createElement('span', '', (currentIndex + 1) + ' / ' + series.posts.length));
+    section.appendChild(header);
+
+    var links = createElement('div', 'post-series-links');
+    appendSeriesDirection(links, series.posts[currentIndex - 1], '上一篇');
+    appendSeriesDirection(links, series.posts[currentIndex + 1], '下一篇');
+    section.appendChild(links);
+    block.appendChild(section);
+  }
+
+  function appendSeriesDirection(container, post, label) {
+    if (!post) {
+      var empty = createElement('span', 'post-series-link is-empty');
+      empty.appendChild(createElement('small', '', label));
+      empty.appendChild(createElement('strong', '', '已经到达专题边界'));
+      container.appendChild(empty);
+      return;
+    }
+    var link = createLink('post-series-link', post.url, '');
+    link.appendChild(createElement('small', '', label));
+    link.appendChild(createElement('strong', '', post.title));
+    container.appendChild(link);
   }
 
   function createRelatedCard(post) {
@@ -536,6 +883,7 @@
     if (document.body.classList.contains('editorial-home-page')) applyHomeData(data);
     if (document.body.classList.contains('editorial-category-page')) applyCategoryData(data);
     if (document.body.classList.contains('editorial-archive-page')) renderArchivePage(data);
+    if (document.body.classList.contains('editorial-series-page')) renderSeriesPage(data);
     if (document.body.classList.contains('editorial-post-page')) applyPostData(data);
   }
 

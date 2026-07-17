@@ -18,20 +18,21 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="一个 Java 后端开发的技术笔记博客">
+    <meta name="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
 <meta property="og:type" content="website">
 <meta property="og:title" content="杰尼龟的笔记">
 <meta property="og:url" content="https://swagch.github.io/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="一个 Java 后端开发的技术笔记博客">
+<meta property="og:description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
-<meta property="article:tag" content="JUC">
-<meta property="article:tag" content="并发编程">
-<meta property="article:tag" content="设计模式">
-<meta property="article:tag" content="Linux">
-<meta name="twitter:card" content="summary">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="系统稳定性">
+<meta property="article:tag" content="故障排查">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="Vibe Coding">
+<meta name="twitter:card" content="summary_large_image">
 
 
 <link rel="canonical" href="https://swagch.github.io/">
@@ -109,7 +110,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-专题"><a href="/series/" rel="section">专题</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger">搜索
         </a>
@@ -168,7 +169,7 @@
     <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
       src="/images/avatar.png">
   <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
-  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+  <div class="site-description" itemprop="description">Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
@@ -225,7 +226,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -249,6 +250,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -267,7 +275,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
+          <p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
+<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2026/06/09/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/#more" rel="contents">
@@ -310,7 +319,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -334,6 +343,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -352,7 +368,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/ai-year-review-cover.svg" alt="2025 AI 编程复盘封面图"></p>
+          <p><img src="/images/posts/2025/ai-year-review-cover.png" alt="2025 AI 编程复盘封面图"></p>
 <p>年初第一次认真使用 AI 编程时，我期待的是“少写一些代码”。到年底回头看，真正发生的变化更像是：代码出现得更快了，于是判断什么值得写、什么可以相信，变得更重要。</p>
 <p>这一年我用 AI 解释陌生项目、补测试、改接口、做原型，也让它带我走过几次很完整的弯路。没有“一人顶一个团队”的故事，倒是积累了一些比工具榜单更稳定的认识。</p>
           <!--noindex-->
@@ -397,7 +413,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -421,6 +437,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -439,7 +462,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/ai-workflow-cover.svg" alt="AI 编程工作流封面图"></p>
+          <p><img src="/images/posts/2025/ai-workflow-cover.png" alt="AI 编程工作流封面图"></p>
 <p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
 <p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
 <p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
@@ -485,7 +508,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -509,6 +532,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -527,7 +557,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/java-refactor-cover.svg" alt="AI 辅助 Java 重构封面图"></p>
+          <p><img src="/images/posts/2025/java-refactor-cover.png" alt="AI 辅助 Java 重构封面图"></p>
 <p>这次想记录一个更接近存量项目的 AI 使用场景：拆解一个 186 行的 <code>createOrder</code> 方法。</p>
 <p>它同时做参数校验、商品查询、价格计算、库存扣减、订单落库、优惠券核销和通知发送。方法虽然长，却已经稳定运行两年。面对这种代码，最危险的需求不是“帮我重构”，而是“帮我一次重写得更优雅”。</p>
 <p>重构的目标应该是改善内部结构而不改变外部行为。AI 可以加快识别重复和生成小函数的速度，但前提是我们先固定行为，再让每一步差异足够小。</p>
@@ -573,7 +603,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -597,6 +627,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -615,7 +652,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/vibe-coding-boundary-cover.svg" alt="Vibe Coding 边界封面图"></p>
+          <p><img src="/images/posts/2025/vibe-coding-boundary-cover.png" alt="Vibe Coding 边界封面图"></p>
 <p>Vibe Coding 最吸引人的画面，是只描述想法，AI 持续修改代码，人看着页面变化说“再来一点”，直到产品能用。这个过程真实存在，而且非常适合探索。但当它被简化成“以后不需要看代码”，问题就从一种高效交互方式变成了责任错位。</p>
 <p>我的理解是：<strong>Vibe Coding 可以降低表达想法的门槛，不能取消软件运行后的后果。</strong></p>
           <!--noindex-->
@@ -660,7 +697,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -684,6 +721,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -702,7 +746,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/ai-feature-log-cover.svg" alt="AI 需求开发日志封面图"></p>
+          <p><img src="/images/posts/2025/ai-feature-log-cover.png" alt="AI 需求开发日志封面图"></p>
 <p>这是我第一次有意识地让 AI 参与一个完整需求，而不是只让它解释报错或补一个工具方法。</p>
 <p>需求不大：在工单列表增加“最近跟进时间”筛选，并让导出接口使用相同条件。真正做下来，AI 最有价值的部分不是写代码，而是帮助我快速梳理分散的调用链；最危险的部分也不是语法错误，而是它会非常自然地替需求补上一个没有确认过的定义。</p>
 <p>下面按当天的开发时间线还原整个过程。项目和数据均做了简化，重点是我与 AI 怎样分工，以及哪些地方发生了返工。</p>
@@ -748,7 +792,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -772,6 +816,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -790,7 +841,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/context-engineering-cover.svg" alt="Context Engineering 实验封面图"></p>
+          <p><img src="/images/posts/2025/context-engineering-cover.png" alt="Context Engineering 实验封面图"></p>
 <p>刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。</p>
 <p>为了确认这个判断，我拿一个相同的小需求做了三轮实验。任务是给 Spring Boot 项目的订单查询接口增加一个 <code>deliveryStatus</code> 字段。三轮使用同一个模型，只改变输入上下文，不手工修正中间结果。</p>
           <!--noindex-->
@@ -835,7 +886,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -859,6 +910,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -877,7 +935,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/llm-basics-cover.svg" alt="大模型入门封面图"></p>
+          <p><img src="/images/posts/2025/llm-basics-cover.png" alt="大模型入门封面图"></p>
 <p>第一次使用大模型时，我把它当成了一个更聪明的搜索框：输入问题，等待正确答案。用了一段时间后才发现，这个理解会制造很多误判。模型不是从知识库里查出一段标准答案，而是在已有上下文后面，持续预测更可能出现的下一个 Token。</p>
 <p>这句话看起来抽象，却能解释日常使用中的大部分现象：为什么同一个问题会得到不同答案，为什么一段无关日志会让结果变差，为什么模型能写出语法正确但根本不存在的 API，也能解释为什么“把需求说清楚”比反复要求它聪明一点更有效。</p>
           <!--noindex-->
@@ -922,7 +980,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -946,6 +1004,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-06-02 13:05:29" itemprop="dateModified" datetime="2024-06-02T13:05:29+08:00">2024-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -964,7 +1029,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
+          <p><img src="/images/posts/2024/offline-nginx-cover.png" alt="无外网安装Nginx封面图"></p>
+<blockquote>
 <p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>
 </blockquote>
 
@@ -1041,7 +1107,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1065,6 +1131,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-06-02 13:03:03" itemprop="dateModified" datetime="2024-06-02T13:03:03+08:00">2024-06-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -1083,7 +1156,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="JUC并发编程"><a href="#JUC并发编程" class="headerlink" title="JUC并发编程"></a>JUC并发编程</h1><blockquote>
+          <p><img src="/images/posts/2024/juc-notes-cover.png" alt="JUC并发编程知识点封面图"></p>
+<h1 id="JUC并发编程"><a href="#JUC并发编程" class="headerlink" title="JUC并发编程"></a>JUC并发编程</h1><blockquote>
 <p>写在前面</p>
 </blockquote>
 <p>基础的查缺补漏问题，感觉工作上用的并发编程不是很多，都快忘得差不多了，通过看书+视频的方式，补充一些相关知识。</p>
@@ -1567,7 +1641,7 @@
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
 </noscript>
-<script src="/js/custom-modern.js?v=20260714l"></script>
+<script src="/js/custom-modern.js?v=20260717a"></script>
 
 </body>
 </html>

@@ -18,20 +18,21 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="一个 Java 后端开发的技术笔记博客">
+    <meta name="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
 <meta property="og:type" content="website">
 <meta property="og:title" content="杰尼龟的笔记">
 <meta property="og:url" content="https://swagch.github.io/page/5/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="一个 Java 后端开发的技术笔记博客">
+<meta property="og:description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
-<meta property="article:tag" content="JUC">
-<meta property="article:tag" content="并发编程">
-<meta property="article:tag" content="设计模式">
-<meta property="article:tag" content="Linux">
-<meta name="twitter:card" content="summary">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="系统稳定性">
+<meta property="article:tag" content="故障排查">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="Vibe Coding">
+<meta name="twitter:card" content="summary_large_image">
 
 
 <link rel="canonical" href="https://swagch.github.io/page/5/">
@@ -109,7 +110,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-专题"><a href="/series/" rel="section">专题</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger">搜索
         </a>
@@ -168,7 +169,7 @@
     <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
       src="/images/avatar.png">
   <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
-  <div class="site-description" itemprop="description">一个 Java 后端开发的技术笔记博客</div>
+  <div class="site-description" itemprop="description">Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
@@ -225,7 +226,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -246,6 +247,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-09-29 23:05:26" itemprop="dateCreated datePublished" datetime="2020-09-29T23:05:26+08:00">2020-09-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:46:53" itemprop="dateModified" datetime="2026-07-16T11:46:53+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -401,7 +409,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -422,6 +430,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-09-13 20:17:04" itemprop="dateCreated datePublished" datetime="2020-09-13T20:17:04+08:00">2020-09-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:45:39" itemprop="dateModified" datetime="2026-07-16T11:45:39+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -554,7 +569,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -575,6 +590,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-08-23 21:33:18" itemprop="dateCreated datePublished" datetime="2020-08-23T21:33:18+08:00">2020-08-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:43:58" itemprop="dateModified" datetime="2026-07-16T11:43:58+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -740,7 +762,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -761,6 +783,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-07-12 18:20:53" itemprop="dateCreated datePublished" datetime="2020-07-12T18:20:53+08:00">2020-07-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:42:44" itemprop="dateModified" datetime="2026-07-16T11:42:44+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -950,7 +979,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -971,6 +1000,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-06-20 19:44:36" itemprop="dateCreated datePublished" datetime="2020-06-20T19:44:36+08:00">2020-06-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:41:30" itemprop="dateModified" datetime="2026-07-16T11:41:30+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1150,7 +1186,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1171,6 +1207,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-05-10 15:28:41" itemprop="dateCreated datePublished" datetime="2020-05-10T15:28:41+08:00">2020-05-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:36:55" itemprop="dateModified" datetime="2026-07-16T11:36:55+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1332,7 +1375,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1353,6 +1396,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-04-19 22:06:17" itemprop="dateCreated datePublished" datetime="2020-04-19T22:06:17+08:00">2020-04-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:36:55" itemprop="dateModified" datetime="2026-07-16T11:36:55+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1512,7 +1562,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1533,6 +1583,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-03-14 20:31:55" itemprop="dateCreated datePublished" datetime="2020-03-14T20:31:55+08:00">2020-03-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:36:55" itemprop="dateModified" datetime="2026-07-16T11:36:55+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1659,7 +1716,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1680,6 +1737,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-02-16 16:42:09" itemprop="dateCreated datePublished" datetime="2020-02-16T16:42:09+08:00">2020-02-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:36:55" itemprop="dateModified" datetime="2026-07-16T11:36:55+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1808,7 +1872,7 @@
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="一个 Java 后端开发的技术笔记博客">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -1829,6 +1893,13 @@
       <span class="post-meta-item-text">发表于</span>
 
       <time title="创建时间：2020-01-11 21:10:28" itemprop="dateCreated datePublished" datetime="2020-01-11T21:10:28+08:00">2020-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-16 11:36:55" itemprop="dateModified" datetime="2026-07-16T11:36:55+08:00">2026-07-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2042,7 +2113,7 @@
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
 </noscript>
-<script src="/js/custom-modern.js?v=20260714l"></script>
+<script src="/js/custom-modern.js?v=20260717a"></script>
 
 </body>
 </html>

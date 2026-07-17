@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#081218"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#111e25" stroke="#31505c"/>
+  <text x="112" y="126" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="22">PERSONAL BLOG / 2026</text>
+  <text x="112" y="214" fill="#f0fdfa" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="52" font-weight="700">博客重新出发</text>
+  <text x="112" y="268" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">找回源码、重建设计、继续记录</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="19">
+    <rect x="112" y="342" width="240" height="104" rx="8" fill="#09161b" stroke="#2dd4bf"/>
+    <text x="180" y="403" fill="#c8faf1">source</text>
+    <rect x="502" y="342" width="240" height="104" rx="8" fill="#09161b" stroke="#fbbf24"/>
+    <text x="582" y="403" fill="#f7e4a6">build</text>
+    <rect x="892" y="342" width="212" height="104" rx="8" fill="#09161b" stroke="#60a5fa"/>
+    <text x="954" y="403" fill="#d3e6fd">pages</text>
+  </g>
+  <path d="M352 394H502M742 394H892" stroke="#69808a" stroke-width="3"/>
+  <path d="M488 385L502 394L488 403M878 385L892 394L878 403" fill="none" stroke="#69808a" stroke-width="3"/>
+  <rect x="112" y="514" width="992" height="64" rx="8" fill="#0b181e" stroke="#31505c"/>
+  <text x="144" y="555" fill="#9fb8be" font-family="Menlo,Consolas,monospace" font-size="18">77 posts · 3 series · one maintainable source</text>
+</svg>
