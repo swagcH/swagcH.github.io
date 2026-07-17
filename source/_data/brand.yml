@@ -1,0 +1,117 @@
+profile:
+  eyebrow: JAVA BACKEND · RELIABILITY · AI CODING
+  title: 杰尼龟的笔记
+  description: Java 后端工程师的实践笔记，聚焦可维护代码、系统稳定性与 AI 编程工作流，用真实案例说明问题如何定位、方案如何验证。
+  primary_action:
+    label: 查看代表专题
+    url: /series/
+  secondary_action:
+    label: 了解我与职业方向
+    url: /about/
+  start_year: 2018
+  core_tracks: 3
+  announcement:
+    label: 站点更新
+    title: 博客重新出发
+    url: /2026/06/09/博客重新出发/
+
+tracks:
+  - slug: java-spring
+    title: Java 与 Spring
+    description: 从语言基础、并发编程到 Spring 服务端工程实践
+    keywords: Java · Spring Boot · JVM · Concurrency
+    icon: fa fa-code
+    categories: [Java, Spring]
+    tags: [Java, Spring, JUC, 并发编程]
+  - slug: data-middleware
+    title: 数据库与中间件
+    description: SQL 调优、缓存、消息可靠性与数据一致性
+    keywords: MySQL · Redis · RabbitMQ · SQL
+    icon: fa fa-database
+    categories: [数据库]
+    tags: [MySQL, Redis, RabbitMQ, SQL优化]
+  - slug: architecture
+    title: 架构与微服务
+    description: 系统边界、服务治理和架构演进中的工程取舍
+    keywords: Architecture · API · Microservice
+    icon: fa fa-sitemap
+    categories: [架构, 接口]
+    tags: [微服务, 系统设计, 架构演进]
+  - slug: reliability
+    title: 稳定性与运维
+    description: 从监控、日志到生产问题的定位、恢复与复盘
+    keywords: Linux · JVM · Docker · Observability
+    icon: fa fa-shield-alt
+    categories: [故障, 问题, 运维, 部署]
+    tags: [故障排查, OOM, CPU, 监控]
+  - slug: ai-tooling
+    title: AI 与开发工具
+    description: 大模型基础、Context Engineering 与 AI 编程实践
+    keywords: AI · Vibe Coding · Context · Workflow
+    icon: fa fa-bolt
+    categories: [AI, 效率工具, 开发工具]
+    tags: [AI, AI编程, Vibe Coding]
+  - slug: engineering
+    title: 工程质量与协作
+    description: 代码质量、测试、交付流程和团队协作方法
+    keywords: Testing · Git · Review · Delivery
+    icon: fa fa-code-branch
+    categories: [工程, 项目, 经验]
+    tags: [测试, Code Review, Git, 代码规范]
+  - slug: growth
+    title: 随笔与成长
+    description: 程序员成长、年度复盘和技术写作记录
+    keywords: Learning · Writing · Career · Review
+    icon: fa fa-pen
+    categories: [随笔, 成长]
+    tags: [年度总结, 程序员成长, 工作复盘]
+
+series:
+  - slug: ai-coding
+    tone: cyan
+    eyebrow: AI ENGINEERING
+    title: AI 编程与 Vibe Coding
+    description: 从理解 Token 和上下文开始，逐步走到真实需求、Java 重构、个人工作流与年度复盘。
+    outcome: 建立可验证、可审查、可回退的 AI 编程方法
+    posts:
+      - 大模型入门：从Token、上下文到幻觉
+      - 从Prompt Engineering到Context Engineering：一次提示词改造实验
+      - 第一次用AI完成一个真实需求：从需求澄清到上线
+      - Vibe Coding不是完全不看代码
+      - AI辅助Java重构实战：拆解一个过长Service
+      - 我的AI编程工作流：让模型先读懂项目再动手
+      - 2025 AI编程实践复盘：效率、安全与能力边界
+  - slug: java-engineering
+    tone: orange
+    eyebrow: BACKEND ENGINEERING
+    title: Java 后端工程成长
+    description: 从项目上手、代码质量和数据库设计，逐步走向可交付的服务骨架与架构演进。
+    outcome: 形成从代码实现到工程交付的完整视角
+    posts:
+      - 新人如何快速熟悉项目
+      - 如何阅读遗留代码
+      - 代码规范的重要性
+      - 数据库设计经验总结
+      - Spring Boot项目搭建
+      - Git协作开发流程
+      - 从单体到微服务总结
+  - slug: reliability
+    tone: green
+    eyebrow: PRODUCTION RELIABILITY
+    title: 稳定性与故障排查
+    description: 沿着接口、线程、消息、CPU、内存和磁盘逐层建立生产问题的证据链。
+    outcome: 掌握先恢复、留证据、再定位和复盘的排障顺序
+    posts:
+      - 一次接口超时问题排查
+      - 线程池使用踩坑记录
+      - 死锁问题定位过程
+      - RabbitMQ消息丢失排查
+      - Linux服务器CPU飙高问题定位
+      - 服务器内存不足与OOM排查
+      - 服务器磁盘空间与IO异常定位
+
+featured:
+  - AI辅助Java重构实战：拆解一个过长Service
+  - Linux服务器CPU飙高问题定位
+  - 一次MySQL慢SQL调优记录
+  - 从单体到微服务总结

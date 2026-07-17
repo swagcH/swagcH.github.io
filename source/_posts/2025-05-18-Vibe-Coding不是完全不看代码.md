@@ -1,13 +1,16 @@
 ---
 title: Vibe Coding不是完全不看代码
 date: 2025-05-18 19:40:00
+updated: 2026-07-17 00:00:00
+verified: '2026-07-17'
+environment: [工程观点, 生产实践]
 tags: [Vibe Coding, AI编程, 代码审查, 工程实践]
 categories: 程序员随笔
 keywords: Vibe Coding, 氛围编程, AI生成代码, AI代码审查, 程序员能力边界
-cover: /images/posts/2025/vibe-coding-boundary-cover.svg
+cover: /images/posts/2025/vibe-coding-boundary-cover.png
 ---
 
-![Vibe Coding 边界封面图](/images/posts/2025/vibe-coding-boundary-cover.svg)
+![Vibe Coding 边界封面图](/images/posts/2025/vibe-coding-boundary-cover.png)
 
 Vibe Coding 最吸引人的画面，是只描述想法，AI 持续修改代码，人看着页面变化说“再来一点”，直到产品能用。这个过程真实存在，而且非常适合探索。但当它被简化成“以后不需要看代码”，问题就从一种高效交互方式变成了责任错位。
 

@@ -6,7 +6,10 @@ tags:
   - 并发编程
   - Java
 categories: Java基础
+cover: /images/posts/2024/juc-notes-cover.png
 ---
+
+![JUC并发编程知识点封面图](/images/posts/2024/juc-notes-cover.png)
 
 <h1 id="JUC并发编程"><a href="#JUC并发编程" class="headerlink" title="JUC并发编程"></a>JUC并发编程</h1><blockquote>
 <p>写在前面</p>

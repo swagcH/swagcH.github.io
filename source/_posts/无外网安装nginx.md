@@ -6,7 +6,10 @@ tags:
   - 运维
   - Linux
 categories: Linux运维
+cover: /images/posts/2024/offline-nginx-cover.png
 ---
+
+![无外网安装Nginx封面图](/images/posts/2024/offline-nginx-cover.png)
 
 <blockquote>
 <p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>

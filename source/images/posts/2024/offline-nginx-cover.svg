@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0a120e"/>
+  <rect x="72" y="64" width="1136" height="592" rx="18" fill="#142019" stroke="#365343"/>
+  <text x="112" y="126" fill="#4ade80" font-family="Menlo,Consolas,monospace" font-size="22">OFFLINE DEPLOYMENT / LINUX</text>
+  <text x="112" y="212" fill="#f4fbf6" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="50" font-weight="700">无外网安装 Nginx</text>
+  <text x="112" y="266" fill="#aec0b4" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24">依赖准备、离线编译与部署验证</text>
+  <g font-family="Menlo,Consolas,monospace" font-size="17">
+    <rect x="112" y="342" width="270" height="174" rx="8" fill="#0b1510" stroke="#4ade80"/>
+    <text x="148" y="389" fill="#86efac">packages/</text>
+    <text x="148" y="430" fill="#b8c8bc">openssl.tar.gz</text>
+    <text x="148" y="464" fill="#b8c8bc">pcre.tar.gz</text>
+    <text x="148" y="498" fill="#b8c8bc">zlib.tar.gz</text>
+    <rect x="824" y="342" width="280" height="174" rx="8" fill="#0b1510" stroke="#60a5fa"/>
+    <text x="862" y="397" fill="#93c5fd">server</text>
+    <text x="862" y="438" fill="#b8c8bc">nginx -t</text>
+    <text x="862" y="476" fill="#b8c8bc">systemctl start</text>
+  </g>
+  <path d="M382 429H824" stroke="#fbbf24" stroke-width="3" stroke-dasharray="10 8"/>
+  <path d="M810 420L824 429L810 438" fill="none" stroke="#fbbf24" stroke-width="3"/>
+  <text x="496" y="402" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="16">no internet</text>
+  <text x="112" y="596" fill="#93a799" font-family="Menlo,Consolas,monospace" font-size="18">prepare → compile → configure → verify</text>
+</svg>

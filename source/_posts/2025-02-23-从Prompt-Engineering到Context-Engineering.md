@@ -1,13 +1,16 @@
 ---
 title: 从Prompt Engineering到Context Engineering：一次提示词改造实验
 date: 2025-02-23 16:20:00
+updated: 2026-07-17 00:00:00
+verified: '2026-07-17'
+environment: [JDK 8, Spring Boot 2.x, Mockito 2]
 tags: [AI, Prompt Engineering, Context Engineering, AI编程]
 categories: AI实践
 keywords: Prompt Engineering, Context Engineering, 提示词工程, AI编程上下文, 代码生成实验
-cover: /images/posts/2025/context-engineering-cover.svg
+cover: /images/posts/2025/context-engineering-cover.png
 ---
 
-![Context Engineering 实验封面图](/images/posts/2025/context-engineering-cover.svg)
+![Context Engineering 实验封面图](/images/posts/2025/context-engineering-cover.png)
 
 刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。
 

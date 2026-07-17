@@ -1,13 +1,14 @@
 # Site
 title: 杰尼龟的笔记
 subtitle: ''
-description: 一个 Java 后端开发的技术笔记博客
+description: Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流
 keywords:
   - Java
-  - JUC
-  - 并发编程
-  - 设计模式
-  - Linux
+  - Spring Boot
+  - 系统稳定性
+  - 故障排查
+  - AI编程
+  - Vibe Coding
 author: 无敌杰尼龟
 language: zh-CN
 timezone: Asia/Shanghai
