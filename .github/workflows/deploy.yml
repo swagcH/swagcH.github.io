@@ -1,0 +1,46 @@
+# 自动部署工作流：push 到 source 分支后，自动构建并发布静态页面到 main 分支
+# 这样任何设备只需推送 Markdown 源码，无需本地安装 Node.js/Hexo 即可发布博客
+name: Deploy Hexo
+
+# 触发条件：source 分支有推送，或手动触发
+on:
+  push:
+    branches: [source]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # 需要写权限，才能把构建产物推送到 main 分支
+    permissions:
+      contents: write
+    steps:
+      # 检出 source 分支的源码（不是默认分支）
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          ref: source
+
+      # 安装 Node.js，并启用 npm 依赖缓存加速构建
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 严格按照 package-lock.json 安装，保证各设备构建环境一致
+      - name: Install dependencies
+        run: npm ci
+
+      # 清理缓存并生成静态页面到 public/
+      - name: Build site
+        run: npx hexo clean && npx hexo generate
+
+      # 将 public/ 内容发布到 main 分支，GitHub Pages 随后自动更新线上站点
+      - name: Deploy to main branch
+        uses: peaceiris/actions-ghpages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: main
+          publish_dir: ./public
+          commit_message: 'deploy: site built from source@${{ github.sha }}'
