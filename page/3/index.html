@@ -175,13 +175,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-count">77</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">23</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -208,186 +208,6 @@
     </div>
 
     <div class="main-inner index posts-expand">
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">Docker基础部署，Docker Compose实践</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-08-14 17:42:26" itemprop="dateCreated datePublished" datetime="2022-08-14T17:42:26+08:00">2022-08-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>这篇做一个可以实际运行的部署练习：把 JDK 8 的 Spring Boot 应用构建成镜像，再使用 Docker Compose 启动应用、MySQL 和 Redis。重点不只是 <code>up -d</code>，还包括网络、健康检查、数据卷、日志和排障。</p>
-</blockquote>
-<h2 id="0-最终目录"><a href="#0-最终目录" class="headerlink" title="0. 最终目录"></a>0. 最终目录</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">demo-app</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── .dockerignore</span><br><span class="line">├── compose.yaml</span><br><span class="line">├── .env.example</span><br><span class="line">├── pom.xml</span><br><span class="line">└── src</span><br></pre></td></tr></table></figure>
-
-<p>Docker Compose V2 推荐使用 <code>docker compose</code> 命令。旧环境可能仍然使用独立的 <code>docker-compose</code>。新版 Compose 文件可以省略顶层 <code>version</code>，旧项目中的 <code>version: &quot;3.8&quot;</code> 仍然常见，但不要把它和 Docker Engine 版本混为一谈。</p>
-<h2 id="1-先理解四个对象"><a href="#1-先理解四个对象" class="headerlink" title="1. 先理解四个对象"></a>1. 先理解四个对象</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Image：只读构建产物</span><br><span class="line">Container：镜像运行后的进程和隔离环境</span><br><span class="line">Network：容器之间的通信空间和 DNS</span><br><span class="line">Volume：独立于容器生命周期的数据存储</span><br></pre></td></tr></table></figure>
-
-<p>容器不是轻量虚拟机。一个容器通常运行一个主要前台进程，进程退出，容器也会停止。容器内写入层可以保存临时文件，但删除容器后数据会消失，因此 MySQL 数据必须放在 Volume。</p>
-<h2 id="2-为-Spring-Boot-编写-Dockerfile"><a href="#2-为-Spring-Boot-编写-Dockerfile" class="headerlink" title="2. 为 Spring Boot 编写 Dockerfile"></a>2. 为 Spring Boot 编写 Dockerfile</h2><p>使用多阶段构建，第一阶段通过 Maven 打包，第二阶段只保留 JRE 和 Jar：</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> maven:<span class="number">3.8</span>.<span class="number">8</span>-eclipse-temurin-<span class="number">8</span> AS build</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /workspace</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> pom.xml ./</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B dependency:go-offline</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> src ./src</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B -DskipTests package</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> eclipse-temurin:<span class="number">8</span>-jre</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> groupadd --system app \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; useradd --system --gid app --home-dir /app app</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=build /workspace/target/*.jar /app/app.jar</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> app</span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>, <span class="string">&quot;-jar&quot;</span>, <span class="string">&quot;/app/app.jar&quot;</span>]</span></span><br></pre></td></tr></table></figure>
-
-<p>这里有几个目的：</p>
-<ol>
-<li>构建环境和运行环境分开，运行镜像不包含 Maven 缓存和源代码。</li>
-<li>先复制 <code>pom.xml</code> 下载依赖，依赖不变时可以复用构建缓存。</li>
-<li>应用使用非 root 用户运行。</li>
-<li>Jar 名称在镜像中固定为 <code>app.jar</code>，启动命令不依赖版本号。</li>
-</ol>
-<p>基础镜像标签应该固定到经过验证的版本或 digest。示例标签用于说明结构，正式项目需要经过漏洞扫描和升级流程。</p>
-<p>如果项目打包目录里可能有多个 Jar，<code>target/*.jar</code> 会匹配多个文件并导致构建失败。可以在 Maven 中固定 <code>finalName</code>，或者在构建脚本中明确选择可执行 Jar。</p>
-<h2 id="3-减少无关构建上下文"><a href="#3-减少无关构建上下文" class="headerlink" title="3. 减少无关构建上下文"></a>3. 减少无关构建上下文</h2><p><code>.dockerignore</code>：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.git</span><br><span class="line">.idea</span><br><span class="line">target</span><br><span class="line">logs</span><br><span class="line">*.iml</span><br><span class="line">README.md</span><br><span class="line">compose.yaml</span><br><span class="line">.env</span><br></pre></td></tr></table></figure>
-
-<p>Docker 构建会把上下文发送给 daemon。忽略 <code>target</code>、日志和本地环境文件可以提升速度，也能避免把密钥误打进镜像层。</p>
-<p>构建并检查：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t demo-app:1.0.0 .</span><br><span class="line">docker image inspect demo-app:1.0.0</span><br><span class="line">docker <span class="built_in">history</span> demo-app:1.0.0</span><br></pre></td></tr></table></figure>
-
-<p>不要只使用永久不变的 <code>latest</code>。至少同时保留不可变版本标签，方便回滚和追踪实际部署内容。</p>
-<h2 id="4-编写-Compose"><a href="#4-编写-Compose" class="headerlink" title="4. 编写 Compose"></a>4. 编写 Compose</h2><p><code>.env.example</code> 只保留变量名和示例值，真实 <code>.env</code> 不提交：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MYSQL_ROOT_PASSWORD=change-me</span><br><span class="line">MYSQL_APP_PASSWORD=change-me</span><br></pre></td></tr></table></figure>
-
-<p><code>compose.yaml</code>：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mysql:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0.36</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">$&#123;MYSQL_ROOT_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_USER:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">TZ:</span> <span class="string">Asia/Shanghai</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-data:/var/lib/mysql</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD-SHELL&quot;</span>, <span class="string">&quot;mysqladmin ping -h 127.0.0.1 -p$$&#123;MYSQL_ROOT_PASSWORD&#125;&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">start_period:</span> <span class="string">30s</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:6.2.14</span></span><br><span class="line">    <span class="attr">command:</span> [<span class="string">&quot;redis-server&quot;</span>, <span class="string">&quot;--appendonly&quot;</span>, <span class="string">&quot;yes&quot;</span>]</span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis-data:/data</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;redis-cli&quot;</span>, <span class="string">&quot;ping&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">3s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">demo-app:1.0.0</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_USERNAME:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_PORT:</span> <span class="number">6379</span></span><br><span class="line">      <span class="attr">JAVA_TOOL_OPTIONS:</span> <span class="string">-Xms256m</span> <span class="string">-Xmx512m</span> <span class="string">-XX:+ExitOnOutOfMemoryError</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">      <span class="attr">redis:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    <span class="attr">logging:</span></span><br><span class="line">      <span class="attr">driver:</span> <span class="string">json-file</span></span><br><span class="line">      <span class="attr">options:</span></span><br><span class="line">        <span class="attr">max-size:</span> <span class="string">100m</span></span><br><span class="line">        <span class="attr">max-file:</span> <span class="string">&quot;5&quot;</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">mysql-data:</span></span><br><span class="line">  <span class="attr">redis-data:</span></span><br></pre></td></tr></table></figure>
-
-<p>示例没有把 MySQL 和 Redis 端口映射到宿主机，因为只有应用容器需要访问它们。减少端口暴露可以降低误访问风险。本地确实需要客户端连接时，再显式增加 <code>127.0.0.1:3306:3306</code>，避免监听所有网卡。</p>
-<p><code>depends_on</code> 的健康条件需要较新的 Compose 实现。旧版本可能只保证启动顺序，不等待服务真正可用，因此应用自身仍应有有限重试和明确的启动失败日志。</p>
-<p><code>-XX:+ExitOnOutOfMemoryError</code> 需要较新的 JDK 8 update，使用前要通过实际基础镜像验证。JVM 堆也不能等于容器全部内存，还要给 Metaspace、线程栈和堆外内存留空间。</p>
-<h2 id="5-为什么容器里不能用-localhost"><a href="#5-为什么容器里不能用-localhost" class="headerlink" title="5. 为什么容器里不能用 localhost"></a>5. 为什么容器里不能用 localhost</h2><p>Compose 默认会创建一个项目网络，服务名自动成为 DNS 名称：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">app -&gt; mysql:3306</span><br><span class="line">app -&gt; redis:6379</span><br></pre></td></tr></table></figure>
-
-<p>应用容器里的 <code>localhost</code> 只指向应用容器自己，不是宿主机，也不是 MySQL 容器。因此：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo</span></span><br><span class="line"><span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br></pre></td></tr></table></figure>
-
-<p>从应用容器检查 DNS 和端口：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker compose <span class="built_in">exec</span> app getent hosts mysql</span><br><span class="line">docker run --<span class="built_in">rm</span> --network demo-app_default busybox:1.36.1 nc -zv mysql 3306</span><br></pre></td></tr></table></figure>
-
-<p>基础镜像不一定包含 <code>curl</code>、<code>ping</code> 或 <code>nc</code>。调试时不要为了一个命令永久把大量工具装进运行镜像，可以临时启动同网络的诊断容器。示例网络名会随 Compose 项目名变化，应先通过 <code>docker network ls</code> 确认。</p>
-<h2 id="6-启动与验证"><a href="#6-启动与验证" class="headerlink" title="6. 启动与验证"></a>6. 启动与验证</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker compose config</span><br><span class="line">docker compose up -d</span><br><span class="line">docker compose ps</span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=200 app</span><br></pre></td></tr></table></figure>
-
-<p><code>docker compose config</code> 会解析变量并校验最终配置。输出可能包含展开后的密码，不要把完整结果贴到公开工单或日志平台。</p>
-<p>验证健康接口：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br></pre></td></tr></table></figure>
-
-<p>再查看容器资源：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker stats --no-stream</span><br><span class="line">docker compose top</span><br></pre></td></tr></table></figure>
-
-<p>启动成功的标准不是三个容器都显示 <code>Up</code>，而是应用健康检查正常，数据库连接可用，Redis 读写成功，并且日志没有持续重连。</p>
-<h2 id="7-验证数据卷"><a href="#7-验证数据卷" class="headerlink" title="7. 验证数据卷"></a>7. 验证数据卷</h2><p>先写入一条测试数据，再重建容器：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker compose down</span><br><span class="line">docker compose up -d</span><br></pre></td></tr></table></figure>
-
-<p>不带 <code>-v</code> 时，命名 Volume 会保留。确认数据仍存在以后，再检查卷位置：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line">docker volume inspect demo-app_mysql-data</span><br></pre></td></tr></table></figure>
-
-<p>下面的命令会同时删除容器和声明的 Volume，数据不可恢复：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker compose down -v</span><br></pre></td></tr></table></figure>
-
-<p>只能在确认数据可删除的开发环境使用。生产数据还需要独立备份，Volume 本身不是备份。</p>
-<h2 id="8-五个常见故障"><a href="#8-五个常见故障" class="headerlink" title="8. 五个常见故障"></a>8. 五个常见故障</h2><h3 id="8-1-容器反复重启"><a href="#8-1-容器反复重启" class="headerlink" title="8.1 容器反复重启"></a>8.1 容器反复重启</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker compose ps</span><br><span class="line">APP_CONTAINER=$(docker compose ps -q app)</span><br><span class="line">docker inspect --format <span class="string">&#x27;&#123;&#123;.State.ExitCode&#125;&#125; &#123;&#123;.State.Error&#125;&#125;&#x27;</span> <span class="string">&quot;<span class="variable">$APP_CONTAINER</span>&quot;</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=300 app</span><br></pre></td></tr></table></figure>
-
-<p>先看退出码和最后一段日志。<code>restart: unless-stopped</code> 会不断拉起失败进程，容易让真正的首次异常滚出日志窗口。</p>
-<h3 id="8-2-MySQL-一直不健康"><a href="#8-2-MySQL-一直不健康" class="headerlink" title="8.2 MySQL 一直不健康"></a>8.2 MySQL 一直不健康</h3><p>检查密码变量是否正确展开、数据目录权限、旧数据卷与新版本是否兼容。MySQL 初始化只在空数据目录执行，修改环境变量不会自动修改已有数据库用户密码。</p>
-<h3 id="8-3-应用能解析服务名但连不上"><a href="#8-3-应用能解析服务名但连不上" class="headerlink" title="8.3 应用能解析服务名但连不上"></a>8.3 应用能解析服务名但连不上</h3><p>检查服务是否在同一个网络、目标进程是否监听 <code>0.0.0.0</code>，以及端口使用的是容器端口还是宿主机映射端口。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker network <span class="built_in">ls</span></span><br><span class="line">docker network inspect demo-app_default</span><br></pre></td></tr></table></figure>
-
-<h3 id="8-4-磁盘被日志写满"><a href="#8-4-磁盘被日志写满" class="headerlink" title="8.4 磁盘被日志写满"></a>8.4 磁盘被日志写满</h3><p>Docker <code>json-file</code> 默认可能持续增长。Compose 中已经限制单文件和数量，仍要监控 Docker 根目录和应用自身文件日志，避免两套日志重复写盘。</p>
-<h3 id="8-5-镜像在另一台机器无法运行"><a href="#8-5-镜像在另一台机器无法运行" class="headerlink" title="8.5 镜像在另一台机器无法运行"></a>8.5 镜像在另一台机器无法运行</h3><p>确认 CPU 架构、镜像是否成功推送、私有仓库认证和配置文件来源。Apple Silicon 本地构建的镜像部署到 x86 服务器时，尤其要检查目标平台。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker image inspect demo-app:1.0.0 --format <span class="string">&#x27;&#123;&#123;.Architecture&#125;&#125;/&#123;&#123;.Os&#125;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="9-配置和密钥"><a href="#9-配置和密钥" class="headerlink" title="9. 配置和密钥"></a>9. 配置和密钥</h2><p>Compose 环境变量适合本地练习，但生产环境不能把密码直接写进仓库。至少做到：</p>
-<ul>
-<li><code>.env</code> 加入 <code>.gitignore</code>。</li>
-<li>使用独立的应用数据库账号，不使用 root。</li>
-<li>密钥通过受控平台、挂载文件或 Secrets 管理。</li>
-<li>日志禁止打印数据库 URL 中的密码和 Token。</li>
-<li>配置变更有审计和回滚版本。</li>
-</ul>
-<p>Docker 镜像应当只包含通用应用，不把某个环境的 <code>application-prod.yml</code> 和密钥烘焙进去。</p>
-<h2 id="10-Compose-的适用边界"><a href="#10-Compose-的适用边界" class="headerlink" title="10. Compose 的适用边界"></a>10. Compose 的适用边界</h2><p>Compose 很适合本地开发、自动化测试和单机多容器部署。它能把依赖关系固化成代码，也方便复现环境。</p>
-<p>生产环境还需要考虑：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">多机调度和节点故障</span><br><span class="line">滚动升级与自动回滚</span><br><span class="line">集中式 Secrets</span><br><span class="line">服务发现和负载均衡</span><br><span class="line">资源限制与配额</span><br><span class="line">日志、指标和告警</span><br><span class="line">数据备份与恢复</span><br></pre></td></tr></table></figure>
-
-<p>这些问题不是再写几行 Compose 就能全部解决的。是否进入 Kubernetes 等平台，要根据服务规模和运维能力决定。</p>
-<h2 id="收尾命令"><a href="#收尾命令" class="headerlink" title="收尾命令"></a>收尾命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看最终状态</span></span><br><span class="line">docker compose ps</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看最近日志</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=100 app mysql redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止但保留数据卷</span></span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure>
-
-<p>这次实践真正解决的不是“会用 Docker 命令”，而是把构建、网络、配置、依赖和数据生命周期写成了一个可以重复执行的环境。能够在另一台干净机器上用同一份配置启动并验证，才是容器化带来的环境一致性。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
 
     
 
@@ -433,7 +253,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -640,7 +460,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -803,7 +623,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -977,7 +797,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1152,7 +972,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1349,7 +1169,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1552,7 +1372,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1720,7 +1540,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1870,7 +1690,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:49:32" itemprop="dateModified" datetime="2026-08-26T11:49:32+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2044,6 +1864,156 @@
 
 <p>线程池参数不是一次配置后永久有效。任务耗时、实例数量和下游容量变化时，稳定处理能力也会变化。</p>
 <p>这次踩坑最大的收获是：线程池本质上是一套容量控制。线程决定同时做多少，队列决定愿意等多久，拒绝策略决定超载后谁承担结果。三者都没有业务边界时，所谓异步只是在把故障推迟到几分钟以后。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/06/20/2021-06-20-Linux%E7%A3%81%E7%9B%98%E7%88%86%E6%BB%A1%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/06/20/2021-06-20-Linux%E7%A3%81%E7%9B%98%E7%88%86%E6%BB%A1%E5%A4%84%E7%90%86/" class="post-title-link" itemprop="url">Linux磁盘爆满处理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-06-20 19:18:37" itemprop="dateCreated datePublished" datetime="2021-06-20T19:18:37+08:00">2021-06-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>这是一段磁盘告警值班记录。表面现象是根分区 100%，但真正占用空间的文件已经被删除，因此 <code>du</code> 怎么找都对不上 <code>df</code>。</p>
+<p>磁盘爆满时最危险的动作，是为了尽快腾空间直接删除不了解用途的大文件。值班处理应先确认挂载点和增长来源，再由对应负责人选择释放方式。</p>
+<h2 id="01-17，告警与业务现象"><a href="#01-17，告警与业务现象" class="headerlink" title="01:17，告警与业务现象"></a>01:17，告警与业务现象</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">host: app-02</span><br><span class="line">mount: /</span><br><span class="line">usage: 100%</span><br><span class="line">available: 0</span><br><span class="line"></span><br><span class="line">应用错误：</span><br><span class="line">java.io.IOException: No space left on device</span><br></pre></td></tr></table></figure>
+
+<p>订单服务仍能处理部分查询，但日志无法写入，临时文件创建失败。我们先暂停该节点的新发布和批处理任务，并确认其他实例有足够容量承接流量。</p>
+<h2 id="01-20，先确认是哪一种“满”"><a href="#01-20，先确认是哪一种“满”" class="headerlink" title="01:20，先确认是哪一种“满”"></a>01:20，先确认是哪一种“满”</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Filesystem  Type  Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda1   xfs    40G   40G     0 100% /</span><br><span class="line"></span><br><span class="line">Filesystem  Inodes IUsed IFree IUse% Mounted on</span><br><span class="line">/dev/vda1     20M  210K 19.8M    2% /</span><br></pre></td></tr></table></figure>
+
+<p>容量用完，inode 很充足，因此不是海量小文件。后续查找始终限制在根文件系统，避免进入其他挂载点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 / 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
+
+<p><code>du</code> 合计只有约 14G，而 <code>df</code> 显示已用 40G，差了 20 多 G。此时继续向下找目录意义不大，应该解释两种统计为什么不同。</p>
+<h2 id="01-24，df-与-du-的差值"><a href="#01-24，df-与-du-的差值" class="headerlink" title="01:24，df 与 du 的差值"></a>01:24，df 与 du 的差值</h2><p><code>df</code> 从文件系统块使用情况统计，只要块还被占用就会计入；<code>du</code> 从目录树遍历可见文件。一个文件被删除后，如果进程仍持有文件描述符：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">目录项已经消失 -&gt; du 看不到</span><br><span class="line">进程仍在写入     -&gt; 磁盘块没有释放</span><br><span class="line">进程关闭描述符   -&gt; 空间才真正归还</span><br></pre></td></tr></table></figure>
+
+<p>检查已删除但仍被占用的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>输出中有一条：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java  1842  app  17w  REG  253,1  21474836480  /var/log/order/app.log (deleted)</span><br></pre></td></tr></table></figure>
+
+<p>Java 进程仍持有约 20G 的已删除日志。原因已经足以解释 <code>df</code> 和 <code>du</code> 的差值。</p>
+<h2 id="01-27，为什么文件删了还在增长"><a href="#01-27，为什么文件删了还在增长" class="headerlink" title="01:27，为什么文件删了还在增长"></a>01:27，为什么文件删了还在增长</h2><p>当天有人手工删除了正在写入的 <code>app.log</code>，以为可以立即释放空间。Linux 删除的是文件名与 inode 的关联，进程已经打开的描述符仍指向原 inode。日志框架不知道路径消失，继续往同一个文件写。</p>
+<p>这也是为什么不建议把 <code>rm</code> 当日志轮转。删除命令成功，不代表空间已经释放。</p>
+<h2 id="01-30，受控释放文件描述符"><a href="#01-30，受控释放文件描述符" class="headerlink" title="01:30，受控释放文件描述符"></a>01:30，受控释放文件描述符</h2><p>可选方式按优先级评估：</p>
+<ol>
+<li>让日志框架主动滚动并重新打开文件。</li>
+<li>平滑重载支持重开日志的进程。</li>
+<li>摘流后重启单个应用实例。</li>
+<li>极端情况下由负责人评估是否截断对应描述符。</li>
+</ol>
+<p>本次 Java 应用没有可靠的重开信号，我们选择：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">从负载均衡摘除 app-02</span><br><span class="line">等待存量请求结束</span><br><span class="line">保存必要日志与进程证据</span><br><span class="line">正常停止服务</span><br><span class="line">确认旧描述符消失</span><br><span class="line">启动服务并通过健康检查</span><br><span class="line">逐步恢复流量</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会改变生产容量，必须由有权限的值班人员执行，并确认其他实例健康。不要为了释放文件直接 <code>kill -9</code>；强制终止可能中断事务，也不利于保留现场。</p>
+<p>进程退出后再次检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -hT /</span><br><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>根分区使用率从 100% 降到 48%，应用健康检查和写入恢复。</p>
+<h2 id="如果-du-找到的就是真实大文件"><a href="#如果-du-找到的就是真实大文件" class="headerlink" title="如果 du 找到的就是真实大文件"></a>如果 du 找到的就是真实大文件</h2><p>不能因为“日志通常可删”就直接处理。先把候选文件按用途分类：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">应用日志：确认保留周期、采集状态和当前写入文件</span><br><span class="line">临时文件：确认是否被任务使用</span><br><span class="line">数据库文件：必须交给数据库机制管理</span><br><span class="line">容器数据：通过容器运行时清理策略处理</span><br><span class="line">Core Dump：确认是否已留存排障证据</span><br><span class="line">发布产物：确认当前和回退版本</span><br></pre></td></tr></table></figure>
+
+<p>数据库数据、binlog、Docker 存储目录都不应通过手工删除底层文件释放空间。错误删除可能让服务无法恢复。</p>
+<p>应急时优先处理已经确认可再生、已归档、不会影响运行的文件，并记录删除范围。所有破坏性操作都需要责任人和复核人。</p>
+<h2 id="把日志滚动交给应用"><a href="#把日志滚动交给应用" class="headerlink" title="把日志滚动交给应用"></a>把日志滚动交给应用</h2><p>本次根因是日志没有稳定滚动，手工处理又删除了当前活跃文件。Spring Boot 使用 Logback 时，可以按日期和大小滚动：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">&quot;FILE&quot;</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">file</span>&gt;</span>/var/log/order/app.log<span class="tag">&lt;/<span class="name">file</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rollingPolicy</span> <span class="attr">class</span>=<span class="string">&quot;ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileNamePattern</span>&gt;</span>/var/log/order/app.%d&#123;yyyy-MM-dd&#125;.%i.log.gz<span class="tag">&lt;/<span class="name">fileNamePattern</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maxFileSize</span>&gt;</span>200MB<span class="tag">&lt;/<span class="name">maxFileSize</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">maxHistory</span>&gt;</span>14<span class="tag">&lt;/<span class="name">maxHistory</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">totalSizeCap</span>&gt;</span>8GB<span class="tag">&lt;/<span class="name">totalSizeCap</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rollingPolicy</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">encoder</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>%d %-5level [%X&#123;traceId&#125;] %logger - %msg%n<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>数值要根据流量、磁盘容量、采集延迟和合规保留要求确定。配置 <code>totalSizeCap</code> 前，先确认当前 Logback 版本支持且 <code>maxHistory</code> 已设置。</p>
+<p>如果统一使用 <code>logrotate</code>，应用必须配合重开文件；<code>copytruncate</code> 虽然不要求进程重开，但复制和截断之间可能丢少量日志，高吞吐场景要评估。不要让应用滚动和系统滚动同时管理同一个文件。</p>
+<h2 id="告警不能等到-100"><a href="#告警不能等到-100" class="headerlink" title="告警不能等到 100%"></a>告警不能等到 100%</h2><p>磁盘容量以增长速度而不是单一百分比判断更有意义：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">预警：使用率 75%，检查趋势</span><br><span class="line">高危：使用率 85% 或预计 24 小时内耗尽</span><br><span class="line">紧急：使用率 95% 或关键写入失败</span><br></pre></td></tr></table></figure>
+
+<p>同时监控：</p>
+<ul>
+<li>inode 使用率。</li>
+<li>每小时增长量和预计耗尽时间。</li>
+<li>日志写入速率。</li>
+<li>已删除文件占用。</li>
+<li>容器层和宿主机各自容量。</li>
+</ul>
+<p>阈值需要按文件系统用途设置。一个 2TB 数据盘的 90% 剩余空间，与 20G 根分区的 90% 完全不同。</p>
+<h2 id="值班记录最后写下什么"><a href="#值班记录最后写下什么" class="headerlink" title="值班记录最后写下什么"></a>值班记录最后写下什么</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">直接原因：Java 持有已删除的 20G 日志文件</span><br><span class="line">触发原因：当前日志被手工 rm，应用未重开描述符</span><br><span class="line">系统缺口：无大小上限、告警过晚、缺少标准处理手册</span><br><span class="line">恢复动作：单实例摘流并正常重启</span><br><span class="line">验证：磁盘 48%，日志可写，订单接口正常</span><br><span class="line">后续：启用滚动策略、增加趋势告警、禁止手工删除活跃日志</span><br></pre></td></tr></table></figure>
+
+<p>这次经历让我记住：磁盘满时，<code>df</code> 回答文件系统还剩多少，<code>du</code> 回答目录树里什么可见，两者对不上本身就是重要证据。先解释差值，再释放空间，比从最大的目录开始盲删可靠得多。</p>
 
       
     </div>

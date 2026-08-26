@@ -3339,6 +3339,111 @@
       </tags>
   </entry>
   <entry>
+    <title>项目部署标准化流程</title>
+    <url>/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
+<p>早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。</p>
+<p>部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。</p>
+<h2 id="发布单先于操作"><a href="#发布单先于操作" class="headerlink" title="发布单先于操作"></a>发布单先于操作</h2><p>没有发布单，不开始生产操作。最小发布单包含：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">版本：v1.12.0</span><br><span class="line">Git 提交：3a91f2c</span><br><span class="line">构建编号：build-20201018-42</span><br><span class="line">变更范围：订单导出、支付回调幂等修复</span><br><span class="line">影响服务：order-service</span><br><span class="line">数据库变更：V20201018_01__add_payment_unique_key.sql</span><br><span class="line">配置变更：PAYMENT_READ_TIMEOUT 3s -&gt; 5s</span><br><span class="line">计划窗口：20:00-20:30</span><br><span class="line">执行人 / 复核人：</span><br><span class="line">观察指标：</span><br><span class="line">回退触发条件：</span><br></pre></td></tr></table></figure>
+
+<p>标题相同的 Jar 不等于同一个版本。发布单必须能对应到唯一 Git 提交和构建产物。</p>
+<h2 id="0-确认变更冻结"><a href="#0-确认变更冻结" class="headerlink" title="0. 确认变更冻结"></a>0. 确认变更冻结</h2><p>发布窗口开始前，确认待发布提交不再变化：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git show --<span class="built_in">stat</span> 3a91f2c</span><br><span class="line">git tag --contains 3a91f2c</span><br><span class="line">shasum -a 256 order-service.jar</span><br></pre></td></tr></table></figure>
+
+<p>校验值应由 CI 生成，并在目标服务器再次核对。不要在服务器上临时修改 Jar、class 或配置后仍沿用原版本号，这会让后续节点无法复现。</p>
+<p>需要一起冻结的还有：</p>
+<ul>
+<li>数据库脚本内容和执行顺序。</li>
+<li>配置版本。</li>
+<li>依赖服务版本。</li>
+<li>灰度节点范围。</li>
+<li>验证用例和测试数据。</li>
+</ul>
+<h2 id="1-上线前检查"><a href="#1-上线前检查" class="headerlink" title="1. 上线前检查"></a>1. 上线前检查</h2><p>我把检查分成业务、系统和恢复能力三组。</p>
+<h3 id="业务条件"><a href="#业务条件" class="headerlink" title="业务条件"></a>业务条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 需求验收完成，已知问题有明确结论</span><br><span class="line">[ ] 新旧客户端兼容</span><br><span class="line">[ ] 定时任务、消息消费者和批处理影响已确认</span><br><span class="line">[ ] 数据初始化、历史迁移和权限配置已准备</span><br><span class="line">[ ] 客服或业务方知道用户可见变化</span><br></pre></td></tr></table></figure>
+
+<h3 id="系统条件"><a href="#系统条件" class="headerlink" title="系统条件"></a>系统条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] CPU、内存、磁盘和连接池处于正常水位</span><br><span class="line">[ ] 当前无未处理生产告警</span><br><span class="line">[ ] 配置项已经双人复核</span><br><span class="line">[ ] 依赖的数据库、缓存、MQ 和外部接口正常</span><br><span class="line">[ ] 监控看板与日志检索可用</span><br></pre></td></tr></table></figure>
+
+<p>不要在系统已经不稳定时叠加发布变量。必须紧急发布时，要在发布单中说明当前故障状态和额外风险。</p>
+<h3 id="恢复条件"><a href="#恢复条件" class="headerlink" title="恢复条件"></a>恢复条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 上一稳定版本产物可获取且校验通过</span><br><span class="line">[ ] 旧配置版本可恢复</span><br><span class="line">[ ] 数据库变更明确可逆或向后兼容</span><br><span class="line">[ ] 回退操作人和决策人在线</span><br><span class="line">[ ] 回退预计耗时符合业务容忍度</span><br></pre></td></tr></table></figure>
+
+<p>“保留旧 Jar”不是完整回退方案。如果新代码已经写入旧版本无法识别的数据，应用回退仍可能失败。</p>
+<h2 id="2-数据库变更先做兼容设计"><a href="#2-数据库变更先做兼容设计" class="headerlink" title="2. 数据库变更先做兼容设计"></a>2. 数据库变更先做兼容设计</h2><p>数据库变更优先使用扩展、迁移、收缩三步：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">扩展：新增可空字段、表或索引，新旧代码都能运行</span><br><span class="line">迁移：新代码双写或迁移历史数据，持续校验</span><br><span class="line">收缩：确认旧版本退出后，再删除旧字段和兼容逻辑</span><br></pre></td></tr></table></figure>
+
+<p>避免在同一个窗口直接重命名字段并立即发布只认识新字段的代码。大表 DDL 还要预估锁时间、临时空间、主从延迟和失败恢复。</p>
+<p>执行脚本前：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 已在相近数据量环境验证</span><br><span class="line">[ ] 脚本带唯一版本号且不可重复修改</span><br><span class="line">[ ] 明确是否幂等</span><br><span class="line">[ ] 评估执行时间、锁和磁盘空间</span><br><span class="line">[ ] 有执行后校验 SQL</span><br><span class="line">[ ] 高风险操作得到数据库负责人授权</span><br></pre></td></tr></table></figure>
+
+<p>生产 DDL 和数据修复应由有权限的人按审批执行。不要把未经 Review 的临时 SQL 粘贴进生产终端。</p>
+<h2 id="3-先灰度一个节点"><a href="#3-先灰度一个节点" class="headerlink" title="3. 先灰度一个节点"></a>3. 先灰度一个节点</h2><p>多实例服务不要一次替换全部节点。标准顺序是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">从负载均衡摘除一个节点</span><br><span class="line">等待存量请求完成</span><br><span class="line">部署新产物和配置</span><br><span class="line">启动并通过就绪检查</span><br><span class="line">执行冒烟验证</span><br><span class="line">重新接入少量流量</span><br><span class="line">观察一个完整业务周期</span><br><span class="line">逐批替换其余节点</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会影响服务容量，必须由具备生产权限的操作人执行，并确认剩余节点能够承载当前流量。</p>
+<p>一个简单的启动检查不能只看进程：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl --fail --silent http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl --fail --silent http://127.0.0.1:8080/api/internal/version</span><br></pre></td></tr></table></figure>
+
+<p>版本接口应返回当前 Git 提交、构建号和启动时间，避免流量打到错误产物。</p>
+<h2 id="4-冒烟验证要覆盖写路径"><a href="#4-冒烟验证要覆盖写路径" class="headerlink" title="4. 冒烟验证要覆盖写路径"></a>4. 冒烟验证要覆盖写路径</h2><p>只打开首页不足以证明后端可用。订单服务至少验证：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">读：查询一条授权范围内的订单</span><br><span class="line">写：创建一笔可清理的测试订单</span><br><span class="line">改：完成一次状态变化</span><br><span class="line">依赖：数据库、缓存和下游调用成功</span><br><span class="line">异步：消息被消费且没有进入死信队列</span><br><span class="line">权限：无权限请求被正确拒绝</span><br></pre></td></tr></table></figure>
+
+<p>测试数据要有固定前缀和清理策略，不能污染报表或触发真实通知。涉及支付、短信和外部客户的流程，应使用专门沙箱或受控验证路径。</p>
+<p>每项冒烟都记录请求时间、traceId 和结果。这样失败时能直接进入日志检索，而不是重新猜测。</p>
+<h2 id="5-观察指标决定是否继续"><a href="#5-观察指标决定是否继续" class="headerlink" title="5. 观察指标决定是否继续"></a>5. 观察指标决定是否继续</h2><p>灰度后至少看四组信号：</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>关注点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流量</td>
+<td>QPS、实例流量是否符合灰度比例</td>
+</tr>
+<tr>
+<td>质量</td>
+<td>错误率、业务失败码、消息失败数</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>P95&#x2F;P99、慢 SQL、下游耗时</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>CPU、堆内存、GC、线程池、连接池</td>
+</tr>
+</tbody></table>
+<p>不能只看平均响应时间。少量长尾请求可能已经影响核心用户，但均值仍然正常。</p>
+<p>发布前应写清触发条件，例如：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">5 分钟错误率高于基线 1 个百分点：暂停扩容</span><br><span class="line">核心接口 P99 连续 3 分钟超过 2 秒：回退灰度节点</span><br><span class="line">出现数据重复或状态不可逆错误：立即停止发布并升级决策</span><br></pre></td></tr></table></figure>
+
+<p>阈值根据系统基线设定，不能把示例数字机械搬到所有服务。</p>
+<h2 id="6-回退是一项预先设计的动作"><a href="#6-回退是一项预先设计的动作" class="headerlink" title="6. 回退是一项预先设计的动作"></a>6. 回退是一项预先设计的动作</h2><p>回退判断由发布负责人根据既定条件做出，不在故障现场临时争论“再看看”。执行顺序通常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">停止继续发布</span><br><span class="line">隔离新版本节点</span><br><span class="line">保存日志、线程和关键指标</span><br><span class="line">恢复旧产物与旧配置</span><br><span class="line">通过健康与业务验证</span><br><span class="line">逐步恢复流量</span><br><span class="line">确认数据兼容与积压任务</span><br></pre></td></tr></table></figure>
+
+<p>如果数据库变更不可逆，可能只能前向修复，不能简单回滚应用。发布前必须把这种情况写进决策记录，并准备降级开关或兼容代码。</p>
+<p>不要为了赶时间删除现场日志或覆盖旧产物。恢复业务和保留证据可以并行安排。</p>
+<h2 id="7-发布结束不是群里说一句“好了”"><a href="#7-发布结束不是群里说一句“好了”" class="headerlink" title="7. 发布结束不是群里说一句“好了”"></a>7. 发布结束不是群里说一句“好了”</h2><p>发布完成记录：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">实际开始与结束时间</span><br><span class="line">每批节点和当前版本</span><br><span class="line">数据库、配置的实际版本</span><br><span class="line">冒烟结果和 traceId</span><br><span class="line">核心指标与基线对比</span><br><span class="line">期间异常及处理</span><br><span class="line">遗留观察项和负责人</span><br></pre></td></tr></table></figure>
+
+<p>至少跨过一个业务高峰或约定观察期后再关闭发布单。定时任务在凌晨执行、账务在次日对账时，十分钟无告警不代表变更已经完全验证。</p>
+<h2 id="最终-Runbook"><a href="#最终-Runbook" class="headerlink" title="最终 Runbook"></a>最终 Runbook</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">发布前：范围冻结 -&gt; 产物校验 -&gt; 条件检查 -&gt; 回退演练</span><br><span class="line">发布中：兼容变更 -&gt; 单节点灰度 -&gt; 冒烟 -&gt; 指标观察 -&gt; 分批扩展</span><br><span class="line">异常时：停止扩展 -&gt; 保存证据 -&gt; 按阈值回退或前向修复</span><br><span class="line">发布后：版本核对 -&gt; 业务验证 -&gt; 持续观察 -&gt; 关闭与复盘</span><br></pre></td></tr></table></figure>
+
+<p>标准化发布的意义，是把原本藏在个人经验里的判断变成团队可以执行和复核的步骤。流程不一定让上线更快，却能让每一次快和慢都有证据，让故障发生时不用从“这次到底改了什么”开始查起。</p>
+]]></content>
+      <categories>
+        <category>项目部署</category>
+      </categories>
+      <tags>
+        <tag>运维</tag>
+        <tag>项目部署</tag>
+        <tag>标准化流程</tag>
+        <tag>发布</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>配置管理经验</title>
     <url>/2020/09/29/2020-09-29-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E7%BB%8F%E9%AA%8C/</url>
     <content><![CDATA[<p><img src="/images/posts/2020/config-management-cover.svg" alt="配置管理经验封面图"></p>
@@ -3449,111 +3554,6 @@
         <tag>Spring Boot</tag>
         <tag>配置管理</tag>
         <tag>环境隔离</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>项目部署标准化流程</title>
-    <url>/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
-<p>早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。</p>
-<p>部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。</p>
-<h2 id="发布单先于操作"><a href="#发布单先于操作" class="headerlink" title="发布单先于操作"></a>发布单先于操作</h2><p>没有发布单，不开始生产操作。最小发布单包含：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">版本：v1.12.0</span><br><span class="line">Git 提交：3a91f2c</span><br><span class="line">构建编号：build-20201018-42</span><br><span class="line">变更范围：订单导出、支付回调幂等修复</span><br><span class="line">影响服务：order-service</span><br><span class="line">数据库变更：V20201018_01__add_payment_unique_key.sql</span><br><span class="line">配置变更：PAYMENT_READ_TIMEOUT 3s -&gt; 5s</span><br><span class="line">计划窗口：20:00-20:30</span><br><span class="line">执行人 / 复核人：</span><br><span class="line">观察指标：</span><br><span class="line">回退触发条件：</span><br></pre></td></tr></table></figure>
-
-<p>标题相同的 Jar 不等于同一个版本。发布单必须能对应到唯一 Git 提交和构建产物。</p>
-<h2 id="0-确认变更冻结"><a href="#0-确认变更冻结" class="headerlink" title="0. 确认变更冻结"></a>0. 确认变更冻结</h2><p>发布窗口开始前，确认待发布提交不再变化：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git show --<span class="built_in">stat</span> 3a91f2c</span><br><span class="line">git tag --contains 3a91f2c</span><br><span class="line">shasum -a 256 order-service.jar</span><br></pre></td></tr></table></figure>
-
-<p>校验值应由 CI 生成，并在目标服务器再次核对。不要在服务器上临时修改 Jar、class 或配置后仍沿用原版本号，这会让后续节点无法复现。</p>
-<p>需要一起冻结的还有：</p>
-<ul>
-<li>数据库脚本内容和执行顺序。</li>
-<li>配置版本。</li>
-<li>依赖服务版本。</li>
-<li>灰度节点范围。</li>
-<li>验证用例和测试数据。</li>
-</ul>
-<h2 id="1-上线前检查"><a href="#1-上线前检查" class="headerlink" title="1. 上线前检查"></a>1. 上线前检查</h2><p>我把检查分成业务、系统和恢复能力三组。</p>
-<h3 id="业务条件"><a href="#业务条件" class="headerlink" title="业务条件"></a>业务条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 需求验收完成，已知问题有明确结论</span><br><span class="line">[ ] 新旧客户端兼容</span><br><span class="line">[ ] 定时任务、消息消费者和批处理影响已确认</span><br><span class="line">[ ] 数据初始化、历史迁移和权限配置已准备</span><br><span class="line">[ ] 客服或业务方知道用户可见变化</span><br></pre></td></tr></table></figure>
-
-<h3 id="系统条件"><a href="#系统条件" class="headerlink" title="系统条件"></a>系统条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] CPU、内存、磁盘和连接池处于正常水位</span><br><span class="line">[ ] 当前无未处理生产告警</span><br><span class="line">[ ] 配置项已经双人复核</span><br><span class="line">[ ] 依赖的数据库、缓存、MQ 和外部接口正常</span><br><span class="line">[ ] 监控看板与日志检索可用</span><br></pre></td></tr></table></figure>
-
-<p>不要在系统已经不稳定时叠加发布变量。必须紧急发布时，要在发布单中说明当前故障状态和额外风险。</p>
-<h3 id="恢复条件"><a href="#恢复条件" class="headerlink" title="恢复条件"></a>恢复条件</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 上一稳定版本产物可获取且校验通过</span><br><span class="line">[ ] 旧配置版本可恢复</span><br><span class="line">[ ] 数据库变更明确可逆或向后兼容</span><br><span class="line">[ ] 回退操作人和决策人在线</span><br><span class="line">[ ] 回退预计耗时符合业务容忍度</span><br></pre></td></tr></table></figure>
-
-<p>“保留旧 Jar”不是完整回退方案。如果新代码已经写入旧版本无法识别的数据，应用回退仍可能失败。</p>
-<h2 id="2-数据库变更先做兼容设计"><a href="#2-数据库变更先做兼容设计" class="headerlink" title="2. 数据库变更先做兼容设计"></a>2. 数据库变更先做兼容设计</h2><p>数据库变更优先使用扩展、迁移、收缩三步：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">扩展：新增可空字段、表或索引，新旧代码都能运行</span><br><span class="line">迁移：新代码双写或迁移历史数据，持续校验</span><br><span class="line">收缩：确认旧版本退出后，再删除旧字段和兼容逻辑</span><br></pre></td></tr></table></figure>
-
-<p>避免在同一个窗口直接重命名字段并立即发布只认识新字段的代码。大表 DDL 还要预估锁时间、临时空间、主从延迟和失败恢复。</p>
-<p>执行脚本前：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 已在相近数据量环境验证</span><br><span class="line">[ ] 脚本带唯一版本号且不可重复修改</span><br><span class="line">[ ] 明确是否幂等</span><br><span class="line">[ ] 评估执行时间、锁和磁盘空间</span><br><span class="line">[ ] 有执行后校验 SQL</span><br><span class="line">[ ] 高风险操作得到数据库负责人授权</span><br></pre></td></tr></table></figure>
-
-<p>生产 DDL 和数据修复应由有权限的人按审批执行。不要把未经 Review 的临时 SQL 粘贴进生产终端。</p>
-<h2 id="3-先灰度一个节点"><a href="#3-先灰度一个节点" class="headerlink" title="3. 先灰度一个节点"></a>3. 先灰度一个节点</h2><p>多实例服务不要一次替换全部节点。标准顺序是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">从负载均衡摘除一个节点</span><br><span class="line">等待存量请求完成</span><br><span class="line">部署新产物和配置</span><br><span class="line">启动并通过就绪检查</span><br><span class="line">执行冒烟验证</span><br><span class="line">重新接入少量流量</span><br><span class="line">观察一个完整业务周期</span><br><span class="line">逐批替换其余节点</span><br></pre></td></tr></table></figure>
-
-<p>摘流和重启会影响服务容量，必须由具备生产权限的操作人执行，并确认剩余节点能够承载当前流量。</p>
-<p>一个简单的启动检查不能只看进程：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl --fail --silent http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl --fail --silent http://127.0.0.1:8080/api/internal/version</span><br></pre></td></tr></table></figure>
-
-<p>版本接口应返回当前 Git 提交、构建号和启动时间，避免流量打到错误产物。</p>
-<h2 id="4-冒烟验证要覆盖写路径"><a href="#4-冒烟验证要覆盖写路径" class="headerlink" title="4. 冒烟验证要覆盖写路径"></a>4. 冒烟验证要覆盖写路径</h2><p>只打开首页不足以证明后端可用。订单服务至少验证：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">读：查询一条授权范围内的订单</span><br><span class="line">写：创建一笔可清理的测试订单</span><br><span class="line">改：完成一次状态变化</span><br><span class="line">依赖：数据库、缓存和下游调用成功</span><br><span class="line">异步：消息被消费且没有进入死信队列</span><br><span class="line">权限：无权限请求被正确拒绝</span><br></pre></td></tr></table></figure>
-
-<p>测试数据要有固定前缀和清理策略，不能污染报表或触发真实通知。涉及支付、短信和外部客户的流程，应使用专门沙箱或受控验证路径。</p>
-<p>每项冒烟都记录请求时间、traceId 和结果。这样失败时能直接进入日志检索，而不是重新猜测。</p>
-<h2 id="5-观察指标决定是否继续"><a href="#5-观察指标决定是否继续" class="headerlink" title="5. 观察指标决定是否继续"></a>5. 观察指标决定是否继续</h2><p>灰度后至少看四组信号：</p>
-<table>
-<thead>
-<tr>
-<th>信号</th>
-<th>关注点</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>流量</td>
-<td>QPS、实例流量是否符合灰度比例</td>
-</tr>
-<tr>
-<td>质量</td>
-<td>错误率、业务失败码、消息失败数</td>
-</tr>
-<tr>
-<td>性能</td>
-<td>P95&#x2F;P99、慢 SQL、下游耗时</td>
-</tr>
-<tr>
-<td>资源</td>
-<td>CPU、堆内存、GC、线程池、连接池</td>
-</tr>
-</tbody></table>
-<p>不能只看平均响应时间。少量长尾请求可能已经影响核心用户，但均值仍然正常。</p>
-<p>发布前应写清触发条件，例如：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">5 分钟错误率高于基线 1 个百分点：暂停扩容</span><br><span class="line">核心接口 P99 连续 3 分钟超过 2 秒：回退灰度节点</span><br><span class="line">出现数据重复或状态不可逆错误：立即停止发布并升级决策</span><br></pre></td></tr></table></figure>
-
-<p>阈值根据系统基线设定，不能把示例数字机械搬到所有服务。</p>
-<h2 id="6-回退是一项预先设计的动作"><a href="#6-回退是一项预先设计的动作" class="headerlink" title="6. 回退是一项预先设计的动作"></a>6. 回退是一项预先设计的动作</h2><p>回退判断由发布负责人根据既定条件做出，不在故障现场临时争论“再看看”。执行顺序通常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">停止继续发布</span><br><span class="line">隔离新版本节点</span><br><span class="line">保存日志、线程和关键指标</span><br><span class="line">恢复旧产物与旧配置</span><br><span class="line">通过健康与业务验证</span><br><span class="line">逐步恢复流量</span><br><span class="line">确认数据兼容与积压任务</span><br></pre></td></tr></table></figure>
-
-<p>如果数据库变更不可逆，可能只能前向修复，不能简单回滚应用。发布前必须把这种情况写进决策记录，并准备降级开关或兼容代码。</p>
-<p>不要为了赶时间删除现场日志或覆盖旧产物。恢复业务和保留证据可以并行安排。</p>
-<h2 id="7-发布结束不是群里说一句“好了”"><a href="#7-发布结束不是群里说一句“好了”" class="headerlink" title="7. 发布结束不是群里说一句“好了”"></a>7. 发布结束不是群里说一句“好了”</h2><p>发布完成记录：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">实际开始与结束时间</span><br><span class="line">每批节点和当前版本</span><br><span class="line">数据库、配置的实际版本</span><br><span class="line">冒烟结果和 traceId</span><br><span class="line">核心指标与基线对比</span><br><span class="line">期间异常及处理</span><br><span class="line">遗留观察项和负责人</span><br></pre></td></tr></table></figure>
-
-<p>至少跨过一个业务高峰或约定观察期后再关闭发布单。定时任务在凌晨执行、账务在次日对账时，十分钟无告警不代表变更已经完全验证。</p>
-<h2 id="最终-Runbook"><a href="#最终-Runbook" class="headerlink" title="最终 Runbook"></a>最终 Runbook</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">发布前：范围冻结 -&gt; 产物校验 -&gt; 条件检查 -&gt; 回退演练</span><br><span class="line">发布中：兼容变更 -&gt; 单节点灰度 -&gt; 冒烟 -&gt; 指标观察 -&gt; 分批扩展</span><br><span class="line">异常时：停止扩展 -&gt; 保存证据 -&gt; 按阈值回退或前向修复</span><br><span class="line">发布后：版本核对 -&gt; 业务验证 -&gt; 持续观察 -&gt; 关闭与复盘</span><br></pre></td></tr></table></figure>
-
-<p>标准化发布的意义，是把原本藏在个人经验里的判断变成团队可以执行和复核的步骤。流程不一定让上线更快，却能让每一次快和慢都有证据，让故障发生时不用从“这次到底改了什么”开始查起。</p>
-]]></content>
-      <categories>
-        <category>项目部署</category>
-      </categories>
-      <tags>
-        <tag>运维</tag>
-        <tag>项目部署</tag>
-        <tag>标准化流程</tag>
-        <tag>发布</tag>
       </tags>
   </entry>
   <entry>
@@ -5247,111 +5247,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Spring Cloud学习笔记</title>
-    <url>/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<blockquote>
-<p>这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。</p>
-</blockquote>
-<h2 id="1-先建立一张治理地图"><a href="#1-先建立一张治理地图" class="headerlink" title="1. 先建立一张治理地图"></a>1. 先建立一张治理地图</h2><p>我把常见能力分成七层：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">流量入口：Gateway</span><br><span class="line">服务位置：Nacos Discovery / Eureka / Consul</span><br><span class="line">远程调用：OpenFeign + LoadBalancer</span><br><span class="line">配置管理：Nacos Config / Config Server</span><br><span class="line">稳定性：CircuitBreaker / Sentinel</span><br><span class="line">可观测性：Micrometer / Prometheus / Trace</span><br><span class="line">交付运行：Docker / CI/CD / Kubernetes</span><br></pre></td></tr></table></figure>
-
-<p>一次请求大概会经过：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Browser</span><br><span class="line">  -&gt; Gateway</span><br><span class="line">  -&gt; order-service</span><br><span class="line">       -&gt; OpenFeign</span><br><span class="line">       -&gt; stock-service</span><br><span class="line"></span><br><span class="line">order-service 和 stock-service</span><br><span class="line">  -&gt; 注册到服务注册中心</span><br><span class="line">  -&gt; 从配置中心读取各自配置</span><br><span class="line">  -&gt; 输出日志、指标和链路信息</span><br></pre></td></tr></table></figure>
-
-<p>这张图最重要的作用不是画架构，而是排查故障。请求没有到订单服务，先看网关；订单服务找不到库存服务，先看注册发现；服务能找到但调用超时，再看网络、线程池和 Feign 超时。</p>
-<h2 id="2-版本兼容比配置更先检查"><a href="#2-版本兼容比配置更先检查" class="headerlink" title="2. 版本兼容比配置更先检查"></a>2. 版本兼容比配置更先检查</h2><p>Spring Cloud 初学时最容易忽略版本。网上复制一段配置，依赖可能来自完全不同的年代：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Spring Boot 2.x：仍可使用 JDK 8，匹配 Spring Cloud 2020/2021 等版本线</span><br><span class="line">Spring Boot 3.x：要求 Java 17，包名迁移到 jakarta.*</span><br><span class="line">Spring Cloud Netflix 旧版本：常见 Ribbon、Hystrix、Zuul</span><br><span class="line">较新版本：更多使用 Spring Cloud LoadBalancer、CircuitBreaker、Gateway</span><br></pre></td></tr></table></figure>
-
-<p>本项目默认 JDK 8，因此示例以 Spring Boot 2.x 和 Spring Cloud 2021.x 的思路为主。具体小版本必须通过官方兼容矩阵确认，尤其是同时使用 Spring Cloud Alibaba 时，不能只让 Maven“没有报错”就认为版本兼容。</p>
-<p>使用 BOM 统一依赖版本：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">spring-cloud.version</span>&gt;</span>2021.0.8<span class="tag">&lt;/<span class="name">spring-cloud.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>Spring Cloud Alibaba 也应该使用对应 BOM，并根据兼容表选择版本。不要在各个子项目单独写组件版本，否则服务之间很快会出现难以解释的差异。</p>
-<h2 id="3-注册中心解决“服务在哪里”"><a href="#3-注册中心解决“服务在哪里”" class="headerlink" title="3. 注册中心解决“服务在哪里”"></a>3. 注册中心解决“服务在哪里”</h2><p>单体应用可以把下游地址写在配置里：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">stock-service:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://10.0.0.15:8082</span></span><br></pre></td></tr></table></figure>
-
-<p>实例扩容、迁移或重启以后，固定地址会变得难以维护。注册发现把实例列表交给注册中心：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure>
-
-<p>服务名是治理体系里的稳定标识。<code>order-service</code> 注册后，调用方通过服务名获取实例列表，再由客户端负载均衡选择一个实例。</p>
-<p>排查注册问题时依次确认：</p>
-<ol>
-<li>应用是否真正启动成功。</li>
-<li><code>spring.application.name</code> 是否符合约定。</li>
-<li>Nacos 地址、namespace、group 和认证是否一致。</li>
-<li>控制台是否能看到实例，实例 IP 和端口是否可达。</li>
-<li>服务是否被标记为不健康。</li>
-</ol>
-<p>控制台“有实例”只代表注册成功，不代表调用方一定能连通。注册进去一个容器内部 IP，也会出现发现成功、调用超时。</p>
-<h2 id="4-配置中心解决“配置怎么管理”"><a href="#4-配置中心解决“配置怎么管理”" class="headerlink" title="4. 配置中心解决“配置怎么管理”"></a>4. 配置中心解决“配置怎么管理”</h2><p>注册中心和配置中心可能由同一个 Nacos 提供，但它们是两条不同链路。注册正常不代表配置一定加载成功。</p>
-<p>配置中心适合管理：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">环境相关地址</span><br><span class="line">连接池和超时参数</span><br><span class="line">功能开关</span><br><span class="line">限流阈值</span><br><span class="line">不需要重新构建即可调整的业务参数</span><br></pre></td></tr></table></figure>
-
-<p>不适合把所有配置都动态刷新。数据库连接、线程池大小等参数修改后是否能安全生效，取决于组件实现。核心参数变更仍然需要评审、灰度和回滚记录。</p>
-<p>Spring Boot 2.4 以后配置加载机制发生过变化，部分版本使用 <code>spring.config.import</code>，旧项目常通过 <code>bootstrap.yml</code> 加载。实际项目要先确认 Spring Boot、Spring Cloud 和 Alibaba 版本，再决定配置写法，不能把两套机制混在一起。</p>
-<p>排查配置时记录三件事：</p>
-<ul>
-<li>最终加载的是哪个 Data ID、group 和 namespace。</li>
-<li>本地配置、环境变量和远程配置谁的优先级更高。</li>
-<li>配置变更以后 Bean 是否真的支持刷新。</li>
-</ul>
-<h2 id="5-OpenFeign-解决“服务怎么调用”"><a href="#5-OpenFeign-解决“服务怎么调用”" class="headerlink" title="5. OpenFeign 解决“服务怎么调用”"></a>5. OpenFeign 解决“服务怎么调用”</h2><p>OpenFeign 把 HTTP 契约声明成 Java 接口：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;, path = &quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>它减少了重复的 HTTP 客户端代码，但远程调用的本质没有改变：仍然可能连接失败、超时、返回非预期状态码，也可能被重复调用。</p>
-<p>接口设计要明确：</p>
-<ol>
-<li>URL、HTTP 方法和参数序列化方式。</li>
-<li>连接超时和读取超时。</li>
-<li>错误码如何映射，不能把所有失败都转成 <code>null</code>。</li>
-<li>是否允许重试，写操作是否幂等。</li>
-<li>调用日志是否包含 traceId、目标服务和耗时。</li>
-</ol>
-<p>一段常见超时配置：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">default:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">1000</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">3000</span></span><br><span class="line">        <span class="attr">loggerLevel:</span> <span class="string">basic</span></span><br></pre></td></tr></table></figure>
-
-<p>不同 Spring Cloud OpenFeign 版本的配置前缀可能变化，升级时需要查看实际版本文档和启动日志。超时不是越大越稳定，应该从整条接口的时间预算倒推。</p>
-<h2 id="6-Gateway-解决“入口怎么收口”"><a href="#6-Gateway-解决“入口怎么收口”" class="headerlink" title="6. Gateway 解决“入口怎么收口”"></a>6. Gateway 解决“入口怎么收口”</h2><p>Gateway 常见职责包括：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">路由</span><br><span class="line">认证信息透传</span><br><span class="line">跨域处理</span><br><span class="line">限流</span><br><span class="line">灰度标记</span><br><span class="line">统一访问日志</span><br></pre></td></tr></table></figure>
-
-<p>它不适合承载大量业务编排。把订单逻辑写进网关过滤器，会让入口层难以扩容和测试。</p>
-<p>基础路由示例：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
-
-<p>这里外部请求 <code>/api/order/create</code> 去掉一段前缀后，转发为 <code>/order/create</code>。遇到 404 时，必须同时写出“外部路径、过滤后路径、Controller 路径”，只看其中一段很容易绕晕。</p>
-<h2 id="7-稳定性组件不是错误吞掉器"><a href="#7-稳定性组件不是错误吞掉器" class="headerlink" title="7. 稳定性组件不是错误吞掉器"></a>7. 稳定性组件不是错误吞掉器</h2><p>熔断、限流和降级解决的是故障扩散问题，不是让异常消失。</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">超时：限制一次调用最长占用资源的时间</span><br><span class="line">限流：限制进入系统的请求速率</span><br><span class="line">熔断：下游持续失败时快速拒绝，给它恢复时间</span><br><span class="line">降级：核心依赖不可用时返回可接受的替代结果</span><br><span class="line">隔离：限制某类调用可以占用的线程或并发量</span><br></pre></td></tr></table></figure>
-
-<p>库存扣减失败不能随便降级成“扣减成功”，商品推荐失败则可以返回空列表。降级策略必须由业务语义决定。</p>
-<h2 id="8-我的学习顺序"><a href="#8-我的学习顺序" class="headerlink" title="8. 我的学习顺序"></a>8. 我的学习顺序</h2><p>相比一次启动十个组件，下面的顺序更容易建立确定性：</p>
-<ol>
-<li>两个普通 Spring Boot 服务分别启动，先用固定 URL 调通。</li>
-<li>接入注册中心，验证服务名调用和实例切换。</li>
-<li>使用 OpenFeign，补齐超时、错误码和调用日志。</li>
-<li>增加 Gateway，逐条验证路由和过滤器。</li>
-<li>接入配置中心，验证配置来源和刷新边界。</li>
-<li>人工制造超时和实例下线，观察客户端行为。</li>
-<li>最后接入指标、日志和链路追踪。</li>
-</ol>
-<p>每一步都保留一个最小测试：健康检查、查询接口、写接口和超时接口。组件增加以后，先重复旧测试，再验证新能力。</p>
-<h2 id="9-一套固定排查顺序"><a href="#9-一套固定排查顺序" class="headerlink" title="9. 一套固定排查顺序"></a>9. 一套固定排查顺序</h2><p>遇到“微服务调用失败”时，我会按下面的顺序缩小范围：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">应用是否启动</span><br><span class="line">  -&gt; 配置是否加载</span><br><span class="line">  -&gt; 实例是否注册且地址可达</span><br><span class="line">  -&gt; 网关路由后的路径是否正确</span><br><span class="line">  -&gt; Feign 是否拿到实例</span><br><span class="line">  -&gt; TCP 连接和超时是否正常</span><br><span class="line">  -&gt; 下游线程池、连接池和业务日志是否异常</span><br></pre></td></tr></table></figure>
-
-<p>不要先怀疑最复杂的组件。很多 404 只是路径前缀错了，很多超时只是注册了不可达 IP，很多配置问题只是 namespace 不一致。</p>
-<h2 id="10-这份笔记最后留下什么"><a href="#10-这份笔记最后留下什么" class="headerlink" title="10. 这份笔记最后留下什么"></a>10. 这份笔记最后留下什么</h2><p>Spring Cloud 的价值不是提供一套固定架构，而是把微服务常见问题抽象成可替换的能力。理解“注册发现、配置、调用、入口、稳定性、可观测性”这些层次以后，即使以后替换 Nacos、Feign 或 Gateway，排查思路仍然有效。</p>
-<p>学习组件时，我更关心三个问题：它解决什么故障，它自己会引入什么故障，以及没有它时有没有更简单的办法。能回答这三个问题，才算真正把组件放进了架构里。</p>
-]]></content>
-      <categories>
-        <category>架构成长</category>
-      </categories>
-      <tags>
-        <tag>配置管理</tag>
-        <tag>Spring Cloud</tag>
-        <tag>微服务</tag>
-        <tag>注册中心</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>微服务架构初体验</title>
     <url>/2022/01/16/2022-01-16-%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%88%9D%E4%BD%93%E9%AA%8C/</url>
     <content><![CDATA[<blockquote>
@@ -5476,6 +5371,111 @@
         <tag>架构设计</tag>
         <tag>系统拆分</tag>
         <tag>后端架构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Spring Cloud学习笔记</title>
+    <url>/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<blockquote>
+<p>这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。</p>
+</blockquote>
+<h2 id="1-先建立一张治理地图"><a href="#1-先建立一张治理地图" class="headerlink" title="1. 先建立一张治理地图"></a>1. 先建立一张治理地图</h2><p>我把常见能力分成七层：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">流量入口：Gateway</span><br><span class="line">服务位置：Nacos Discovery / Eureka / Consul</span><br><span class="line">远程调用：OpenFeign + LoadBalancer</span><br><span class="line">配置管理：Nacos Config / Config Server</span><br><span class="line">稳定性：CircuitBreaker / Sentinel</span><br><span class="line">可观测性：Micrometer / Prometheus / Trace</span><br><span class="line">交付运行：Docker / CI/CD / Kubernetes</span><br></pre></td></tr></table></figure>
+
+<p>一次请求大概会经过：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Browser</span><br><span class="line">  -&gt; Gateway</span><br><span class="line">  -&gt; order-service</span><br><span class="line">       -&gt; OpenFeign</span><br><span class="line">       -&gt; stock-service</span><br><span class="line"></span><br><span class="line">order-service 和 stock-service</span><br><span class="line">  -&gt; 注册到服务注册中心</span><br><span class="line">  -&gt; 从配置中心读取各自配置</span><br><span class="line">  -&gt; 输出日志、指标和链路信息</span><br></pre></td></tr></table></figure>
+
+<p>这张图最重要的作用不是画架构，而是排查故障。请求没有到订单服务，先看网关；订单服务找不到库存服务，先看注册发现；服务能找到但调用超时，再看网络、线程池和 Feign 超时。</p>
+<h2 id="2-版本兼容比配置更先检查"><a href="#2-版本兼容比配置更先检查" class="headerlink" title="2. 版本兼容比配置更先检查"></a>2. 版本兼容比配置更先检查</h2><p>Spring Cloud 初学时最容易忽略版本。网上复制一段配置，依赖可能来自完全不同的年代：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Spring Boot 2.x：仍可使用 JDK 8，匹配 Spring Cloud 2020/2021 等版本线</span><br><span class="line">Spring Boot 3.x：要求 Java 17，包名迁移到 jakarta.*</span><br><span class="line">Spring Cloud Netflix 旧版本：常见 Ribbon、Hystrix、Zuul</span><br><span class="line">较新版本：更多使用 Spring Cloud LoadBalancer、CircuitBreaker、Gateway</span><br></pre></td></tr></table></figure>
+
+<p>本项目默认 JDK 8，因此示例以 Spring Boot 2.x 和 Spring Cloud 2021.x 的思路为主。具体小版本必须通过官方兼容矩阵确认，尤其是同时使用 Spring Cloud Alibaba 时，不能只让 Maven“没有报错”就认为版本兼容。</p>
+<p>使用 BOM 统一依赖版本：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">spring-cloud.version</span>&gt;</span>2021.0.8<span class="tag">&lt;/<span class="name">spring-cloud.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Spring Cloud Alibaba 也应该使用对应 BOM，并根据兼容表选择版本。不要在各个子项目单独写组件版本，否则服务之间很快会出现难以解释的差异。</p>
+<h2 id="3-注册中心解决“服务在哪里”"><a href="#3-注册中心解决“服务在哪里”" class="headerlink" title="3. 注册中心解决“服务在哪里”"></a>3. 注册中心解决“服务在哪里”</h2><p>单体应用可以把下游地址写在配置里：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">stock-service:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://10.0.0.15:8082</span></span><br></pre></td></tr></table></figure>
+
+<p>实例扩容、迁移或重启以后，固定地址会变得难以维护。注册发现把实例列表交给注册中心：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure>
+
+<p>服务名是治理体系里的稳定标识。<code>order-service</code> 注册后，调用方通过服务名获取实例列表，再由客户端负载均衡选择一个实例。</p>
+<p>排查注册问题时依次确认：</p>
+<ol>
+<li>应用是否真正启动成功。</li>
+<li><code>spring.application.name</code> 是否符合约定。</li>
+<li>Nacos 地址、namespace、group 和认证是否一致。</li>
+<li>控制台是否能看到实例，实例 IP 和端口是否可达。</li>
+<li>服务是否被标记为不健康。</li>
+</ol>
+<p>控制台“有实例”只代表注册成功，不代表调用方一定能连通。注册进去一个容器内部 IP，也会出现发现成功、调用超时。</p>
+<h2 id="4-配置中心解决“配置怎么管理”"><a href="#4-配置中心解决“配置怎么管理”" class="headerlink" title="4. 配置中心解决“配置怎么管理”"></a>4. 配置中心解决“配置怎么管理”</h2><p>注册中心和配置中心可能由同一个 Nacos 提供，但它们是两条不同链路。注册正常不代表配置一定加载成功。</p>
+<p>配置中心适合管理：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">环境相关地址</span><br><span class="line">连接池和超时参数</span><br><span class="line">功能开关</span><br><span class="line">限流阈值</span><br><span class="line">不需要重新构建即可调整的业务参数</span><br></pre></td></tr></table></figure>
+
+<p>不适合把所有配置都动态刷新。数据库连接、线程池大小等参数修改后是否能安全生效，取决于组件实现。核心参数变更仍然需要评审、灰度和回滚记录。</p>
+<p>Spring Boot 2.4 以后配置加载机制发生过变化，部分版本使用 <code>spring.config.import</code>，旧项目常通过 <code>bootstrap.yml</code> 加载。实际项目要先确认 Spring Boot、Spring Cloud 和 Alibaba 版本，再决定配置写法，不能把两套机制混在一起。</p>
+<p>排查配置时记录三件事：</p>
+<ul>
+<li>最终加载的是哪个 Data ID、group 和 namespace。</li>
+<li>本地配置、环境变量和远程配置谁的优先级更高。</li>
+<li>配置变更以后 Bean 是否真的支持刷新。</li>
+</ul>
+<h2 id="5-OpenFeign-解决“服务怎么调用”"><a href="#5-OpenFeign-解决“服务怎么调用”" class="headerlink" title="5. OpenFeign 解决“服务怎么调用”"></a>5. OpenFeign 解决“服务怎么调用”</h2><p>OpenFeign 把 HTTP 契约声明成 Java 接口：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;, path = &quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它减少了重复的 HTTP 客户端代码，但远程调用的本质没有改变：仍然可能连接失败、超时、返回非预期状态码，也可能被重复调用。</p>
+<p>接口设计要明确：</p>
+<ol>
+<li>URL、HTTP 方法和参数序列化方式。</li>
+<li>连接超时和读取超时。</li>
+<li>错误码如何映射，不能把所有失败都转成 <code>null</code>。</li>
+<li>是否允许重试，写操作是否幂等。</li>
+<li>调用日志是否包含 traceId、目标服务和耗时。</li>
+</ol>
+<p>一段常见超时配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">default:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">1000</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">3000</span></span><br><span class="line">        <span class="attr">loggerLevel:</span> <span class="string">basic</span></span><br></pre></td></tr></table></figure>
+
+<p>不同 Spring Cloud OpenFeign 版本的配置前缀可能变化，升级时需要查看实际版本文档和启动日志。超时不是越大越稳定，应该从整条接口的时间预算倒推。</p>
+<h2 id="6-Gateway-解决“入口怎么收口”"><a href="#6-Gateway-解决“入口怎么收口”" class="headerlink" title="6. Gateway 解决“入口怎么收口”"></a>6. Gateway 解决“入口怎么收口”</h2><p>Gateway 常见职责包括：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">路由</span><br><span class="line">认证信息透传</span><br><span class="line">跨域处理</span><br><span class="line">限流</span><br><span class="line">灰度标记</span><br><span class="line">统一访问日志</span><br></pre></td></tr></table></figure>
+
+<p>它不适合承载大量业务编排。把订单逻辑写进网关过滤器，会让入口层难以扩容和测试。</p>
+<p>基础路由示例：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
+
+<p>这里外部请求 <code>/api/order/create</code> 去掉一段前缀后，转发为 <code>/order/create</code>。遇到 404 时，必须同时写出“外部路径、过滤后路径、Controller 路径”，只看其中一段很容易绕晕。</p>
+<h2 id="7-稳定性组件不是错误吞掉器"><a href="#7-稳定性组件不是错误吞掉器" class="headerlink" title="7. 稳定性组件不是错误吞掉器"></a>7. 稳定性组件不是错误吞掉器</h2><p>熔断、限流和降级解决的是故障扩散问题，不是让异常消失。</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">超时：限制一次调用最长占用资源的时间</span><br><span class="line">限流：限制进入系统的请求速率</span><br><span class="line">熔断：下游持续失败时快速拒绝，给它恢复时间</span><br><span class="line">降级：核心依赖不可用时返回可接受的替代结果</span><br><span class="line">隔离：限制某类调用可以占用的线程或并发量</span><br></pre></td></tr></table></figure>
+
+<p>库存扣减失败不能随便降级成“扣减成功”，商品推荐失败则可以返回空列表。降级策略必须由业务语义决定。</p>
+<h2 id="8-我的学习顺序"><a href="#8-我的学习顺序" class="headerlink" title="8. 我的学习顺序"></a>8. 我的学习顺序</h2><p>相比一次启动十个组件，下面的顺序更容易建立确定性：</p>
+<ol>
+<li>两个普通 Spring Boot 服务分别启动，先用固定 URL 调通。</li>
+<li>接入注册中心，验证服务名调用和实例切换。</li>
+<li>使用 OpenFeign，补齐超时、错误码和调用日志。</li>
+<li>增加 Gateway，逐条验证路由和过滤器。</li>
+<li>接入配置中心，验证配置来源和刷新边界。</li>
+<li>人工制造超时和实例下线，观察客户端行为。</li>
+<li>最后接入指标、日志和链路追踪。</li>
+</ol>
+<p>每一步都保留一个最小测试：健康检查、查询接口、写接口和超时接口。组件增加以后，先重复旧测试，再验证新能力。</p>
+<h2 id="9-一套固定排查顺序"><a href="#9-一套固定排查顺序" class="headerlink" title="9. 一套固定排查顺序"></a>9. 一套固定排查顺序</h2><p>遇到“微服务调用失败”时，我会按下面的顺序缩小范围：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">应用是否启动</span><br><span class="line">  -&gt; 配置是否加载</span><br><span class="line">  -&gt; 实例是否注册且地址可达</span><br><span class="line">  -&gt; 网关路由后的路径是否正确</span><br><span class="line">  -&gt; Feign 是否拿到实例</span><br><span class="line">  -&gt; TCP 连接和超时是否正常</span><br><span class="line">  -&gt; 下游线程池、连接池和业务日志是否异常</span><br></pre></td></tr></table></figure>
+
+<p>不要先怀疑最复杂的组件。很多 404 只是路径前缀错了，很多超时只是注册了不可达 IP，很多配置问题只是 namespace 不一致。</p>
+<h2 id="10-这份笔记最后留下什么"><a href="#10-这份笔记最后留下什么" class="headerlink" title="10. 这份笔记最后留下什么"></a>10. 这份笔记最后留下什么</h2><p>Spring Cloud 的价值不是提供一套固定架构，而是把微服务常见问题抽象成可替换的能力。理解“注册发现、配置、调用、入口、稳定性、可观测性”这些层次以后，即使以后替换 Nacos、Feign 或 Gateway，排查思路仍然有效。</p>
+<p>学习组件时，我更关心三个问题：它解决什么故障，它自己会引入什么故障，以及没有它时有没有更简单的办法。能回答这三个问题，才算真正把组件放进了架构里。</p>
+]]></content>
+      <categories>
+        <category>架构成长</category>
+      </categories>
+      <tags>
+        <tag>配置管理</tag>
+        <tag>微服务</tag>
+        <tag>Spring Cloud</tag>
+        <tag>注册中心</tag>
       </tags>
   </entry>
   <entry>
@@ -6013,6 +6013,110 @@
         <tag>日志平台</tag>
         <tag>Elasticsearch</tag>
         <tag>Logstash</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Prometheus监控部署</title>
+    <url>/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/</url>
+    <content><![CDATA[<blockquote>
+<p>日志适合解释一次具体失败，指标适合回答系统是否正在变坏。Prometheus 建起来不难，难的是决定采集什么、标签怎么设计，以及什么情况值得在半夜叫醒值班人员。</p>
+</blockquote>
+<p>这篇按“指标、查询、面板、告警、运行”五个层次整理，不把部署成功等同于监控完成。</p>
+<h2 id="1-先确定要回答的问题"><a href="#1-先确定要回答的问题" class="headerlink" title="1. 先确定要回答的问题"></a>1. 先确定要回答的问题</h2><p>对于一个订单服务，我希望监控能快速回答：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现在有没有流量</span><br><span class="line">成功率是否下降</span><br><span class="line">用户等待时间是否变长</span><br><span class="line">哪个 URI 或下游导致异常</span><br><span class="line">线程池、连接池和 JVM 是否接近容量上限</span><br><span class="line">订单创建量与支付量是否出现业务偏差</span><br></pre></td></tr></table></figure>
+
+<p>这些问题可以分成两套方法：</p>
+<h3 id="RED：面向请求"><a href="#RED：面向请求" class="headerlink" title="RED：面向请求"></a>RED：面向请求</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Rate：请求速率</span><br><span class="line">Errors：错误比例</span><br><span class="line">Duration：耗时分布</span><br></pre></td></tr></table></figure>
+
+<h3 id="USE：面向资源"><a href="#USE：面向资源" class="headerlink" title="USE：面向资源"></a>USE：面向资源</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Utilization：资源使用率</span><br><span class="line">Saturation：资源排队或饱和程度</span><br><span class="line">Errors：资源错误</span><br></pre></td></tr></table></figure>
+
+<p>接口使用 RED，CPU、磁盘、连接池和线程池使用 USE。两者结合，才能区分“请求变慢是业务代码问题”还是“资源已经饱和”。</p>
+<h2 id="2-Prometheus-链路"><a href="#2-Prometheus-链路" class="headerlink" title="2. Prometheus 链路"></a>2. Prometheus 链路</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Spring Boot + Micrometer</span><br><span class="line">  -&gt; /actuator/prometheus</span><br><span class="line">  -&gt; Prometheus 定时拉取</span><br><span class="line">  -&gt; PromQL 查询与规则计算</span><br><span class="line">  -&gt; Grafana 展示</span><br><span class="line">  -&gt; Alertmanager 分组、抑制和通知</span><br></pre></td></tr></table></figure>
+
+<p>Prometheus 使用 Pull 模型。目标服务暴露当前累计指标，Prometheus 定期抓取并保存时间序列。应用不需要知道 Prometheus 地址，也不会因为监控端短暂不可用而阻塞业务请求。</p>
+<p>批处理等短生命周期任务不适合机械套用 Pull，可以评估 Pushgateway，但 Pushgateway 中指标生命周期需要额外管理，不能把它当成所有业务指标的通用上报入口。</p>
+<h2 id="3-Spring-Boot-接入"><a href="#3-Spring-Boot-接入" class="headerlink" title="3. Spring Boot 接入"></a>3. Spring Boot 接入</h2><p>JDK 8、Spring Boot 2.x 项目增加依赖：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.micrometer<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>micrometer-registry-prometheus<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">health,prometheus</span></span><br><span class="line">  <span class="attr">endpoint:</span></span><br><span class="line">    <span class="attr">health:</span></span><br><span class="line">      <span class="attr">show-details:</span> <span class="string">never</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="attr">tags:</span></span><br><span class="line">      <span class="attr">application:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">distribution:</span></span><br><span class="line">      <span class="attr">percentiles-histogram:</span></span><br><span class="line">        <span class="attr">http.server.requests:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>不要为了方便暴露 <code>*</code>。Actuator 可能包含环境、配置和线程信息，应该通过独立管理端口、认证或网络策略限制访问。Prometheus 抓取端点不应直接暴露到公网。</p>
+<p>验证：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -s http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl -s http://127.0.0.1:8080/actuator/prometheus | <span class="built_in">head</span> -30</span><br></pre></td></tr></table></figure>
+
+<p>如果 Prometheus 端点不存在，先检查依赖和 exposure 配置；如果返回 401&#x2F;403，再检查安全规则，不要直接关闭所有鉴权。</p>
+<h2 id="4-Prometheus-抓取配置"><a href="#4-Prometheus-抓取配置" class="headerlink" title="4. Prometheus 抓取配置"></a>4. Prometheus 抓取配置</h2><p>最小静态配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> <span class="string">15s</span></span><br><span class="line">  <span class="attr">evaluation_interval:</span> <span class="string">15s</span></span><br><span class="line"></span><br><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">metrics_path:</span> <span class="string">/actuator/prometheus</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">order-service-1:8080</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">order-service-2:8080</span></span><br><span class="line">        <span class="attr">labels:</span></span><br><span class="line">          <span class="attr">env:</span> <span class="string">prod</span></span><br></pre></td></tr></table></figure>
+
+<p>检查配置并热加载前先验证：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">promtool check config /etc/prometheus/prometheus.yml</span><br><span class="line">promtool check rules /etc/prometheus/rules/*.yml</span><br></pre></td></tr></table></figure>
+
+<p>实例经常变化时，不应该长期手工维护静态地址。可以接入 Kubernetes、Consul、云平台或文件服务发现。服务发现标签很多，进入存储前要通过 relabel 只保留稳定且有查询价值的标签。</p>
+<h2 id="5-指标名称和标签"><a href="#5-指标名称和标签" class="headerlink" title="5. 指标名称和标签"></a>5. 指标名称和标签</h2><p>一条时间序列由指标名和完整标签集合唯一确定：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">http_server_requests_seconds_count&#123;</span><br><span class="line">  application=&quot;order-service&quot;,</span><br><span class="line">  method=&quot;POST&quot;,</span><br><span class="line">  status=&quot;200&quot;,</span><br><span class="line">  uri=&quot;/orders&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>标签最危险的问题是高基数。下面这些值不能直接做 label：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">userId</span><br><span class="line">orderId</span><br><span class="line">traceId</span><br><span class="line">完整 URL</span><br><span class="line">异常 message</span><br><span class="line">时间戳</span><br></pre></td></tr></table></figure>
+
+<p>每个不同值都会创建新时间序列。订单量上百万，就可能产生百万级序列，显著增加应用、Prometheus 和查询压力。</p>
+<p>适合做标签的是有限枚举：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">service、env、method、status、规范化 uri、result、reason_type</span><br></pre></td></tr></table></figure>
+
+<p>具体 orderId 和 traceId 留在日志中，指标负责发现趋势，日志负责定位单次事件。</p>
+<h2 id="6-自定义业务指标"><a href="#6-自定义业务指标" class="headerlink" title="6. 自定义业务指标"></a>6. 自定义业务指标</h2><p>订单创建结果可以使用 Counter：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderMetrics</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MeterRegistry registry;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderMetrics</span><span class="params">(MeterRegistry registry)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.registry = registry;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">recordCreate</span><span class="params">(String result, String reasonType)</span> &#123;</span><br><span class="line">        Counter.builder(<span class="string">&quot;order_create_total&quot;</span>)</span><br><span class="line">            .tag(<span class="string">&quot;result&quot;</span>, result)</span><br><span class="line">            .tag(<span class="string">&quot;reason&quot;</span>, reasonType)</span><br><span class="line">            .register(registry)</span><br><span class="line">            .increment();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>reasonType</code> 必须是有限枚举，例如 <code>stock_shortage</code>、<code>payment_timeout</code>、<code>validation</code>，不能直接放异常文本。</p>
+<p>频繁在业务方法里动态创建 Meter 会增加阅读成本。生产代码可以封装固定 Counter，或者通过统一埋点组件管理指标定义。指标名称、标签和语义变化都要经过评审，因为 Grafana 和告警规则依赖它们。</p>
+<h2 id="7-四条基础-PromQL"><a href="#7-四条基础-PromQL" class="headerlink" title="7. 四条基础 PromQL"></a>7. 四条基础 PromQL</h2><h3 id="7-1-总-QPS"><a href="#7-1-总-QPS" class="headerlink" title="7.1 总 QPS"></a>7.1 总 QPS</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum(</span><br><span class="line">  rate(http_server_requests_seconds_count&#123;</span><br><span class="line">    application=&quot;order-service&quot;</span><br><span class="line">  &#125;[5m])</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>Counter 必须使用 <code>rate</code> 或 <code>increase</code> 计算变化，不要直接对累计值做告警。</p>
+<h3 id="7-2-5xx-错误比例"><a href="#7-2-5xx-错误比例" class="headerlink" title="7.2 5xx 错误比例"></a>7.2 5xx 错误比例</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum(rate(http_server_requests_seconds_count&#123;</span><br><span class="line">  application=&quot;order-service&quot;,</span><br><span class="line">  status=~&quot;5..&quot;</span><br><span class="line">&#125;[5m]))</span><br><span class="line">/</span><br><span class="line">clamp_min(</span><br><span class="line">  sum(rate(http_server_requests_seconds_count&#123;</span><br><span class="line">    application=&quot;order-service&quot;</span><br><span class="line">  &#125;[5m])),</span><br><span class="line">  0.001</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>使用比例比固定错误数更合理。低流量服务还要设置最小请求量条件，否则偶发一个错误就会显示 100%。</p>
+<h3 id="7-3-按-URI-计算-P95"><a href="#7-3-按-URI-计算-P95" class="headerlink" title="7.3 按 URI 计算 P95"></a>7.3 按 URI 计算 P95</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">histogram_quantile(</span><br><span class="line">  0.95,</span><br><span class="line">  sum by (le, uri) (</span><br><span class="line">    rate(http_server_requests_seconds_bucket&#123;</span><br><span class="line">      application=&quot;order-service&quot;</span><br><span class="line">    &#125;[5m])</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>只有启用了 Histogram Bucket，才能正确计算分位数。<code>uri</code> 应该是框架归一化后的路由模板，例如 <code>/orders/&#123;id&#125;</code>，不能是带真实订单号的 URL。</p>
+<h3 id="7-4-订单创建失败速率"><a href="#7-4-订单创建失败速率" class="headerlink" title="7.4 订单创建失败速率"></a>7.4 订单创建失败速率</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum by (reason) (</span><br><span class="line">  rate(order_create_total&#123;result=&quot;failed&quot;&#125;[5m])</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这条业务指标可以直接看出失败原因趋势，比只统计 HTTP 500 更接近用户感知。</p>
+<h2 id="8-Grafana-面板怎么排"><a href="#8-Grafana-面板怎么排" class="headerlink" title="8. Grafana 面板怎么排"></a>8. Grafana 面板怎么排</h2><p>一个服务首页我会按排查顺序摆放：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">第一行：QPS、成功率、P95/P99</span><br><span class="line">第二行：各 URI 错误和耗时</span><br><span class="line">第三行：下游 HTTP、数据库、Redis、MQ</span><br><span class="line">第四行：JVM Heap、GC、线程、CPU</span><br><span class="line">第五行：连接池、线程池队列和拒绝数</span><br><span class="line">第六行：核心业务量和业务失败原因</span><br></pre></td></tr></table></figure>
+
+<p>面板变量只提供有边界的选项，例如 <code>env</code>、<code>application</code> 和 <code>instance</code>。默认时间范围、单位和阈值颜色要统一，避免每个面板用不同口径。</p>
+<p>图表标题应该表达问题，例如“订单接口 P95”比“HTTP Duration”更容易使用。Dashboard 需要存入版本库或通过平台 API 备份，不能只存在 Grafana 数据库里。</p>
+<h2 id="9-告警规则要包含持续时间"><a href="#9-告警规则要包含持续时间" class="headerlink" title="9. 告警规则要包含持续时间"></a>9. 告警规则要包含持续时间</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">groups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">alert:</span> <span class="string">OrderServiceHighErrorRate</span></span><br><span class="line">        <span class="attr">expr:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          sum(rate(http_server_requests_seconds_count&#123;</span></span><br><span class="line"><span class="string">            application=&quot;order-service&quot;,status=~&quot;5..&quot;</span></span><br><span class="line"><span class="string">          &#125;[5m]))</span></span><br><span class="line"><span class="string">          /</span></span><br><span class="line"><span class="string">          clamp_min(sum(rate(http_server_requests_seconds_count&#123;</span></span><br><span class="line"><span class="string">            application=&quot;order-service&quot;</span></span><br><span class="line"><span class="string">          &#125;[5m])), 0.001) &gt; 0.05</span></span><br><span class="line"><span class="string"></span>        <span class="attr">for:</span> <span class="string">10m</span></span><br><span class="line">        <span class="attr">labels:</span></span><br><span class="line">          <span class="attr">severity:</span> <span class="string">warning</span></span><br><span class="line">          <span class="attr">service:</span> <span class="string">order-service</span></span><br><span class="line">        <span class="attr">annotations:</span></span><br><span class="line">          <span class="attr">summary:</span> <span class="string">&quot;订单服务 5xx 比例持续超过 5%&quot;</span></span><br><span class="line">          <span class="attr">runbook:</span> <span class="string">&quot;https://runbook.example.com/order/high-error-rate&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>for: 10m</code> 能过滤短暂毛刺。阈值只是示例，真实值要结合 SLO、历史基线和业务时段调整。</p>
+<p>一条可执行的告警至少包含：</p>
+<ul>
+<li>哪个服务、环境和症状。</li>
+<li>当前值与阈值。</li>
+<li>相关 Dashboard 和日志入口。</li>
+<li>Runbook 与升级联系人。</li>
+<li>恢复通知和抑制规则。</li>
+</ul>
+<h2 id="10-告警为什么会失效"><a href="#10-告警为什么会失效" class="headerlink" title="10. 告警为什么会失效"></a>10. 告警为什么会失效</h2><h3 id="告警太多"><a href="#告警太多" class="headerlink" title="告警太多"></a>告警太多</h3><p>同一个根因触发 CPU、延迟、错误率和实例存活几十条通知，值班人员很快会忽略。Alertmanager 应按服务和故障域分组，并用抑制规则让根因告警覆盖症状告警。</p>
+<h3 id="没有用户影响"><a href="#没有用户影响" class="headerlink" title="没有用户影响"></a>没有用户影响</h3><p>JVM Old 区 80% 不一定是故障，GC 后能回落就可能正常。相比单个资源阈值，持续的错误率和延迟更接近用户影响。资源告警适合作为容量预警，不一定都需要最高级别通知。</p>
+<h3 id="标签变化导致规则静默"><a href="#标签变化导致规则静默" class="headerlink" title="标签变化导致规则静默"></a>标签变化导致规则静默</h3><p>框架升级后 <code>uri</code>、<code>status</code> 或指标名改变，查询可能返回空结果。规则也要测试，并对关键指标使用 <code>absent()</code> 检测缺失。</p>
+<h3 id="没有最小流量条件"><a href="#没有最小流量条件" class="headerlink" title="没有最小流量条件"></a>没有最小流量条件</h3><p>凌晨只有一次请求且失败，错误率是 100%，但影响和高峰期完全不同。告警表达式需要结合请求量或使用燃烧率思路。</p>
+<h2 id="11-监控系统本身也要监控"><a href="#11-监控系统本身也要监控" class="headerlink" title="11. 监控系统本身也要监控"></a>11. 监控系统本身也要监控</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Prometheus target 是否持续 up</span><br><span class="line">抓取耗时是否接近 scrape_interval</span><br><span class="line">规则计算是否失败</span><br><span class="line">本地磁盘和 TSDB 压缩是否正常</span><br><span class="line">时间序列数量和新增速度</span><br><span class="line">Alertmanager 通知是否成功</span><br><span class="line">Grafana 数据源查询是否异常</span><br></pre></td></tr></table></figure>
+
+<p>Prometheus 本地存储适合一定规模和保留周期。需要长期保存、跨集群查询或更高可用时，可以评估远程存储方案，但先解决标签治理，否则只是把高基数问题搬到更大的集群。</p>
+<h2 id="12-上线检查"><a href="#12-上线检查" class="headerlink" title="12. 上线检查"></a>12. 上线检查</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] Actuator 端点不暴露公网</span><br><span class="line">[ ] target 标签能区分服务、环境和实例</span><br><span class="line">[ ] HTTP Histogram 已按需开启</span><br><span class="line">[ ] 没有 userId、orderId、traceId 等高基数标签</span><br><span class="line">[ ] Dashboard 覆盖 RED、资源和业务指标</span><br><span class="line">[ ] 告警有 for、分级、Runbook 和恢复通知</span><br><span class="line">[ ] 规则通过 promtool 检查</span><br><span class="line">[ ] Prometheus 和 Alertmanager 自身有监控</span><br></pre></td></tr></table></figure>
+
+<h2 id="最后的理解"><a href="#最后的理解" class="headerlink" title="最后的理解"></a>最后的理解</h2><p>Prometheus 最有价值的地方不是收集了多少指标，而是把“系统健康”变成了可以讨论和验证的数字。QPS、错误率、延迟和饱和度形成趋势以后，很多问题会在用户反馈前出现信号。</p>
+<p>日志、指标和链路各有职责：指标发现异常，链路缩小范围，日志解释细节。把三者通过服务名、时间和 traceId 关联起来，才是一套真正可用于故障处理的可观测体系。</p>
+]]></content>
+      <categories>
+        <category>架构成长</category>
+      </categories>
+      <tags>
+        <tag>可观测性</tag>
+        <tag>Prometheus</tag>
+        <tag>监控</tag>
+        <tag>Grafana</tag>
       </tags>
   </entry>
   <entry>
@@ -6588,110 +6692,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Prometheus监控部署</title>
-    <url>/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/</url>
-    <content><![CDATA[<blockquote>
-<p>日志适合解释一次具体失败，指标适合回答系统是否正在变坏。Prometheus 建起来不难，难的是决定采集什么、标签怎么设计，以及什么情况值得在半夜叫醒值班人员。</p>
-</blockquote>
-<p>这篇按“指标、查询、面板、告警、运行”五个层次整理，不把部署成功等同于监控完成。</p>
-<h2 id="1-先确定要回答的问题"><a href="#1-先确定要回答的问题" class="headerlink" title="1. 先确定要回答的问题"></a>1. 先确定要回答的问题</h2><p>对于一个订单服务，我希望监控能快速回答：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现在有没有流量</span><br><span class="line">成功率是否下降</span><br><span class="line">用户等待时间是否变长</span><br><span class="line">哪个 URI 或下游导致异常</span><br><span class="line">线程池、连接池和 JVM 是否接近容量上限</span><br><span class="line">订单创建量与支付量是否出现业务偏差</span><br></pre></td></tr></table></figure>
-
-<p>这些问题可以分成两套方法：</p>
-<h3 id="RED：面向请求"><a href="#RED：面向请求" class="headerlink" title="RED：面向请求"></a>RED：面向请求</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Rate：请求速率</span><br><span class="line">Errors：错误比例</span><br><span class="line">Duration：耗时分布</span><br></pre></td></tr></table></figure>
-
-<h3 id="USE：面向资源"><a href="#USE：面向资源" class="headerlink" title="USE：面向资源"></a>USE：面向资源</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Utilization：资源使用率</span><br><span class="line">Saturation：资源排队或饱和程度</span><br><span class="line">Errors：资源错误</span><br></pre></td></tr></table></figure>
-
-<p>接口使用 RED，CPU、磁盘、连接池和线程池使用 USE。两者结合，才能区分“请求变慢是业务代码问题”还是“资源已经饱和”。</p>
-<h2 id="2-Prometheus-链路"><a href="#2-Prometheus-链路" class="headerlink" title="2. Prometheus 链路"></a>2. Prometheus 链路</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Spring Boot + Micrometer</span><br><span class="line">  -&gt; /actuator/prometheus</span><br><span class="line">  -&gt; Prometheus 定时拉取</span><br><span class="line">  -&gt; PromQL 查询与规则计算</span><br><span class="line">  -&gt; Grafana 展示</span><br><span class="line">  -&gt; Alertmanager 分组、抑制和通知</span><br></pre></td></tr></table></figure>
-
-<p>Prometheus 使用 Pull 模型。目标服务暴露当前累计指标，Prometheus 定期抓取并保存时间序列。应用不需要知道 Prometheus 地址，也不会因为监控端短暂不可用而阻塞业务请求。</p>
-<p>批处理等短生命周期任务不适合机械套用 Pull，可以评估 Pushgateway，但 Pushgateway 中指标生命周期需要额外管理，不能把它当成所有业务指标的通用上报入口。</p>
-<h2 id="3-Spring-Boot-接入"><a href="#3-Spring-Boot-接入" class="headerlink" title="3. Spring Boot 接入"></a>3. Spring Boot 接入</h2><p>JDK 8、Spring Boot 2.x 项目增加依赖：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.micrometer<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>micrometer-registry-prometheus<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>配置：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">health,prometheus</span></span><br><span class="line">  <span class="attr">endpoint:</span></span><br><span class="line">    <span class="attr">health:</span></span><br><span class="line">      <span class="attr">show-details:</span> <span class="string">never</span></span><br><span class="line">  <span class="attr">metrics:</span></span><br><span class="line">    <span class="attr">tags:</span></span><br><span class="line">      <span class="attr">application:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">distribution:</span></span><br><span class="line">      <span class="attr">percentiles-histogram:</span></span><br><span class="line">        <span class="attr">http.server.requests:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<p>不要为了方便暴露 <code>*</code>。Actuator 可能包含环境、配置和线程信息，应该通过独立管理端口、认证或网络策略限制访问。Prometheus 抓取端点不应直接暴露到公网。</p>
-<p>验证：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -s http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl -s http://127.0.0.1:8080/actuator/prometheus | <span class="built_in">head</span> -30</span><br></pre></td></tr></table></figure>
-
-<p>如果 Prometheus 端点不存在，先检查依赖和 exposure 配置；如果返回 401&#x2F;403，再检查安全规则，不要直接关闭所有鉴权。</p>
-<h2 id="4-Prometheus-抓取配置"><a href="#4-Prometheus-抓取配置" class="headerlink" title="4. Prometheus 抓取配置"></a>4. Prometheus 抓取配置</h2><p>最小静态配置：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">global:</span></span><br><span class="line">  <span class="attr">scrape_interval:</span> <span class="string">15s</span></span><br><span class="line">  <span class="attr">evaluation_interval:</span> <span class="string">15s</span></span><br><span class="line"></span><br><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">job_name:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">metrics_path:</span> <span class="string">/actuator/prometheus</span></span><br><span class="line">    <span class="attr">static_configs:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">targets:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">order-service-1:8080</span></span><br><span class="line">          <span class="bullet">-</span> <span class="string">order-service-2:8080</span></span><br><span class="line">        <span class="attr">labels:</span></span><br><span class="line">          <span class="attr">env:</span> <span class="string">prod</span></span><br></pre></td></tr></table></figure>
-
-<p>检查配置并热加载前先验证：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">promtool check config /etc/prometheus/prometheus.yml</span><br><span class="line">promtool check rules /etc/prometheus/rules/*.yml</span><br></pre></td></tr></table></figure>
-
-<p>实例经常变化时，不应该长期手工维护静态地址。可以接入 Kubernetes、Consul、云平台或文件服务发现。服务发现标签很多，进入存储前要通过 relabel 只保留稳定且有查询价值的标签。</p>
-<h2 id="5-指标名称和标签"><a href="#5-指标名称和标签" class="headerlink" title="5. 指标名称和标签"></a>5. 指标名称和标签</h2><p>一条时间序列由指标名和完整标签集合唯一确定：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">http_server_requests_seconds_count&#123;</span><br><span class="line">  application=&quot;order-service&quot;,</span><br><span class="line">  method=&quot;POST&quot;,</span><br><span class="line">  status=&quot;200&quot;,</span><br><span class="line">  uri=&quot;/orders&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>标签最危险的问题是高基数。下面这些值不能直接做 label：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">userId</span><br><span class="line">orderId</span><br><span class="line">traceId</span><br><span class="line">完整 URL</span><br><span class="line">异常 message</span><br><span class="line">时间戳</span><br></pre></td></tr></table></figure>
-
-<p>每个不同值都会创建新时间序列。订单量上百万，就可能产生百万级序列，显著增加应用、Prometheus 和查询压力。</p>
-<p>适合做标签的是有限枚举：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">service、env、method、status、规范化 uri、result、reason_type</span><br></pre></td></tr></table></figure>
-
-<p>具体 orderId 和 traceId 留在日志中，指标负责发现趋势，日志负责定位单次事件。</p>
-<h2 id="6-自定义业务指标"><a href="#6-自定义业务指标" class="headerlink" title="6. 自定义业务指标"></a>6. 自定义业务指标</h2><p>订单创建结果可以使用 Counter：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderMetrics</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> MeterRegistry registry;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderMetrics</span><span class="params">(MeterRegistry registry)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.registry = registry;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">recordCreate</span><span class="params">(String result, String reasonType)</span> &#123;</span><br><span class="line">        Counter.builder(<span class="string">&quot;order_create_total&quot;</span>)</span><br><span class="line">            .tag(<span class="string">&quot;result&quot;</span>, result)</span><br><span class="line">            .tag(<span class="string">&quot;reason&quot;</span>, reasonType)</span><br><span class="line">            .register(registry)</span><br><span class="line">            .increment();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>reasonType</code> 必须是有限枚举，例如 <code>stock_shortage</code>、<code>payment_timeout</code>、<code>validation</code>，不能直接放异常文本。</p>
-<p>频繁在业务方法里动态创建 Meter 会增加阅读成本。生产代码可以封装固定 Counter，或者通过统一埋点组件管理指标定义。指标名称、标签和语义变化都要经过评审，因为 Grafana 和告警规则依赖它们。</p>
-<h2 id="7-四条基础-PromQL"><a href="#7-四条基础-PromQL" class="headerlink" title="7. 四条基础 PromQL"></a>7. 四条基础 PromQL</h2><h3 id="7-1-总-QPS"><a href="#7-1-总-QPS" class="headerlink" title="7.1 总 QPS"></a>7.1 总 QPS</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum(</span><br><span class="line">  rate(http_server_requests_seconds_count&#123;</span><br><span class="line">    application=&quot;order-service&quot;</span><br><span class="line">  &#125;[5m])</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>Counter 必须使用 <code>rate</code> 或 <code>increase</code> 计算变化，不要直接对累计值做告警。</p>
-<h3 id="7-2-5xx-错误比例"><a href="#7-2-5xx-错误比例" class="headerlink" title="7.2 5xx 错误比例"></a>7.2 5xx 错误比例</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum(rate(http_server_requests_seconds_count&#123;</span><br><span class="line">  application=&quot;order-service&quot;,</span><br><span class="line">  status=~&quot;5..&quot;</span><br><span class="line">&#125;[5m]))</span><br><span class="line">/</span><br><span class="line">clamp_min(</span><br><span class="line">  sum(rate(http_server_requests_seconds_count&#123;</span><br><span class="line">    application=&quot;order-service&quot;</span><br><span class="line">  &#125;[5m])),</span><br><span class="line">  0.001</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>使用比例比固定错误数更合理。低流量服务还要设置最小请求量条件，否则偶发一个错误就会显示 100%。</p>
-<h3 id="7-3-按-URI-计算-P95"><a href="#7-3-按-URI-计算-P95" class="headerlink" title="7.3 按 URI 计算 P95"></a>7.3 按 URI 计算 P95</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">histogram_quantile(</span><br><span class="line">  0.95,</span><br><span class="line">  sum by (le, uri) (</span><br><span class="line">    rate(http_server_requests_seconds_bucket&#123;</span><br><span class="line">      application=&quot;order-service&quot;</span><br><span class="line">    &#125;[5m])</span><br><span class="line">  )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>只有启用了 Histogram Bucket，才能正确计算分位数。<code>uri</code> 应该是框架归一化后的路由模板，例如 <code>/orders/&#123;id&#125;</code>，不能是带真实订单号的 URL。</p>
-<h3 id="7-4-订单创建失败速率"><a href="#7-4-订单创建失败速率" class="headerlink" title="7.4 订单创建失败速率"></a>7.4 订单创建失败速率</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sum by (reason) (</span><br><span class="line">  rate(order_create_total&#123;result=&quot;failed&quot;&#125;[5m])</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<p>这条业务指标可以直接看出失败原因趋势，比只统计 HTTP 500 更接近用户感知。</p>
-<h2 id="8-Grafana-面板怎么排"><a href="#8-Grafana-面板怎么排" class="headerlink" title="8. Grafana 面板怎么排"></a>8. Grafana 面板怎么排</h2><p>一个服务首页我会按排查顺序摆放：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">第一行：QPS、成功率、P95/P99</span><br><span class="line">第二行：各 URI 错误和耗时</span><br><span class="line">第三行：下游 HTTP、数据库、Redis、MQ</span><br><span class="line">第四行：JVM Heap、GC、线程、CPU</span><br><span class="line">第五行：连接池、线程池队列和拒绝数</span><br><span class="line">第六行：核心业务量和业务失败原因</span><br></pre></td></tr></table></figure>
-
-<p>面板变量只提供有边界的选项，例如 <code>env</code>、<code>application</code> 和 <code>instance</code>。默认时间范围、单位和阈值颜色要统一，避免每个面板用不同口径。</p>
-<p>图表标题应该表达问题，例如“订单接口 P95”比“HTTP Duration”更容易使用。Dashboard 需要存入版本库或通过平台 API 备份，不能只存在 Grafana 数据库里。</p>
-<h2 id="9-告警规则要包含持续时间"><a href="#9-告警规则要包含持续时间" class="headerlink" title="9. 告警规则要包含持续时间"></a>9. 告警规则要包含持续时间</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">groups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">alert:</span> <span class="string">OrderServiceHighErrorRate</span></span><br><span class="line">        <span class="attr">expr:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          sum(rate(http_server_requests_seconds_count&#123;</span></span><br><span class="line"><span class="string">            application=&quot;order-service&quot;,status=~&quot;5..&quot;</span></span><br><span class="line"><span class="string">          &#125;[5m]))</span></span><br><span class="line"><span class="string">          /</span></span><br><span class="line"><span class="string">          clamp_min(sum(rate(http_server_requests_seconds_count&#123;</span></span><br><span class="line"><span class="string">            application=&quot;order-service&quot;</span></span><br><span class="line"><span class="string">          &#125;[5m])), 0.001) &gt; 0.05</span></span><br><span class="line"><span class="string"></span>        <span class="attr">for:</span> <span class="string">10m</span></span><br><span class="line">        <span class="attr">labels:</span></span><br><span class="line">          <span class="attr">severity:</span> <span class="string">warning</span></span><br><span class="line">          <span class="attr">service:</span> <span class="string">order-service</span></span><br><span class="line">        <span class="attr">annotations:</span></span><br><span class="line">          <span class="attr">summary:</span> <span class="string">&quot;订单服务 5xx 比例持续超过 5%&quot;</span></span><br><span class="line">          <span class="attr">runbook:</span> <span class="string">&quot;https://runbook.example.com/order/high-error-rate&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p><code>for: 10m</code> 能过滤短暂毛刺。阈值只是示例，真实值要结合 SLO、历史基线和业务时段调整。</p>
-<p>一条可执行的告警至少包含：</p>
-<ul>
-<li>哪个服务、环境和症状。</li>
-<li>当前值与阈值。</li>
-<li>相关 Dashboard 和日志入口。</li>
-<li>Runbook 与升级联系人。</li>
-<li>恢复通知和抑制规则。</li>
-</ul>
-<h2 id="10-告警为什么会失效"><a href="#10-告警为什么会失效" class="headerlink" title="10. 告警为什么会失效"></a>10. 告警为什么会失效</h2><h3 id="告警太多"><a href="#告警太多" class="headerlink" title="告警太多"></a>告警太多</h3><p>同一个根因触发 CPU、延迟、错误率和实例存活几十条通知，值班人员很快会忽略。Alertmanager 应按服务和故障域分组，并用抑制规则让根因告警覆盖症状告警。</p>
-<h3 id="没有用户影响"><a href="#没有用户影响" class="headerlink" title="没有用户影响"></a>没有用户影响</h3><p>JVM Old 区 80% 不一定是故障，GC 后能回落就可能正常。相比单个资源阈值，持续的错误率和延迟更接近用户影响。资源告警适合作为容量预警，不一定都需要最高级别通知。</p>
-<h3 id="标签变化导致规则静默"><a href="#标签变化导致规则静默" class="headerlink" title="标签变化导致规则静默"></a>标签变化导致规则静默</h3><p>框架升级后 <code>uri</code>、<code>status</code> 或指标名改变，查询可能返回空结果。规则也要测试，并对关键指标使用 <code>absent()</code> 检测缺失。</p>
-<h3 id="没有最小流量条件"><a href="#没有最小流量条件" class="headerlink" title="没有最小流量条件"></a>没有最小流量条件</h3><p>凌晨只有一次请求且失败，错误率是 100%，但影响和高峰期完全不同。告警表达式需要结合请求量或使用燃烧率思路。</p>
-<h2 id="11-监控系统本身也要监控"><a href="#11-监控系统本身也要监控" class="headerlink" title="11. 监控系统本身也要监控"></a>11. 监控系统本身也要监控</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Prometheus target 是否持续 up</span><br><span class="line">抓取耗时是否接近 scrape_interval</span><br><span class="line">规则计算是否失败</span><br><span class="line">本地磁盘和 TSDB 压缩是否正常</span><br><span class="line">时间序列数量和新增速度</span><br><span class="line">Alertmanager 通知是否成功</span><br><span class="line">Grafana 数据源查询是否异常</span><br></pre></td></tr></table></figure>
-
-<p>Prometheus 本地存储适合一定规模和保留周期。需要长期保存、跨集群查询或更高可用时，可以评估远程存储方案，但先解决标签治理，否则只是把高基数问题搬到更大的集群。</p>
-<h2 id="12-上线检查"><a href="#12-上线检查" class="headerlink" title="12. 上线检查"></a>12. 上线检查</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] Actuator 端点不暴露公网</span><br><span class="line">[ ] target 标签能区分服务、环境和实例</span><br><span class="line">[ ] HTTP Histogram 已按需开启</span><br><span class="line">[ ] 没有 userId、orderId、traceId 等高基数标签</span><br><span class="line">[ ] Dashboard 覆盖 RED、资源和业务指标</span><br><span class="line">[ ] 告警有 for、分级、Runbook 和恢复通知</span><br><span class="line">[ ] 规则通过 promtool 检查</span><br><span class="line">[ ] Prometheus 和 Alertmanager 自身有监控</span><br></pre></td></tr></table></figure>
-
-<h2 id="最后的理解"><a href="#最后的理解" class="headerlink" title="最后的理解"></a>最后的理解</h2><p>Prometheus 最有价值的地方不是收集了多少指标，而是把“系统健康”变成了可以讨论和验证的数字。QPS、错误率、延迟和饱和度形成趋势以后，很多问题会在用户反馈前出现信号。</p>
-<p>日志、指标和链路各有职责：指标发现异常，链路缩小范围，日志解释细节。把三者通过服务名、时间和 traceId 关联起来，才是一套真正可用于故障处理的可观测体系。</p>
-]]></content>
-      <categories>
-        <category>架构成长</category>
-      </categories>
-      <tags>
-        <tag>可观测性</tag>
-        <tag>Prometheus</tag>
-        <tag>监控</tag>
-        <tag>Grafana</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Vibe Coding不是完全不看代码</title>
     <url>/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/</url>
     <content><![CDATA[<p><img src="/images/posts/2025/vibe-coding-boundary-cover.png" alt="Vibe Coding 边界封面图"></p>
@@ -7037,25 +7037,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello from server</title>
-    <url>/2026/08/26/2026-08-26-hello-from-server/</url>
-    <content><![CDATA[<p>这是一篇从服务器端推送的测试文章，验证完整发布链路：</p>
-<ul>
-<li>服务器：Linux 容器</li>
-<li>推送方式：SSH Key（ed25519）</li>
-<li>触发部署：GitHub Actions 自动 build &amp; deploy 到 main 分支</li>
-</ul>
-<p>如果这篇文章正常出现在博客上，说明服务器发布链路全部打通。</p>
-]]></content>
-      <categories>
-        <category>测试</category>
-      </categories>
-      <tags>
-        <tag>服务器</tag>
-        <tag>测试</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2025 AI编程实践复盘：效率、安全与能力边界</title>
     <url>/2025/12/28/2025-12-28-2025%E5%B9%B4AI%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E5%A4%8D%E7%9B%98/</url>
     <content><![CDATA[<p><img src="/images/posts/2025/ai-year-review-cover.png" alt="2025 AI 编程复盘封面图"></p>
@@ -7160,6 +7141,154 @@
         <tag>AI编程</tag>
         <tag>Vibe Coding</tag>
         <tag>程序员成长</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL联合索引与索引失效排查</title>
+    <url>/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/</url>
+    <content><![CDATA[<blockquote>
+<p>写在前面：索引建了不等于一定会用，执行计划里出现索引也不等于查询足够快。与其背“最左匹配”“范围后失效”这些短句，不如准备一张测试表，把每个判断放进执行计划里验证。</p>
+</blockquote>
+<p>这篇使用同一个订单表回答十个常见问题。实验基于 MySQL 8.0，具体计划会随版本、数据分布和统计信息变化，结论不能脱离现场照搬。</p>
+<h2 id="实验台"><a href="#实验台" class="headerlink" title="实验台"></a>实验台</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    tenant_id <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span>,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    buyer_phone <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_tenant_status_created (tenant_id, status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引可以近似理解为先按 <code>tenant_id</code> 排序，在相同租户内按 <code>status</code> 排序，再在相同状态内按 <code>created_at</code> 排序：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id -&gt; status -&gt; created_at -&gt; primary key</span><br></pre></td></tr></table></figure>
+
+<p>测试数据约 500 万行：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id：1 万个，分布不完全均匀</span><br><span class="line">status：PAID 58%，CREATED 22%，其他 20%</span><br><span class="line">created_at：覆盖 24 个月</span><br><span class="line">buyer_phone：高区分度字符串</span><br></pre></td></tr></table></figure>
+
+<p>数据分布很重要。只有 5 行的空表上，优化器选择全表扫描并不能证明索引失效。</p>
+<p>每个问题至少执行：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN FORMAT<span class="operator">=</span>TREE</span><br><span class="line"><span class="keyword">SELECT</span> ...;</span><br><span class="line"></span><br><span class="line">EXPLAIN ANALYZE</span><br><span class="line"><span class="keyword">SELECT</span> ...;</span><br></pre></td></tr></table></figure>
+
+<p><code>EXPLAIN ANALYZE</code> 会真正执行 SQL，只在可控环境或经过评估的查询上使用。对更新和删除语句更不能直接在生产试验。</p>
+<h2 id="问题一：最左匹配是不是必须写全三列"><a href="#问题一：最左匹配是不是必须写全三列" class="headerlink" title="问题一：最左匹配是不是必须写全三列"></a>问题一：最左匹配是不是必须写全三列</h2><p>不是。只使用连续的左侧列也可以：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 可以按 tenant_id 定位</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以继续按 tenant_id、status 定位</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>跳过中间的 <code>status</code>：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>执行计划仍可能使用 <code>idx_tenant_status_created</code> 按 <code>tenant_id</code> 缩小范围，但 <code>created_at</code> 无法与前导列组成连续边界，需要扫描该租户的多个状态后再过滤。</p>
+<p>所以“索引使用了”和“索引的每一列都用于定位”是两件事。看 <code>key_len</code>、树形计划和实际扫描行数，不能只看 <code>key</code>。</p>
+<h2 id="问题二：跳过第一列一定全表扫描吗"><a href="#问题二：跳过第一列一定全表扫描吗" class="headerlink" title="问题二：跳过第一列一定全表扫描吗"></a>问题二：跳过第一列一定全表扫描吗</h2><p>查询：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>普通 B-Tree 无法直接从 <code>status</code> 找到一个连续区间，因为相同状态散布在每个租户段中。当前数据里 <code>tenant_id</code> 有一万个不同值，优化器选择全表扫描。</p>
+<p>MySQL 8.0 在特定条件下可能使用 Skip Scan，把少量前导列值分别探测。但它依赖版本、前导列基数和成本估算。前导列一万个值时，跳跃一万次通常没有优势。</p>
+<p>结论不是“永远不可能使用”，而是不能把 Skip Scan 当成核心查询的稳定设计。如果按状态和时间查询是高频场景，应建立与它匹配的索引或改变查询入口。</p>
+<h2 id="问题三：范围条件后的列是否完全失效"><a href="#问题三：范围条件后的列是否完全失效" class="headerlink" title="问题三：范围条件后的列是否完全失效"></a>问题三：范围条件后的列是否完全失效</h2><p>索引顺序改成：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_created_status</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, created_at, status);</span><br></pre></td></tr></table></figure>
+
+<p>查询：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>tenant_id</code> 和 <code>created_at</code> 可以形成索引范围。到达 <code>created_at &gt;=</code> 后，<code>status</code> 通常不能继续缩小连续范围，但它仍可能：</p>
+<ul>
+<li>在索引条件下推中提前过滤。</li>
+<li>作为覆盖列避免回表。</li>
+<li>减少传递到 Server 层的记录。</li>
+</ul>
+<p>因此“范围之后全部失效”太绝对。更准确的说法是：后续列通常不能继续参与构造本次索引查找的连续边界，但仍可能降低其他成本。</p>
+<p>如果 <code>status</code> 是等值且选择性有价值，原索引 <code>(tenant_id, status, created_at)</code> 往往更适合当前查询。最终仍要比较真实分布。</p>
+<h2 id="问题四：字段上使用函数一定没救吗"><a href="#问题四：字段上使用函数一定没救吗" class="headerlink" title="问题四：字段上使用函数一定没救吗"></a>问题四：字段上使用函数一定没救吗</h2><p>普通写法：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> <span class="type">DATE</span>(created_at) <span class="operator">=</span> <span class="string">&#x27;2023-04-23&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对每行计算 <code>DATE(created_at)</code>，普通 <code>created_at</code> 索引无法直接定位原值区间。优先改写为：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-23 00:00:00&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span>  <span class="string">&#x27;2023-04-24 00:00:00&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>半开区间避免 <code>23:59:59</code> 漏掉更高精度时间。</p>
+<p>如果业务只能按表达式查询，MySQL 8.0.13 以上可以评估函数索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_created_date</span><br><span class="line"><span class="keyword">ON</span> order_info ((<span class="type">DATE</span>(created_at)));</span><br></pre></td></tr></table></figure>
+
+<p>函数索引增加存储与写入成本，也要求查询表达式与索引表达式匹配。能用原字段范围表达时，通常先选择范围查询。</p>
+<h2 id="问题五：隐式类型转换为什么有时影响索引"><a href="#问题五：隐式类型转换为什么有时影响索引" class="headerlink" title="问题五：隐式类型转换为什么有时影响索引"></a>问题五：隐式类型转换为什么有时影响索引</h2><p><code>buyer_phone</code> 是 <code>VARCHAR</code>：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_buyer_phone</span><br><span class="line"><span class="keyword">ON</span> order_info (buyer_phone);</span><br></pre></td></tr></table></figure>
+
+<p>错误参数类型：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="number">13800138000</span>;</span><br></pre></td></tr></table></figure>
+
+<p>数字与字符串比较可能让 MySQL 对列做数值转换，普通字符串索引难以按原顺序定位。正确方式：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>反过来，数字列与可转换的字符串常量比较时，优化器可能转换常量后继续使用索引。不能简化成“类型不同一定失效”，但应用层仍应使用与字段一致的 JDBC 参数类型，避免计划、精度和异常值差异。</p>
+<p>排查时同时看表定义和实际绑定参数。日志里的 <code>user_id = &#39;1001&#39;</code> 不一定等于驱动实际以字符串发送，需要在 SQL 采样或代码中确认。</p>
+<h2 id="问题六：LIKE-是否都会失去索引"><a href="#问题六：LIKE-是否都会失去索引" class="headerlink" title="问题六：LIKE 是否都会失去索引"></a>问题六：LIKE 是否都会失去索引</h2><p>前缀匹配通常能转成范围：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="keyword">LIKE</span> <span class="string">&#x27;O20230423%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>前置通配符无法利用普通 B-Tree 的有序前缀：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="keyword">LIKE</span> <span class="string">&#x27;%0423&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果后缀查询是核心需求，可以考虑冗余反转字段并按前缀查询、全文索引或搜索系统，但要同步写入和校验。不要为一个低频后台搜索立刻增加复杂链路。</p>
+<p>字符集、排序规则和参数长度也会影响范围与选择性，仍以计划和扫描量为准。</p>
+<h2 id="问题七：不等于、NOT-IN、IS-NOT-NULL-一定全表扫描吗"><a href="#问题七：不等于、NOT-IN、IS-NOT-NULL-一定全表扫描吗" class="headerlink" title="问题七：不等于、NOT IN、IS NOT NULL 一定全表扫描吗"></a>问题七：不等于、NOT IN、IS NOT NULL 一定全表扫描吗</h2><p>这类条件经常匹配大部分数据：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">&lt;&gt;</span> <span class="string">&#x27;CANCELLED&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果 95% 行都符合，走二级索引再回表可能比顺序扫描更贵，优化器选择全表扫描是合理成本决策，不是索引坏了。</p>
+<p>当查询只返回索引中的 <code>id</code> 和 <code>status</code> 时，覆盖索引成本可能又低于全表扫描。结果取决于：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">匹配比例</span><br><span class="line">返回字段</span><br><span class="line">表行宽</span><br><span class="line">缓存命中</span><br><span class="line">随机 IO 成本</span><br><span class="line">统计信息</span><br></pre></td></tr></table></figure>
+
+<p>优化目标是总成本，不是强迫每条 SQL 都显示 <code>type=ref</code>。</p>
+<h2 id="问题八：OR-一定让索引失效吗"><a href="#问题八：OR-一定让索引失效吗" class="headerlink" title="问题八：OR 一定让索引失效吗"></a>问题八：OR 一定让索引失效吗</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;O202304230001&#x27;</span></span><br><span class="line">   <span class="keyword">OR</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>两列都有合适索引时，MySQL 可能使用 <code>index_merge</code>；数据量和成本不合适时，也可能全表扫描。</p>
+<p>可以对照改写：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;O202304230001&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">DISTINCT</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>UNION DISTINCT</code> 有去重成本；如果业务保证两边不重叠，才可以使用 <code>UNION ALL</code>。改写后还要验证排序、分页和重复语义，不能只比较执行计划。</p>
+<p>如果 OR 的一侧完全没有可用条件，常常会拖累整体。此时要评估拆查询、补索引，还是限制搜索能力。</p>
+<h2 id="问题九：IN-很短就一定等同于等值吗"><a href="#问题九：IN-很短就一定等同于等值吗" class="headerlink" title="问题九：IN 很短就一定等同于等值吗"></a>问题九：IN 很短就一定等同于等值吗</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="keyword">IN</span> (<span class="string">&#x27;PAID&#x27;</span>, <span class="string">&#x27;REFUNDED&#x27;</span>)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>(tenant_id, status, created_at)</code> 上，两个 status 对应两个索引区间。每个区间内部按时间有序，但合并后的全局时间顺序可能需要额外排序。</p>
+<p>当 <code>IN</code> 值很多时，范围数量、优化器内存和排序成本继续增加。不要仅凭“IN 也是等值”判断能否同时满足 <code>ORDER BY</code>。</p>
+<p>如果“全部有效状态按时间取最近”是核心入口，可能需要：</p>
+<ul>
+<li>冗余一个 <code>is_active</code> 分类字段并建立匹配索引。</li>
+<li>分状态各取一部分后在应用合并。</li>
+<li>调整业务查询模型。</li>
+</ul>
+<p>每个方案都增加写入或实现成本，应通过数据验证。</p>
+<h2 id="问题十：索引完全匹配，优化器为什么仍不用"><a href="#问题十：索引完全匹配，优化器为什么仍不用" class="headerlink" title="问题十：索引完全匹配，优化器为什么仍不用"></a>问题十：索引完全匹配，优化器为什么仍不用</h2><p>常见原因不止“统计信息过期”：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">条件匹配比例太高</span><br><span class="line">返回列很多，回表成本高</span><br><span class="line">表很小，全表扫描更便宜</span><br><span class="line">数据倾斜，平均统计无法描述某个热点值</span><br><span class="line">组合条件存在相关性，估算偏差</span><br><span class="line">索引和表缓存状态不同</span><br><span class="line">优化器参数或版本行为变化</span><br></pre></td></tr></table></figure>
+
+<p>先核对：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br><span class="line">ANALYZE <span class="keyword">TABLE</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p><code>ANALYZE TABLE</code> 会更新统计信息，并可能带来资源和锁影响，应按数据库变更规范执行。不要把它当成每次慢查询的固定按钮。</p>
+<p>MySQL 8.0 可以用直方图描述非索引列或倾斜分布，但直方图也需要维护，且不是联合相关性的万能解法。</p>
+<h2 id="FORCE-INDEX-能不能作为最终修复"><a href="#FORCE-INDEX-能不能作为最终修复" class="headerlink" title="FORCE INDEX 能不能作为最终修复"></a>FORCE INDEX 能不能作为最终修复</h2><p><code>FORCE INDEX</code> 适合在隔离环境比较候选计划，生产长期使用要谨慎：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant_status_created)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>它把今天的判断固定进 SQL。数据增长、状态比例和索引变化后，被强制的计划可能变差，优化器也失去调整空间。</p>
+<p>如果必须临时使用，应记录：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么优化器当前误判</span><br><span class="line">哪些参数和数据已验证</span><br><span class="line">观察指标</span><br><span class="line">移除条件</span><br><span class="line">复核日期</span><br></pre></td></tr></table></figure>
+
+<p>更长期的方向通常是修正统计、查询模型或索引设计。</p>
+<h2 id="联合索引怎么从业务查询推导"><a href="#联合索引怎么从业务查询推导" class="headerlink" title="联合索引怎么从业务查询推导"></a>联合索引怎么从业务查询推导</h2><p>我现在按四步设计。</p>
+<h3 id="1-收集查询族"><a href="#1-收集查询族" class="headerlink" title="1. 收集查询族"></a>1. 收集查询族</h3><p>不是只看一条慢 SQL，而是整理同一张表的高频读写：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">租户 + 状态 + 时间列表</span><br><span class="line">订单号精确查询</span><br><span class="line">买家手机号搜索</span><br><span class="line">按用户游标分页</span><br><span class="line">状态更新</span><br><span class="line">批量归档</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-区分等值、范围、排序和返回"><a href="#2-区分等值、范围、排序和返回" class="headerlink" title="2. 区分等值、范围、排序和返回"></a>2. 区分等值、范围、排序和返回</h3><p>通常先考虑高频等值条件，再考虑范围和排序；但数据选择性、是否总是出现、是否支持多种查询同样重要。不存在一个脱离业务的固定顺序口诀。</p>
+<h3 id="3-用最少索引覆盖主要路径"><a href="#3-用最少索引覆盖主要路径" class="headerlink" title="3. 用最少索引覆盖主要路径"></a>3. 用最少索引覆盖主要路径</h3><p>相似索引会重复占用空间并拖慢写入：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">idx_tenant</span><br><span class="line">idx_tenant_status</span><br><span class="line">idx_tenant_status_created</span><br></pre></td></tr></table></figure>
+
+<p>长索引可能覆盖短索引的部分查询，但不一定能完全替代：索引宽度、排序、覆盖和其他 SQL 都要检查。确认替代关系后再分阶段删除。</p>
+<h3 id="4-对读写一起压测"><a href="#4-对读写一起压测" class="headerlink" title="4. 对读写一起压测"></a>4. 对读写一起压测</h3><p>索引验收至少看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">目标查询 P95 / P99</span><br><span class="line">Rows_examined / Rows_sent</span><br><span class="line">并发下 CPU 与 IO</span><br><span class="line">INSERT / UPDATE 延迟</span><br><span class="line">索引体积与 Buffer Pool</span><br><span class="line">主从复制延迟</span><br></pre></td></tr></table></figure>
+
+<p>查询快了 20ms、写入慢了 30%，可能不是一次成功优化。</p>
+<h2 id="一张不靠口诀的排查单"><a href="#一张不靠口诀的排查单" class="headerlink" title="一张不靠口诀的排查单"></a>一张不靠口诀的排查单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] SQL、参数类型和表结构来自真实现场</span><br><span class="line">[ ] 数据量与分布足以代表生产</span><br><span class="line">[ ] 分清“使用索引”和“各列参与定位”</span><br><span class="line">[ ] 查看估算行数，也查看实际扫描行数</span><br><span class="line">[ ] 函数和类型转换是否作用在列上</span><br><span class="line">[ ] 范围、IN、OR 与 ORDER BY 的组合是否改变计划</span><br><span class="line">[ ] 优化器选择全表扫描是否本来就更便宜</span><br><span class="line">[ ] 统计信息、倾斜和版本差异是否影响估算</span><br><span class="line">[ ] 候选索引是否重复或过宽</span><br><span class="line">[ ] 读取收益与写入、存储成本一起验证</span><br></pre></td></tr></table></figure>
+
+<p>所谓“索引失效”经常把很多不同现象揉成一句话：有时根本没用索引，有时只用了联合索引前几列，有时使用了索引但扫描仍然很大，还有时全表扫描就是更好的计划。</p>
+<p>把问题还原成“优化器选择了哪条访问路径、估算依据是什么、实际付出了多少成本”，比背下更多绝对规则更可靠。</p>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>SQL优化</tag>
+        <tag>联合索引</tag>
       </tags>
   </entry>
   <entry>
@@ -7367,377 +7496,6 @@
         <tag>Linux</tag>
         <tag>故障排查</tag>
         <tag>CPU</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MySQL联合索引与索引失效排查</title>
-    <url>/2023/04/23/MySQL%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E6%8E%92%E6%9F%A5/</url>
-    <content><![CDATA[<blockquote>
-<p>写在前面：索引建了不等于一定会用，执行计划里出现索引也不等于查询足够快。与其背“最左匹配”“范围后失效”这些短句，不如准备一张测试表，把每个判断放进执行计划里验证。</p>
-</blockquote>
-<p>这篇使用同一个订单表回答十个常见问题。实验基于 MySQL 8.0，具体计划会随版本、数据分布和统计信息变化，结论不能脱离现场照搬。</p>
-<h2 id="实验台"><a href="#实验台" class="headerlink" title="实验台"></a>实验台</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    tenant_id <span class="type">BIGINT</span> <span class="keyword">NOT NULL</span>,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    buyer_phone <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_tenant_status_created (tenant_id, status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB;</span><br></pre></td></tr></table></figure>
-
-<p>联合索引可以近似理解为先按 <code>tenant_id</code> 排序，在相同租户内按 <code>status</code> 排序，再在相同状态内按 <code>created_at</code> 排序：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id -&gt; status -&gt; created_at -&gt; primary key</span><br></pre></td></tr></table></figure>
-
-<p>测试数据约 500 万行：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id：1 万个，分布不完全均匀</span><br><span class="line">status：PAID 58%，CREATED 22%，其他 20%</span><br><span class="line">created_at：覆盖 24 个月</span><br><span class="line">buyer_phone：高区分度字符串</span><br></pre></td></tr></table></figure>
-
-<p>数据分布很重要。只有 5 行的空表上，优化器选择全表扫描并不能证明索引失效。</p>
-<p>每个问题至少执行：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN FORMAT<span class="operator">=</span>TREE</span><br><span class="line"><span class="keyword">SELECT</span> ...;</span><br><span class="line"></span><br><span class="line">EXPLAIN ANALYZE</span><br><span class="line"><span class="keyword">SELECT</span> ...;</span><br></pre></td></tr></table></figure>
-
-<p><code>EXPLAIN ANALYZE</code> 会真正执行 SQL，只在可控环境或经过评估的查询上使用。对更新和删除语句更不能直接在生产试验。</p>
-<h2 id="问题一：最左匹配是不是必须写全三列"><a href="#问题一：最左匹配是不是必须写全三列" class="headerlink" title="问题一：最左匹配是不是必须写全三列"></a>问题一：最左匹配是不是必须写全三列</h2><p>不是。只使用连续的左侧列也可以：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 可以按 tenant_id 定位</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以继续按 tenant_id、status 定位</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>跳过中间的 <code>status</code>：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>执行计划仍可能使用 <code>idx_tenant_status_created</code> 按 <code>tenant_id</code> 缩小范围，但 <code>created_at</code> 无法与前导列组成连续边界，需要扫描该租户的多个状态后再过滤。</p>
-<p>所以“索引使用了”和“索引的每一列都用于定位”是两件事。看 <code>key_len</code>、树形计划和实际扫描行数，不能只看 <code>key</code>。</p>
-<h2 id="问题二：跳过第一列一定全表扫描吗"><a href="#问题二：跳过第一列一定全表扫描吗" class="headerlink" title="问题二：跳过第一列一定全表扫描吗"></a>问题二：跳过第一列一定全表扫描吗</h2><p>查询：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>普通 B-Tree 无法直接从 <code>status</code> 找到一个连续区间，因为相同状态散布在每个租户段中。当前数据里 <code>tenant_id</code> 有一万个不同值，优化器选择全表扫描。</p>
-<p>MySQL 8.0 在特定条件下可能使用 Skip Scan，把少量前导列值分别探测。但它依赖版本、前导列基数和成本估算。前导列一万个值时，跳跃一万次通常没有优势。</p>
-<p>结论不是“永远不可能使用”，而是不能把 Skip Scan 当成核心查询的稳定设计。如果按状态和时间查询是高频场景，应建立与它匹配的索引或改变查询入口。</p>
-<h2 id="问题三：范围条件后的列是否完全失效"><a href="#问题三：范围条件后的列是否完全失效" class="headerlink" title="问题三：范围条件后的列是否完全失效"></a>问题三：范围条件后的列是否完全失效</h2><p>索引顺序改成：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_created_status</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, created_at, status);</span><br></pre></td></tr></table></figure>
-
-<p>查询：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-01&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>tenant_id</code> 和 <code>created_at</code> 可以形成索引范围。到达 <code>created_at &gt;=</code> 后，<code>status</code> 通常不能继续缩小连续范围，但它仍可能：</p>
-<ul>
-<li>在索引条件下推中提前过滤。</li>
-<li>作为覆盖列避免回表。</li>
-<li>减少传递到 Server 层的记录。</li>
-</ul>
-<p>因此“范围之后全部失效”太绝对。更准确的说法是：后续列通常不能继续参与构造本次索引查找的连续边界，但仍可能降低其他成本。</p>
-<p>如果 <code>status</code> 是等值且选择性有价值，原索引 <code>(tenant_id, status, created_at)</code> 往往更适合当前查询。最终仍要比较真实分布。</p>
-<h2 id="问题四：字段上使用函数一定没救吗"><a href="#问题四：字段上使用函数一定没救吗" class="headerlink" title="问题四：字段上使用函数一定没救吗"></a>问题四：字段上使用函数一定没救吗</h2><p>普通写法：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> <span class="type">DATE</span>(created_at) <span class="operator">=</span> <span class="string">&#x27;2023-04-23&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>对每行计算 <code>DATE(created_at)</code>，普通 <code>created_at</code> 索引无法直接定位原值区间。优先改写为：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2023-04-23 00:00:00&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span>  <span class="string">&#x27;2023-04-24 00:00:00&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>半开区间避免 <code>23:59:59</code> 漏掉更高精度时间。</p>
-<p>如果业务只能按表达式查询，MySQL 8.0.13 以上可以评估函数索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_created_date</span><br><span class="line"><span class="keyword">ON</span> order_info ((<span class="type">DATE</span>(created_at)));</span><br></pre></td></tr></table></figure>
-
-<p>函数索引增加存储与写入成本，也要求查询表达式与索引表达式匹配。能用原字段范围表达时，通常先选择范围查询。</p>
-<h2 id="问题五：隐式类型转换为什么有时影响索引"><a href="#问题五：隐式类型转换为什么有时影响索引" class="headerlink" title="问题五：隐式类型转换为什么有时影响索引"></a>问题五：隐式类型转换为什么有时影响索引</h2><p><code>buyer_phone</code> 是 <code>VARCHAR</code>：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_buyer_phone</span><br><span class="line"><span class="keyword">ON</span> order_info (buyer_phone);</span><br></pre></td></tr></table></figure>
-
-<p>错误参数类型：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="number">13800138000</span>;</span><br></pre></td></tr></table></figure>
-
-<p>数字与字符串比较可能让 MySQL 对列做数值转换，普通字符串索引难以按原顺序定位。正确方式：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>反过来，数字列与可转换的字符串常量比较时，优化器可能转换常量后继续使用索引。不能简化成“类型不同一定失效”，但应用层仍应使用与字段一致的 JDBC 参数类型，避免计划、精度和异常值差异。</p>
-<p>排查时同时看表定义和实际绑定参数。日志里的 <code>user_id = &#39;1001&#39;</code> 不一定等于驱动实际以字符串发送，需要在 SQL 采样或代码中确认。</p>
-<h2 id="问题六：LIKE-是否都会失去索引"><a href="#问题六：LIKE-是否都会失去索引" class="headerlink" title="问题六：LIKE 是否都会失去索引"></a>问题六：LIKE 是否都会失去索引</h2><p>前缀匹配通常能转成范围：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="keyword">LIKE</span> <span class="string">&#x27;O20230423%&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>前置通配符无法利用普通 B-Tree 的有序前缀：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="keyword">LIKE</span> <span class="string">&#x27;%0423&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>如果后缀查询是核心需求，可以考虑冗余反转字段并按前缀查询、全文索引或搜索系统，但要同步写入和校验。不要为一个低频后台搜索立刻增加复杂链路。</p>
-<p>字符集、排序规则和参数长度也会影响范围与选择性，仍以计划和扫描量为准。</p>
-<h2 id="问题七：不等于、NOT-IN、IS-NOT-NULL-一定全表扫描吗"><a href="#问题七：不等于、NOT-IN、IS-NOT-NULL-一定全表扫描吗" class="headerlink" title="问题七：不等于、NOT IN、IS NOT NULL 一定全表扫描吗"></a>问题七：不等于、NOT IN、IS NOT NULL 一定全表扫描吗</h2><p>这类条件经常匹配大部分数据：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">&lt;&gt;</span> <span class="string">&#x27;CANCELLED&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>如果 95% 行都符合，走二级索引再回表可能比顺序扫描更贵，优化器选择全表扫描是合理成本决策，不是索引坏了。</p>
-<p>当查询只返回索引中的 <code>id</code> 和 <code>status</code> 时，覆盖索引成本可能又低于全表扫描。结果取决于：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">匹配比例</span><br><span class="line">返回字段</span><br><span class="line">表行宽</span><br><span class="line">缓存命中</span><br><span class="line">随机 IO 成本</span><br><span class="line">统计信息</span><br></pre></td></tr></table></figure>
-
-<p>优化目标是总成本，不是强迫每条 SQL 都显示 <code>type=ref</code>。</p>
-<h2 id="问题八：OR-一定让索引失效吗"><a href="#问题八：OR-一定让索引失效吗" class="headerlink" title="问题八：OR 一定让索引失效吗"></a>问题八：OR 一定让索引失效吗</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;O202304230001&#x27;</span></span><br><span class="line">   <span class="keyword">OR</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>两列都有合适索引时，MySQL 可能使用 <code>index_merge</code>；数据量和成本不合适时，也可能全表扫描。</p>
-<p>可以对照改写：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> order_no <span class="operator">=</span> <span class="string">&#x27;O202304230001&#x27;</span></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">DISTINCT</span></span><br><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> buyer_phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>UNION DISTINCT</code> 有去重成本；如果业务保证两边不重叠，才可以使用 <code>UNION ALL</code>。改写后还要验证排序、分页和重复语义，不能只比较执行计划。</p>
-<p>如果 OR 的一侧完全没有可用条件，常常会拖累整体。此时要评估拆查询、补索引，还是限制搜索能力。</p>
-<h2 id="问题九：IN-很短就一定等同于等值吗"><a href="#问题九：IN-很短就一定等同于等值吗" class="headerlink" title="问题九：IN 很短就一定等同于等值吗"></a>问题九：IN 很短就一定等同于等值吗</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="keyword">IN</span> (<span class="string">&#x27;PAID&#x27;</span>, <span class="string">&#x27;REFUNDED&#x27;</span>)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>(tenant_id, status, created_at)</code> 上，两个 status 对应两个索引区间。每个区间内部按时间有序，但合并后的全局时间顺序可能需要额外排序。</p>
-<p>当 <code>IN</code> 值很多时，范围数量、优化器内存和排序成本继续增加。不要仅凭“IN 也是等值”判断能否同时满足 <code>ORDER BY</code>。</p>
-<p>如果“全部有效状态按时间取最近”是核心入口，可能需要：</p>
-<ul>
-<li>冗余一个 <code>is_active</code> 分类字段并建立匹配索引。</li>
-<li>分状态各取一部分后在应用合并。</li>
-<li>调整业务查询模型。</li>
-</ul>
-<p>每个方案都增加写入或实现成本，应通过数据验证。</p>
-<h2 id="问题十：索引完全匹配，优化器为什么仍不用"><a href="#问题十：索引完全匹配，优化器为什么仍不用" class="headerlink" title="问题十：索引完全匹配，优化器为什么仍不用"></a>问题十：索引完全匹配，优化器为什么仍不用</h2><p>常见原因不止“统计信息过期”：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">条件匹配比例太高</span><br><span class="line">返回列很多，回表成本高</span><br><span class="line">表很小，全表扫描更便宜</span><br><span class="line">数据倾斜，平均统计无法描述某个热点值</span><br><span class="line">组合条件存在相关性，估算偏差</span><br><span class="line">索引和表缓存状态不同</span><br><span class="line">优化器参数或版本行为变化</span><br></pre></td></tr></table></figure>
-
-<p>先核对：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br><span class="line">ANALYZE <span class="keyword">TABLE</span> order_info;</span><br></pre></td></tr></table></figure>
-
-<p><code>ANALYZE TABLE</code> 会更新统计信息，并可能带来资源和锁影响，应按数据库变更规范执行。不要把它当成每次慢查询的固定按钮。</p>
-<p>MySQL 8.0 可以用直方图描述非索引列或倾斜分布，但直方图也需要维护，且不是联合相关性的万能解法。</p>
-<h2 id="FORCE-INDEX-能不能作为最终修复"><a href="#FORCE-INDEX-能不能作为最终修复" class="headerlink" title="FORCE INDEX 能不能作为最终修复"></a>FORCE INDEX 能不能作为最终修复</h2><p><code>FORCE INDEX</code> 适合在隔离环境比较候选计划，生产长期使用要谨慎：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant_status_created)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>它把今天的判断固定进 SQL。数据增长、状态比例和索引变化后，被强制的计划可能变差，优化器也失去调整空间。</p>
-<p>如果必须临时使用，应记录：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么优化器当前误判</span><br><span class="line">哪些参数和数据已验证</span><br><span class="line">观察指标</span><br><span class="line">移除条件</span><br><span class="line">复核日期</span><br></pre></td></tr></table></figure>
-
-<p>更长期的方向通常是修正统计、查询模型或索引设计。</p>
-<h2 id="联合索引怎么从业务查询推导"><a href="#联合索引怎么从业务查询推导" class="headerlink" title="联合索引怎么从业务查询推导"></a>联合索引怎么从业务查询推导</h2><p>我现在按四步设计。</p>
-<h3 id="1-收集查询族"><a href="#1-收集查询族" class="headerlink" title="1. 收集查询族"></a>1. 收集查询族</h3><p>不是只看一条慢 SQL，而是整理同一张表的高频读写：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">租户 + 状态 + 时间列表</span><br><span class="line">订单号精确查询</span><br><span class="line">买家手机号搜索</span><br><span class="line">按用户游标分页</span><br><span class="line">状态更新</span><br><span class="line">批量归档</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-区分等值、范围、排序和返回"><a href="#2-区分等值、范围、排序和返回" class="headerlink" title="2. 区分等值、范围、排序和返回"></a>2. 区分等值、范围、排序和返回</h3><p>通常先考虑高频等值条件，再考虑范围和排序；但数据选择性、是否总是出现、是否支持多种查询同样重要。不存在一个脱离业务的固定顺序口诀。</p>
-<h3 id="3-用最少索引覆盖主要路径"><a href="#3-用最少索引覆盖主要路径" class="headerlink" title="3. 用最少索引覆盖主要路径"></a>3. 用最少索引覆盖主要路径</h3><p>相似索引会重复占用空间并拖慢写入：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">idx_tenant</span><br><span class="line">idx_tenant_status</span><br><span class="line">idx_tenant_status_created</span><br></pre></td></tr></table></figure>
-
-<p>长索引可能覆盖短索引的部分查询，但不一定能完全替代：索引宽度、排序、覆盖和其他 SQL 都要检查。确认替代关系后再分阶段删除。</p>
-<h3 id="4-对读写一起压测"><a href="#4-对读写一起压测" class="headerlink" title="4. 对读写一起压测"></a>4. 对读写一起压测</h3><p>索引验收至少看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">目标查询 P95 / P99</span><br><span class="line">Rows_examined / Rows_sent</span><br><span class="line">并发下 CPU 与 IO</span><br><span class="line">INSERT / UPDATE 延迟</span><br><span class="line">索引体积与 Buffer Pool</span><br><span class="line">主从复制延迟</span><br></pre></td></tr></table></figure>
-
-<p>查询快了 20ms、写入慢了 30%，可能不是一次成功优化。</p>
-<h2 id="一张不靠口诀的排查单"><a href="#一张不靠口诀的排查单" class="headerlink" title="一张不靠口诀的排查单"></a>一张不靠口诀的排查单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] SQL、参数类型和表结构来自真实现场</span><br><span class="line">[ ] 数据量与分布足以代表生产</span><br><span class="line">[ ] 分清“使用索引”和“各列参与定位”</span><br><span class="line">[ ] 查看估算行数，也查看实际扫描行数</span><br><span class="line">[ ] 函数和类型转换是否作用在列上</span><br><span class="line">[ ] 范围、IN、OR 与 ORDER BY 的组合是否改变计划</span><br><span class="line">[ ] 优化器选择全表扫描是否本来就更便宜</span><br><span class="line">[ ] 统计信息、倾斜和版本差异是否影响估算</span><br><span class="line">[ ] 候选索引是否重复或过宽</span><br><span class="line">[ ] 读取收益与写入、存储成本一起验证</span><br></pre></td></tr></table></figure>
-
-<p>所谓“索引失效”经常把很多不同现象揉成一句话：有时根本没用索引，有时只用了联合索引前几列，有时使用了索引但扫描仍然很大，还有时全表扫描就是更好的计划。</p>
-<p>把问题还原成“优化器选择了哪条访问路径、估算依据是什么、实际付出了多少成本”，比背下更多绝对规则更可靠。</p>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>SQL优化</tag>
-        <tag>联合索引</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一次MySQL慢SQL调优记录</title>
-    <url>/2023/02/19/%E4%B8%80%E6%AC%A1MySQL%E6%85%A2SQL%E8%B0%83%E4%BC%98%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<blockquote>
-<p>写在前面：SQL 调优最怕一上来就加索引。索引可能暂时把耗时压下去，也可能只是把成本从查询转移到写入和存储。下面按一次完整实验记录来写：先保存基线，再提出候选方案，用执行计划和对照数据筛选，最后明确上线与回滚条件。</p>
-</blockquote>
-<p>问题接口查询某个用户最近的已支付订单。数据增长后，P99 从 300ms 左右升到 5 秒，数据库 CPU 没有打满，但慢查询中的扫描行数非常夸张。</p>
-<h2 id="13-50，固定问题样本"><a href="#13-50，固定问题样本" class="headerlink" title="13:50，固定问题样本"></a>13:50，固定问题样本</h2><p>原始 SQL：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>慢查询摘要：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line"># Query_time: 4.782  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 20  Rows_examined: 2864317</span><br></pre></td></tr></table></figure>
-
-<p>只返回 20 行，却扫描 286 万行。为了避免优化错对象，还需要确认：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQL digest：0x7A82...</span><br><span class="line">过去 1 小时调用：18,420 次</span><br><span class="line">参数分布：高频用户与普通用户都慢</span><br><span class="line">调用入口：订单列表、支付结果页</span><br><span class="line">数据库实例：只读副本</span><br><span class="line">表数据量：约 1,860 万行</span><br></pre></td></tr></table></figure>
-
-<p>应用日志中的 SQL 可能经过 ORM 动态拼装，真正执行的字段、条件和排序应以数据库采样为准。样本中的用户和订单数据均做脱敏。</p>
-<h2 id="14-05，建立可比较的基线"><a href="#14-05，建立可比较的基线" class="headerlink" title="14:05，建立可比较的基线"></a>14:05，建立可比较的基线</h2><p>测试环境使用一份接近生产分布的快照，数据库版本与参数保持一致。每个候选方案执行：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">冷缓存：重启隔离测试实例后执行 3 次</span><br><span class="line">暖缓存：预热后执行 20 次</span><br><span class="line">并发：1、20、50 三档</span><br><span class="line">写入：保持相同订单写入压测</span><br><span class="line">记录：P50、P95、P99、Rows_examined、CPU、IO</span><br></pre></td></tr></table></figure>
-
-<p>这里不通过生产执行 <code>RESET QUERY CACHE</code> 或重启数据库制造冷缓存。冷缓存实验只在隔离实例进行。</p>
-<p>基线结果：</p>
-<table>
-<thead>
-<tr>
-<th>场景</th>
-<th align="right">P50</th>
-<th align="right">P99</th>
-<th align="right">Rows_examined</th>
-<th align="right">数据库 CPU</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>单线程暖缓存</td>
-<td align="right">4.12s</td>
-<td align="right">4.91s</td>
-<td align="right">2,864,317</td>
-<td align="right">18%</td>
-</tr>
-<tr>
-<td>20 并发</td>
-<td align="right">5.86s</td>
-<td align="right">8.42s</td>
-<td align="right">2,864,317</td>
-<td align="right">63%</td>
-</tr>
-<tr>
-<td>50 并发</td>
-<td align="right">9.74s</td>
-<td align="right">超时</td>
-<td align="right">2,864,317</td>
-<td align="right">91%</td>
-</tr>
-</tbody></table>
-<p>单次查询时 CPU 看起来不高，并发放大后问题才接近生产影响。只测一次很容易低估扫描成本。</p>
-<h2 id="14-18，读执行计划而不是只看-key"><a href="#14-18，读执行计划而不是只看-key" class="headerlink" title="14:18，读执行计划而不是只看 key"></a>14:18，读执行计划而不是只看 key</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>关键结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: index</span><br><span class="line">possible_keys: idx_user_id,idx_status</span><br><span class="line">key: idx_created_at</span><br><span class="line">rows: 2840000</span><br><span class="line">filtered: 0.1</span><br><span class="line">Extra: Using where</span><br></pre></td></tr></table></figure>
-
-<p>优化器选择 <code>idx_created_at</code>，是因为它能按创建时间倒序扫描并尽早满足 <code>LIMIT</code>。但用户 10001 的已支付订单很稀疏，为找到 20 条匹配记录，它沿时间索引跳过了大量其他用户订单。</p>
-<p><code>key</code> 不为空只说明使用了某个索引，不说明这个访问路径足够便宜。<code>rows</code> 和实际 <code>Rows_examined</code> 才暴露扫描规模。</p>
-<p>在 MySQL 8.0.18 以上的隔离环境，还可以使用：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN ANALYZE</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>EXPLAIN ANALYZE</code> 会真实执行查询，可能产生负载和读取开销，不能把它当成生产环境的无成本命令。它显示大部分时间消耗在按 <code>created_at</code> 扫描后过滤。</p>
-<h2 id="14-32，先看选择性和数据分布"><a href="#14-32，先看选择性和数据分布" class="headerlink" title="14:32，先看选择性和数据分布"></a>14:32，先看选择性和数据分布</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> total,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> user_id) <span class="keyword">AS</span> users,</span><br><span class="line">    <span class="built_in">SUM</span>(status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>) <span class="keyword">AS</span> paid_rows</span><br><span class="line"><span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
-
-<p>结果概要：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">总行数：18,600,000</span><br><span class="line">用户数：1,240,000</span><br><span class="line">PAID 占比：约 61%</span><br><span class="line">普通用户订单中位数：9</span><br><span class="line">高频用户最大订单数：84,000</span><br></pre></td></tr></table></figure>
-
-<p><code>status</code> 单列区分度很低，<code>user_id</code> 更适合作为联合索引前导列。查询还有按时间排序，因此候选索引应同时考虑过滤和顺序。</p>
-<h2 id="14-45，候选-A：user-id-status"><a href="#14-45，候选-A：user-id-status" class="headerlink" title="14:45，候选 A：user_id + status"></a>14:45，候选 A：user_id + status</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status</span><br><span class="line"><span class="keyword">ON</span> order_info (user_id, status);</span><br></pre></td></tr></table></figure>
-
-<p>执行计划改为按用户和状态定位，但仍有：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">rows: 84216</span><br><span class="line">Extra: Using index condition; Using filesort</span><br></pre></td></tr></table></figure>
-
-<p>普通用户查询约 28ms，高频用户约 310ms。相比原方案已经明显改善，但热门用户需要读取并排序 8 万多行，P99 仍不稳定。</p>
-<p>这个实验验证了前两列的过滤价值，也说明排序字段不能忽略。</p>
-<h2 id="15-10，候选-B：加入-created-at"><a href="#15-10，候选-B：加入-created-at" class="headerlink" title="15:10，候选 B：加入 created_at"></a>15:10，候选 B：加入 created_at</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (user_id, status, created_at <span class="keyword">DESC</span>);</span><br></pre></td></tr></table></figure>
-
-<p>MySQL 8.0 支持降序索引；在不支持的版本中，InnoDB 也可以反向扫描普通 B-Tree，需要以实际执行计划验证。</p>
-<p>新计划：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: ref</span><br><span class="line">key: idx_user_status_created</span><br><span class="line">rows: 84216</span><br><span class="line">Extra: Backward index scan</span><br></pre></td></tr></table></figure>
-
-<p><code>rows</code> 仍是统计估算，但实际执行在按顺序取到 20 行后停止：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Rows_sent: 20</span><br><span class="line">Rows_examined: 20</span><br></pre></td></tr></table></figure>
-
-<p>关键不是计划里某个字段看起来漂亮，而是实际扫描量已经与返回量接近。</p>
-<h2 id="15-35，候选-C：做成宽覆盖索引"><a href="#15-35，候选-C：做成宽覆盖索引" class="headerlink" title="15:35，候选 C：做成宽覆盖索引"></a>15:35，候选 C：做成宽覆盖索引</h2><p>为了验证回表成本，又测试：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status_created_cover</span><br><span class="line"><span class="keyword">ON</span> order_info (</span><br><span class="line">    user_id,</span><br><span class="line">    status,</span><br><span class="line">    created_at <span class="keyword">DESC</span>,</span><br><span class="line">    order_no,</span><br><span class="line">    amount</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>因为 InnoDB 二级索引叶子节点已经包含主键，查询所需字段基本都在索引中。单查询 P99 从 14ms 下降到约 10ms，但索引体积增加明显，订单写入 P99 上升约 13%。</p>
-<p>一次只返回 20 行，方案 B 的回表次数很少。为了 4ms 收益承担更宽索引和更高写放大不划算，因此候选 C 被淘汰。</p>
-<h2 id="三个方案的对照结果"><a href="#三个方案的对照结果" class="headerlink" title="三个方案的对照结果"></a>三个方案的对照结果</h2><table>
-<thead>
-<tr>
-<th>方案</th>
-<th align="right">暖缓存 P99</th>
-<th align="right">50 并发 P99</th>
-<th align="right">实际扫描行</th>
-<th align="right">写入 P99 变化</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>原始索引</td>
-<td align="right">4.91s</td>
-<td align="right">超时</td>
-<td align="right">2,864,317</td>
-<td align="right">基线</td>
-</tr>
-<tr>
-<td>A：user,status</td>
-<td align="right">310ms</td>
-<td align="right">1.12s</td>
-<td align="right">84,216</td>
-<td align="right">+5%</td>
-</tr>
-<tr>
-<td>B：user,status,time</td>
-<td align="right">14ms</td>
-<td align="right">68ms</td>
-<td align="right">20</td>
-<td align="right">+7%</td>
-</tr>
-<tr>
-<td>C：宽覆盖索引</td>
-<td align="right">10ms</td>
-<td align="right">55ms</td>
-<td align="right">20</td>
-<td align="right">+13%</td>
-</tr>
-</tbody></table>
-<p>最终选择 B。它不是查询绝对最快的方案，但在读取收益、写入成本和索引体积之间更平衡。</p>
-<h2 id="16-10，上线前先写回滚门槛"><a href="#16-10，上线前先写回滚门槛" class="headerlink" title="16:10，上线前先写回滚门槛"></a>16:10，上线前先写回滚门槛</h2><p>大表加索引不是普通代码发布。执行前记录：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">预计索引大小</span><br><span class="line">构建临时空间</span><br><span class="line">DDL 预计时间</span><br><span class="line">元数据锁等待</span><br><span class="line">主从复制延迟</span><br><span class="line">写入延迟变化</span><br><span class="line">中止方式</span><br><span class="line">旧索引保留时间</span><br></pre></td></tr></table></figure>
-
-<p>本次先在只读副本创建并验证，再通过数据库变更平台执行。是否支持在线 DDL 与 <code>LOCK=NONE</code> 取决于 MySQL 版本、存储引擎和具体操作，不能只看语法：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER TABLE</span> order_info</span><br><span class="line"><span class="keyword">ADD</span> INDEX idx_user_status_created (user_id, status, created_at <span class="keyword">DESC</span>),</span><br><span class="line">ALGORITHM<span class="operator">=</span>INPLACE,</span><br><span class="line">LOCK<span class="operator">=</span><span class="keyword">NONE</span>;</span><br></pre></td></tr></table></figure>
-
-<p>执行由数据库负责人操作，并持续观察。预先约定暂停或回滚条件：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">元数据锁阻塞核心写入</span><br><span class="line">复制延迟持续超过 30 秒</span><br><span class="line">磁盘剩余空间低于安全线</span><br><span class="line">订单写入 P99 比基线上升超过 15%</span><br><span class="line">新索引上线后仍未被目标 SQL 使用</span><br></pre></td></tr></table></figure>
-
-<p>删除索引同样是生产 DDL，不在发现异常后凭情绪立即执行。先确认异常与索引相关，再按变更流程回退。</p>
-<h2 id="17-20，灰度验证真实流量"><a href="#17-20，灰度验证真实流量" class="headerlink" title="17:20，灰度验证真实流量"></a>17:20，灰度验证真实流量</h2><p>索引完成后先让一个只读实例承接少量订单查询，核对：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">目标 SQL 的 key 是否为新索引</span><br><span class="line">Rows_examined / Rows_sent 是否接近 1</span><br><span class="line">普通用户与高频用户 P99</span><br><span class="line">Buffer Pool、磁盘读取与 CPU</span><br><span class="line">订单写入和复制延迟</span><br><span class="line">错误率与结果一致性</span><br></pre></td></tr></table></figure>
-
-<p>灰度一小时后：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">接口 P99：4.9s -&gt; 72ms</span><br><span class="line">Rows_examined P95：280 万 -&gt; 20</span><br><span class="line">只读实例 CPU 峰值：76% -&gt; 31%</span><br><span class="line">订单写入 P99：增加约 6%</span><br><span class="line">复制延迟：无明显变化</span><br></pre></td></tr></table></figure>
-
-<p>结果符合实验，才逐步扩大流量。</p>
-<h2 id="索引解决不了深分页"><a href="#索引解决不了深分页" class="headerlink" title="索引解决不了深分页"></a>索引解决不了深分页</h2><p>首页查询改善后，运营后台仍有：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>即使使用联合索引，数据库仍要跳过大量记录。用户侧列表改为游标分页：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> :userId</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (</span><br><span class="line">      created_at <span class="operator">&lt;</span> :lastCreatedAt</span><br><span class="line">      <span class="keyword">OR</span> (created_at <span class="operator">=</span> :lastCreatedAt <span class="keyword">AND</span> id <span class="operator">&lt;</span> :lastId)</span><br><span class="line">  )</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>正式索引相应增加 <code>id</code> 作为稳定排序键。只按时间游标时，相同时间的订单可能重复或遗漏。</p>
-<p>运营导出不再通过深分页同步拉取，而是走异步批任务，避免一个请求长期占用数据库连接。</p>
-<h2 id="一周后的复核"><a href="#一周后的复核" class="headerlink" title="一周后的复核"></a>一周后的复核</h2><p>索引上线不是实验结束。我们在一周后再次检查：</p>
-<ul>
-<li>慢查询 digest 的调用量和 P99。</li>
-<li>新索引实际使用次数。</li>
-<li>单表索引体积和 Buffer Pool 命中。</li>
-<li>写入、更新和删除成本。</li>
-<li>旧单列索引是否与新索引重复。</li>
-<li>数据分布变化后计划是否稳定。</li>
-</ul>
-<p>确认新联合索引覆盖了 <code>idx_user_id</code> 的用途后，才单独发起旧索引下线评审。删除前还要检索其他 SQL，不能只围绕本次接口判断。</p>
-<p>这次调优最后留下的不是一句“加联合索引”，而是一条可以复查的决策链：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">真实慢日志建立基线</span><br><span class="line">执行计划解释扫描路径</span><br><span class="line">数据分布决定候选顺序</span><br><span class="line">多个索引方案对照读写成本</span><br><span class="line">提前定义上线和回滚门槛</span><br><span class="line">灰度验证真实流量</span><br><span class="line">持续复核索引价值</span><br></pre></td></tr></table></figure>
-
-<p>性能优化不是把某一次耗时压到最低，而是在真实负载下，让读取、写入、容量和可回退性达到更稳定的平衡。</p>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>慢查询</tag>
-        <tag>SQL优化</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>从零开始学习设计模式-第一篇</title>
-    <url>/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/</url>
-    <content><![CDATA[<p><img src="/images/posts/2024/design-patterns-cover.png" alt="设计模式知识梳理封面图"></p>
-<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><blockquote>
-<p>写在前面：</p>
-</blockquote>
-<p>找工作下来感觉自己基础知识确实很不牢靠，成了无情的接口调用工具人，所以恶补一下相关的知识。</p>
-
-
-<h2 id="1-单例模式"><a href="#1-单例模式" class="headerlink" title="1. 单例模式"></a>1. 单例模式</h2><p>概念就是<strong>一个类负责创建自己的对象，同时确保只有单个对象被创建</strong>。</p>
-<h3 id="1-1分类"><a href="#1-1分类" class="headerlink" title="1.1分类"></a>1.1分类</h3><h4 id="恶汉：加载就会导致该实例对象被创建"><a href="#恶汉：加载就会导致该实例对象被创建" class="headerlink" title="恶汉：加载就会导致该实例对象被创建"></a>恶汉：加载就会导致该实例对象被创建</h4><ol>
-<li>创建方式<ol>
-<li>静态变量方式 直接new Singleton（）；</li>
-<li>静态代码块的方式 写一个 static{}</li>
-</ol>
-</li>
-</ol>
-<h4 id="懒汉：首次使用该对象时才会创建对象"><a href="#懒汉：首次使用该对象时才会创建对象" class="headerlink" title="懒汉：首次使用该对象时才会创建对象"></a>懒汉：首次使用该对象时才会创建对象</h4><blockquote>
-<p>懒汉式会出现线程安全问题，需要优化判断条件</p>
-</blockquote>
-<p>可以通过对外提供静态方法的方式来获取，但是效率特别低。一般使用双重检查锁的方式进行处理，但是JVM可能会出现优化和指令重排的问题，所以可以使用volatile关键字保证代码的有序性。</p>
-<figure class="highlight java"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>{</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>{}</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton instance;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//对外提供静态方法获取该对象</span></span><br><span class="line">  	<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>{</span><br><span class="line">      	<span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">          <span class="keyword">synchronized</span>(Singleton.class){</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">              instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">            }</span><br><span class="line">          }</span><br><span class="line">        }</span><br><span class="line">      <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="1-2-破解单例"><a href="#1-2-破解单例" class="headerlink" title="1.2 破解单例"></a>1.2 破解单例</h3><blockquote>
-<p>可以通过序列化和反射的方式破解单例模式</p>
-</blockquote>
-<p><strong>解决办法</strong></p>
-<ol>
-<li>序列化：添加readResolve()方法，返回SingletonHolder.INSTANCE;</li>
-<li>反射：在构造方法中，增加判断，如果私有化对象不为空，直接抛出异常</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Java基础</category>
-      </categories>
-      <tags>
-        <tag>设计模式</tag>
       </tags>
   </entry>
   <entry>
@@ -8162,6 +7920,46 @@
       </tags>
   </entry>
   <entry>
+    <title>从零开始学习设计模式-第一篇</title>
+    <url>/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/</url>
+    <content><![CDATA[<p><img src="/images/posts/2024/design-patterns-cover.png" alt="设计模式知识梳理封面图"></p>
+<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><blockquote>
+<p>写在前面：</p>
+</blockquote>
+<p>找工作下来感觉自己基础知识确实很不牢靠，成了无情的接口调用工具人，所以恶补一下相关的知识。</p>
+
+
+<h2 id="1-单例模式"><a href="#1-单例模式" class="headerlink" title="1. 单例模式"></a>1. 单例模式</h2><p>概念就是<strong>一个类负责创建自己的对象，同时确保只有单个对象被创建</strong>。</p>
+<h3 id="1-1分类"><a href="#1-1分类" class="headerlink" title="1.1分类"></a>1.1分类</h3><h4 id="恶汉：加载就会导致该实例对象被创建"><a href="#恶汉：加载就会导致该实例对象被创建" class="headerlink" title="恶汉：加载就会导致该实例对象被创建"></a>恶汉：加载就会导致该实例对象被创建</h4><ol>
+<li>创建方式<ol>
+<li>静态变量方式 直接new Singleton（）；</li>
+<li>静态代码块的方式 写一个 static{}</li>
+</ol>
+</li>
+</ol>
+<h4 id="懒汉：首次使用该对象时才会创建对象"><a href="#懒汉：首次使用该对象时才会创建对象" class="headerlink" title="懒汉：首次使用该对象时才会创建对象"></a>懒汉：首次使用该对象时才会创建对象</h4><blockquote>
+<p>懒汉式会出现线程安全问题，需要优化判断条件</p>
+</blockquote>
+<p>可以通过对外提供静态方法的方式来获取，但是效率特别低。一般使用双重检查锁的方式进行处理，但是JVM可能会出现优化和指令重排的问题，所以可以使用volatile关键字保证代码的有序性。</p>
+<figure class="highlight java"><table><tbody><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>{</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>{}</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton instance;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//对外提供静态方法获取该对象</span></span><br><span class="line">  	<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>{</span><br><span class="line">      	<span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">          <span class="keyword">synchronized</span>(Singleton.class){</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">              instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">            }</span><br><span class="line">          }</span><br><span class="line">        }</span><br><span class="line">      <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="1-2-破解单例"><a href="#1-2-破解单例" class="headerlink" title="1.2 破解单例"></a>1.2 破解单例</h3><blockquote>
+<p>可以通过序列化和反射的方式破解单例模式</p>
+</blockquote>
+<p><strong>解决办法</strong></p>
+<ol>
+<li>序列化：添加readResolve()方法，返回SingletonHolder.INSTANCE;</li>
+<li>反射：在构造方法中，增加判断，如果私有化对象不为空，直接抛出异常</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Java基础</category>
+      </categories>
+      <tags>
+        <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>博客重新出发</title>
     <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
     <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
@@ -8188,6 +7986,189 @@
       <tags>
         <tag>Hexo</tag>
         <tag>GitHub Pages</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一次MySQL慢SQL调优记录</title>
+    <url>/2023/02/19/%E4%B8%80%E6%AC%A1MySQL%E6%85%A2SQL%E8%B0%83%E4%BC%98%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<blockquote>
+<p>写在前面：SQL 调优最怕一上来就加索引。索引可能暂时把耗时压下去，也可能只是把成本从查询转移到写入和存储。下面按一次完整实验记录来写：先保存基线，再提出候选方案，用执行计划和对照数据筛选，最后明确上线与回滚条件。</p>
+</blockquote>
+<p>问题接口查询某个用户最近的已支付订单。数据增长后，P99 从 300ms 左右升到 5 秒，数据库 CPU 没有打满，但慢查询中的扫描行数非常夸张。</p>
+<h2 id="13-50，固定问题样本"><a href="#13-50，固定问题样本" class="headerlink" title="13:50，固定问题样本"></a>13:50，固定问题样本</h2><p>原始 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>慢查询摘要：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line"># Query_time: 4.782  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 20  Rows_examined: 2864317</span><br></pre></td></tr></table></figure>
+
+<p>只返回 20 行，却扫描 286 万行。为了避免优化错对象，还需要确认：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQL digest：0x7A82...</span><br><span class="line">过去 1 小时调用：18,420 次</span><br><span class="line">参数分布：高频用户与普通用户都慢</span><br><span class="line">调用入口：订单列表、支付结果页</span><br><span class="line">数据库实例：只读副本</span><br><span class="line">表数据量：约 1,860 万行</span><br></pre></td></tr></table></figure>
+
+<p>应用日志中的 SQL 可能经过 ORM 动态拼装，真正执行的字段、条件和排序应以数据库采样为准。样本中的用户和订单数据均做脱敏。</p>
+<h2 id="14-05，建立可比较的基线"><a href="#14-05，建立可比较的基线" class="headerlink" title="14:05，建立可比较的基线"></a>14:05，建立可比较的基线</h2><p>测试环境使用一份接近生产分布的快照，数据库版本与参数保持一致。每个候选方案执行：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">冷缓存：重启隔离测试实例后执行 3 次</span><br><span class="line">暖缓存：预热后执行 20 次</span><br><span class="line">并发：1、20、50 三档</span><br><span class="line">写入：保持相同订单写入压测</span><br><span class="line">记录：P50、P95、P99、Rows_examined、CPU、IO</span><br></pre></td></tr></table></figure>
+
+<p>这里不通过生产执行 <code>RESET QUERY CACHE</code> 或重启数据库制造冷缓存。冷缓存实验只在隔离实例进行。</p>
+<p>基线结果：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th align="right">P50</th>
+<th align="right">P99</th>
+<th align="right">Rows_examined</th>
+<th align="right">数据库 CPU</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单线程暖缓存</td>
+<td align="right">4.12s</td>
+<td align="right">4.91s</td>
+<td align="right">2,864,317</td>
+<td align="right">18%</td>
+</tr>
+<tr>
+<td>20 并发</td>
+<td align="right">5.86s</td>
+<td align="right">8.42s</td>
+<td align="right">2,864,317</td>
+<td align="right">63%</td>
+</tr>
+<tr>
+<td>50 并发</td>
+<td align="right">9.74s</td>
+<td align="right">超时</td>
+<td align="right">2,864,317</td>
+<td align="right">91%</td>
+</tr>
+</tbody></table>
+<p>单次查询时 CPU 看起来不高，并发放大后问题才接近生产影响。只测一次很容易低估扫描成本。</p>
+<h2 id="14-18，读执行计划而不是只看-key"><a href="#14-18，读执行计划而不是只看-key" class="headerlink" title="14:18，读执行计划而不是只看 key"></a>14:18，读执行计划而不是只看 key</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>关键结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: index</span><br><span class="line">possible_keys: idx_user_id,idx_status</span><br><span class="line">key: idx_created_at</span><br><span class="line">rows: 2840000</span><br><span class="line">filtered: 0.1</span><br><span class="line">Extra: Using where</span><br></pre></td></tr></table></figure>
+
+<p>优化器选择 <code>idx_created_at</code>，是因为它能按创建时间倒序扫描并尽早满足 <code>LIMIT</code>。但用户 10001 的已支付订单很稀疏，为找到 20 条匹配记录，它沿时间索引跳过了大量其他用户订单。</p>
+<p><code>key</code> 不为空只说明使用了某个索引，不说明这个访问路径足够便宜。<code>rows</code> 和实际 <code>Rows_examined</code> 才暴露扫描规模。</p>
+<p>在 MySQL 8.0.18 以上的隔离环境，还可以使用：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN ANALYZE</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>EXPLAIN ANALYZE</code> 会真实执行查询，可能产生负载和读取开销，不能把它当成生产环境的无成本命令。它显示大部分时间消耗在按 <code>created_at</code> 扫描后过滤。</p>
+<h2 id="14-32，先看选择性和数据分布"><a href="#14-32，先看选择性和数据分布" class="headerlink" title="14:32，先看选择性和数据分布"></a>14:32，先看选择性和数据分布</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> total,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> user_id) <span class="keyword">AS</span> users,</span><br><span class="line">    <span class="built_in">SUM</span>(status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span>) <span class="keyword">AS</span> paid_rows</span><br><span class="line"><span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>结果概要：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">总行数：18,600,000</span><br><span class="line">用户数：1,240,000</span><br><span class="line">PAID 占比：约 61%</span><br><span class="line">普通用户订单中位数：9</span><br><span class="line">高频用户最大订单数：84,000</span><br></pre></td></tr></table></figure>
+
+<p><code>status</code> 单列区分度很低，<code>user_id</code> 更适合作为联合索引前导列。查询还有按时间排序，因此候选索引应同时考虑过滤和顺序。</p>
+<h2 id="14-45，候选-A：user-id-status"><a href="#14-45，候选-A：user-id-status" class="headerlink" title="14:45，候选 A：user_id + status"></a>14:45，候选 A：user_id + status</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status</span><br><span class="line"><span class="keyword">ON</span> order_info (user_id, status);</span><br></pre></td></tr></table></figure>
+
+<p>执行计划改为按用户和状态定位，但仍有：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">rows: 84216</span><br><span class="line">Extra: Using index condition; Using filesort</span><br></pre></td></tr></table></figure>
+
+<p>普通用户查询约 28ms，高频用户约 310ms。相比原方案已经明显改善，但热门用户需要读取并排序 8 万多行，P99 仍不稳定。</p>
+<p>这个实验验证了前两列的过滤价值，也说明排序字段不能忽略。</p>
+<h2 id="15-10，候选-B：加入-created-at"><a href="#15-10，候选-B：加入-created-at" class="headerlink" title="15:10，候选 B：加入 created_at"></a>15:10，候选 B：加入 created_at</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (user_id, status, created_at <span class="keyword">DESC</span>);</span><br></pre></td></tr></table></figure>
+
+<p>MySQL 8.0 支持降序索引；在不支持的版本中，InnoDB 也可以反向扫描普通 B-Tree，需要以实际执行计划验证。</p>
+<p>新计划：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: ref</span><br><span class="line">key: idx_user_status_created</span><br><span class="line">rows: 84216</span><br><span class="line">Extra: Backward index scan</span><br></pre></td></tr></table></figure>
+
+<p><code>rows</code> 仍是统计估算，但实际执行在按顺序取到 20 行后停止：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Rows_sent: 20</span><br><span class="line">Rows_examined: 20</span><br></pre></td></tr></table></figure>
+
+<p>关键不是计划里某个字段看起来漂亮，而是实际扫描量已经与返回量接近。</p>
+<h2 id="15-35，候选-C：做成宽覆盖索引"><a href="#15-35，候选-C：做成宽覆盖索引" class="headerlink" title="15:35，候选 C：做成宽覆盖索引"></a>15:35，候选 C：做成宽覆盖索引</h2><p>为了验证回表成本，又测试：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_user_status_created_cover</span><br><span class="line"><span class="keyword">ON</span> order_info (</span><br><span class="line">    user_id,</span><br><span class="line">    status,</span><br><span class="line">    created_at <span class="keyword">DESC</span>,</span><br><span class="line">    order_no,</span><br><span class="line">    amount</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>因为 InnoDB 二级索引叶子节点已经包含主键，查询所需字段基本都在索引中。单查询 P99 从 14ms 下降到约 10ms，但索引体积增加明显，订单写入 P99 上升约 13%。</p>
+<p>一次只返回 20 行，方案 B 的回表次数很少。为了 4ms 收益承担更宽索引和更高写放大不划算，因此候选 C 被淘汰。</p>
+<h2 id="三个方案的对照结果"><a href="#三个方案的对照结果" class="headerlink" title="三个方案的对照结果"></a>三个方案的对照结果</h2><table>
+<thead>
+<tr>
+<th>方案</th>
+<th align="right">暖缓存 P99</th>
+<th align="right">50 并发 P99</th>
+<th align="right">实际扫描行</th>
+<th align="right">写入 P99 变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始索引</td>
+<td align="right">4.91s</td>
+<td align="right">超时</td>
+<td align="right">2,864,317</td>
+<td align="right">基线</td>
+</tr>
+<tr>
+<td>A：user,status</td>
+<td align="right">310ms</td>
+<td align="right">1.12s</td>
+<td align="right">84,216</td>
+<td align="right">+5%</td>
+</tr>
+<tr>
+<td>B：user,status,time</td>
+<td align="right">14ms</td>
+<td align="right">68ms</td>
+<td align="right">20</td>
+<td align="right">+7%</td>
+</tr>
+<tr>
+<td>C：宽覆盖索引</td>
+<td align="right">10ms</td>
+<td align="right">55ms</td>
+<td align="right">20</td>
+<td align="right">+13%</td>
+</tr>
+</tbody></table>
+<p>最终选择 B。它不是查询绝对最快的方案，但在读取收益、写入成本和索引体积之间更平衡。</p>
+<h2 id="16-10，上线前先写回滚门槛"><a href="#16-10，上线前先写回滚门槛" class="headerlink" title="16:10，上线前先写回滚门槛"></a>16:10，上线前先写回滚门槛</h2><p>大表加索引不是普通代码发布。执行前记录：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">预计索引大小</span><br><span class="line">构建临时空间</span><br><span class="line">DDL 预计时间</span><br><span class="line">元数据锁等待</span><br><span class="line">主从复制延迟</span><br><span class="line">写入延迟变化</span><br><span class="line">中止方式</span><br><span class="line">旧索引保留时间</span><br></pre></td></tr></table></figure>
+
+<p>本次先在只读副本创建并验证，再通过数据库变更平台执行。是否支持在线 DDL 与 <code>LOCK=NONE</code> 取决于 MySQL 版本、存储引擎和具体操作，不能只看语法：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ALTER TABLE</span> order_info</span><br><span class="line"><span class="keyword">ADD</span> INDEX idx_user_status_created (user_id, status, created_at <span class="keyword">DESC</span>),</span><br><span class="line">ALGORITHM<span class="operator">=</span>INPLACE,</span><br><span class="line">LOCK<span class="operator">=</span><span class="keyword">NONE</span>;</span><br></pre></td></tr></table></figure>
+
+<p>执行由数据库负责人操作，并持续观察。预先约定暂停或回滚条件：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">元数据锁阻塞核心写入</span><br><span class="line">复制延迟持续超过 30 秒</span><br><span class="line">磁盘剩余空间低于安全线</span><br><span class="line">订单写入 P99 比基线上升超过 15%</span><br><span class="line">新索引上线后仍未被目标 SQL 使用</span><br></pre></td></tr></table></figure>
+
+<p>删除索引同样是生产 DDL，不在发现异常后凭情绪立即执行。先确认异常与索引相关，再按变更流程回退。</p>
+<h2 id="17-20，灰度验证真实流量"><a href="#17-20，灰度验证真实流量" class="headerlink" title="17:20，灰度验证真实流量"></a>17:20，灰度验证真实流量</h2><p>索引完成后先让一个只读实例承接少量订单查询，核对：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">目标 SQL 的 key 是否为新索引</span><br><span class="line">Rows_examined / Rows_sent 是否接近 1</span><br><span class="line">普通用户与高频用户 P99</span><br><span class="line">Buffer Pool、磁盘读取与 CPU</span><br><span class="line">订单写入和复制延迟</span><br><span class="line">错误率与结果一致性</span><br></pre></td></tr></table></figure>
+
+<p>灰度一小时后：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">接口 P99：4.9s -&gt; 72ms</span><br><span class="line">Rows_examined P95：280 万 -&gt; 20</span><br><span class="line">只读实例 CPU 峰值：76% -&gt; 31%</span><br><span class="line">订单写入 P99：增加约 6%</span><br><span class="line">复制延迟：无明显变化</span><br></pre></td></tr></table></figure>
+
+<p>结果符合实验，才逐步扩大流量。</p>
+<h2 id="索引解决不了深分页"><a href="#索引解决不了深分页" class="headerlink" title="索引解决不了深分页"></a>索引解决不了深分页</h2><p>首页查询改善后，运营后台仍有：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>即使使用联合索引，数据库仍要跳过大量记录。用户侧列表改为游标分页：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, user_id, status, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> :userId</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (</span><br><span class="line">      created_at <span class="operator">&lt;</span> :lastCreatedAt</span><br><span class="line">      <span class="keyword">OR</span> (created_at <span class="operator">=</span> :lastCreatedAt <span class="keyword">AND</span> id <span class="operator">&lt;</span> :lastId)</span><br><span class="line">  )</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>正式索引相应增加 <code>id</code> 作为稳定排序键。只按时间游标时，相同时间的订单可能重复或遗漏。</p>
+<p>运营导出不再通过深分页同步拉取，而是走异步批任务，避免一个请求长期占用数据库连接。</p>
+<h2 id="一周后的复核"><a href="#一周后的复核" class="headerlink" title="一周后的复核"></a>一周后的复核</h2><p>索引上线不是实验结束。我们在一周后再次检查：</p>
+<ul>
+<li>慢查询 digest 的调用量和 P99。</li>
+<li>新索引实际使用次数。</li>
+<li>单表索引体积和 Buffer Pool 命中。</li>
+<li>写入、更新和删除成本。</li>
+<li>旧单列索引是否与新索引重复。</li>
+<li>数据分布变化后计划是否稳定。</li>
+</ul>
+<p>确认新联合索引覆盖了 <code>idx_user_id</code> 的用途后，才单独发起旧索引下线评审。删除前还要检索其他 SQL，不能只围绕本次接口判断。</p>
+<p>这次调优最后留下的不是一句“加联合索引”，而是一条可以复查的决策链：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">真实慢日志建立基线</span><br><span class="line">执行计划解释扫描路径</span><br><span class="line">数据分布决定候选顺序</span><br><span class="line">多个索引方案对照读写成本</span><br><span class="line">提前定义上线和回滚门槛</span><br><span class="line">灰度验证真实流量</span><br><span class="line">持续复核索引价值</span><br></pre></td></tr></table></figure>
+
+<p>性能优化不是把某一次耗时压到最低，而是在真实负载下，让读取、写入、容量和可回退性达到更稳定的平衡。</p>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>慢查询</tag>
+        <tag>SQL优化</tag>
       </tags>
   </entry>
   <entry>
