@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-count">216</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,181 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/" class="post-title-link" itemprop="url">项目部署标准化流程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-10-18 17:58:45" itemprop="dateCreated datePublished" datetime="2020-10-18T17:58:45+08:00">2020-10-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" itemprop="url" rel="index"><span itemprop="name">项目部署</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
+<p>早期上线常见的场景是：开发把 Jar 发给运维，附上一句“替换后重启就行”。顺利时看不出问题，一旦启动失败，大家才开始确认配置改没改、数据库脚本跑没跑、旧包放在哪里。</p>
+<p>部署标准化不是增加一堆表格，而是把一次上线变成可重复执行的 Runbook。即使换一个人值班，也能知道前置条件、执行顺序、验证标准和回退边界。</p>
+<h2 id="发布单先于操作"><a href="#发布单先于操作" class="headerlink" title="发布单先于操作"></a>发布单先于操作</h2><p>没有发布单，不开始生产操作。最小发布单包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">版本：v1.12.0</span><br><span class="line">Git 提交：3a91f2c</span><br><span class="line">构建编号：build-20201018-42</span><br><span class="line">变更范围：订单导出、支付回调幂等修复</span><br><span class="line">影响服务：order-service</span><br><span class="line">数据库变更：V20201018_01__add_payment_unique_key.sql</span><br><span class="line">配置变更：PAYMENT_READ_TIMEOUT 3s -&gt; 5s</span><br><span class="line">计划窗口：20:00-20:30</span><br><span class="line">执行人 / 复核人：</span><br><span class="line">观察指标：</span><br><span class="line">回退触发条件：</span><br></pre></td></tr></table></figure>
+
+<p>标题相同的 Jar 不等于同一个版本。发布单必须能对应到唯一 Git 提交和构建产物。</p>
+<h2 id="0-确认变更冻结"><a href="#0-确认变更冻结" class="headerlink" title="0. 确认变更冻结"></a>0. 确认变更冻结</h2><p>发布窗口开始前，确认待发布提交不再变化：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git show --<span class="built_in">stat</span> 3a91f2c</span><br><span class="line">git tag --contains 3a91f2c</span><br><span class="line">shasum -a 256 order-service.jar</span><br></pre></td></tr></table></figure>
+
+<p>校验值应由 CI 生成，并在目标服务器再次核对。不要在服务器上临时修改 Jar、class 或配置后仍沿用原版本号，这会让后续节点无法复现。</p>
+<p>需要一起冻结的还有：</p>
+<ul>
+<li>数据库脚本内容和执行顺序。</li>
+<li>配置版本。</li>
+<li>依赖服务版本。</li>
+<li>灰度节点范围。</li>
+<li>验证用例和测试数据。</li>
+</ul>
+<h2 id="1-上线前检查"><a href="#1-上线前检查" class="headerlink" title="1. 上线前检查"></a>1. 上线前检查</h2><p>我把检查分成业务、系统和恢复能力三组。</p>
+<h3 id="业务条件"><a href="#业务条件" class="headerlink" title="业务条件"></a>业务条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 需求验收完成，已知问题有明确结论</span><br><span class="line">[ ] 新旧客户端兼容</span><br><span class="line">[ ] 定时任务、消息消费者和批处理影响已确认</span><br><span class="line">[ ] 数据初始化、历史迁移和权限配置已准备</span><br><span class="line">[ ] 客服或业务方知道用户可见变化</span><br></pre></td></tr></table></figure>
+
+<h3 id="系统条件"><a href="#系统条件" class="headerlink" title="系统条件"></a>系统条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] CPU、内存、磁盘和连接池处于正常水位</span><br><span class="line">[ ] 当前无未处理生产告警</span><br><span class="line">[ ] 配置项已经双人复核</span><br><span class="line">[ ] 依赖的数据库、缓存、MQ 和外部接口正常</span><br><span class="line">[ ] 监控看板与日志检索可用</span><br></pre></td></tr></table></figure>
+
+<p>不要在系统已经不稳定时叠加发布变量。必须紧急发布时，要在发布单中说明当前故障状态和额外风险。</p>
+<h3 id="恢复条件"><a href="#恢复条件" class="headerlink" title="恢复条件"></a>恢复条件</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[ ] 上一稳定版本产物可获取且校验通过</span><br><span class="line">[ ] 旧配置版本可恢复</span><br><span class="line">[ ] 数据库变更明确可逆或向后兼容</span><br><span class="line">[ ] 回退操作人和决策人在线</span><br><span class="line">[ ] 回退预计耗时符合业务容忍度</span><br></pre></td></tr></table></figure>
+
+<p>“保留旧 Jar”不是完整回退方案。如果新代码已经写入旧版本无法识别的数据，应用回退仍可能失败。</p>
+<h2 id="2-数据库变更先做兼容设计"><a href="#2-数据库变更先做兼容设计" class="headerlink" title="2. 数据库变更先做兼容设计"></a>2. 数据库变更先做兼容设计</h2><p>数据库变更优先使用扩展、迁移、收缩三步：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">扩展：新增可空字段、表或索引，新旧代码都能运行</span><br><span class="line">迁移：新代码双写或迁移历史数据，持续校验</span><br><span class="line">收缩：确认旧版本退出后，再删除旧字段和兼容逻辑</span><br></pre></td></tr></table></figure>
+
+<p>避免在同一个窗口直接重命名字段并立即发布只认识新字段的代码。大表 DDL 还要预估锁时间、临时空间、主从延迟和失败恢复。</p>
+<p>执行脚本前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 已在相近数据量环境验证</span><br><span class="line">[ ] 脚本带唯一版本号且不可重复修改</span><br><span class="line">[ ] 明确是否幂等</span><br><span class="line">[ ] 评估执行时间、锁和磁盘空间</span><br><span class="line">[ ] 有执行后校验 SQL</span><br><span class="line">[ ] 高风险操作得到数据库负责人授权</span><br></pre></td></tr></table></figure>
+
+<p>生产 DDL 和数据修复应由有权限的人按审批执行。不要把未经 Review 的临时 SQL 粘贴进生产终端。</p>
+<h2 id="3-先灰度一个节点"><a href="#3-先灰度一个节点" class="headerlink" title="3. 先灰度一个节点"></a>3. 先灰度一个节点</h2><p>多实例服务不要一次替换全部节点。标准顺序是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">从负载均衡摘除一个节点</span><br><span class="line">等待存量请求完成</span><br><span class="line">部署新产物和配置</span><br><span class="line">启动并通过就绪检查</span><br><span class="line">执行冒烟验证</span><br><span class="line">重新接入少量流量</span><br><span class="line">观察一个完整业务周期</span><br><span class="line">逐批替换其余节点</span><br></pre></td></tr></table></figure>
+
+<p>摘流和重启会影响服务容量，必须由具备生产权限的操作人执行，并确认剩余节点能够承载当前流量。</p>
+<p>一个简单的启动检查不能只看进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl --fail --silent http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl --fail --silent http://127.0.0.1:8080/api/internal/version</span><br></pre></td></tr></table></figure>
+
+<p>版本接口应返回当前 Git 提交、构建号和启动时间，避免流量打到错误产物。</p>
+<h2 id="4-冒烟验证要覆盖写路径"><a href="#4-冒烟验证要覆盖写路径" class="headerlink" title="4. 冒烟验证要覆盖写路径"></a>4. 冒烟验证要覆盖写路径</h2><p>只打开首页不足以证明后端可用。订单服务至少验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">读：查询一条授权范围内的订单</span><br><span class="line">写：创建一笔可清理的测试订单</span><br><span class="line">改：完成一次状态变化</span><br><span class="line">依赖：数据库、缓存和下游调用成功</span><br><span class="line">异步：消息被消费且没有进入死信队列</span><br><span class="line">权限：无权限请求被正确拒绝</span><br></pre></td></tr></table></figure>
+
+<p>测试数据要有固定前缀和清理策略，不能污染报表或触发真实通知。涉及支付、短信和外部客户的流程，应使用专门沙箱或受控验证路径。</p>
+<p>每项冒烟都记录请求时间、traceId 和结果。这样失败时能直接进入日志检索，而不是重新猜测。</p>
+<h2 id="5-观察指标决定是否继续"><a href="#5-观察指标决定是否继续" class="headerlink" title="5. 观察指标决定是否继续"></a>5. 观察指标决定是否继续</h2><p>灰度后至少看四组信号：</p>
+<table>
+<thead>
+<tr>
+<th>信号</th>
+<th>关注点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>流量</td>
+<td>QPS、实例流量是否符合灰度比例</td>
+</tr>
+<tr>
+<td>质量</td>
+<td>错误率、业务失败码、消息失败数</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>P95&#x2F;P99、慢 SQL、下游耗时</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>CPU、堆内存、GC、线程池、连接池</td>
+</tr>
+</tbody></table>
+<p>不能只看平均响应时间。少量长尾请求可能已经影响核心用户，但均值仍然正常。</p>
+<p>发布前应写清触发条件，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5 分钟错误率高于基线 1 个百分点：暂停扩容</span><br><span class="line">核心接口 P99 连续 3 分钟超过 2 秒：回退灰度节点</span><br><span class="line">出现数据重复或状态不可逆错误：立即停止发布并升级决策</span><br></pre></td></tr></table></figure>
+
+<p>阈值根据系统基线设定，不能把示例数字机械搬到所有服务。</p>
+<h2 id="6-回退是一项预先设计的动作"><a href="#6-回退是一项预先设计的动作" class="headerlink" title="6. 回退是一项预先设计的动作"></a>6. 回退是一项预先设计的动作</h2><p>回退判断由发布负责人根据既定条件做出，不在故障现场临时争论“再看看”。执行顺序通常是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">停止继续发布</span><br><span class="line">隔离新版本节点</span><br><span class="line">保存日志、线程和关键指标</span><br><span class="line">恢复旧产物与旧配置</span><br><span class="line">通过健康与业务验证</span><br><span class="line">逐步恢复流量</span><br><span class="line">确认数据兼容与积压任务</span><br></pre></td></tr></table></figure>
+
+<p>如果数据库变更不可逆，可能只能前向修复，不能简单回滚应用。发布前必须把这种情况写进决策记录，并准备降级开关或兼容代码。</p>
+<p>不要为了赶时间删除现场日志或覆盖旧产物。恢复业务和保留证据可以并行安排。</p>
+<h2 id="7-发布结束不是群里说一句“好了”"><a href="#7-发布结束不是群里说一句“好了”" class="headerlink" title="7. 发布结束不是群里说一句“好了”"></a>7. 发布结束不是群里说一句“好了”</h2><p>发布完成记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">实际开始与结束时间</span><br><span class="line">每批节点和当前版本</span><br><span class="line">数据库、配置的实际版本</span><br><span class="line">冒烟结果和 traceId</span><br><span class="line">核心指标与基线对比</span><br><span class="line">期间异常及处理</span><br><span class="line">遗留观察项和负责人</span><br></pre></td></tr></table></figure>
+
+<p>至少跨过一个业务高峰或约定观察期后再关闭发布单。定时任务在凌晨执行、账务在次日对账时，十分钟无告警不代表变更已经完全验证。</p>
+<h2 id="最终-Runbook"><a href="#最终-Runbook" class="headerlink" title="最终 Runbook"></a>最终 Runbook</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">发布前：范围冻结 -&gt; 产物校验 -&gt; 条件检查 -&gt; 回退演练</span><br><span class="line">发布中：兼容变更 -&gt; 单节点灰度 -&gt; 冒烟 -&gt; 指标观察 -&gt; 分批扩展</span><br><span class="line">异常时：停止扩展 -&gt; 保存证据 -&gt; 按阈值回退或前向修复</span><br><span class="line">发布后：版本核对 -&gt; 业务验证 -&gt; 持续观察 -&gt; 关闭与复盘</span><br></pre></td></tr></table></figure>
+
+<p>标准化发布的意义，是把原本藏在个人经验里的判断变成团队可以执行和复核的步骤。流程不一定让上线更快，却能让每一次快和慢都有证据，让故障发生时不用从“这次到底改了什么”开始查起。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +428,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -436,7 +611,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -596,7 +771,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -789,7 +964,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1006,7 +1181,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1213,7 +1388,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1402,7 +1577,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1589,7 +1764,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1743,7 +1918,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1837,206 +2012,6 @@
 <p>规范也需要例外机制。性能热点、框架约束或兼容代码可能无法遵循普通写法，但例外应在代码或设计记录中解释原因。</p>
 <h2 id="最后看质量"><a href="#最后看质量" class="headerlink" title="最后看质量"></a>最后看质量</h2><p>规范的目标不是让所有代码看起来像一个人写的，而是让任何团队成员都能更快理解、修改和验证。真正有效的规范会减少 Review 往返、降低缺陷率、缩短新人上手时间，并让线上日志更容易使用。</p>
 <p>当团队开始讨论业务边界和失败语义，而不是反复争论括号位置，代码规范才真正发挥作用。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/" class="post-title-link" itemprop="url">新人如何快速熟悉项目</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-01-11 21:10:28" itemprop="dateCreated datePublished" datetime="2020-01-11T21:10:28+08:00">2020-01-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/" itemprop="url" rel="index"><span itemprop="name">经验沉淀</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/onboarding-project-cover.svg" alt="新人如何快速熟悉项目封面图"></p>
-<blockquote>
-<p>刚进入一个项目时，最容易走两个极端：从第一行源码开始读，几天后仍然没有全局概念；或者只等别人分配任务，能改代码却解释不清请求为什么这样流转。比较有效的方法，是用一周建立一张“可以工作的项目地图”。</p>
-</blockquote>
-<h2 id="第-0-天：先约定上手目标"><a href="#第-0-天：先约定上手目标" class="headerlink" title="第 0 天：先约定上手目标"></a>第 0 天：先约定上手目标</h2><p>“熟悉项目”太模糊。第一周不要求掌握所有模块，我会把目标改成五个可以验证的结果：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">能在本地独立启动</span><br><span class="line">能讲清一个核心业务流程</span><br><span class="line">能找到对应接口、服务和数据表</span><br><span class="line">能通过日志调试一次请求</span><br><span class="line">能提交一个低风险修改并完成测试</span><br></pre></td></tr></table></figure>
-
-<p>同时确认联系人：业务问题问谁、环境问题问谁、数据库变更由谁审核、线上故障如何升级。提前知道责任边界，比卡住以后在群里泛问“有人知道吗”有效得多。</p>
-<h2 id="第-1-天：把项目可靠地跑起来"><a href="#第-1-天：把项目可靠地跑起来" class="headerlink" title="第 1 天：把项目可靠地跑起来"></a>第 1 天：把项目可靠地跑起来</h2><p>先读这些文件，而不是立即搜索业务类：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">README.md</span><br><span class="line">pom.xml</span><br><span class="line">application*.yml</span><br><span class="line">Dockerfile / compose.yaml</span><br><span class="line">数据库初始化脚本</span><br><span class="line">CI 配置</span><br><span class="line">启动脚本</span><br></pre></td></tr></table></figure>
-
-<p>记录本地依赖和版本：JDK、Maven、MySQL、Redis、消息队列，以及必须申请的配置或账号。敏感值只记录获取方式，不复制到个人笔记。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">mvn -version</span><br><span class="line">mvn clean <span class="built_in">test</span></span><br><span class="line">mvn spring-boot:run -Dspring-boot.run.profiles=<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
-
-<p>启动完成后，不以“控制台没有报错”为标准，而要验证：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl -i http://127.0.0.1:8080/api/ping</span><br></pre></td></tr></table></figure>
-
-<p>把启动过程中遇到的缺失配置、端口冲突和初始化步骤补回团队文档。新人遇到的问题往往也是下一位新人会遇到的问题。</p>
-<h2 id="第-2-天：画业务地图，不急着画类图"><a href="#第-2-天：画业务地图，不急着画类图" class="headerlink" title="第 2 天：画业务地图，不急着画类图"></a>第 2 天：画业务地图，不急着画类图</h2><p>先问产品或同事三个问题：</p>
-<ol>
-<li>系统最重要的用户是谁。</li>
-<li>哪三个流程最影响业务结果。</li>
-<li>哪些状态一旦错误最难修复。</li>
-</ol>
-<p>例如订单系统可以先画成：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户下单</span><br><span class="line">  -&gt; 价格计算</span><br><span class="line">  -&gt; 库存校验</span><br><span class="line">  -&gt; 创建订单</span><br><span class="line">  -&gt; 支付</span><br><span class="line">  -&gt; 履约</span><br><span class="line">  -&gt; 完成/退款</span><br></pre></td></tr></table></figure>
-
-<p>再标出每一步的入口、数据和外部依赖：</p>
-<table>
-<thead>
-<tr>
-<th>环节</th>
-<th>接口</th>
-<th>核心表</th>
-<th>外部依赖</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>创建订单</td>
-<td><code>POST /orders</code></td>
-<td><code>order_info</code></td>
-<td>库存服务</td>
-</tr>
-<tr>
-<td>支付</td>
-<td><code>POST /payments</code></td>
-<td><code>payment_record</code></td>
-<td>支付渠道</td>
-</tr>
-<tr>
-<td>退款</td>
-<td><code>POST /refunds</code></td>
-<td><code>refund_record</code></td>
-<td>支付渠道、消息队列</td>
-</tr>
-</tbody></table>
-<p>这张表不需要第一天就完全正确。它的价值是暴露未知项，让后续阅读有方向。</p>
-<h2 id="第-3-天：认识数据和状态"><a href="#第-3-天：认识数据和状态" class="headerlink" title="第 3 天：认识数据和状态"></a>第 3 天：认识数据和状态</h2><p>代码可以重构，数据库里的历史数据会长期存在。优先了解：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">核心表主键和业务唯一键</span><br><span class="line">状态字段及合法流转</span><br><span class="line">金额、时间和逻辑删除字段</span><br><span class="line">读写量最大的索引</span><br><span class="line">定时任务和数据修复脚本</span><br></pre></td></tr></table></figure>
-
-<p>不要用生产账号随意执行查询。通过只读环境或脱敏数据查看表结构：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">CREATE TABLE</span> order_info;</span><br><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
-
-<p>针对状态字段，写出状态机：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CREATED -&gt; PAID -&gt; SHIPPED -&gt; FINISHED</span><br><span class="line">   |         |</span><br><span class="line">   v         v</span><br><span class="line">CANCELLED  REFUNDING -&gt; REFUNDED</span><br></pre></td></tr></table></figure>
-
-<p>如果代码里任何状态都能改成任何状态，这是一个值得记录的风险，但新人第一周不需要立刻重构它。</p>
-<h2 id="第-4-天：跟踪一条完整请求"><a href="#第-4-天：跟踪一条完整请求" class="headerlink" title="第 4 天：跟踪一条完整请求"></a>第 4 天：跟踪一条完整请求</h2><p>选择一个查询接口，从入口追到数据库：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Controller</span><br><span class="line">  -&gt; Application Service</span><br><span class="line">  -&gt; Domain/Business Service</span><br><span class="line">  -&gt; Repository/Mapper</span><br><span class="line">  -&gt; SQL</span><br><span class="line">  -&gt; Response</span><br></pre></td></tr></table></figure>
-
-<p>常用搜索：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rg <span class="string">&#x27;@(Get|Post|Put|Delete)Mapping&#x27;</span> src/main/java</span><br><span class="line">rg <span class="string">&#x27;orderNo|requestId&#x27;</span> src/main/java src/main/resources</span><br><span class="line">rg <span class="string">&#x27;select .*order_info|from order_info&#x27;</span> src/main/resources</span><br></pre></td></tr></table></figure>
-
-<p>IDEA 中用 Call Hierarchy、Find Usages 和断点确认真实调用，不能只凭类名猜。记录请求参数在哪一层校验、事务从哪里开始、异常在哪里转换、日志是否能串起全过程。</p>
-<h2 id="第-5-天：看最近修改，而不是考古所有历史"><a href="#第-5-天：看最近修改，而不是考古所有历史" class="headerlink" title="第 5 天：看最近修改，而不是考古所有历史"></a>第 5 天：看最近修改，而不是考古所有历史</h2><p>最近三个月的提交最接近当前业务重点：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> --oneline --decorate -30</span><br><span class="line">git <span class="built_in">log</span> --since=<span class="string">&#x27;3 months ago&#x27;</span> --<span class="built_in">stat</span></span><br><span class="line">git blame -L 80,130 src/main/java/com/example/order/OrderService.java</span><br></pre></td></tr></table></figure>
-
-<p><code>git blame</code> 不是为了找责任人，而是找到引入这段逻辑的提交，再理解当时的上下文。结合需求单、PR 描述和测试用例，通常比猜注释更准确。</p>
-<p>选择两个近期需求回答：</p>
-<ul>
-<li>为什么要改。</li>
-<li>改了哪些层。</li>
-<li>哪些兼容逻辑被保留。</li>
-<li>测试覆盖了什么。</li>
-<li>上线后如何验证。</li>
-</ul>
-<h2 id="第-6-天：完成一个低风险闭环"><a href="#第-6-天：完成一个低风险闭环" class="headerlink" title="第 6 天：完成一个低风险闭环"></a>第 6 天：完成一个低风险闭环</h2><p>合适的首个任务可以是：补充校验、修复文案、增加测试、完善日志或调整只读接口。重点不是任务大小，而是完整走一遍流程：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">理解需求</span><br><span class="line">  -&gt; 定位代码</span><br><span class="line">  -&gt; 修改和测试</span><br><span class="line">  -&gt; 自查影响范围</span><br><span class="line">  -&gt; 提交 PR</span><br><span class="line">  -&gt; 响应 Review</span><br><span class="line">  -&gt; 验证环境</span><br></pre></td></tr></table></figure>
-
-<p>提交前至少运行关联测试，不要因为任务小就跳过：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn -Dtest=OrderServiceTest <span class="built_in">test</span></span><br><span class="line">git diff --check</span><br><span class="line">git diff --<span class="built_in">stat</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="第-7-天：输出一页项目地图"><a href="#第-7-天：输出一页项目地图" class="headerlink" title="第 7 天：输出一页项目地图"></a>第 7 天：输出一页项目地图</h2><p>我的一页总结通常包含：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目目标与核心用户</span><br><span class="line">三个核心业务流程</span><br><span class="line">主要模块和负责人</span><br><span class="line">核心表与状态机</span><br><span class="line">外部依赖和环境入口</span><br><span class="line">启动、测试和发布命令</span><br><span class="line">当前仍不理解的问题</span><br></pre></td></tr></table></figure>
-
-<p>最后一项很重要。项目复杂时，不可能一周全部掌握。把未知项显式列出，后续任务会自然补全地图。</p>
-<h2 id="怎样提一个高质量问题"><a href="#怎样提一个高质量问题" class="headerlink" title="怎样提一个高质量问题"></a>怎样提一个高质量问题</h2><p>不要只说“项目启动不了”，可以这样组织：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">目标：使用 local profile 启动 order-service</span><br><span class="line">已做：JDK 8、MySQL 和 Redis 已确认；mvn test 通过</span><br><span class="line">现象：启动时连接 config-service 超时</span><br><span class="line">证据：异常首行、目标地址、发生时间</span><br><span class="line">判断：怀疑缺少本地配置或网络权限</span><br><span class="line">问题：local 环境应使用哪个配置入口？</span><br></pre></td></tr></table></figure>
-
-<p>这能让对方快速判断，也证明自己已经完成基础排查。</p>
-<h2 id="最容易浪费时间的做法"><a href="#最容易浪费时间的做法" class="headerlink" title="最容易浪费时间的做法"></a>最容易浪费时间的做法</h2><ol>
-<li>从工具类开始逐行阅读，没有业务问题作为线索。</li>
-<li>复制同事配置却不知道来源和权限边界。</li>
-<li>一上来重构公共代码，尚未理解兼容原因。</li>
-<li>只记录结论，不记录命令、现象和判断过程。</li>
-<li>遇到问题立即问人，从不先搜索日志和历史提交。</li>
-</ol>
-<h2 id="一个月后的验收"><a href="#一个月后的验收" class="headerlink" title="一个月后的验收"></a>一个月后的验收</h2><p>第一周建立地图，第一个月应该逐步做到：</p>
-<ul>
-<li>能独立完成一个中等需求。</li>
-<li>能解释核心链路的事务和失败分支。</li>
-<li>能处理常见环境和数据问题。</li>
-<li>能在 Review 中发现业务影响，不只看格式。</li>
-<li>至少补齐一份团队可复用的文档或测试。</li>
-</ul>
-<p>快速熟悉项目不是记住最多类名，而是形成定位问题的坐标系。知道业务目标、数据边界、调用入口和协作流程后，陌生代码会从一片文件变成可以逐步验证的系统。</p>
 
       
     </div>

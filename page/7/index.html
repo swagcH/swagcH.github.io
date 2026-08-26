@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-count">216</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,122 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/" class="post-title-link" itemprop="url">Spring IOC理解</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-06-08 21:05:49" itemprop="dateCreated datePublished" datetime="2019-06-08T21:05:49+08:00">2019-06-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/spring-ioc-cover.svg" alt="Spring IOC理解封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学习 Spring 的第一道坎就是 IOC，刚开始觉得抽象，后来才明白它是在帮我们管理对象。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring IOC理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>为什么对象不自己 new 了</li>
+<li>XML 配置 Bean 很容易写错</li>
+<li>依赖注入和控制反转概念抽象</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>IOC 的重点是对象创建权从业务代码转移到了 Spring 容器，DI 是容器把依赖关系装配进去的过程。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.repository.UserRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.service.UserService&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> UserRepository userRepository;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUserRepository</span><span class="params">(UserRepository userRepository)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.userRepository = userRepository;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Spring IOC理解 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +369,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -368,7 +484,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -484,7 +600,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -602,7 +718,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -718,7 +834,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -833,7 +949,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -950,7 +1066,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1097,7 +1213,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1310,7 +1426,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1486,250 +1602,6 @@
 <li><strong>用EXPLAIN验证SQL</strong>：查询慢的时候，不要靠猜，要看执行计划。</li>
 </ol>
 <p>2018年10月的这个阶段，我觉得自己终于从“会照着写SQL”，开始慢慢变成“知道为什么这样写SQL”了。下一步准备继续学习事务、锁和隔离级别，这些应该会更接近真实项目里的数据库问题。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/09/15/2018-09-15-JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/09/15/2018-09-15-JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">JDBC连接MySQL实践</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-09-15 10:27:44" itemprop="dateCreated datePublished" datetime="2018-09-15T10:27:44+08:00">2018-09-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 9 月，我刚把 Java 基础和 MySQL 的常用语法系统学完。前面写 Java 时，大多是在控制台里打印结果；学 MySQL 时，也主要是在命令行或者图形化工具里执行 SQL。到了这个阶段，一个很自然的问题出现了：能不能用 Java 代码直接操作 MySQL 数据库？</p>
-<p>答案就是 JDBC。</p>
-<p>JDBC，全称是 Java Database Connectivity，它是 Java 提供的一套数据库访问规范。简单理解，JDBC 就像 Java 程序和数据库之间的一座桥：Java 代码通过 JDBC API 发送 SQL，数据库执行后再把结果返回给 Java 程序。</p>
-<p><img src="/images/posts/2018/jdbc-mysql-1.svg" alt="Java 程序通过 JDBC 连接 MySQL 的流程图"></p>
-<p>我当时的目标很明确：</p>
-<ul>
-<li>用 Java 连接 MySQL；</li>
-<li>用 Java 执行增删改查；</li>
-<li>理解 <code>Connection</code>、<code>PreparedStatement</code>、<code>ResultSet</code> 这些核心对象；</li>
-<li>避免连接泄漏、SQL 注入、中文乱码这些常见坑。</li>
-</ul>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>第一次真正写 JDBC 代码时，问题比想象中多。很多错误不是 SQL 写错，而是连接、驱动、资源释放这些基础细节没有处理好。</p>
-<h2 id="1-ClassNotFoundException-找不到驱动"><a href="#1-ClassNotFoundException-找不到驱动" class="headerlink" title="1. ClassNotFoundException 找不到驱动"></a>1. ClassNotFoundException 找不到驱动</h2><p>最常见的报错是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.lang.ClassNotFoundException: com.mysql.jdbc.Driver</span><br></pre></td></tr></table></figure>
-
-<p>这个异常的意思很直接：Java 程序找不到 MySQL 的 JDBC 驱动类。</p>
-<p>当时我以为 JDK 自带了所有数据库驱动，后来才知道 JDBC 只是规范，真正连接 MySQL 还需要 MySQL 官方提供的 Connector&#x2F;J 驱动包。如果没有把 <code>mysql-connector-java</code> 加入 classpath，<code>Class.forName(&quot;com.mysql.jdbc.Driver&quot;)</code> 就会失败。</p>
-<h2 id="2-连接字符串写错"><a href="#2-连接字符串写错" class="headerlink" title="2. 连接字符串写错"></a>2. 连接字符串写错</h2><p>第二类问题是 JDBC URL 写错，比如数据库名漏写、端口写错、参数拼错。</p>
-<p>JDBC 连接 MySQL 的基本格式是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://host:port/database</span><br></pre></td></tr></table></figure>
-
-<p>例如：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://localhost:3306/test</span><br></pre></td></tr></table></figure>
-
-<p>如果还要处理中文编码，通常需要加上参数：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-SQL-注入风险"><a href="#3-SQL-注入风险" class="headerlink" title="3. SQL 注入风险"></a>3. SQL 注入风险</h2><p>一开始我会用字符串拼接 SQL：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;select * from user where username = &#x27;&quot;</span> + username + <span class="string">&quot;&#x27; and password = &#x27;&quot;</span> + password + <span class="string">&quot;&#x27;&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法看起来简单，但非常危险。如果用户输入中带有特殊 SQL 片段，就可能绕过登录校验，甚至破坏数据。</p>
-<h2 id="4-ResultSet-取值顺序混乱"><a href="#4-ResultSet-取值顺序混乱" class="headerlink" title="4. ResultSet 取值顺序混乱"></a>4. ResultSet 取值顺序混乱</h2><p><code>ResultSet</code> 不是一次性把所有数据都变成 Java 对象，而是一个游标。刚拿到 <code>ResultSet</code> 时，游标在第一行之前，必须先调用 <code>next()</code>，再读取当前行的数据。</p>
-<p>如果忘记 <code>next()</code>，或者列名、列下标混着用，很容易出现取值混乱。</p>
-<h2 id="5-资源忘记关闭导致连接泄漏"><a href="#5-资源忘记关闭导致连接泄漏" class="headerlink" title="5. 资源忘记关闭导致连接泄漏"></a>5. 资源忘记关闭导致连接泄漏</h2><p>JDBC 里最容易忽略的一点是资源释放。<code>Connection</code>、<code>Statement</code>、<code>ResultSet</code> 都持有数据库或网络资源，用完不关闭，就可能导致连接越来越多，最后数据库拒绝新的连接。</p>
-<h2 id="6-中文数据存入乱码"><a href="#6-中文数据存入乱码" class="headerlink" title="6. 中文数据存入乱码"></a>6. 中文数据存入乱码</h2><p>如果数据库、表、连接 URL 的编码不一致，中文数据就可能变成问号或者乱码。尤其是早期 MySQL 项目里，连接参数里没有指定 <code>characterEncoding=UTF-8</code> 时很容易遇到。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>把这些问题拆开看，其实它们都对应 JDBC 的几个基础机制。</p>
-<h2 id="1-驱动必须加入-classpath"><a href="#1-驱动必须加入-classpath" class="headerlink" title="1. 驱动必须加入 classpath"></a>1. 驱动必须加入 classpath</h2><p>JDBC API 在 JDK 中提供，但 MySQL 的具体驱动实现不在 JDK 里。要连接 MySQL，必须引入 Connector&#x2F;J。</p>
-<p>如果是普通 Java 工程，需要把 jar 包加入 classpath；如果是 Maven 工程，可以加入依赖：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.47<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>2018 年我使用较多的是 MySQL Connector&#x2F;J 5.x，对应驱动类通常写：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.mysql.jdbc.Driver</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-JDBC-URL-要写完整"><a href="#2-JDBC-URL-要写完整" class="headerlink" title="2. JDBC URL 要写完整"></a>2. JDBC URL 要写完整</h2><p>JDBC URL 不是普通网址，它会被驱动解析。MySQL 的基础格式是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://主机名:端口号/数据库名?参数1=值1&amp;参数2=值2</span><br></pre></td></tr></table></figure>
-
-<p>常用示例：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:mysql://localhost:3306/jdbc_demo?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false</span><br></pre></td></tr></table></figure>
-
-<p>其中：</p>
-<ul>
-<li><code>localhost</code> 表示本机数据库；</li>
-<li><code>3306</code> 是 MySQL 默认端口；</li>
-<li><code>jdbc_demo</code> 是数据库名；</li>
-<li><code>useUnicode=true</code> 和 <code>characterEncoding=UTF-8</code> 用于处理中文；</li>
-<li><code>useSSL=false</code> 可以避免部分版本驱动的 SSL 警告。</li>
-</ul>
-<h2 id="3-PreparedStatement-比-Statement-更安全"><a href="#3-PreparedStatement-比-Statement-更安全" class="headerlink" title="3. PreparedStatement 比 Statement 更安全"></a>3. PreparedStatement 比 Statement 更安全</h2><p><code>Statement</code> 通常需要拼接 SQL 字符串，这会带来 SQL 注入风险。<code>PreparedStatement</code> 使用占位符 <code>?</code>，再通过 <code>setXxx</code> 方法传参，参数会被驱动正确处理。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;select * from user where username = ? and password = ?&quot;</span>;</span><br><span class="line"><span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(sql);</span><br><span class="line">ps.setString(<span class="number">1</span>, username);</span><br><span class="line">ps.setString(<span class="number">2</span>, password);</span><br></pre></td></tr></table></figure>
-
-<p>这样 SQL 结构和参数值是分离的，可读性和安全性都更好。</p>
-<h2 id="4-ResultSet-是游标模式"><a href="#4-ResultSet-是游标模式" class="headerlink" title="4. ResultSet 是游标模式"></a>4. ResultSet 是游标模式</h2><p><code>ResultSet</code> 可以理解为结果集游标。读取数据时通常这样写：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">id</span> <span class="operator">=</span> rs.getInt(<span class="string">&quot;id&quot;</span>);</span><br><span class="line">    <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> rs.getString(<span class="string">&quot;username&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我更推荐使用列名取值，而不是列下标。列名更直观，SQL 字段顺序调整时也不容易出错。</p>
-<h2 id="5-资源必须关闭"><a href="#5-资源必须关闭" class="headerlink" title="5. 资源必须关闭"></a>5. 资源必须关闭</h2><p>JDBC 资源关闭顺序一般和创建顺序相反：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ResultSet -&gt; Statement/PreparedStatement -&gt; Connection</span><br></pre></td></tr></table></figure>
-
-<p>JDK 1.7 以后可以使用 try-with-resources 自动关闭资源。不过为了理解原理，先掌握 <code>finally</code> 中手动关闭也很重要。</p>
-<h2 id="6-编码要统一"><a href="#6-编码要统一" class="headerlink" title="6. 编码要统一"></a>6. 编码要统一</h2><p>中文乱码通常不是单点问题，要同时检查：</p>
-<ul>
-<li>数据库编码；</li>
-<li>表编码；</li>
-<li>字段编码；</li>
-<li>JDBC URL 编码参数；</li>
-<li>Java 字符串本身。</li>
-</ul>
-<p>JDBC URL 中至少应明确指定：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useUnicode=true&amp;characterEncoding=UTF-8</span><br></pre></td></tr></table></figure>
-
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>下面记录一套完整的 JDBC 连接 MySQL 实践代码。示例基于 JDK 1.8、MySQL Connector&#x2F;J 5.x，表结构使用一个简单的 <code>user</code> 表。</p>
-<h2 id="准备表结构"><a href="#准备表结构" class="headerlink" title="准备表结构"></a>准备表结构</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database if <span class="keyword">not</span> <span class="keyword">exists</span> jdbc_demo <span class="keyword">default</span> <span class="keyword">character set</span> utf8;</span><br><span class="line"></span><br><span class="line">use jdbc_demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create table</span> if <span class="keyword">not</span> <span class="keyword">exists</span> <span class="keyword">user</span> (</span><br><span class="line">    id <span class="type">int</span> <span class="keyword">primary key</span> auto_increment,</span><br><span class="line">    username <span class="type">varchar</span>(<span class="number">50</span>) <span class="keyword">not null</span>,</span><br><span class="line">    password <span class="type">varchar</span>(<span class="number">50</span>) <span class="keyword">not null</span>,</span><br><span class="line">    age <span class="type">int</span>,</span><br><span class="line">    create_time datetime</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="1-JDBC-连接-MySQL-的-6-步代码"><a href="#1-JDBC-连接-MySQL-的-6-步代码" class="headerlink" title="1. JDBC 连接 MySQL 的 6 步代码"></a>1. JDBC 连接 MySQL 的 6 步代码</h2><p>JDBC 最基础的流程可以概括为 6 步：</p>
-<ol>
-<li>加载数据库驱动；</li>
-<li>获取数据库连接；</li>
-<li>编写 SQL；</li>
-<li>创建执行 SQL 的对象；</li>
-<li>执行 SQL 并处理结果；</li>
-<li>关闭资源。</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.PreparedStatement;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JdbcSixStepDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">url</span> <span class="operator">=</span> <span class="string">&quot;jdbc:mysql://localhost:3306/jdbc_demo?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">username</span> <span class="operator">=</span> <span class="string">&quot;root&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">password</span> <span class="operator">=</span> <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">ResultSet</span> <span class="variable">rs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(<span class="string">&quot;com.mysql.jdbc.Driver&quot;</span>);</span><br><span class="line">            conn = DriverManager.getConnection(url, username, password);</span><br><span class="line"></span><br><span class="line">            <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;select id, username, age from user where age &gt; ?&quot;</span>;</span><br><span class="line">            ps = conn.prepareStatement(sql);</span><br><span class="line">            ps.setInt(<span class="number">1</span>, <span class="number">18</span>);</span><br><span class="line"></span><br><span class="line">            rs = ps.executeQuery();</span><br><span class="line">            <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">                <span class="type">int</span> <span class="variable">id</span> <span class="operator">=</span> rs.getInt(<span class="string">&quot;id&quot;</span>);</span><br><span class="line">                <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> rs.getString(<span class="string">&quot;username&quot;</span>);</span><br><span class="line">                <span class="type">int</span> <span class="variable">age</span> <span class="operator">=</span> rs.getInt(<span class="string">&quot;age&quot;</span>);</span><br><span class="line">                System.out.println(id + <span class="string">&quot; - &quot;</span> + name + <span class="string">&quot; - &quot;</span> + age);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            closeQuietly(rs, ps, conn);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">closeQuietly</span><span class="params">(ResultSet rs, PreparedStatement ps, Connection conn)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (rs != <span class="literal">null</span>) &#123;</span><br><span class="line">                rs.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (ps != <span class="literal">null</span>) &#123;</span><br><span class="line">                ps.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (conn != <span class="literal">null</span>) &#123;</span><br><span class="line">                conn.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码看起来比较长，但它把 JDBC 的基本动作都展示出来了。实际开发中，关闭资源、获取连接这些重复代码应该封装到工具类里。</p>
-<h2 id="2-PreparedStatement-的-CRUD-完整示例"><a href="#2-PreparedStatement-的-CRUD-完整示例" class="headerlink" title="2. PreparedStatement 的 CRUD 完整示例"></a>2. PreparedStatement 的 CRUD 完整示例</h2><p>下面用 <code>PreparedStatement</code> 完成增删改查。为了让代码更清晰，我先定义一个简单的实体类。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Integer id;</span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="keyword">private</span> Date createTime;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">getId</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setId</span><span class="params">(Integer id)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getUsername</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUsername</span><span class="params">(String username)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.username = username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getPassword</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPassword</span><span class="params">(String password)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.password = password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">getAge</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAge</span><span class="params">(Integer age)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Date <span class="title function_">getCreateTime</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> createTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setCreateTime</span><span class="params">(Date createTime)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.createTime = createTime;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="新增数据"><a href="#新增数据" class="headerlink" title="新增数据"></a>新增数据</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">insertUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;insert into user(username, password, age, create_time) values(?, ?, ?, ?)&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line">        ps.setString(<span class="number">1</span>, user.getUsername());</span><br><span class="line">        ps.setString(<span class="number">2</span>, user.getPassword());</span><br><span class="line">        ps.setInt(<span class="number">3</span>, user.getAge());</span><br><span class="line">        ps.setTimestamp(<span class="number">4</span>, <span class="keyword">new</span> <span class="title class_">java</span>.sql.Timestamp(user.getCreateTime().getTime()));</span><br><span class="line">        <span class="keyword">return</span> ps.executeUpdate();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, ps, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="查询数据"><a href="#查询数据" class="headerlink" title="查询数据"></a>查询数据</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> User <span class="title function_">findUserById</span><span class="params">(Integer id)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;select id, username, password, age, create_time from user where id = ?&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">ResultSet</span> <span class="variable">rs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line">        ps.setInt(<span class="number">1</span>, id);</span><br><span class="line">        rs = ps.executeQuery();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!rs.next()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">        user.setId(rs.getInt(<span class="string">&quot;id&quot;</span>));</span><br><span class="line">        user.setUsername(rs.getString(<span class="string">&quot;username&quot;</span>));</span><br><span class="line">        user.setPassword(rs.getString(<span class="string">&quot;password&quot;</span>));</span><br><span class="line">        user.setAge(rs.getInt(<span class="string">&quot;age&quot;</span>));</span><br><span class="line">        user.setCreateTime(rs.getTimestamp(<span class="string">&quot;create_time&quot;</span>));</span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(rs, ps, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="修改数据"><a href="#修改数据" class="headerlink" title="修改数据"></a>修改数据</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">updateUserAge</span><span class="params">(Integer id, Integer age)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;update user set age = ? where id = ?&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line">        ps.setInt(<span class="number">1</span>, age);</span><br><span class="line">        ps.setInt(<span class="number">2</span>, id);</span><br><span class="line">        <span class="keyword">return</span> ps.executeUpdate();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, ps, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">deleteUserById</span><span class="params">(Integer id)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;delete from user where id = ?&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line">        ps.setInt(<span class="number">1</span>, id);</span><br><span class="line">        <span class="keyword">return</span> ps.executeUpdate();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, ps, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里有一个小经验：查询使用 <code>executeQuery()</code>，增删改使用 <code>executeUpdate()</code>。后者返回受影响的行数，可以用来判断操作是否成功。</p>
-<h2 id="3-事务管理代码"><a href="#3-事务管理代码" class="headerlink" title="3. 事务管理代码"></a>3. 事务管理代码</h2><p>事务适合处理一组必须同时成功或同时失败的操作，比如转账：A 扣钱成功，B 加钱也必须成功。</p>
-<p>JDBC 默认是自动提交事务的，也就是每执行一条 SQL 就提交一次。要手动控制事务，需要关闭自动提交：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Integer fromId, Integer toId, Integer amount)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">decreaseSql</span> <span class="operator">=</span> <span class="string">&quot;update account set balance = balance - ? where id = ?&quot;</span>;</span><br><span class="line">    <span class="type">String</span> <span class="variable">increaseSql</span> <span class="operator">=</span> <span class="string">&quot;update account set balance = balance + ? where id = ?&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">decreasePs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">increasePs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        conn.setAutoCommit(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">        decreasePs = conn.prepareStatement(decreaseSql);</span><br><span class="line">        decreasePs.setInt(<span class="number">1</span>, amount);</span><br><span class="line">        decreasePs.setInt(<span class="number">2</span>, fromId);</span><br><span class="line">        decreasePs.executeUpdate();</span><br><span class="line"></span><br><span class="line">        increasePs = conn.prepareStatement(increaseSql);</span><br><span class="line">        increasePs.setInt(<span class="number">1</span>, amount);</span><br><span class="line">        increasePs.setInt(<span class="number">2</span>, toId);</span><br><span class="line">        increasePs.executeUpdate();</span><br><span class="line"></span><br><span class="line">        conn.commit();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        rollback(conn);</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, increasePs, <span class="literal">null</span>);</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, decreasePs, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">rollback</span><span class="params">(Connection conn)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (conn == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn.rollback();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码的关键点是：</p>
-<ul>
-<li><code>conn.setAutoCommit(false)</code>：关闭自动提交；</li>
-<li><code>conn.commit()</code>：所有 SQL 成功后提交；</li>
-<li><code>conn.rollback()</code>：出现异常时回滚；</li>
-<li>同一个事务中的多条 SQL 必须使用同一个 <code>Connection</code>。</li>
-</ul>
-<h2 id="4-JDBC-工具类封装"><a href="#4-JDBC-工具类封装" class="headerlink" title="4. JDBC 工具类封装"></a>4. JDBC 工具类封装</h2><p>如果每个方法都写加载驱动、创建连接、关闭资源，代码会非常重复。所以我把这些逻辑封装成一个工具类。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.sql.DriverManager;</span><br><span class="line"><span class="keyword">import</span> java.sql.ResultSet;</span><br><span class="line"><span class="keyword">import</span> java.sql.Statement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">JdbcUtils</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">DRIVER_CLASS</span> <span class="operator">=</span> <span class="string">&quot;com.mysql.jdbc.Driver&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">URL</span> <span class="operator">=</span> <span class="string">&quot;jdbc:mysql://localhost:3306/jdbc_demo?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">USERNAME</span> <span class="operator">=</span> <span class="string">&quot;root&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">PASSWORD</span> <span class="operator">=</span> <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class.forName(DRIVER_CLASS);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ExceptionInInitializerError</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">JdbcUtils</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title function_">getConnection</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> DriverManager.getConnection(URL, USERNAME, PASSWORD);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">(ResultSet rs, Statement stmt, Connection conn)</span> &#123;</span><br><span class="line">        closeResultSet(rs);</span><br><span class="line">        closeStatement(stmt);</span><br><span class="line">        closeConnection(conn);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">closeResultSet</span><span class="params">(ResultSet rs)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (rs == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            rs.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">closeStatement</span><span class="params">(Statement stmt)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (stmt == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            stmt.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">closeConnection</span><span class="params">(Connection conn)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (conn == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            conn.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个工具类做了三件事：</p>
-<ul>
-<li>静态代码块加载驱动；</li>
-<li><code>getConnection()</code> 统一获取连接；</li>
-<li><code>close()</code> 统一关闭资源。</li>
-</ul>
-<p>学习阶段这样写足够清晰，但生产环境不建议每次都通过 <code>DriverManager</code> 新建物理连接，因为创建连接成本比较高。</p>
-<h2 id="5-try-with-resources-写法"><a href="#5-try-with-resources-写法" class="headerlink" title="5. try-with-resources 写法"></a>5. try-with-resources 写法</h2><p>JDK 1.7 之后可以用 try-with-resources 自动关闭资源。JDK 1.8 中也可以使用这种写法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> User <span class="title function_">findUserByUsername</span><span class="params">(String username)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;select id, username, password, age, create_time from user where username = ?&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> (<span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> JdbcUtils.getConnection();</span><br><span class="line">         <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> conn.prepareStatement(sql)) &#123;</span><br><span class="line"></span><br><span class="line">        ps.setString(<span class="number">1</span>, username);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">ResultSet</span> <span class="variable">rs</span> <span class="operator">=</span> ps.executeQuery()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!rs.next()) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">User</span>();</span><br><span class="line">            user.setId(rs.getInt(<span class="string">&quot;id&quot;</span>));</span><br><span class="line">            user.setUsername(rs.getString(<span class="string">&quot;username&quot;</span>));</span><br><span class="line">            user.setPassword(rs.getString(<span class="string">&quot;password&quot;</span>));</span><br><span class="line">            user.setAge(rs.getInt(<span class="string">&quot;age&quot;</span>));</span><br><span class="line">            user.setCreateTime(rs.getTimestamp(<span class="string">&quot;create_time&quot;</span>));</span><br><span class="line">            <span class="keyword">return</span> user;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法的好处是资源关闭更可靠，也减少了大量 <code>finally</code> 模板代码。</p>
-<h2 id="6-Druid-连接池简介"><a href="#6-Druid-连接池简介" class="headerlink" title="6. Druid 连接池简介"></a>6. Druid 连接池简介</h2><p>实际项目中，不应该每次操作数据库都创建一个新的物理连接。连接池会提前维护一批连接，程序需要时从池中取，用完后归还给连接池。</p>
-<p>Druid 是阿里开源的数据库连接池，在国内 Java 项目里很常见。Maven 依赖示例：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>druid<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><code>druid.properties</code> 配置示例：</p>
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">driverClassName</span>=<span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line"><span class="attr">url</span>=<span class="string">jdbc:mysql://localhost:3306/jdbc_demo?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false</span></span><br><span class="line"><span class="attr">username</span>=<span class="string">root</span></span><br><span class="line"><span class="attr">password</span>=<span class="string">root</span></span><br><span class="line"><span class="attr">initialSize</span>=<span class="string">5</span></span><br><span class="line"><span class="attr">maxActive</span>=<span class="string">20</span></span><br><span class="line"><span class="attr">minIdle</span>=<span class="string">5</span></span><br><span class="line"><span class="attr">maxWait</span>=<span class="string">3000</span></span><br><span class="line"><span class="attr">validationQuery</span>=<span class="string">select 1</span></span><br><span class="line"><span class="attr">testWhileIdle</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">testOnBorrow</span>=<span class="string">false</span></span><br><span class="line"><span class="attr">testOnReturn</span>=<span class="string">false</span></span><br></pre></td></tr></table></figure>
-
-<p>使用 Druid 获取连接：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.alibaba.druid.pool.DruidDataSourceFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.sql.DataSource;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.sql.Connection;</span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DruidUtils</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> DataSource dataSource;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Properties</span> <span class="variable">properties</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Properties</span>();</span><br><span class="line">            <span class="type">InputStream</span> <span class="variable">inputStream</span> <span class="operator">=</span> DruidUtils.class.getClassLoader().getResourceAsStream(<span class="string">&quot;druid.properties&quot;</span>);</span><br><span class="line">            properties.load(inputStream);</span><br><span class="line">            dataSource = DruidDataSourceFactory.createDataSource(properties);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ExceptionInInitializerError</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">DruidUtils</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title function_">getConnection</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> dataSource.getConnection();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> DataSource <span class="title function_">getDataSource</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> dataSource;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>使用连接池后，调用 <code>conn.close()</code> 并不是真的关闭物理连接，而是把连接归还给连接池。这一点很重要，所以即使用了连接池，也仍然必须关闭连接。</p>
-<h2 id="7-批处理操作"><a href="#7-批处理操作" class="headerlink" title="7. 批处理操作"></a>7. 批处理操作</h2><p>当需要一次插入很多条数据时，如果一条一条执行 SQL，效率会比较低。JDBC 提供了批处理能力，可以把多条操作合并提交。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">batchInsertUsers</span><span class="params">(List&lt;User&gt; users)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;insert into user(username, password, age, create_time) values(?, ?, ?, ?)&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">PreparedStatement</span> <span class="variable">ps</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        conn = JdbcUtils.getConnection();</span><br><span class="line">        ps = conn.prepareStatement(sql);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; users.size(); i++) &#123;</span><br><span class="line">            <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> users.get(i);</span><br><span class="line">            ps.setString(<span class="number">1</span>, user.getUsername());</span><br><span class="line">            ps.setString(<span class="number">2</span>, user.getPassword());</span><br><span class="line">            ps.setInt(<span class="number">3</span>, user.getAge());</span><br><span class="line">            ps.setTimestamp(<span class="number">4</span>, <span class="keyword">new</span> <span class="title class_">java</span>.sql.Timestamp(user.getCreateTime().getTime()));</span><br><span class="line">            ps.addBatch();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> ((i + <span class="number">1</span>) % <span class="number">500</span> == <span class="number">0</span>) &#123;</span><br><span class="line">                ps.executeBatch();</span><br><span class="line">                ps.clearBatch();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ps.executeBatch();</span><br><span class="line">        ps.clearBatch();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        JdbcUtils.close(<span class="literal">null</span>, ps, conn);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>批处理适合大量新增或更新数据。这里每 500 条执行一次，是为了避免一次性积累太多 SQL 占用内存。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次 JDBC 连接 MySQL 的实践，让我把 Java 基础、SQL 语法和数据库连接机制串了起来。以前只是在数据库工具里执行 SQL，现在可以通过 Java 代码完成完整的 CRUD 操作，感觉 Java 程序终于可以真正和数据打交道了。</p>
-<p>我给自己总结了几条规则：</p>
-<ol>
-<li>永远优先使用 <code>PreparedStatement</code>，不要用字符串拼接 SQL；</li>
-<li><code>ResultSet</code> 是游标模式，读取前先 <code>next()</code>；</li>
-<li><code>Connection</code>、<code>Statement</code>、<code>ResultSet</code> 用完必须关闭；</li>
-<li>资源关闭要放在 <code>finally</code> 中，或者使用 try-with-resources；</li>
-<li>中文数据要注意数据库编码和 JDBC URL 中的 <code>characterEncoding=UTF-8</code>；</li>
-<li>涉及多条 SQL 的一致性操作时，要明确事务边界；</li>
-<li>生产环境不要直接频繁创建连接，应该使用连接池，比如 Druid。</li>
-</ol>
-<p>JDBC 的代码确实比较模板化，但它非常适合用来理解数据库访问的底层过程。后面再学习 DBUtils、JdbcTemplate、MyBatis 这些框架时，就会更容易明白它们到底帮我们封装了什么。</p>
 
       
     </div>

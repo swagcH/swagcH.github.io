@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-count">78</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">214</span>
+        <span class="site-state-item-count">216</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,206 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/01/11/2020-01-11-%E6%96%B0%E4%BA%BA%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E7%86%9F%E6%82%89%E9%A1%B9%E7%9B%AE/" class="post-title-link" itemprop="url">新人如何快速熟悉项目</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-01-11 21:10:28" itemprop="dateCreated datePublished" datetime="2020-01-11T21:10:28+08:00">2020-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/" itemprop="url" rel="index"><span itemprop="name">经验沉淀</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/onboarding-project-cover.svg" alt="新人如何快速熟悉项目封面图"></p>
+<blockquote>
+<p>刚进入一个项目时，最容易走两个极端：从第一行源码开始读，几天后仍然没有全局概念；或者只等别人分配任务，能改代码却解释不清请求为什么这样流转。比较有效的方法，是用一周建立一张“可以工作的项目地图”。</p>
+</blockquote>
+<h2 id="第-0-天：先约定上手目标"><a href="#第-0-天：先约定上手目标" class="headerlink" title="第 0 天：先约定上手目标"></a>第 0 天：先约定上手目标</h2><p>“熟悉项目”太模糊。第一周不要求掌握所有模块，我会把目标改成五个可以验证的结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">能在本地独立启动</span><br><span class="line">能讲清一个核心业务流程</span><br><span class="line">能找到对应接口、服务和数据表</span><br><span class="line">能通过日志调试一次请求</span><br><span class="line">能提交一个低风险修改并完成测试</span><br></pre></td></tr></table></figure>
+
+<p>同时确认联系人：业务问题问谁、环境问题问谁、数据库变更由谁审核、线上故障如何升级。提前知道责任边界，比卡住以后在群里泛问“有人知道吗”有效得多。</p>
+<h2 id="第-1-天：把项目可靠地跑起来"><a href="#第-1-天：把项目可靠地跑起来" class="headerlink" title="第 1 天：把项目可靠地跑起来"></a>第 1 天：把项目可靠地跑起来</h2><p>先读这些文件，而不是立即搜索业务类：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">README.md</span><br><span class="line">pom.xml</span><br><span class="line">application*.yml</span><br><span class="line">Dockerfile / compose.yaml</span><br><span class="line">数据库初始化脚本</span><br><span class="line">CI 配置</span><br><span class="line">启动脚本</span><br></pre></td></tr></table></figure>
+
+<p>记录本地依赖和版本：JDK、Maven、MySQL、Redis、消息队列，以及必须申请的配置或账号。敏感值只记录获取方式，不复制到个人笔记。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">mvn -version</span><br><span class="line">mvn clean <span class="built_in">test</span></span><br><span class="line">mvn spring-boot:run -Dspring-boot.run.profiles=<span class="built_in">local</span></span><br></pre></td></tr></table></figure>
+
+<p>启动完成后，不以“控制台没有报错”为标准，而要验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br><span class="line">curl -i http://127.0.0.1:8080/api/ping</span><br></pre></td></tr></table></figure>
+
+<p>把启动过程中遇到的缺失配置、端口冲突和初始化步骤补回团队文档。新人遇到的问题往往也是下一位新人会遇到的问题。</p>
+<h2 id="第-2-天：画业务地图，不急着画类图"><a href="#第-2-天：画业务地图，不急着画类图" class="headerlink" title="第 2 天：画业务地图，不急着画类图"></a>第 2 天：画业务地图，不急着画类图</h2><p>先问产品或同事三个问题：</p>
+<ol>
+<li>系统最重要的用户是谁。</li>
+<li>哪三个流程最影响业务结果。</li>
+<li>哪些状态一旦错误最难修复。</li>
+</ol>
+<p>例如订单系统可以先画成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户下单</span><br><span class="line">  -&gt; 价格计算</span><br><span class="line">  -&gt; 库存校验</span><br><span class="line">  -&gt; 创建订单</span><br><span class="line">  -&gt; 支付</span><br><span class="line">  -&gt; 履约</span><br><span class="line">  -&gt; 完成/退款</span><br></pre></td></tr></table></figure>
+
+<p>再标出每一步的入口、数据和外部依赖：</p>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>接口</th>
+<th>核心表</th>
+<th>外部依赖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建订单</td>
+<td><code>POST /orders</code></td>
+<td><code>order_info</code></td>
+<td>库存服务</td>
+</tr>
+<tr>
+<td>支付</td>
+<td><code>POST /payments</code></td>
+<td><code>payment_record</code></td>
+<td>支付渠道</td>
+</tr>
+<tr>
+<td>退款</td>
+<td><code>POST /refunds</code></td>
+<td><code>refund_record</code></td>
+<td>支付渠道、消息队列</td>
+</tr>
+</tbody></table>
+<p>这张表不需要第一天就完全正确。它的价值是暴露未知项，让后续阅读有方向。</p>
+<h2 id="第-3-天：认识数据和状态"><a href="#第-3-天：认识数据和状态" class="headerlink" title="第 3 天：认识数据和状态"></a>第 3 天：认识数据和状态</h2><p>代码可以重构，数据库里的历史数据会长期存在。优先了解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">核心表主键和业务唯一键</span><br><span class="line">状态字段及合法流转</span><br><span class="line">金额、时间和逻辑删除字段</span><br><span class="line">读写量最大的索引</span><br><span class="line">定时任务和数据修复脚本</span><br></pre></td></tr></table></figure>
+
+<p>不要用生产账号随意执行查询。通过只读环境或脱敏数据查看表结构：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> <span class="keyword">CREATE TABLE</span> order_info;</span><br><span class="line"><span class="keyword">SHOW</span> INDEX <span class="keyword">FROM</span> order_info;</span><br></pre></td></tr></table></figure>
+
+<p>针对状态字段，写出状态机：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CREATED -&gt; PAID -&gt; SHIPPED -&gt; FINISHED</span><br><span class="line">   |         |</span><br><span class="line">   v         v</span><br><span class="line">CANCELLED  REFUNDING -&gt; REFUNDED</span><br></pre></td></tr></table></figure>
+
+<p>如果代码里任何状态都能改成任何状态，这是一个值得记录的风险，但新人第一周不需要立刻重构它。</p>
+<h2 id="第-4-天：跟踪一条完整请求"><a href="#第-4-天：跟踪一条完整请求" class="headerlink" title="第 4 天：跟踪一条完整请求"></a>第 4 天：跟踪一条完整请求</h2><p>选择一个查询接口，从入口追到数据库：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Controller</span><br><span class="line">  -&gt; Application Service</span><br><span class="line">  -&gt; Domain/Business Service</span><br><span class="line">  -&gt; Repository/Mapper</span><br><span class="line">  -&gt; SQL</span><br><span class="line">  -&gt; Response</span><br></pre></td></tr></table></figure>
+
+<p>常用搜索：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rg <span class="string">&#x27;@(Get|Post|Put|Delete)Mapping&#x27;</span> src/main/java</span><br><span class="line">rg <span class="string">&#x27;orderNo|requestId&#x27;</span> src/main/java src/main/resources</span><br><span class="line">rg <span class="string">&#x27;select .*order_info|from order_info&#x27;</span> src/main/resources</span><br></pre></td></tr></table></figure>
+
+<p>IDEA 中用 Call Hierarchy、Find Usages 和断点确认真实调用，不能只凭类名猜。记录请求参数在哪一层校验、事务从哪里开始、异常在哪里转换、日志是否能串起全过程。</p>
+<h2 id="第-5-天：看最近修改，而不是考古所有历史"><a href="#第-5-天：看最近修改，而不是考古所有历史" class="headerlink" title="第 5 天：看最近修改，而不是考古所有历史"></a>第 5 天：看最近修改，而不是考古所有历史</h2><p>最近三个月的提交最接近当前业务重点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> --oneline --decorate -30</span><br><span class="line">git <span class="built_in">log</span> --since=<span class="string">&#x27;3 months ago&#x27;</span> --<span class="built_in">stat</span></span><br><span class="line">git blame -L 80,130 src/main/java/com/example/order/OrderService.java</span><br></pre></td></tr></table></figure>
+
+<p><code>git blame</code> 不是为了找责任人，而是找到引入这段逻辑的提交，再理解当时的上下文。结合需求单、PR 描述和测试用例，通常比猜注释更准确。</p>
+<p>选择两个近期需求回答：</p>
+<ul>
+<li>为什么要改。</li>
+<li>改了哪些层。</li>
+<li>哪些兼容逻辑被保留。</li>
+<li>测试覆盖了什么。</li>
+<li>上线后如何验证。</li>
+</ul>
+<h2 id="第-6-天：完成一个低风险闭环"><a href="#第-6-天：完成一个低风险闭环" class="headerlink" title="第 6 天：完成一个低风险闭环"></a>第 6 天：完成一个低风险闭环</h2><p>合适的首个任务可以是：补充校验、修复文案、增加测试、完善日志或调整只读接口。重点不是任务大小，而是完整走一遍流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">理解需求</span><br><span class="line">  -&gt; 定位代码</span><br><span class="line">  -&gt; 修改和测试</span><br><span class="line">  -&gt; 自查影响范围</span><br><span class="line">  -&gt; 提交 PR</span><br><span class="line">  -&gt; 响应 Review</span><br><span class="line">  -&gt; 验证环境</span><br></pre></td></tr></table></figure>
+
+<p>提交前至少运行关联测试，不要因为任务小就跳过：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mvn -Dtest=OrderServiceTest <span class="built_in">test</span></span><br><span class="line">git diff --check</span><br><span class="line">git diff --<span class="built_in">stat</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="第-7-天：输出一页项目地图"><a href="#第-7-天：输出一页项目地图" class="headerlink" title="第 7 天：输出一页项目地图"></a>第 7 天：输出一页项目地图</h2><p>我的一页总结通常包含：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目目标与核心用户</span><br><span class="line">三个核心业务流程</span><br><span class="line">主要模块和负责人</span><br><span class="line">核心表与状态机</span><br><span class="line">外部依赖和环境入口</span><br><span class="line">启动、测试和发布命令</span><br><span class="line">当前仍不理解的问题</span><br></pre></td></tr></table></figure>
+
+<p>最后一项很重要。项目复杂时，不可能一周全部掌握。把未知项显式列出，后续任务会自然补全地图。</p>
+<h2 id="怎样提一个高质量问题"><a href="#怎样提一个高质量问题" class="headerlink" title="怎样提一个高质量问题"></a>怎样提一个高质量问题</h2><p>不要只说“项目启动不了”，可以这样组织：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">目标：使用 local profile 启动 order-service</span><br><span class="line">已做：JDK 8、MySQL 和 Redis 已确认；mvn test 通过</span><br><span class="line">现象：启动时连接 config-service 超时</span><br><span class="line">证据：异常首行、目标地址、发生时间</span><br><span class="line">判断：怀疑缺少本地配置或网络权限</span><br><span class="line">问题：local 环境应使用哪个配置入口？</span><br></pre></td></tr></table></figure>
+
+<p>这能让对方快速判断，也证明自己已经完成基础排查。</p>
+<h2 id="最容易浪费时间的做法"><a href="#最容易浪费时间的做法" class="headerlink" title="最容易浪费时间的做法"></a>最容易浪费时间的做法</h2><ol>
+<li>从工具类开始逐行阅读，没有业务问题作为线索。</li>
+<li>复制同事配置却不知道来源和权限边界。</li>
+<li>一上来重构公共代码，尚未理解兼容原因。</li>
+<li>只记录结论，不记录命令、现象和判断过程。</li>
+<li>遇到问题立即问人，从不先搜索日志和历史提交。</li>
+</ol>
+<h2 id="一个月后的验收"><a href="#一个月后的验收" class="headerlink" title="一个月后的验收"></a>一个月后的验收</h2><p>第一周建立地图，第一个月应该逐步做到：</p>
+<ul>
+<li>能独立完成一个中等需求。</li>
+<li>能解释核心链路的事务和失败分支。</li>
+<li>能处理常见环境和数据问题。</li>
+<li>能在 Review 中发现业务影响，不只看格式。</li>
+<li>至少补齐一份团队可复用的文档或测试。</li>
+</ul>
+<p>快速熟悉项目不是记住最多类名，而是形成定位问题的坐标系。知道业务目标、数据边界、调用入口和协作流程后，陌生代码会从一片文件变成可以逐步验证的系统。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +453,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -369,7 +569,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -485,7 +685,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -601,7 +801,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -717,7 +917,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -832,7 +1032,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -947,7 +1147,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1062,7 +1262,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1176,7 +1376,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
+      <time title="修改时间：2026-08-26 12:01:08" itemprop="dateModified" datetime="2026-08-26T12:01:08+08:00">2026-08-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1221,122 +1421,6 @@
 <p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
 <p>对 Spring MVC请求流程理解 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/06/08/2019-06-08-Spring%20IOC%E7%90%86%E8%A7%A3/" class="post-title-link" itemprop="url">Spring IOC理解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-06-08 21:05:49" itemprop="dateCreated datePublished" datetime="2019-06-08T21:05:49+08:00">2019-06-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-08-26 11:54:37" itemprop="dateModified" datetime="2026-08-26T11:54:37+08:00">2026-08-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/spring-ioc-cover.svg" alt="Spring IOC理解封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学习 Spring 的第一道坎就是 IOC，刚开始觉得抽象，后来才明白它是在帮我们管理对象。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring IOC理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>为什么对象不自己 new 了</li>
-<li>XML 配置 Bean 很容易写错</li>
-<li>依赖注入和控制反转概念抽象</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>IOC 的重点是对象创建权从业务代码转移到了 Spring 容器，DI 是容器把依赖关系装配进去的过程。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.repository.UserRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.demo.service.UserService&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;userRepository&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userRepository&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> UserRepository userRepository;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUserRepository</span><span class="params">(UserRepository userRepository)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.userRepository = userRepository;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 Spring IOC理解 的理解，我最后沉淀成几条经验：</p>
 <ul>
 <li>先理解它解决什么问题，再记具体用法；</li>
 <li>先跑通最小 Demo，再接入完整项目；</li>
