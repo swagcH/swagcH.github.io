@@ -161,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E8%A3%85-Hermes%EF%BC%9A%E4%BB%8E%E9%9B%B6%E5%88%B0%E8%83%BD%E8%B7%9F%E5%AE%83%E8%81%8A%E5%A4%A9%EF%BC%8C%E6%88%91%E8%B8%A9%E4%BA%86%E5%93%AA%E4%BA%9B%E5%9D%91"><span class="nav-text">在服务器上装 Hermes：从零到能跟它聊天，我踩了哪些坑</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E6%88%91%E8%A6%81%E8%BE%BE%E6%88%90%E4%BB%80%E4%B9%88"><span class="nav-text">先说我要达成什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C%EF%BC%9A%E4%BD%A0%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BE%97%E6%9C%89%E8%BF%99%E4%BA%9B"><span class="nav-text">准备工作：你的服务器得有这些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E8%A3%85-Node-js"><span class="nav-text">第一步：装 Node.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E8%A3%85-Hermes"><span class="nav-text">第二步：装 Hermes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A3%85%E5%93%AA%E9%87%8C"><span class="nav-text">第一个选择：装哪里</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A6%81%E4%B8%8D%E8%A6%81%E5%90%AF-gateway"><span class="nav-text">第二个选择：要不要启 gateway</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A6%81%E4%B8%8D%E8%A6%81%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="nav-text">第三个选择：要不要开机自启</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E9%AA%8C%E8%AF%81%E8%A3%85%E5%A5%BD%E4%BA%86"><span class="nav-text">第三步：验证装好了</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E9%85%8D%E9%A3%9E%E4%B9%A6%EF%BC%88%E6%88%96%E8%80%85%E4%BD%A0%E7%94%A8%E7%9A%84-IM%EF%BC%89"><span class="nav-text">第四步：配飞书（或者你用的 IM）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%85%88%E5%9C%A8%E9%A3%9E%E4%B9%A6%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E5%BB%BA%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="nav-text">4.1 先在飞书开放平台建个应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E9%85%8D%E6%9D%83%E9%99%90"><span class="nav-text">4.2 配权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E9%85%8D%E4%BA%8B%E4%BB%B6%E8%AE%A2%E9%98%85"><span class="nav-text">4.3 配事件订阅</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E6%8A%8A%E5%87%AD%E8%AF%81%E5%91%8A%E8%AF%89-Hermes"><span class="nav-text">4.4 把凭证告诉 Hermes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E9%AA%8C%E8%AF%81"><span class="nav-text">4.5 验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E8%B7%91%E4%B8%AA%E7%9C%9F%E4%BB%BB%E5%8A%A1%E8%AF%95%E8%AF%95"><span class="nav-text">第五步：跑个真任务试试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E8%B8%A9%E7%9A%84%E5%9D%91%EF%BC%88%E5%BB%BA%E8%AE%AE%E4%BD%A0%E6%8F%90%E5%89%8D%E9%81%BF%EF%BC%89"><span class="nav-text">我踩的坑（建议你提前避）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-1%EF%BC%9Asystemd-%E7%94%A8%E9%94%99%E4%BA%86-user-%E8%BF%98%E6%98%AF-system"><span class="nav-text">坑 1：systemd 用错了 user 还是 system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-2%EF%BC%9ANode-%E7%89%88%E6%9C%AC-20-%E8%A3%85%E4%B8%8D%E4%B8%8A"><span class="nav-text">坑 2：Node 版本 &lt; 20 装不上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-3%EF%BC%9A%E9%A3%9E%E4%B9%A6%E4%BA%8B%E4%BB%B6%E8%AE%A2%E9%98%85-URL-%E5%BF%85%E9%A1%BB-HTTPS"><span class="nav-text">坑 3：飞书事件订阅 URL 必须 HTTPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-4%EF%BC%9A%E9%98%B2%E7%81%AB%E5%A2%99%E6%B2%A1%E5%BC%80"><span class="nav-text">坑 4：防火墙没开</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-5%EF%BC%9A%E5%86%85%E5%AD%98%E4%B8%8D%E5%A4%9F%E8%A2%AB-OOM-kill"><span class="nav-text">坑 5：内存不够被 OOM kill</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%B8%B8%E6%80%8E%E4%B9%88%E7%94%A8"><span class="nav-text">日常怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E8%AF%B4%E4%B8%A4%E5%8F%A5"><span class="nav-text">最后说两句</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E8%A3%85-Hermes%EF%BC%9A%E4%BB%8E%E9%9B%B6%E5%88%B0%E8%83%BD%E8%B7%9F%E5%AE%83%E8%81%8A%E5%A4%A9%EF%BC%8C%E6%88%91%E8%B8%A9%E4%BA%86%E5%93%AA%E4%BA%9B%E5%9D%91"><span class="nav-text">在服务器上装 Hermes：从零到能跟它聊天，我踩了哪些坑</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E6%88%91%E8%A6%81%E8%BE%BE%E6%88%90%E4%BB%80%E4%B9%88"><span class="nav-text">先说我要达成什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C%EF%BC%9A%E4%BD%A0%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BE%97%E6%9C%89%E8%BF%99%E4%BA%9B"><span class="nav-text">准备工作：你的服务器得有这些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E8%A3%85-Node-js"><span class="nav-text">第一步：装 Node.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E8%A3%85-Hermes"><span class="nav-text">第二步：装 Hermes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%9F%A2-%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A3%85%E5%93%AA%E9%87%8C"><span class="nav-text">🟢 第一个选择：装哪里</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%9F%A1-%E7%AC%AC%E4%BA%8C%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A6%81%E4%B8%8D%E8%A6%81%E5%90%AF-gateway"><span class="nav-text">🟡 第二个选择：要不要启 gateway</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%F0%9F%94%B4-%E7%AC%AC%E4%B8%89%E4%B8%AA%E9%80%89%E6%8B%A9%EF%BC%9A%E8%A6%81%E4%B8%8D%E8%A6%81%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="nav-text">🔴 第三个选择：要不要开机自启</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E9%AA%8C%E8%AF%81%E8%A3%85%E5%A5%BD%E4%BA%86"><span class="nav-text">第三步：验证装好了</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E9%85%8D%E9%A3%9E%E4%B9%A6%EF%BC%88%E6%88%96%E8%80%85%E4%BD%A0%E7%94%A8%E7%9A%84-IM%EF%BC%89"><span class="nav-text">第四步：配飞书（或者你用的 IM）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E5%85%88%E5%9C%A8%E9%A3%9E%E4%B9%A6%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E5%BB%BA%E4%B8%AA%E5%BA%94%E7%94%A8"><span class="nav-text">4.1 先在飞书开放平台建个应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E9%85%8D%E6%9D%83%E9%99%90"><span class="nav-text">4.2 配权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E9%85%8D%E4%BA%8B%E4%BB%B6%E8%AE%A2%E9%98%85"><span class="nav-text">4.3 配事件订阅</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E6%8A%8A%E5%87%AD%E8%AF%81%E5%91%8A%E8%AF%89-Hermes"><span class="nav-text">4.4 把凭证告诉 Hermes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%E9%AA%8C%E8%AF%81"><span class="nav-text">4.5 验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E8%B7%91%E4%B8%AA%E7%9C%9F%E4%BB%BB%E5%8A%A1%E8%AF%95%E8%AF%95"><span class="nav-text">第五步：跑个真任务试试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E8%B8%A9%E7%9A%84%E5%9D%91%EF%BC%88%E5%BB%BA%E8%AE%AE%E4%BD%A0%E6%8F%90%E5%89%8D%E9%81%BF%EF%BC%89"><span class="nav-text">我踩的坑（建议你提前避）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-1%EF%BC%9Asystemd-%E7%94%A8%E9%94%99%E4%BA%86-user-%E8%BF%98%E6%98%AF-system"><span class="nav-text">坑 1：systemd 用错了 user 还是 system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-2%EF%BC%9ANode-%E7%89%88%E6%9C%AC-20-%E8%A3%85%E4%B8%8D%E4%B8%8A"><span class="nav-text">坑 2：Node 版本 &lt; 20 装不上</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-3%EF%BC%9A%E9%A3%9E%E4%B9%A6%E4%BA%8B%E4%BB%B6%E8%AE%A2%E9%98%85-URL-%E5%BF%85%E9%A1%BB-HTTPS"><span class="nav-text">坑 3：飞书事件订阅 URL 必须 HTTPS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-4%EF%BC%9A%E9%98%B2%E7%81%AB%E5%A2%99%E6%B2%A1%E5%BC%80"><span class="nav-text">坑 4：防火墙没开</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-5%EF%BC%9A%E5%86%85%E5%AD%98%E4%B8%8D%E5%A4%9F%E8%A2%AB-OOM-kill"><span class="nav-text">坑 5：内存不够被 OOM kill</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%B8%B8%E6%80%8E%E4%B9%88%E7%94%A8"><span class="nav-text">日常怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E8%AF%B4%E4%B8%A4%E5%8F%A5"><span class="nav-text">最后说两句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%A6-%E9%99%84%E5%BD%95%EF%BC%9A%E5%AE%8C%E6%95%B4%E5%91%BD%E4%BB%A4%E6%B8%85%E5%8D%95%EF%BC%88%E5%A4%8D%E5%88%B6%E5%B0%B1%E8%83%BD%E8%B7%91%EF%BC%89"><span class="nav-text">📦 附录：完整命令清单（复制就能跑）</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -290,45 +290,167 @@
 </ul>
 <p>听起来简单对吧。实际上每一步都有坑。</p>
 <h2 id="准备工作：你的服务器得有这些"><a href="#准备工作：你的服务器得有这些" class="headerlink" title="准备工作：你的服务器得有这些"></a>准备工作：你的服务器得有这些</h2><p>先看下我用的环境，后面所有命令都是基于这个：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">系统:  OpenCloudOS 9.4（CentOS 系，基本一样）</span><br><span class="line">架构:  x86_64</span><br><span class="line">Node:  v22.15.0</span><br><span class="line">Python: 3.11.6</span><br></pre></td></tr></table></figure>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0;padding:16px;border-radius:10px;background:linear-gradient(135deg,#f6f8fa 0%,#eef1f5 100%);border:1px solid #d0d7de;">
 
-<p>注意 Node 版本。Hermes 官方说需要 <code>&gt;= 20</code>，我装的是 22，没问题。</p>
-<p>如果你的系统是 Ubuntu&#x2F;Debian，绝大部分命令也一样，只有 <code>yum/dnf</code> 换成 <code>apt</code> 的事。</p>
+<div style="text-align:center;padding:12px;background:white;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+<div style="font-size:28px;margin-bottom:4px;">🐧</div>
+<div style="color:#57606a;font-size:12px;margin-bottom:4px;">系统</div>
+<div style="font-weight:600;color:#1f2328;">OpenCloudOS 9.4</div>
+<div style="font-size:11px;color:#6e7781;">CentOS 系</div>
+</div>
+
+<div style="text-align:center;padding:12px;background:white;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+<div style="font-size:28px;margin-bottom:4px;">⚙️</div>
+<div style="color:#57606a;font-size:12px;margin-bottom:4px;">架构</div>
+<div style="font-weight:600;color:#1f2328;">x86_64</div>
+</div>
+
+<div style="text-align:center;padding:12px;background:white;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+<div style="font-size:28px;margin-bottom:4px;">💚</div>
+<div style="color:#57606a;font-size:12px;margin-bottom:4px;">Node</div>
+<div style="font-weight:600;color:#2da44e;">v22.15.0</div>
+</div>
+
+<div style="text-align:center;padding:12px;background:white;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+<div style="font-size:28px;margin-bottom:4px;">🐍</div>
+<div style="color:#57606a;font-size:12px;margin-bottom:4px;">Python</div>
+<div style="font-weight:600;color:#3776ab;">3.11.6</div>
+</div>
+
+</div>
+
+<blockquote>
+<p>💡 <strong>小贴士</strong>：Node 版本要 <code>&gt;= 20</code>，我装的是 22，没问题。如果你的系统是 Ubuntu&#x2F;Debian，绝大部分命令也一样，只有 <code>yum/dnf</code> 换成 <code>apt</code> 的事。</p>
+</blockquote>
 <h2 id="第一步：装-Node-js"><a href="#第一步：装-Node-js" class="headerlink" title="第一步：装 Node.js"></a>第一步：装 Node.js</h2><p>这个不是装 Hermes 必须的（它其实有 Python 版本），但官方文档和大部分教程都按 Node 走，而且后面如果你想自己写点工具脚本也会用到。装上不亏。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 看下有没有</span></span><br><span class="line">node --version</span><br><span class="line"></span><br><span class="line"><span class="comment"># 没有的话，OpenCloudOS / CentOS 用 dnf</span></span><br><span class="line">dnf install -y nodejs npm</span><br><span class="line"></span><br><span class="line"><span class="comment"># Ubuntu / Debian 用 apt</span></span><br><span class="line"><span class="comment"># apt install -y nodejs npm</span></span><br></pre></td></tr></table></figure>
+<p><strong>① 先看看有没有装：</strong></p>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#ff5f57;">●</span>
+<span style="color:#febc2e;">●</span>
+<span style="color:#28c840;">●</span>
+<span style="color:#8b949e;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ terminal</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">node</span> <span style="color:#79c0ff;">--version</span>
+</div>
+</div>
 
-<p>装完验证一下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ node --version</span><br><span class="line">v22.15.0</span><br><span class="line">$ npm --version</span><br><span class="line">10.9.2</span><br></pre></td></tr></table></figure>
+<p><strong>② 没装的话装一下：</strong></p>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#1a3a2e 0%,#0d2818 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#3fb950;">●</span>
+<span style="color:#3fb950;">●</span>
+<span style="color:#3fb950;">●</span>
+<span style="color:#7ee787;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ install</span>
+<span style="margin-left:auto;background:rgba(63,185,80,0.15);color:#7ee787;padding:2px 8px;border-radius:4px;font-size:11px;">运行中</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<div><span style="color:#7ee787;">$</span> <span style="color:#8b949e;"># OpenCloudOS / CentOS</span></div>
+<div><span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">dnf</span> <span style="color:#79c0ff;">install</span> <span style="color:#79c0ff;">-y</span> nodejs npm</div>
+<div style="margin-top:6px;"><span style="color:#7ee787;">$</span> <span style="color:#8b949e;"># Ubuntu / Debian（如果你的系统是这类）</span></div>
+<div><span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">apt</span> <span style="color:#79c0ff;">install</span> <span style="color:#79c0ff;">-y</span> nodejs npm</div>
+</div>
+</div>
 
-<p>如果版本太低（Node &lt; 20），就别用系统源了，去 Node 官网下 LTS。</p>
+<p><strong>③ 装完验证一下：</strong></p>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#ff5f57;">●</span>
+<span style="color:#febc2e;">●</span>
+<span style="color:#28c840;">●</span>
+<span style="color:#8b949e;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ verify</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<div><span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">node</span> <span style="color:#79c0ff;">--version</span></div>
+<div><span style="color:#56d364;">v22.15.0</span></div>
+<div><span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">npm</span> <span style="color:#79c0ff;">--version</span></div>
+<div><span style="color:#56d364;">10.9.2</span></div>
+</div>
+</div>
+
+<blockquote>
+<p>⚠️ <strong>注意</strong>：如果版本太低（Node &lt; 20），就别用系统源了，去 Node 官网下 LTS。</p>
+</blockquote>
 <h2 id="第二步：装-Hermes"><a href="#第二步：装-Hermes" class="headerlink" title="第二步：装 Hermes"></a>第二步：装 Hermes</h2><p>这是正文。打开 <a target="_blank" rel="noopener" href="https://github.com/NousResearch/hermes-agent">Hermes Agent 的 GitHub</a>，README 写得很清楚。</p>
-<p>我用的是官方推荐的一键脚本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</span><br></pre></td></tr></table></figure>
+<div style="margin:16px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#1e3a8a 0%,#0c1e3e 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#3b82f6;">●</span>
+<span style="color:#3b82f6;">●</span>
+<span style="color:#3b82f6;">●</span>
+<span style="color:#93c5fd;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ curl install</span>
+<span style="margin-left:auto;background:rgba(59,130,246,0.2);color:#93c5fd;padding:2px 8px;border-radius:4px;font-size:11px;">关键命令</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">curl</span> <span style="color:#79c0ff;">-fsSL</span> https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh <span style="color:#d2a8ff;">|</span> <span style="color:#d2a8ff;">bash</span>
+</div>
+</div>
 
 <p>跑完会让你选几个东西。<strong>这步我栽过跟头</strong>，所以我一个个说。</p>
-<h3 id="第一个选择：装哪里"><a href="#第一个选择：装哪里" class="headerlink" title="第一个选择：装哪里"></a>第一个选择：装哪里</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install directory [/usr/local/lib/hermes-agent]:</span><br></pre></td></tr></table></figure>
+<h3 id="🟢-第一个选择：装哪里"><a href="#🟢-第一个选择：装哪里" class="headerlink" title="🟢 第一个选择：装哪里"></a>🟢 第一个选择：装哪里</h3><div style="margin:12px 0;padding:14px 18px;border-radius:8px;background:#f6f8fa;border-left:4px solid #2da44e;font-family:'SF Mono',Monaco,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#57606a;">Install directory</span> [<span style="color:#1f2328;">/usr/local/lib/hermes-agent</span>]:
+</div>
 
 <p>直接回车用默认 <code>/usr/local/lib/hermes-agent</code> 就行。改路径后面配 systemd 会麻烦。</p>
-<h3 id="第二个选择：要不要启-gateway"><a href="#第二个选择：要不要启-gateway" class="headerlink" title="第二个选择：要不要启 gateway"></a>第二个选择：要不要启 gateway</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Start the gateway now? [Y/n]:</span><br></pre></td></tr></table></figure>
+<h3 id="🟡-第二个选择：要不要启-gateway"><a href="#🟡-第二个选择：要不要启-gateway" class="headerlink" title="🟡 第二个选择：要不要启 gateway"></a>🟡 第二个选择：要不要启 gateway</h3><div style="margin:12px 0;padding:14px 18px;border-radius:8px;background:#fff8c5;border-left:4px solid #d4a72c;font-family:'SF Mono',Monaco,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#57606a;">Start the gateway now?</span> [<span style="color:#1f2328;font-weight:600;">Y</span>/n]:
+</div>
 
 <p><strong>选 Y</strong>。gateway 就是 Hermes 跟外部世界（飞书、微信）通信的桥梁。不启它就是个命令行工具，不能在飞书里调它。</p>
-<h3 id="第三个选择：要不要开机自启"><a href="#第三个选择：要不要开机自启" class="headerlink" title="第三个选择：要不要开机自启"></a>第三个选择：要不要开机自启</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enable systemd service? [Y/n]:</span><br></pre></td></tr></table></figure>
+<h3 id="🔴-第三个选择：要不要开机自启"><a href="#🔴-第三个选择：要不要开机自启" class="headerlink" title="🔴 第三个选择：要不要开机自启"></a>🔴 第三个选择：要不要开机自启</h3><div style="margin:12px 0;padding:14px 18px;border-radius:8px;background:#ffebe9;border-left:4px solid #cf222e;font-family:'SF Mono',Monaco,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#57606a;">Enable systemd service?</span> [<span style="color:#1f2328;font-weight:600;">Y</span>/n]:
+</div>
 
 <p><strong>选 Y</strong>。你不会想每次重启服务器都手动 <code>hermes gateway start</code> 吧。</p>
 <p>装完最后会给你一个表格，类似这样：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────┐</span><br><span class="line">│  Installation complete                   │</span><br><span class="line">│  Install dir:    /usr/local/lib/hermes  │</span><br><span class="line">│  Python venv:    .../venv                │</span><br><span class="line">│  Gateway:        running                 │</span><br><span class="line">│  Systemd:        enabled                 │</span><br><span class="line">└─────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+<div style="margin:16px 0;padding:20px;border-radius:10px;background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border:1px solid #6ee7b7;box-shadow:0 2px 8px rgba(16,185,129,0.1);">
+<div style="font-weight:600;color:#065f46;margin-bottom:12px;font-size:15px;">✅ Installation complete</div>
+<div style="display:grid;gap:8px;font-family:'SF Mono',Monaco,monospace;font-size:13px;">
+<div style="display:flex;gap:12px;"><span style="color:#047857;min-width:130px;">Install dir:</span><span style="color:#1f2328;">/usr/local/lib/hermes-agent</span></div>
+<div style="display:flex;gap:12px;"><span style="color:#047857;min-width:130px;">Python venv:</span><span style="color:#1f2328;">.../venv</span></div>
+<div style="display:flex;gap:12px;"><span style="color:#047857;min-width:130px;">Gateway:</span><span style="color:#1f2328;"><span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:6px;"></span>running</span></div>
+<div style="display:flex;gap:12px;"><span style="color:#047857;min-width:130px;">Systemd:</span><span style="color:#1f2328;"><span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:6px;"></span>enabled</span></div>
+</div>
+</div>
 
 <h2 id="第三步：验证装好了"><a href="#第三步：验证装好了" class="headerlink" title="第三步：验证装好了"></a>第三步：验证装好了</h2><p>不管安装脚本怎么说，自己跑一遍命令确认：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ hermes --version</span><br><span class="line">Hermes Agent v0.20.5 (2026.8.19) · upstream 1bbb6e5b</span><br><span class="line">Install directory: /usr/local/lib/hermes-agent</span><br><span class="line">Install method: git</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#ff5f57;">●</span>
+<span style="color:#febc2e;">●</span>
+<span style="color:#28c840;">●</span>
+<span style="color:#8b949e;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ hermes --version</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<div><span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">hermes</span> <span style="color:#79c0ff;">--version</span></div>
+<div style="margin-top:4px;color:#c9d1d9;">Hermes Agent <span style="color:#79c0ff;">v0.20.5</span> <span style="color:#8b949e;">(2026.8.19)</span> · upstream <span style="color:#79c0ff;">1bbb6e5b</span></div>
+<div style="color:#8b949e;">Install directory: /usr/local/lib/hermes-agent</div>
+<div style="color:#8b949e;">Install method: git</div>
+</div>
+</div>
 
 <p>看到版本号就算装好了。</p>
 <p>再查下 gateway 是否在跑：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ hermes gateway status</span><br><span class="line">● hermes-gateway.service - Hermes Agent Gateway</span><br><span class="line">     Loaded: loaded</span><br><span class="line">     Active: active (running) since Tue 2026-08-25 23:30:03 CST</span><br><span class="line">   Main PID: 1998472 (hermes)</span><br><span class="line">      Memory: 596.5M</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#ff5f57;">●</span>
+<span style="color:#febc2e;">●</span>
+<span style="color:#28c840;">●</span>
+<span style="color:#8b949e;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ systemctl status</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<div>● <span style="color:#d2a8ff;">hermes-gateway.service</span> - Hermes Agent Gateway</div>
+<div style="margin-left:14px;color:#8b949e;">Loaded: loaded</div>
+<div style="margin-left:14px;color:#c9d1d9;">Active: <span style="color:#56d364;font-weight:600;">active (running)</span> since Tue 2026-08-25 23:30:03 CST</div>
+<div style="margin-left:14px;color:#8b949e;">Main PID: 1998472 (hermes)</div>
+<div style="margin-left:14px;color:#8b949e;">Memory: 596.5M</div>
+</div>
+</div>
 
-<p><code>active (running)</code> 就对了。</p>
-<p>如果显示 <code>inactive (dead)</code>，手动起一下：</p>
+<blockquote>
+<p>✅ <code>active (running)</code> 就对了。如果显示 <code>inactive (dead)</code>，手动起一下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user start hermes-gateway.service</span><br></pre></td></tr></table></figure>
-
+</blockquote>
 <h2 id="第四步：配飞书（或者你用的-IM）"><a href="#第四步：配飞书（或者你用的-IM）" class="headerlink" title="第四步：配飞书（或者你用的 IM）"></a>第四步：配飞书（或者你用的 IM）</h2><p>这一步是<strong>真正能聊天</strong>的环节。Hermes 支持飞书、Slack、WhatsApp、邮件……我自己用飞书，所以只讲飞书。</p>
 <h3 id="4-1-先在飞书开放平台建个应用"><a href="#4-1-先在飞书开放平台建个应用" class="headerlink" title="4.1 先在飞书开放平台建个应用"></a>4.1 先在飞书开放平台建个应用</h3><p>打开 <a target="_blank" rel="noopener" href="https://open.feishu.cn/app">飞书开放平台</a>，登录后：</p>
 <ol>
@@ -338,12 +460,16 @@
 <li>进应用详情页，记下 <strong>App ID</strong> 和 <strong>App Secret</strong>（后面要用）</li>
 </ol>
 <h3 id="4-2-配权限"><a href="#4-2-配权限" class="headerlink" title="4.2 配权限"></a>4.2 配权限</h3><p>在应用的「权限管理」里，至少要勾这几个：</p>
-<ul>
-<li><code>im:message</code> — 收发消息</li>
-<li><code>im:message:send_as_bot</code> — 以机器人身份发消息</li>
-<li><code>im:message.p2p_msg</code> — 私聊（如果你想跟它 1v1 聊）</li>
-<li><code>im:message.group_at_msg</code> — 群聊 @ 机器人</li>
-</ul>
+<div style="margin:12px 0;border-radius:8px;background:#f6f8fa;border:1px solid #d0d7de;overflow:hidden;">
+<div style="background:#eaeef2;padding:8px 14px;border-bottom:1px solid #d0d7de;font-size:12px;color:#57606a;font-weight:600;">📋 飞书权限清单</div>
+<div style="padding:12px 16px;font-family:'SF Mono',Monaco,monospace;font-size:13px;line-height:1.9;">
+<div><span style="color:#cf222e;">●</span> <span style="color:#8250df;">im:message</span> <span style="color:#8b949e;">— 收发消息</span></div>
+<div><span style="color:#cf222e;">●</span> <span style="color:#8250df;">im:message:send_as_bot</span> <span style="color:#8b949e;">— 以机器人身份发消息</span></div>
+<div><span style="color:#cf222e;">●</span> <span style="color:#8250df;">im:message.p2p_msg</span> <span style="color:#8b949e;">— 私聊（1v1 跟它聊）</span></div>
+<div><span style="color:#cf222e;">●</span> <span style="color:#8250df;">im:message.group_at_msg</span> <span style="color:#8b949e;">— 群聊 @ 机器人</span></div>
+</div>
+</div>
+
 <p>申请完要点「发布版本」才生效。</p>
 <h3 id="4-3-配事件订阅"><a href="#4-3-配事件订阅" class="headerlink" title="4.3 配事件订阅"></a>4.3 配事件订阅</h3><p>在「事件订阅」里：</p>
 <ul>
@@ -352,51 +478,156 @@
 <li>或者用 <a target="_blank" rel="noopener" href="https://ngrok.com/">ngrok</a> 这种内网穿透</li>
 </ul>
 </li>
-<li>加密策略：选「加密」或「明文」都行</li>
 </ul>
+<blockquote>
+<p>💡 <strong>小贴士</strong>：加密策略选「加密」或「明文」都行，新手选明文调试更简单。</p>
+</blockquote>
 <h3 id="4-4-把凭证告诉-Hermes"><a href="#4-4-把凭证告诉-Hermes" class="headerlink" title="4.4 把凭证告诉 Hermes"></a>4.4 把凭证告诉 Hermes</h3><p>回到服务器，跑：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hermes setup feishu</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#1e3a8a 0%,#0c1e3e 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#3b82f6;">●</span>
+<span style="color:#3b82f6;">●</span>
+<span style="color:#3b82f6;">●</span>
+<span style="color:#93c5fd;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ 配置</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">hermes</span> setup feishu
+</div>
+</div>
 
 <p>它会问你 App ID 和 App Secret，照着填。配置文件会写到 <code>~/.config/hermes/feishu.json</code>，权限 600。</p>
 <p>填完重启 gateway：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user restart hermes-gateway.service</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;box-shadow:0 4px 12px rgba(13,17,23,0.15);">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#ff5f57;">●</span>
+<span style="color:#febc2e;">●</span>
+<span style="color:#28c840;">●</span>
+<span style="color:#8b949e;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ restart</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">systemctl</span> <span style="color:#79c0ff;">--user</span> <span style="color:#d2a8ff;">restart</span> hermes-gateway.service
+</div>
+</div>
 
 <h3 id="4-5-验证"><a href="#4-5-验证" class="headerlink" title="4.5 验证"></a>4.5 验证</h3><p>在飞书里找你的机器人发一条「你好」。<strong>这里我翻车过一次</strong>——消息发过去完全没反应。</p>
 <p>排查思路：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 看 gateway 日志</span></span><br><span class="line">journalctl --user -u hermes-gateway -f</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 看有没有收到回调</span></span><br><span class="line">grep <span class="string">&quot;feishu&quot;</span> ~/.hermes/logs/*.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 检查端口监听</span></span><br><span class="line">ss -tlnp | grep hermes</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:8px;background:#f6f8fa;border:1px solid #d0d7de;overflow:hidden;">
+<div style="background:#eaeef2;padding:8px 14px;border-bottom:1px solid #d0d7de;font-size:12px;color:#57606a;font-weight:600;">🔍 排查三连</div>
+<div style="padding:12px 16px;font-family:'SF Mono',Monaco,monospace;font-size:13px;line-height:1.9;">
+<div><span style="color:#1f2328;font-weight:600;">1.</span> <span style="color:#cf222e;">看 gateway 日志</span></div>
+<div style="margin-left:20px;color:#57606a;">journalctl --user -u hermes-gateway -f</div>
+<div style="margin-top:6px;"><span style="color:#1f2328;font-weight:600;">2.</span> <span style="color:#cf222e;">看有没有收到回调</span></div>
+<div style="margin-left:20px;color:#57606a;">grep "feishu" ~/.hermes/logs/*.log</div>
+<div style="margin-top:6px;"><span style="color:#1f2328;font-weight:600;">3.</span> <span style="color:#cf222e;">检查端口监听</span></div>
+<div style="margin-left:20px;color:#57606a;">ss -tlnp | grep hermes</div>
+</div>
+</div>
 
-<p>我那次的问题是<strong>事件订阅的 URL 没配对</strong>。配的是 <code>http://...</code>，飞书非要 <code>https://...</code>。改成反代之后就好了。</p>
+<blockquote>
+<p>⚠️ <strong>我当时的问题</strong>：事件订阅的 URL 没配对。配的是 <code>http://...</code>，飞书非要 <code>https://...</code>。改成反代之后就好了。</p>
+</blockquote>
 <h2 id="第五步：跑个真任务试试"><a href="#第五步：跑个真任务试试" class="headerlink" title="第五步：跑个真任务试试"></a>第五步：跑个真任务试试</h2><p>别光发”你好”测试。<strong>用任务验证它</strong>才是真的。</p>
 <p>我让它干的第一件事：</p>
 <blockquote>
 <p>「帮我看下当前服务器都跑了哪些服务，按 CPU 占用排序」</p>
 </blockquote>
 <p>它的回复（精简版）：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">跑了 21 个 systemd 服务 + 2 个 Docker 容器。</span><br><span class="line">按 CPU 排：</span><br><span class="line">1. kswapd0 (内核) - 17.2%</span><br><span class="line">2. hermes-gateway (我自己) - 8.7%</span><br><span class="line">3. mysqld - 11.5%</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);border:1px solid #cbd5e1;overflow:hidden;">
+<div style="background:linear-gradient(90deg,#475569 0%,#334155 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1;">
+<span style="color:#fff;">🤖</span>
+<span style="color:#fff;font-size:12px;font-family:'SF Mono',Monaco,monospace;">Hermes Agent</span>
+</div>
+<div style="padding:16px;font-size:14px;line-height:1.8;color:#1f2937;">
+跑了 <strong>21</strong> 个 systemd 服务 + <strong>2</strong> 个 Docker 容器。<br>
+按 CPU 排：<br>
+<span style="color:#dc2626;">1.</span> kswapd0 (内核) - <strong>17.2%</strong><br>
+<span style="color:#dc2626;">2.</span> hermes-gateway (我自己) - <strong>8.7%</strong><br>
+<span style="color:#dc2626;">3.</span> mysqld - <strong>11.5%</strong><br>
+<span style="color:#9ca3af;">...</span>
+</div>
+</div>
 
 <p>OK 它确实在跑、确实能看到系统。<strong>装到这里就算完整跑通了</strong>。</p>
 <h2 id="我踩的坑（建议你提前避）"><a href="#我踩的坑（建议你提前避）" class="headerlink" title="我踩的坑（建议你提前避）"></a>我踩的坑（建议你提前避）</h2><h3 id="坑-1：systemd-用错了-user-还是-system"><a href="#坑-1：systemd-用错了-user-还是-system" class="headerlink" title="坑 1：systemd 用错了 user 还是 system"></a>坑 1：systemd 用错了 user 还是 system</h3><p>Hermes 装的是 <code>~/.config/systemd/user/hermes-gateway.service</code>，是<strong>用户级</strong>的。</p>
 <p>所以**所有命令都要加 <code>--user</code>**：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user status hermes-gateway   <span class="comment"># ✅</span></span><br><span class="line">systemctl status hermes-gateway          <span class="comment"># ❌ 找不到</span></span><br></pre></td></tr></table></figure>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+<div style="border-radius:8px;overflow:hidden;border:1px solid #6ee7b7;">
+<div style="background:#d1fae5;padding:6px 12px;font-size:11px;font-weight:600;color:#065f46;">✅ 正确</div>
+<div style="padding:10px 12px;background:#f0fdf4;font-family:'SF Mono',Monaco,monospace;font-size:12px;color:#1f2328;">systemctl <span style="color:#cf222e;">--user</span> status hermes-gateway</div>
+</div>
+<div style="border-radius:8px;overflow:hidden;border:1px solid #fca5a5;">
+<div style="background:#fee2e2;padding:6px 12px;font-size:11px;font-weight:600;color:#991b1b;">❌ 错误</div>
+<div style="padding:10px 12px;background:#fef2f2;font-family:'SF Mono',Monaco,monospace;font-size:12px;color:#1f2328;">systemctl status hermes-gateway</div>
+<div style="background:#fee2e2;padding:6px 12px;font-size:11px;color:#991b1b;">→ 找不到服务</div>
+</div>
+</div>
 
-<p>如果你服务器开了多用户，gateway 跟用户绑定。用户退了 gateway 也停。要全局用就改成 system 级，但官方不推荐。</p>
-<h3 id="坑-2：Node-版本-20-装不上"><a href="#坑-2：Node-版本-20-装不上" class="headerlink" title="坑 2：Node 版本 &lt; 20 装不上"></a>坑 2：Node 版本 &lt; 20 装不上</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR: Hermes Agent requires Node.js 20+ (found 18.17.0)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>💡 如果你服务器开了多用户，gateway 跟用户绑定。用户退了 gateway 也停。要全局用就改成 system 级，但官方不推荐。</p>
+</blockquote>
+<h3 id="坑-2：Node-版本-20-装不上"><a href="#坑-2：Node-版本-20-装不上" class="headerlink" title="坑 2：Node 版本 &lt; 20 装不上"></a>坑 2：Node 版本 &lt; 20 装不上</h3><div style="margin:12px 0;padding:12px 16px;border-radius:8px;background:#fff8c5;border-left:4px solid #d4a72c;font-family:'SF Mono',Monaco,monospace;font-size:13px;color:#1f2328;">
+⚠ ERROR: Hermes Agent requires Node.js 20+ (found 18.17.0)
+</div>
 
 <p>老老实实装新版。</p>
 <h3 id="坑-3：飞书事件订阅-URL-必须-HTTPS"><a href="#坑-3：飞书事件订阅-URL-必须-HTTPS" class="headerlink" title="坑 3：飞书事件订阅 URL 必须 HTTPS"></a>坑 3：飞书事件订阅 URL 必须 HTTPS</h3><p>这个上面提了。如果你懒得搞反代，用 <code>ngrok</code> 一行命令解决：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ngrok http 8765</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:10px;background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border:1px solid #30363d;overflow:hidden;">
+<div style="background:linear-gradient(90deg,#7c3aed 0%,#4c1d95 100%);padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+<span style="color:#a78bfa;">●</span>
+<span style="color:#a78bfa;">●</span>
+<span style="color:#a78bfa;">●</span>
+<span style="color:#c4b5fd;font-size:12px;margin-left:8px;font-family:'SF Mono',Monaco,monospace;">~ ngrok</span>
+</div>
+<div style="padding:14px 16px;font-family:'SF Mono','JetBrains Mono',Monaco,Consolas,monospace;font-size:13.5px;line-height:1.7;">
+<span style="color:#7ee787;">$</span> <span style="color:#d2a8ff;">ngrok</span> <span style="color:#79c0ff;">http</span> <span style="color:#79c0ff;">8765</span>
+</div>
+</div>
 
 <p>把 ngrok 给你的 https 地址填进飞书就行。<strong>仅限测试用</strong>，生产环境别这么干。</p>
-<h3 id="坑-4：防火墙没开"><a href="#坑-4：防火墙没开" class="headerlink" title="坑 4：防火墙没开"></a>坑 4：防火墙没开</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 看端口监听</span></span><br><span class="line">ss -tlnp | grep -E <span class="string">&#x27;8765|hermes&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 没监听 = gateway 没起来</span></span><br><span class="line"><span class="comment"># 起了但外面连不上 = 防火墙</span></span><br><span class="line">firewall-cmd --add-port=8765/tcp --permanent</span><br><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+<h3 id="坑-4：防火墙没开"><a href="#坑-4：防火墙没开" class="headerlink" title="坑 4：防火墙没开"></a>坑 4：防火墙没开</h3><div style="margin:12px 0;border-radius:8px;background:#f6f8fa;border:1px solid #d0d7de;overflow:hidden;">
+<div style="background:#eaeef2;padding:8px 14px;border-bottom:1px solid #d0d7de;font-size:12px;color:#57606a;font-weight:600;">📋 排查步骤</div>
+<div style="padding:12px 16px;font-family:'SF Mono',Monaco,monospace;font-size:13px;line-height:1.9;">
+<div><span style="color:#1f2328;font-weight:600;">①</span> 看端口监听</div>
+<div style="margin-left:20px;color:#57606a;">ss -tlnp | grep -E '8765|hermes'</div>
+<div style="margin-top:4px;color:#1f2328;">没监听 = gateway 没起来</div>
+<div style="margin-top:8px;"><span style="color:#1f2328;font-weight:600;">②</span> 起了但外面连不上 = 防火墙</div>
+<div style="margin-left:20px;color:#57606a;">firewall-cmd --add-port=8765/tcp --permanent</div>
+<div style="margin-left:20px;color:#57606a;">firewall-cmd --reload</div>
+</div>
+</div>
 
-<p>云服务器（阿里云&#x2F;腾讯云）<strong>还要去控制台的安全组里开端口</strong>，不然白搭。</p>
+<blockquote>
+<p>⚠️ <strong>云服务器（阿里云&#x2F;腾讯云）还要去控制台的安全组里开端口</strong>，不然白搭。</p>
+</blockquote>
 <h3 id="坑-5：内存不够被-OOM-kill"><a href="#坑-5：内存不够被-OOM-kill" class="headerlink" title="坑 5：内存不够被 OOM kill"></a>坑 5：内存不够被 OOM kill</h3><p>Hermes gateway 启动后内存大概 400-600MB。如果你的服务器只有 1GB 内存，跑它一个就吃满了，再加别的服务就被 OOM。</p>
-<p>我建议<strong>至少 2GB 内存</strong>起步。</p>
+<blockquote>
+<p>💡 <strong>建议</strong>：至少 2GB 内存起步。</p>
+</blockquote>
 <h2 id="日常怎么用"><a href="#日常怎么用" class="headerlink" title="日常怎么用"></a>日常怎么用</h2><p>装好之后基本不用管它了。常用命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查 gateway 状态</span></span><br><span class="line">hermes gateway status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 看最近日志</span></span><br><span class="line">hermes logs --<span class="built_in">tail</span> 50</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启 gateway</span></span><br><span class="line">systemctl --user restart hermes-gateway</span><br><span class="line"></span><br><span class="line"><span class="comment"># 完全卸载（如果你哪天不想要了）</span></span><br><span class="line">hermes uninstall</span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:8px;background:#f6f8fa;border:1px solid #d0d7de;overflow:hidden;">
+<div style="background:#eaeef2;padding:8px 14px;border-bottom:1px solid #d0d7de;font-size:12px;color:#57606a;font-weight:600;">🛠️ 常用命令</div>
+<div style="padding:12px 16px;font-family:'SF Mono',Monaco,monospace;font-size:13px;line-height:2;">
+<div><span style="color:#cf222e;">#</span> 查 gateway 状态</div>
+<div>hermes gateway status</div>
+<div style="margin-top:4px;"><span style="color:#cf222e;">#</span> 看最近日志</div>
+<div>hermes logs --tail 50</div>
+<div style="margin-top:4px;"><span style="color:#cf222e;">#</span> 重启 gateway</div>
+<div>systemctl --user restart hermes-gateway</div>
+<div style="margin-top:4px;"><span style="color:#cf222e;">#</span> 完全卸载（如果你哪天不想要了）</div>
+<div>hermes uninstall</div>
+</div>
+</div>
 
 <p>如果你想让它<strong>主动</strong>做点什么（比如每天早上 7 点给你发新闻），那就要用 <code>hermes cron</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hermes cron list                    <span class="comment"># 列出所有定时任务</span></span><br><span class="line">hermes cron run &lt;job_id&gt;            <span class="comment"># 手动跑一次</span></span><br><span class="line">hermes cron pause &lt;job_id&gt;          <span class="comment"># 暂停</span></span><br><span class="line">hermes cron resume &lt;job_id&gt;         <span class="comment"># 恢复</span></span><br></pre></td></tr></table></figure>
+<div style="margin:12px 0;border-radius:8px;background:#0d1117;border:1px solid #30363d;overflow:hidden;">
+<div style="background:linear-gradient(90deg,#21262d 0%,#30363d 100%);padding:8px 14px;border-bottom:1px solid #30363d;font-size:12px;color:#8b949e;font-family:'SF Mono',Monaco,monospace;">~ hermes cron</div>
+<div style="padding:12px 16px;font-family:'SF Mono',Monaco,monospace;font-size:13px;line-height:2;color:#c9d1d9;">
+<div><span style="color:#79c0ff;">hermes</span> cron list &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#8b949e;"># 列出所有定时任务</span></div>
+<div><span style="color:#79c0ff;">hermes</span> cron run <span style="color:#a5d6ff;">&lt;job_id&gt;</span> &nbsp;&nbsp;&nbsp;<span style="color:#8b949e;"># 手动跑一次</span></div>
+<div><span style="color:#79c0ff;">hermes</span> cron pause <span style="color:#a5d6ff;">&lt;job_id&gt;</span> &nbsp;&nbsp;<span style="color:#8b949e;"># 暂停</span></div>
+<div><span style="color:#79c0ff;">hermes</span> cron resume <span style="color:#a5d6ff;">&lt;job_id&gt;</span> &nbsp;<span style="color:#8b949e;"># 恢复</span></div>
+</div>
+</div>
 
 <p>这个我另一篇文章会写。</p>
 <h2 id="最后说两句"><a href="#最后说两句" class="headerlink" title="最后说两句"></a>最后说两句</h2><p>装完 Hermes 在服务器上跑了快两周了，最大的感受是：<strong>这玩意真的能当个私人助手用</strong>。</p>
@@ -405,8 +636,25 @@
 <p>当然它不是万能的。复杂决策、需要物理操作的事它干不了。<strong>但作为一个 7x24 待命的程序，它比大部分同类都靠谱</strong>。</p>
 <p>如果你们也想装，按我上面写的顺序走一遍，应该 1-2 小时搞定。中间卡住了欢迎来问我——别一个人闷头搞，那是最慢的方式。</p>
 <hr>
-<p><strong>附录：完整命令清单（复制就能跑）</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 装 Node（如果没装）</span></span><br><span class="line">dnf install -y nodejs npm  <span class="comment"># 或 apt install -y nodejs npm</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 一键装 Hermes</span></span><br><span class="line">curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 验证</span></span><br><span class="line">hermes --version</span><br><span class="line">hermes gateway status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 配飞书</span></span><br><span class="line">hermes setup feishu</span><br><span class="line"><span class="comment"># （按提示填 App ID / App Secret）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 重启</span></span><br><span class="line">systemctl --user restart hermes-gateway</span><br><span class="line"></span><br><span class="line"><span class="comment"># 6. 去飞书给机器人发消息测试</span></span><br></pre></td></tr></table></figure>
+<h2 id="📦-附录：完整命令清单（复制就能跑）"><a href="#📦-附录：完整命令清单（复制就能跑）" class="headerlink" title="📦 附录：完整命令清单（复制就能跑）"></a>📦 附录：完整命令清单（复制就能跑）</h2><div style="margin:16px 0;padding:20px;border-radius:10px;background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:1px solid #cbd5e1;">
+
+<p><strong>① 装 Node（如果没装）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnf install -y nodejs npm  <span class="comment"># 或 apt install -y nodejs npm</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>② 一键装 Hermes</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</span><br></pre></td></tr></table></figure>
+
+<p><strong>③ 验证</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hermes --version</span><br><span class="line">hermes gateway status</span><br></pre></td></tr></table></figure>
+
+<p><strong>④ 配飞书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hermes setup feishu</span><br><span class="line"><span class="comment"># （按提示填 App ID / App Secret）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>⑤ 重启</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl --user restart hermes-gateway</span><br></pre></td></tr></table></figure>
+
+<p><strong>⑥ 去飞书给机器人发消息测试</strong></p>
+</div>
 
     </div>
 
