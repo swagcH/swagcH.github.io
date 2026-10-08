@@ -1009,175 +1009,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MySQL基础增删改查</title>
-    <url>/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/</url>
-    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。</p>
-<p>这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，一步一步把每个知识点搞清楚。这篇文章就是我在2018年10月学习MySQL基础CRUD的完整记录。</p>
-<p><img src="/images/posts/2018/mysql-crud-1.svg" alt="MySQL基础增删改查"></p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在实际写SQL的过程中，我遇到了好几个一直没搞明白的问题：</p>
-<ol>
-<li><strong>DELETE和TRUNCATE到底有什么区别？</strong> 之前一直以为都是删数据，随便用哪个都行，结果有一次用TRUNCATE删完数据发现回不去了。</li>
-<li><strong>GROUP BY和HAVING总是写错</strong>，经常把过滤条件写在WHERE里，结果报错，搞不清什么时候该用WHERE、什么时候该用HAVING。</li>
-<li><strong>多表JOIN搞不清关系</strong>，INNER JOIN、LEFT JOIN、RIGHT JOIN到底返回什么数据，每次都要画图才能想明白。</li>
-<li><strong>索引加了但查询还是很慢</strong>，以为建了索引就万事大吉，结果有些查询根本没走索引。</li>
-<li><strong>不知道什么时候该建索引</strong>，哪些列该建、哪些不该建，完全没有概念。</li>
-</ol>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="DELETE和TRUNCATE的区别"><a href="#DELETE和TRUNCATE的区别" class="headerlink" title="DELETE和TRUNCATE的区别"></a>DELETE和TRUNCATE的区别</h2><p>这两个看起来都是“删数据”，但底层机制完全不同：</p>
-<table>
-<thead>
-<tr>
-<th>对比点</th>
-<th>DELETE</th>
-<th>TRUNCATE</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>删除方式</td>
-<td>逐行删除</td>
-<td>清空并重建表结构</td>
-</tr>
-<tr>
-<td>SQL类型</td>
-<td>DML</td>
-<td>DDL</td>
-</tr>
-<tr>
-<td>是否可回滚</td>
-<td>在事务中可回滚</td>
-<td>通常不可回滚</td>
-</tr>
-<tr>
-<td>是否支持WHERE</td>
-<td>支持</td>
-<td>不支持</td>
-</tr>
-<tr>
-<td>自增ID</td>
-<td>一般不重置</td>
-<td>通常会重置</td>
-</tr>
-<tr>
-<td>执行速度</td>
-<td>数据量大时较慢</td>
-<td>通常更快</td>
-</tr>
-</tbody></table>
-<p>简单理解：DELETE是一行一行删，可以配合WHERE精确删除，也可以在事务中回滚；TRUNCATE更像是把表清空后重新整理，速度快，但风险也更高。</p>
-<h2 id="GROUP-BY和HAVING"><a href="#GROUP-BY和HAVING" class="headerlink" title="GROUP BY和HAVING"></a>GROUP BY和HAVING</h2><p>我之前经常把聚合条件写到WHERE里，例如想查平均分大于80的学生，却写成：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id;</span><br></pre></td></tr></table></figure>
-
-<p>这肯定是不对的，因为WHERE执行时还没有分组，自然也没有AVG(score)这个结果。正确写法应该是：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
-
-<p>WHERE是在分组前过滤原始行，HAVING是在分组后过滤聚合结果。</p>
-<h2 id="JOIN类型的区别"><a href="#JOIN类型的区别" class="headerlink" title="JOIN类型的区别"></a>JOIN类型的区别</h2><p>JOIN最核心的不是语法，而是先搞清楚两张表之间的关系：</p>
-<ul>
-<li><strong>INNER JOIN</strong>：只返回两边都匹配的数据。</li>
-<li><strong>LEFT JOIN</strong>：左表全部保留，右表匹配不到的地方用NULL补齐。</li>
-<li><strong>RIGHT JOIN</strong>：右表全部保留，左表匹配不到的地方用NULL补齐。</li>
-</ul>
-<p>实际开发中我感觉LEFT JOIN用得更多，因为很多时候我们会以一张主表为中心，再去关联其它明细表。</p>
-<h2 id="索引不是万能的"><a href="#索引不是万能的" class="headerlink" title="索引不是万能的"></a>索引不是万能的</h2><p>索引像书的目录，可以帮助数据库快速定位数据。但它不是万能药，加了索引并不代表一定快：</p>
-<ul>
-<li>表数据量很小时，全表扫描可能更快。</li>
-<li>查询返回的数据太多时，走索引反而不划算。</li>
-<li>在索引列上使用函数，可能导致索引失效。</li>
-<li>LIKE以<code>%</code>开头时，通常无法利用普通索引。</li>
-<li>字段发生隐式类型转换时，也可能导致索引失效。</li>
-</ul>
-<h2 id="索引应该建在什么列上"><a href="#索引应该建在什么列上" class="headerlink" title="索引应该建在什么列上"></a>索引应该建在什么列上</h2><p>比较适合建索引的列：</p>
-<ul>
-<li>区分度高的列，比如学生ID、手机号、身份证号。</li>
-<li>经常出现在WHERE条件里的列。</li>
-<li>经常用于JOIN关联的外键列。</li>
-<li>经常用于ORDER BY或GROUP BY的列。</li>
-</ul>
-<p>不太适合建索引的列：</p>
-<ul>
-<li>区分度很低的列，比如性别。</li>
-<li>经常更新的列，因为维护索引也有成本。</li>
-<li>很少参与查询条件的列。</li>
-</ul>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="准备三张表"><a href="#准备三张表" class="headerlink" title="准备三张表"></a>准备三张表</h2><p>我用学生、课程、成绩三张表来练习，关系比较清晰：一个学生可以选择多门课程，一门课程也可以被多个学生选择，成绩表负责连接学生和课程。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 学生表：保存学生基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> student (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;姓名&#x27;</span>,</span><br><span class="line">    age <span class="type">INT</span> COMMENT <span class="string">&#x27;年龄&#x27;</span>,</span><br><span class="line">    gender <span class="type">VARCHAR</span>(<span class="number">10</span>) COMMENT <span class="string">&#x27;性别&#x27;</span>,</span><br><span class="line">    major <span class="type">VARCHAR</span>(<span class="number">50</span>) COMMENT <span class="string">&#x27;专业&#x27;</span>,</span><br><span class="line">    create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;学生表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 课程表：保存课程基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> course (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程名称&#x27;</span>,</span><br><span class="line">    credit <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学分&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;课程表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 成绩表：保存学生和课程的对应关系以及成绩</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> score (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;成绩ID&#x27;</span>,</span><br><span class="line">    student_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    course_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    score <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>) COMMENT <span class="string">&#x27;成绩&#x27;</span>,</span><br><span class="line">    exam_time <span class="type">DATE</span> COMMENT <span class="string">&#x27;考试日期&#x27;</span>,</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_student <span class="keyword">FOREIGN KEY</span> (student_id) <span class="keyword">REFERENCES</span> student(id),</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_course <span class="keyword">FOREIGN KEY</span> (course_id) <span class="keyword">REFERENCES</span> course(id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;成绩表&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="INSERT：新增数据"><a href="#INSERT：新增数据" class="headerlink" title="INSERT：新增数据"></a>INSERT：新增数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 新增学生数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> student (name, age, gender, major) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;张三&#x27;</span>, <span class="number">20</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;李四&#x27;</span>, <span class="number">21</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;软件工程&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;王五&#x27;</span>, <span class="number">19</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;数据科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;赵六&#x27;</span>, <span class="number">22</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增课程数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> course (name, credit) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;数据库原理&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;数据结构&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">(<span class="string">&#x27;操作系统&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;计算机网络&#x27;</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增成绩数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> score (student_id, course_id, score, exam_time) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="number">1</span>, <span class="number">1</span>, <span class="number">92.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">88.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">1</span>, <span class="number">78.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">3</span>, <span class="number">95.00</span>, <span class="string">&#x27;2018-10-22&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">2</span>, <span class="number">66.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">4</span>, <span class="number">72.50</span>, <span class="string">&#x27;2018-10-23&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">1</span>, <span class="number">85.00</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">4</span>, <span class="number">90.00</span>, <span class="string">&#x27;2018-10-23&#x27;</span>);</span><br></pre></td></tr></table></figure>
-
-<h2 id="UPDATE：修改数据"><a href="#UPDATE：修改数据" class="headerlink" title="UPDATE：修改数据"></a>UPDATE：修改数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 修改张三的年龄</span></span><br><span class="line"><span class="keyword">UPDATE</span> student</span><br><span class="line"><span class="keyword">SET</span> age <span class="operator">=</span> <span class="number">21</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 修改数据库原理课程的学分</span></span><br><span class="line"><span class="keyword">UPDATE</span> course</span><br><span class="line"><span class="keyword">SET</span> credit <span class="operator">=</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给王五的所有成绩加5分</span></span><br><span class="line"><span class="keyword">UPDATE</span> score</span><br><span class="line"><span class="keyword">SET</span> score <span class="operator">=</span> score <span class="operator">+</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;王五&#x27;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="DELETE：删除数据"><a href="#DELETE：删除数据" class="headerlink" title="DELETE：删除数据"></a>DELETE：删除数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 删除低于60分的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> score <span class="operator">&lt;</span> <span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除某个学生的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除成绩表全部数据，可配合事务回滚</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 清空成绩表，不支持WHERE，风险更高</span></span><br><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span> score;</span><br></pre></td></tr></table></figure>
-
-<h2 id="SELECT：基础查询"><a href="#SELECT：基础查询" class="headerlink" title="SELECT：基础查询"></a>SELECT：基础查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询所有学生</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 只查询指定列</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age, major <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 条件查询</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> major <span class="operator">=</span> <span class="string">&#x27;计算机科学&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 模糊查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 排序查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分页查询：从第0条开始取10条</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line">LIMIT <span class="number">0</span>, <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="多表JOIN查询"><a href="#多表JOIN查询" class="headerlink" title="多表JOIN查询"></a>多表JOIN查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- INNER JOIN：只查询有成绩的学生和课程</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- LEFT JOIN：查询所有学生，即使学生还没有成绩也会显示</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- RIGHT JOIN：以课程表为主，查询所有课程的选课成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
-
-<h2 id="聚合函数和GROUP-BY"><a href="#聚合函数和GROUP-BY" class="headerlink" title="聚合函数和GROUP BY"></a>聚合函数和GROUP BY</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询每个学生的平均成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询平均成绩大于80分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(sc.score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询每门课程的选课人数、最高分和最低分</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    <span class="built_in">COUNT</span>(sc.id) <span class="keyword">AS</span> student_count,</span><br><span class="line">    <span class="built_in">MAX</span>(sc.score) <span class="keyword">AS</span> max_score,</span><br><span class="line">    <span class="built_in">MIN</span>(sc.score) <span class="keyword">AS</span> min_score</span><br><span class="line"><span class="keyword">FROM</span> course c</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> c.id <span class="operator">=</span> sc.course_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> c.id, c.name;</span><br></pre></td></tr></table></figure>
-
-<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询成绩高于全班平均分的记录</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">WHERE</span> sc.score <span class="operator">&gt;</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="built_in">AVG</span>(score) <span class="keyword">FROM</span> score</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询选择了数据库原理课程的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> name</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> sc.student_id</span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id</span><br><span class="line">    <span class="keyword">WHERE</span> c.name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询至少有一门成绩大于90分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> s.name</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">WHERE</span> sc.student_id <span class="operator">=</span> s.id</span><br><span class="line">      <span class="keyword">AND</span> sc.score <span class="operator">&gt;</span> <span class="number">90</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<h2 id="索引创建和使用建议"><a href="#索引创建和使用建议" class="headerlink" title="索引创建和使用建议"></a>索引创建和使用建议</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 给成绩表的学生ID建立索引，提升按学生查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_id <span class="keyword">ON</span> score(student_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给成绩表的课程ID建立索引，提升按课程查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_course_id <span class="keyword">ON</span> score(course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给学生姓名建立索引，提升按姓名精确查询的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 联合索引：适合同时按学生和课程查询成绩的场景</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_course <span class="keyword">ON</span> score(student_id, course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX idx_student_name <span class="keyword">ON</span> student;</span><br></pre></td></tr></table></figure>
-
-<p>联合索引要注意最左前缀原则。假设建立了<code>(student_id, course_id)</code>这个联合索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span> <span class="keyword">AND</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 通常不能完整使用这个联合索引，因为跳过了最左边的student_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
-
-<h2 id="EXPLAIN查看执行计划"><a href="#EXPLAIN查看执行计划" class="headerlink" title="EXPLAIN查看执行计划"></a>EXPLAIN查看执行计划</h2><p>EXPLAIN可以帮助我判断SQL到底有没有走索引，不能只靠感觉猜。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查看按学生ID查询成绩的执行计划</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看JOIN查询的执行计划</span></span><br><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
-
-<p>EXPLAIN里我现在重点看这几个字段：</p>
-<table>
-<thead>
-<tr>
-<th>字段</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>type</td>
-<td>访问类型，ALL通常表示全表扫描，ref、range一般比ALL好</td>
-</tr>
-<tr>
-<td>possible_keys</td>
-<td>可能用到的索引</td>
-</tr>
-<tr>
-<td>key</td>
-<td>实际使用的索引</td>
-</tr>
-<tr>
-<td>rows</td>
-<td>MySQL预估要扫描的行数</td>
-</tr>
-<tr>
-<td>Extra</td>
-<td>额外信息，比如Using index、Using where、Using filesort</td>
-</tr>
-</tbody></table>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 如果name没有索引，可能会全表扫描</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建立索引后，再观察key和rows的变化</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次系统整理MySQL基础增删改查之后，我最大的感受是：SQL真的是后端开发的基本功。以前写JDBC时，我只关心Java代码能不能跑通，现在才发现SQL本身才是和数据库沟通的核心。</p>
-<p>我需要牢记的几个点：</p>
-<ol>
-<li><strong>理解SQL执行顺序</strong>：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY。只有知道SQL先做什么、后做什么，才能写出正确的分组查询。</li>
-<li><strong>DELETE和TRUNCATE不能混用</strong>：DELETE适合按条件删除，也更容易配合事务；TRUNCATE适合清空整张表，但风险更高。</li>
-<li><strong>JOIN要先想清楚主表和关系</strong>：INNER JOIN看匹配，LEFT JOIN保留左表，RIGHT JOIN保留右表。</li>
-<li><strong>索引要合理使用</strong>：索引应该建在区分度高、经常查询、经常关联的列上，不是越多越好。</li>
-<li><strong>用EXPLAIN验证SQL</strong>：查询慢的时候，不要靠猜，要看执行计划。</li>
-</ol>
-<p>2018年10月的这个阶段，我觉得自己终于从“会照着写SQL”，开始慢慢变成“知道为什么这样写SQL”了。下一步准备继续学习事务、锁和隔离级别，这些应该会更接近真实项目里的数据库问题。</p>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>SQL</tag>
-        <tag>数据库</tag>
-        <tag>CRUD</tag>
-        <tag>索引</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JDBC连接MySQL实践</title>
     <url>/2018/09/15/2018-09-15-JDBC%E8%BF%9E%E6%8E%A5MySQL%E5%AE%9E%E8%B7%B5/</url>
     <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2018 年 9 月，我刚把 Java 基础和 MySQL 的常用语法系统学完。前面写 Java 时，大多是在控制台里打印结果；学 MySQL 时，也主要是在命令行或者图形化工具里执行 SQL。到了这个阶段，一个很自然的问题出现了：能不能用 Java 代码直接操作 MySQL 数据库？</p>
@@ -1346,10 +1177,179 @@
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>JDBC</tag>
+        <tag>MySQL</tag>
+        <tag>数据库连接</tag>
+        <tag>CRUD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL基础增删改查</title>
+    <url>/2018/10/28/2018-10-28-MySQL%E5%9F%BA%E7%A1%80%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5/</url>
+    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完JDBC之后，我意识到一个很严重的问题——我一直在“照着写”SQL，却从来没有真正理解过每条SQL背后的含义。JDBC教会了我怎么用Java连接数据库、怎么执行SQL、怎么处理ResultSet，但SQL本身呢？我只会照猫画虎地写几句SELECT和INSERT，稍微复杂一点的查询就抓瞎。</p>
+<p>这段时间我决定从头系统地学习SQL，从最基础的建表开始，到增删改查，再到多表关联、聚合函数、索引优化，一步一步把每个知识点搞清楚。这篇文章就是我在2018年10月学习MySQL基础CRUD的完整记录。</p>
+<p><img src="/images/posts/2018/mysql-crud-1.svg" alt="MySQL基础增删改查"></p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>在实际写SQL的过程中，我遇到了好几个一直没搞明白的问题：</p>
+<ol>
+<li><strong>DELETE和TRUNCATE到底有什么区别？</strong> 之前一直以为都是删数据，随便用哪个都行，结果有一次用TRUNCATE删完数据发现回不去了。</li>
+<li><strong>GROUP BY和HAVING总是写错</strong>，经常把过滤条件写在WHERE里，结果报错，搞不清什么时候该用WHERE、什么时候该用HAVING。</li>
+<li><strong>多表JOIN搞不清关系</strong>，INNER JOIN、LEFT JOIN、RIGHT JOIN到底返回什么数据，每次都要画图才能想明白。</li>
+<li><strong>索引加了但查询还是很慢</strong>，以为建了索引就万事大吉，结果有些查询根本没走索引。</li>
+<li><strong>不知道什么时候该建索引</strong>，哪些列该建、哪些不该建，完全没有概念。</li>
+</ol>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="DELETE和TRUNCATE的区别"><a href="#DELETE和TRUNCATE的区别" class="headerlink" title="DELETE和TRUNCATE的区别"></a>DELETE和TRUNCATE的区别</h2><p>这两个看起来都是“删数据”，但底层机制完全不同：</p>
+<table>
+<thead>
+<tr>
+<th>对比点</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>删除方式</td>
+<td>逐行删除</td>
+<td>清空并重建表结构</td>
+</tr>
+<tr>
+<td>SQL类型</td>
+<td>DML</td>
+<td>DDL</td>
+</tr>
+<tr>
+<td>是否可回滚</td>
+<td>在事务中可回滚</td>
+<td>通常不可回滚</td>
+</tr>
+<tr>
+<td>是否支持WHERE</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>自增ID</td>
+<td>一般不重置</td>
+<td>通常会重置</td>
+</tr>
+<tr>
+<td>执行速度</td>
+<td>数据量大时较慢</td>
+<td>通常更快</td>
+</tr>
+</tbody></table>
+<p>简单理解：DELETE是一行一行删，可以配合WHERE精确删除，也可以在事务中回滚；TRUNCATE更像是把表清空后重新整理，速度快，但风险也更高。</p>
+<h2 id="GROUP-BY和HAVING"><a href="#GROUP-BY和HAVING" class="headerlink" title="GROUP BY和HAVING"></a>GROUP BY和HAVING</h2><p>我之前经常把聚合条件写到WHERE里，例如想查平均分大于80的学生，却写成：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id;</span><br></pre></td></tr></table></figure>
+
+<p>这肯定是不对的，因为WHERE执行时还没有分组，自然也没有AVG(score)这个结果。正确写法应该是：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> student_id, <span class="built_in">AVG</span>(score)</span><br><span class="line"><span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> student_id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br></pre></td></tr></table></figure>
+
+<p>WHERE是在分组前过滤原始行，HAVING是在分组后过滤聚合结果。</p>
+<h2 id="JOIN类型的区别"><a href="#JOIN类型的区别" class="headerlink" title="JOIN类型的区别"></a>JOIN类型的区别</h2><p>JOIN最核心的不是语法，而是先搞清楚两张表之间的关系：</p>
+<ul>
+<li><strong>INNER JOIN</strong>：只返回两边都匹配的数据。</li>
+<li><strong>LEFT JOIN</strong>：左表全部保留，右表匹配不到的地方用NULL补齐。</li>
+<li><strong>RIGHT JOIN</strong>：右表全部保留，左表匹配不到的地方用NULL补齐。</li>
+</ul>
+<p>实际开发中我感觉LEFT JOIN用得更多，因为很多时候我们会以一张主表为中心，再去关联其它明细表。</p>
+<h2 id="索引不是万能的"><a href="#索引不是万能的" class="headerlink" title="索引不是万能的"></a>索引不是万能的</h2><p>索引像书的目录，可以帮助数据库快速定位数据。但它不是万能药，加了索引并不代表一定快：</p>
+<ul>
+<li>表数据量很小时，全表扫描可能更快。</li>
+<li>查询返回的数据太多时，走索引反而不划算。</li>
+<li>在索引列上使用函数，可能导致索引失效。</li>
+<li>LIKE以<code>%</code>开头时，通常无法利用普通索引。</li>
+<li>字段发生隐式类型转换时，也可能导致索引失效。</li>
+</ul>
+<h2 id="索引应该建在什么列上"><a href="#索引应该建在什么列上" class="headerlink" title="索引应该建在什么列上"></a>索引应该建在什么列上</h2><p>比较适合建索引的列：</p>
+<ul>
+<li>区分度高的列，比如学生ID、手机号、身份证号。</li>
+<li>经常出现在WHERE条件里的列。</li>
+<li>经常用于JOIN关联的外键列。</li>
+<li>经常用于ORDER BY或GROUP BY的列。</li>
+</ul>
+<p>不太适合建索引的列：</p>
+<ul>
+<li>区分度很低的列，比如性别。</li>
+<li>经常更新的列，因为维护索引也有成本。</li>
+<li>很少参与查询条件的列。</li>
+</ul>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="准备三张表"><a href="#准备三张表" class="headerlink" title="准备三张表"></a>准备三张表</h2><p>我用学生、课程、成绩三张表来练习，关系比较清晰：一个学生可以选择多门课程，一门课程也可以被多个学生选择，成绩表负责连接学生和课程。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 学生表：保存学生基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> student (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;姓名&#x27;</span>,</span><br><span class="line">    age <span class="type">INT</span> COMMENT <span class="string">&#x27;年龄&#x27;</span>,</span><br><span class="line">    gender <span class="type">VARCHAR</span>(<span class="number">10</span>) COMMENT <span class="string">&#x27;性别&#x27;</span>,</span><br><span class="line">    major <span class="type">VARCHAR</span>(<span class="number">50</span>) COMMENT <span class="string">&#x27;专业&#x27;</span>,</span><br><span class="line">    create_time DATETIME <span class="keyword">DEFAULT</span> <span class="built_in">CURRENT_TIMESTAMP</span> COMMENT <span class="string">&#x27;创建时间&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;学生表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 课程表：保存课程基本信息</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> course (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    name <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程名称&#x27;</span>,</span><br><span class="line">    credit <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学分&#x27;</span></span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;课程表&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 成绩表：保存学生和课程的对应关系以及成绩</span></span><br><span class="line"><span class="keyword">CREATE TABLE</span> score (</span><br><span class="line">    id <span class="type">INT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT COMMENT <span class="string">&#x27;成绩ID&#x27;</span>,</span><br><span class="line">    student_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;学生ID&#x27;</span>,</span><br><span class="line">    course_id <span class="type">INT</span> <span class="keyword">NOT NULL</span> COMMENT <span class="string">&#x27;课程ID&#x27;</span>,</span><br><span class="line">    score <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>) COMMENT <span class="string">&#x27;成绩&#x27;</span>,</span><br><span class="line">    exam_time <span class="type">DATE</span> COMMENT <span class="string">&#x27;考试日期&#x27;</span>,</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_student <span class="keyword">FOREIGN KEY</span> (student_id) <span class="keyword">REFERENCES</span> student(id),</span><br><span class="line">    <span class="keyword">CONSTRAINT</span> fk_score_course <span class="keyword">FOREIGN KEY</span> (course_id) <span class="keyword">REFERENCES</span> course(id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 COMMENT<span class="operator">=</span><span class="string">&#x27;成绩表&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="INSERT：新增数据"><a href="#INSERT：新增数据" class="headerlink" title="INSERT：新增数据"></a>INSERT：新增数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 新增学生数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> student (name, age, gender, major) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;张三&#x27;</span>, <span class="number">20</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;李四&#x27;</span>, <span class="number">21</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;软件工程&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;王五&#x27;</span>, <span class="number">19</span>, <span class="string">&#x27;男&#x27;</span>, <span class="string">&#x27;数据科学&#x27;</span>),</span><br><span class="line">(<span class="string">&#x27;赵六&#x27;</span>, <span class="number">22</span>, <span class="string">&#x27;女&#x27;</span>, <span class="string">&#x27;计算机科学&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增课程数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> course (name, credit) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="string">&#x27;数据库原理&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;数据结构&#x27;</span>, <span class="number">3</span>),</span><br><span class="line">(<span class="string">&#x27;操作系统&#x27;</span>, <span class="number">4</span>),</span><br><span class="line">(<span class="string">&#x27;计算机网络&#x27;</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 新增成绩数据</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> score (student_id, course_id, score, exam_time) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="number">1</span>, <span class="number">1</span>, <span class="number">92.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">1</span>, <span class="number">2</span>, <span class="number">88.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">1</span>, <span class="number">78.50</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="number">3</span>, <span class="number">95.00</span>, <span class="string">&#x27;2018-10-22&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">2</span>, <span class="number">66.00</span>, <span class="string">&#x27;2018-10-21&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="number">4</span>, <span class="number">72.50</span>, <span class="string">&#x27;2018-10-23&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">1</span>, <span class="number">85.00</span>, <span class="string">&#x27;2018-10-20&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="number">4</span>, <span class="number">90.00</span>, <span class="string">&#x27;2018-10-23&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="UPDATE：修改数据"><a href="#UPDATE：修改数据" class="headerlink" title="UPDATE：修改数据"></a>UPDATE：修改数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 修改张三的年龄</span></span><br><span class="line"><span class="keyword">UPDATE</span> student</span><br><span class="line"><span class="keyword">SET</span> age <span class="operator">=</span> <span class="number">21</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 修改数据库原理课程的学分</span></span><br><span class="line"><span class="keyword">UPDATE</span> course</span><br><span class="line"><span class="keyword">SET</span> credit <span class="operator">=</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给王五的所有成绩加5分</span></span><br><span class="line"><span class="keyword">UPDATE</span> score</span><br><span class="line"><span class="keyword">SET</span> score <span class="operator">=</span> score <span class="operator">+</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;王五&#x27;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="DELETE：删除数据"><a href="#DELETE：删除数据" class="headerlink" title="DELETE：删除数据"></a>DELETE：删除数据</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 删除低于60分的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> score <span class="operator">&lt;</span> <span class="number">60</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除某个学生的成绩记录</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score</span><br><span class="line"><span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除成绩表全部数据，可配合事务回滚</span></span><br><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> score;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 清空成绩表，不支持WHERE，风险更高</span></span><br><span class="line"><span class="keyword">TRUNCATE</span> <span class="keyword">TABLE</span> score;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SELECT：基础查询"><a href="#SELECT：基础查询" class="headerlink" title="SELECT：基础查询"></a>SELECT：基础查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询所有学生</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 只查询指定列</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age, major <span class="keyword">FROM</span> student;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 条件查询</span></span><br><span class="line"><span class="keyword">SELECT</span> name, age</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> major <span class="operator">=</span> <span class="string">&#x27;计算机科学&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 模糊查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 排序查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> age <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 分页查询：从第0条开始取10条</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student</span><br><span class="line">LIMIT <span class="number">0</span>, <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="多表JOIN查询"><a href="#多表JOIN查询" class="headerlink" title="多表JOIN查询"></a>多表JOIN查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- INNER JOIN：只查询有成绩的学生和课程</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- LEFT JOIN：查询所有学生，即使学生还没有成绩也会显示</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- RIGHT JOIN：以课程表为主，查询所有课程的选课成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<h2 id="聚合函数和GROUP-BY"><a href="#聚合函数和GROUP-BY" class="headerlink" title="聚合函数和GROUP BY"></a>聚合函数和GROUP BY</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询每个学生的平均成绩</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询平均成绩大于80分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    <span class="built_in">AVG</span>(sc.score) <span class="keyword">AS</span> avg_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> s.id, s.name</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">AVG</span>(sc.score) <span class="operator">&gt;</span> <span class="number">80</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询每门课程的选课人数、最高分和最低分</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    <span class="built_in">COUNT</span>(sc.id) <span class="keyword">AS</span> student_count,</span><br><span class="line">    <span class="built_in">MAX</span>(sc.score) <span class="keyword">AS</span> max_score,</span><br><span class="line">    <span class="built_in">MIN</span>(sc.score) <span class="keyword">AS</span> min_score</span><br><span class="line"><span class="keyword">FROM</span> course c</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> c.id <span class="operator">=</span> sc.course_id</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> c.id, c.name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查询成绩高于全班平均分的记录</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">WHERE</span> sc.score <span class="operator">&gt;</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="built_in">AVG</span>(score) <span class="keyword">FROM</span> score</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询选择了数据库原理课程的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> name</span><br><span class="line"><span class="keyword">FROM</span> student</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> sc.student_id</span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id</span><br><span class="line">    <span class="keyword">WHERE</span> c.name <span class="operator">=</span> <span class="string">&#x27;数据库原理&#x27;</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询至少有一门成绩大于90分的学生</span></span><br><span class="line"><span class="keyword">SELECT</span> s.name</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">FROM</span> score sc</span><br><span class="line">    <span class="keyword">WHERE</span> sc.student_id <span class="operator">=</span> s.id</span><br><span class="line">      <span class="keyword">AND</span> sc.score <span class="operator">&gt;</span> <span class="number">90</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h2 id="索引创建和使用建议"><a href="#索引创建和使用建议" class="headerlink" title="索引创建和使用建议"></a>索引创建和使用建议</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 给成绩表的学生ID建立索引，提升按学生查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_id <span class="keyword">ON</span> score(student_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给成绩表的课程ID建立索引，提升按课程查询成绩的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_course_id <span class="keyword">ON</span> score(course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给学生姓名建立索引，提升按姓名精确查询的速度</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 联合索引：适合同时按学生和课程查询成绩的场景</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_score_student_course <span class="keyword">ON</span> score(student_id, course_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> INDEX idx_student_name <span class="keyword">ON</span> student;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引要注意最左前缀原则。假设建立了<code>(student_id, course_id)</code>这个联合索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以使用联合索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span> <span class="keyword">AND</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 通常不能完整使用这个联合索引，因为跳过了最左边的student_id</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> course_id <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPLAIN查看执行计划"><a href="#EXPLAIN查看执行计划" class="headerlink" title="EXPLAIN查看执行计划"></a>EXPLAIN查看执行计划</h2><p>EXPLAIN可以帮助我判断SQL到底有没有走索引，不能只靠感觉猜。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 查看按学生ID查询成绩的执行计划</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> score <span class="keyword">WHERE</span> student_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看JOIN查询的执行计划</span></span><br><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    s.name <span class="keyword">AS</span> student_name,</span><br><span class="line">    c.name <span class="keyword">AS</span> course_name,</span><br><span class="line">    sc.score <span class="keyword">AS</span> exam_score</span><br><span class="line"><span class="keyword">FROM</span> student s</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> score sc <span class="keyword">ON</span> s.id <span class="operator">=</span> sc.student_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> course c <span class="keyword">ON</span> sc.course_id <span class="operator">=</span> c.id;</span><br></pre></td></tr></table></figure>
+
+<p>EXPLAIN里我现在重点看这几个字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>type</td>
+<td>访问类型，ALL通常表示全表扫描，ref、range一般比ALL好</td>
+</tr>
+<tr>
+<td>possible_keys</td>
+<td>可能用到的索引</td>
+</tr>
+<tr>
+<td>key</td>
+<td>实际使用的索引</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>MySQL预估要扫描的行数</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>额外信息，比如Using index、Using where、Using filesort</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 如果name没有索引，可能会全表扫描</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建立索引后，再观察key和rows的变化</span></span><br><span class="line"><span class="keyword">CREATE</span> INDEX idx_student_name <span class="keyword">ON</span> student(name);</span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student <span class="keyword">WHERE</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次系统整理MySQL基础增删改查之后，我最大的感受是：SQL真的是后端开发的基本功。以前写JDBC时，我只关心Java代码能不能跑通，现在才发现SQL本身才是和数据库沟通的核心。</p>
+<p>我需要牢记的几个点：</p>
+<ol>
+<li><strong>理解SQL执行顺序</strong>：FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY。只有知道SQL先做什么、后做什么，才能写出正确的分组查询。</li>
+<li><strong>DELETE和TRUNCATE不能混用</strong>：DELETE适合按条件删除，也更容易配合事务；TRUNCATE适合清空整张表，但风险更高。</li>
+<li><strong>JOIN要先想清楚主表和关系</strong>：INNER JOIN看匹配，LEFT JOIN保留左表，RIGHT JOIN保留右表。</li>
+<li><strong>索引要合理使用</strong>：索引应该建在区分度高、经常查询、经常关联的列上，不是越多越好。</li>
+<li><strong>用EXPLAIN验证SQL</strong>：查询慢的时候，不要靠猜，要看执行计划。</li>
+</ol>
+<p>2018年10月的这个阶段，我觉得自己终于从“会照着写SQL”，开始慢慢变成“知道为什么这样写SQL”了。下一步准备继续学习事务、锁和隔离级别，这些应该会更接近真实项目里的数据库问题。</p>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
         <tag>MySQL</tag>
         <tag>CRUD</tag>
-        <tag>JDBC</tag>
-        <tag>数据库连接</tag>
+        <tag>SQL</tag>
+        <tag>数据库</tag>
+        <tag>索引</tag>
       </tags>
   </entry>
   <entry>
@@ -1898,50 +1898,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Spring AOP初探</title>
-    <url>/2019/07/21/2019-07-21-Spring%20AOP%E5%88%9D%E6%8E%A2/</url>
-    <content><![CDATA[<p><img src="/images/posts/2019/spring-aop-cover.svg" alt="Spring AOP初探封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>AOP 是我接触到的第一个比较“绕”的框架思想，尤其是切点和通知，一开始很容易混。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-07 前后学习和实践 <strong>Spring AOP初探</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>切点表达式不会写</li>
-<li>前置通知和环绕通知执行顺序不清楚</li>
-<li>JDK 动态代理和 CGLIB 分不清</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>AOP 适合处理横切关注点，例如日志、权限、事务。它不是替代 OOP，而是补充 OOP 在横向逻辑复用上的不足。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LogAspect</span> &#123;</span><br><span class="line">    <span class="meta">@Pointcut(&quot;execution(* com.demo.service..*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">serviceMethods</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;serviceMethods()&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">logCost</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> joinPoint.proceed();</span><br><span class="line">        System.out.println(joinPoint.getSignature() + <span class="string">&quot; cost &quot;</span> + (System.currentTimeMillis() - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 Spring AOP初探 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-]]></content>
-      <categories>
-        <category>Spring</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
-        <tag>AOP</tag>
-        <tag>动态代理</tag>
-        <tag>切面编程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Spring MVC请求流程理解</title>
     <url>/2019/06/29/2019-06-29-Spring%20MVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E7%90%86%E8%A7%A3/</url>
     <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在能写 Controller 之后，我开始追问一个问题：请求到底是怎么一步步进入方法里的。</p>
@@ -1984,6 +1940,50 @@
         <tag>DispatcherServlet</tag>
         <tag>Controller</tag>
         <tag>请求流程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Spring AOP初探</title>
+    <url>/2019/07/21/2019-07-21-Spring%20AOP%E5%88%9D%E6%8E%A2/</url>
+    <content><![CDATA[<p><img src="/images/posts/2019/spring-aop-cover.svg" alt="Spring AOP初探封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>AOP 是我接触到的第一个比较“绕”的框架思想，尤其是切点和通知，一开始很容易混。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-07 前后学习和实践 <strong>Spring AOP初探</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>切点表达式不会写</li>
+<li>前置通知和环绕通知执行顺序不清楚</li>
+<li>JDK 动态代理和 CGLIB 分不清</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>AOP 适合处理横切关注点，例如日志、权限、事务。它不是替代 OOP，而是补充 OOP 在横向逻辑复用上的不足。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LogAspect</span> &#123;</span><br><span class="line">    <span class="meta">@Pointcut(&quot;execution(* com.demo.service..*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">serviceMethods</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;serviceMethods()&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">logCost</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Throwable &#123;</span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> joinPoint.proceed();</span><br><span class="line">        System.out.println(joinPoint.getSignature() + <span class="string">&quot; cost &quot;</span> + (System.currentTimeMillis() - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Spring AOP初探 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+]]></content>
+      <categories>
+        <category>Spring</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
+        <tag>AOP</tag>
+        <tag>动态代理</tag>
+        <tag>切面编程</tag>
       </tags>
   </entry>
   <entry>
@@ -2436,6 +2436,90 @@
       </tags>
   </entry>
   <entry>
+    <title>数据库设计经验总结</title>
+    <url>/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p>
+<blockquote>
+<p>数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。</p>
+</blockquote>
+<h2 id="先从业务事实开始"><a href="#先从业务事实开始" class="headerlink" title="先从业务事实开始"></a>先从业务事实开始</h2><p>设计订单表前，不急着列字段，先确认：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">订单由谁创建</span><br><span class="line">一个订单包含哪些商品</span><br><span class="line">金额在哪个时间点确定</span><br><span class="line">状态有哪些合法流转</span><br><span class="line">取消、退款和删除是否保留历史</span><br><span class="line">订单号是否需要对外展示</span><br><span class="line">查询主要按用户、状态还是时间</span><br><span class="line">预计数据量和保留年限</span><br></pre></td></tr></table></figure>
+
+<p>“用户可以买商品”不足以支撑表设计。金额是否允许调整、订单是否拆单、退款能否部分发生，都会改变数据模型。</p>
+<h2 id="1-主键和业务编号分开"><a href="#1-主键和业务编号分开" class="headerlink" title="1. 主键和业务编号分开"></a>1. 主键和业务编号分开</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status TINYINT UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    paid_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0.00</span>,</span><br><span class="line">    version <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_user_created (user_id, created_at),</span><br><span class="line">    KEY idx_status_created (status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
+
+<p><code>id</code> 是数据库内部主键，适合聚簇索引和关联；<code>order_no</code> 是稳定的业务编号，可以暴露给外部。不要把自增 ID 直接当公开订单号，也不要让一个过长随机字符串承担所有关联主键成本。</p>
+<p>业务编号生成要考虑全局唯一、趋势性、时钟回拨和信息泄露。使用雪花算法、号段或数据库序列都可以，但要明确失败和重复检测方式。</p>
+<h2 id="2-数据类型按语义选择"><a href="#2-数据类型按语义选择" class="headerlink" title="2. 数据类型按语义选择"></a>2. 数据类型按语义选择</h2><h3 id="金额"><a href="#金额" class="headerlink" title="金额"></a>金额</h3><p>使用 <code>DECIMAL</code> 或最小货币单位整数，不使用浮点数：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>同时记录币种时，金额精度不能假设永远是两位小数。跨币种系统需要专门的 Money 设计。</p>
+<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
+
+<p>团队必须约定数据库时区和应用转换方式。<code>TIMESTAMP</code> 与 <code>DATETIME</code> 的范围、时区行为不同，不能只因为示例常见就随意选择。</p>
+<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p><code>TINYINT</code> 节省空间，但数据库里看到 <code>3</code> 不直观。需要在代码、文档和数据字典中维护同一映射：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">10 CREATED</span><br><span class="line">20 PAID</span><br><span class="line">30 SHIPPED</span><br><span class="line">40 FINISHED</span><br><span class="line">90 CANCELLED</span><br></pre></td></tr></table></figure>
+
+<p>给状态值留间隔，后续可以插入中间状态。不要复用已经废弃的数字表示新含义，否则历史数据会被重新解释。</p>
+<h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>字段长度来自业务约束，而不是统一写 <code>VARCHAR(255)</code>。手机号、订单号、外部流水号的长度和字符集不同。超长正文放 <code>TEXT</code> 时，也要考虑是否真的需要频繁查询和索引。</p>
+<h2 id="3-NULL-和默认值要表达真实含义"><a href="#3-NULL-和默认值要表达真实含义" class="headerlink" title="3. NULL 和默认值要表达真实含义"></a>3. NULL 和默认值要表达真实含义</h2><p><code>NULL</code> 应该表示“未知或不存在”，不是“开发暂时没想好”。</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">paid_at = NULL：尚未支付</span><br><span class="line">cancel_reason = NULL：没有取消</span><br><span class="line">paid_amount = 0.00：已知支付金额为零</span><br></pre></td></tr></table></figure>
+
+<p>把所有字符串默认成空串，会让“未填写”和“明确为空”无法区分。反过来，所有字段都允许 NULL 也会把校验压力推给每个查询。</p>
+<h2 id="4-订单明细单独建表"><a href="#4-订单明细单独建表" class="headerlink" title="4. 订单明细单独建表"></a>4. 订单明细单独建表</h2><p>不要把商品列表保存成逗号字符串：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_item (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_name <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    unit_price <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    quantity <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    KEY idx_order_id (order_id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
+
+<p><code>sku_name</code> 和成交单价是下单时快照。商品后来改名或改价，历史订单仍应保持当时事实。是否同时保存规格、图片和税费，要根据展示和对账需求决定。</p>
+<h2 id="5-索引从查询模式出发"><a href="#5-索引从查询模式出发" class="headerlink" title="5. 索引从查询模式出发"></a>5. 索引从查询模式出发</h2><p>先列高频查询：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 用户订单列表</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, status, total_amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 待处理订单扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at</span><br><span class="line">LIMIT <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
+
+<p>对应索引 <code>(user_id, created_at)</code> 和 <code>(status, created_at)</code>。索引字段顺序要匹配过滤和排序，不是简单把区分度最高的字段放最前面。</p>
+<p>每个二级索引都会保存主键，并增加写入、存储和维护成本。下面几类索引需要重点检查：</p>
+<ul>
+<li>被联合索引前缀覆盖的重复索引。</li>
+<li>低区分度单列索引。</li>
+<li>为一次临时报表增加、长期无人使用的索引。</li>
+<li>包含过多长字符串的“万能覆盖索引”。</li>
+</ul>
+<p>上线前使用真实数据量查看执行计划，不能只在几十行测试数据上验证。</p>
+<h2 id="6-唯一约束是业务防线"><a href="#6-唯一约束是业务防线" class="headerlink" title="6. 唯一约束是业务防线"></a>6. 唯一约束是业务防线</h2><p>应用先查询“订单号是否存在”再插入，在并发下仍可能重复。数据库唯一索引提供最终保证：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_order_no (order_no)</span><br></pre></td></tr></table></figure>
+
+<p>幂等请求也可以建立唯一约束：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_user_request (user_id, request_id)</span><br></pre></td></tr></table></figure>
+
+<p>捕获唯一键冲突后，要查询并返回原业务结果，而不是统一转换成“系统异常”。</p>
+<h2 id="7-外键是否使用"><a href="#7-外键是否使用" class="headerlink" title="7. 外键是否使用"></a>7. 外键是否使用</h2><p>外键能保护引用完整性，但会增加迁移、写入和跨表操作约束。单体且表关系稳定时可以使用；高并发、分库分表或跨服务数据所有权场景通常由应用和对账保证。</p>
+<p>无论是否创建数据库外键，关系都必须明确：删除用户后订单如何保留，删除商品后订单快照是否还可展示。没有外键不代表没有约束。</p>
+<h2 id="8-逻辑删除不能滥用"><a href="#8-逻辑删除不能滥用" class="headerlink" title="8. 逻辑删除不能滥用"></a>8. 逻辑删除不能滥用</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">deleted TINYINT <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>逻辑删除方便恢复和审计，但会影响唯一索引、所有查询条件和数据量。订单通常不是“删除”，而是取消或关闭；用业务状态表达比统一 <code>deleted=1</code> 更准确。</p>
+<p>真正需要删除的临时数据，应有明确生命周期和归档任务。不要让所有表永久增长。</p>
+<h2 id="9-乐观锁和并发更新"><a href="#9-乐观锁和并发更新" class="headerlink" title="9. 乐观锁和并发更新"></a>9. 乐观锁和并发更新</h2><p>订单状态更新可以带版本号：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> order_info</span><br><span class="line"><span class="keyword">SET</span> status <span class="operator">=</span> ?, version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span>, updated_at <span class="operator">=</span> NOW(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
+
+<p>检查受影响行数，零行表示状态已变化或版本冲突。这样比先查后改更能保护合法状态流转。</p>
+<p>乐观锁不适合所有高冲突场景。冲突频繁时要重新审视业务串行化、队列或数据库锁策略。</p>
+<h2 id="10-表结构变更要可回退"><a href="#10-表结构变更要可回退" class="headerlink" title="10. 表结构变更要可回退"></a>10. 表结构变更要可回退</h2><p>开发环境能瞬间执行的 DDL，在线上大表可能锁表、占满磁盘或造成复制延迟。</p>
+<p>变更前确认：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">表大小和增长速度</span><br><span class="line">MySQL 版本及 Online DDL 能力</span><br><span class="line">新增索引的磁盘空间</span><br><span class="line">主从复制和延迟</span><br><span class="line">应用新旧版本兼容窗口</span><br><span class="line">失败后的回退方式</span><br></pre></td></tr></table></figure>
+
+<p>新增字段优先做到新旧代码都能运行：先加可兼容字段，再发布写入，再迁移历史数据，最后切换读取。不要把表变更和代码行为切换压在同一秒完成。</p>
+<h2 id="11-评审清单"><a href="#11-评审清单" class="headerlink" title="11. 评审清单"></a>11. 评审清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 表名和字段使用统一业务术语</span><br><span class="line">[ ] 主键与公开业务编号分离</span><br><span class="line">[ ] 金额、时间、状态类型符合语义</span><br><span class="line">[ ] NULL 与默认值有明确含义</span><br><span class="line">[ ] 唯一约束覆盖并发重复风险</span><br><span class="line">[ ] 索引来自真实查询和排序</span><br><span class="line">[ ] 历史快照不会被主数据变化污染</span><br><span class="line">[ ] 状态迁移和并发更新有保护</span><br><span class="line">[ ] 数据保留、归档和删除策略明确</span><br><span class="line">[ ] DDL 有容量评估和回退方案</span><br></pre></td></tr></table></figure>
+
+<p>好的数据库设计不是一次把未来所有字段都猜出来，而是准确表达当前业务事实，同时为常见演进保留空间。表结构越接近业务语言，后续查询、接口和故障排查就越少依赖口头解释。</p>
+]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>索引</tag>
+        <tag>数据库设计</tag>
+        <tag>表结构</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>代码规范的重要性</title>
     <url>/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/</url>
     <content><![CDATA[<p><img src="/images/posts/2020/code-style-cover.svg" alt="代码规范的重要性封面图"></p>
@@ -2519,90 +2603,6 @@
         <tag>代码规范</tag>
         <tag>Code Review</tag>
         <tag>可维护性</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据库设计经验总结</title>
-    <url>/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p>
-<blockquote>
-<p>数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。</p>
-</blockquote>
-<h2 id="先从业务事实开始"><a href="#先从业务事实开始" class="headerlink" title="先从业务事实开始"></a>先从业务事实开始</h2><p>设计订单表前，不急着列字段，先确认：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">订单由谁创建</span><br><span class="line">一个订单包含哪些商品</span><br><span class="line">金额在哪个时间点确定</span><br><span class="line">状态有哪些合法流转</span><br><span class="line">取消、退款和删除是否保留历史</span><br><span class="line">订单号是否需要对外展示</span><br><span class="line">查询主要按用户、状态还是时间</span><br><span class="line">预计数据量和保留年限</span><br></pre></td></tr></table></figure>
-
-<p>“用户可以买商品”不足以支撑表设计。金额是否允许调整、订单是否拆单、退款能否部分发生，都会改变数据模型。</p>
-<h2 id="1-主键和业务编号分开"><a href="#1-主键和业务编号分开" class="headerlink" title="1. 主键和业务编号分开"></a>1. 主键和业务编号分开</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status TINYINT UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    paid_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0.00</span>,</span><br><span class="line">    version <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_user_created (user_id, created_at),</span><br><span class="line">    KEY idx_status_created (status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
-
-<p><code>id</code> 是数据库内部主键，适合聚簇索引和关联；<code>order_no</code> 是稳定的业务编号，可以暴露给外部。不要把自增 ID 直接当公开订单号，也不要让一个过长随机字符串承担所有关联主键成本。</p>
-<p>业务编号生成要考虑全局唯一、趋势性、时钟回拨和信息泄露。使用雪花算法、号段或数据库序列都可以，但要明确失败和重复检测方式。</p>
-<h2 id="2-数据类型按语义选择"><a href="#2-数据类型按语义选择" class="headerlink" title="2. 数据类型按语义选择"></a>2. 数据类型按语义选择</h2><h3 id="金额"><a href="#金额" class="headerlink" title="金额"></a>金额</h3><p>使用 <code>DECIMAL</code> 或最小货币单位整数，不使用浮点数：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
-
-<p>同时记录币种时，金额精度不能假设永远是两位小数。跨币种系统需要专门的 Money 设计。</p>
-<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
-
-<p>团队必须约定数据库时区和应用转换方式。<code>TIMESTAMP</code> 与 <code>DATETIME</code> 的范围、时区行为不同，不能只因为示例常见就随意选择。</p>
-<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p><code>TINYINT</code> 节省空间，但数据库里看到 <code>3</code> 不直观。需要在代码、文档和数据字典中维护同一映射：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">10 CREATED</span><br><span class="line">20 PAID</span><br><span class="line">30 SHIPPED</span><br><span class="line">40 FINISHED</span><br><span class="line">90 CANCELLED</span><br></pre></td></tr></table></figure>
-
-<p>给状态值留间隔，后续可以插入中间状态。不要复用已经废弃的数字表示新含义，否则历史数据会被重新解释。</p>
-<h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>字段长度来自业务约束，而不是统一写 <code>VARCHAR(255)</code>。手机号、订单号、外部流水号的长度和字符集不同。超长正文放 <code>TEXT</code> 时，也要考虑是否真的需要频繁查询和索引。</p>
-<h2 id="3-NULL-和默认值要表达真实含义"><a href="#3-NULL-和默认值要表达真实含义" class="headerlink" title="3. NULL 和默认值要表达真实含义"></a>3. NULL 和默认值要表达真实含义</h2><p><code>NULL</code> 应该表示“未知或不存在”，不是“开发暂时没想好”。</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">paid_at = NULL：尚未支付</span><br><span class="line">cancel_reason = NULL：没有取消</span><br><span class="line">paid_amount = 0.00：已知支付金额为零</span><br></pre></td></tr></table></figure>
-
-<p>把所有字符串默认成空串，会让“未填写”和“明确为空”无法区分。反过来，所有字段都允许 NULL 也会把校验压力推给每个查询。</p>
-<h2 id="4-订单明细单独建表"><a href="#4-订单明细单独建表" class="headerlink" title="4. 订单明细单独建表"></a>4. 订单明细单独建表</h2><p>不要把商品列表保存成逗号字符串：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_item (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_name <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    unit_price <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    quantity <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    KEY idx_order_id (order_id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
-
-<p><code>sku_name</code> 和成交单价是下单时快照。商品后来改名或改价，历史订单仍应保持当时事实。是否同时保存规格、图片和税费，要根据展示和对账需求决定。</p>
-<h2 id="5-索引从查询模式出发"><a href="#5-索引从查询模式出发" class="headerlink" title="5. 索引从查询模式出发"></a>5. 索引从查询模式出发</h2><p>先列高频查询：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 用户订单列表</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, status, total_amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 待处理订单扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at</span><br><span class="line">LIMIT <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
-
-<p>对应索引 <code>(user_id, created_at)</code> 和 <code>(status, created_at)</code>。索引字段顺序要匹配过滤和排序，不是简单把区分度最高的字段放最前面。</p>
-<p>每个二级索引都会保存主键，并增加写入、存储和维护成本。下面几类索引需要重点检查：</p>
-<ul>
-<li>被联合索引前缀覆盖的重复索引。</li>
-<li>低区分度单列索引。</li>
-<li>为一次临时报表增加、长期无人使用的索引。</li>
-<li>包含过多长字符串的“万能覆盖索引”。</li>
-</ul>
-<p>上线前使用真实数据量查看执行计划，不能只在几十行测试数据上验证。</p>
-<h2 id="6-唯一约束是业务防线"><a href="#6-唯一约束是业务防线" class="headerlink" title="6. 唯一约束是业务防线"></a>6. 唯一约束是业务防线</h2><p>应用先查询“订单号是否存在”再插入，在并发下仍可能重复。数据库唯一索引提供最终保证：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_order_no (order_no)</span><br></pre></td></tr></table></figure>
-
-<p>幂等请求也可以建立唯一约束：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_user_request (user_id, request_id)</span><br></pre></td></tr></table></figure>
-
-<p>捕获唯一键冲突后，要查询并返回原业务结果，而不是统一转换成“系统异常”。</p>
-<h2 id="7-外键是否使用"><a href="#7-外键是否使用" class="headerlink" title="7. 外键是否使用"></a>7. 外键是否使用</h2><p>外键能保护引用完整性，但会增加迁移、写入和跨表操作约束。单体且表关系稳定时可以使用；高并发、分库分表或跨服务数据所有权场景通常由应用和对账保证。</p>
-<p>无论是否创建数据库外键，关系都必须明确：删除用户后订单如何保留，删除商品后订单快照是否还可展示。没有外键不代表没有约束。</p>
-<h2 id="8-逻辑删除不能滥用"><a href="#8-逻辑删除不能滥用" class="headerlink" title="8. 逻辑删除不能滥用"></a>8. 逻辑删除不能滥用</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">deleted TINYINT <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<p>逻辑删除方便恢复和审计，但会影响唯一索引、所有查询条件和数据量。订单通常不是“删除”，而是取消或关闭；用业务状态表达比统一 <code>deleted=1</code> 更准确。</p>
-<p>真正需要删除的临时数据，应有明确生命周期和归档任务。不要让所有表永久增长。</p>
-<h2 id="9-乐观锁和并发更新"><a href="#9-乐观锁和并发更新" class="headerlink" title="9. 乐观锁和并发更新"></a>9. 乐观锁和并发更新</h2><p>订单状态更新可以带版本号：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> order_info</span><br><span class="line"><span class="keyword">SET</span> status <span class="operator">=</span> ?, version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span>, updated_at <span class="operator">=</span> NOW(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
-
-<p>检查受影响行数，零行表示状态已变化或版本冲突。这样比先查后改更能保护合法状态流转。</p>
-<p>乐观锁不适合所有高冲突场景。冲突频繁时要重新审视业务串行化、队列或数据库锁策略。</p>
-<h2 id="10-表结构变更要可回退"><a href="#10-表结构变更要可回退" class="headerlink" title="10. 表结构变更要可回退"></a>10. 表结构变更要可回退</h2><p>开发环境能瞬间执行的 DDL，在线上大表可能锁表、占满磁盘或造成复制延迟。</p>
-<p>变更前确认：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">表大小和增长速度</span><br><span class="line">MySQL 版本及 Online DDL 能力</span><br><span class="line">新增索引的磁盘空间</span><br><span class="line">主从复制和延迟</span><br><span class="line">应用新旧版本兼容窗口</span><br><span class="line">失败后的回退方式</span><br></pre></td></tr></table></figure>
-
-<p>新增字段优先做到新旧代码都能运行：先加可兼容字段，再发布写入，再迁移历史数据，最后切换读取。不要把表变更和代码行为切换压在同一秒完成。</p>
-<h2 id="11-评审清单"><a href="#11-评审清单" class="headerlink" title="11. 评审清单"></a>11. 评审清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 表名和字段使用统一业务术语</span><br><span class="line">[ ] 主键与公开业务编号分离</span><br><span class="line">[ ] 金额、时间、状态类型符合语义</span><br><span class="line">[ ] NULL 与默认值有明确含义</span><br><span class="line">[ ] 唯一约束覆盖并发重复风险</span><br><span class="line">[ ] 索引来自真实查询和排序</span><br><span class="line">[ ] 历史快照不会被主数据变化污染</span><br><span class="line">[ ] 状态迁移和并发更新有保护</span><br><span class="line">[ ] 数据保留、归档和删除策略明确</span><br><span class="line">[ ] DDL 有容量评估和回退方案</span><br></pre></td></tr></table></figure>
-
-<p>好的数据库设计不是一次把未来所有字段都猜出来，而是准确表达当前业务事实，同时为常见演进保留空间。表结构越接近业务语言，后续查询、接口和故障排查就越少依赖口头解释。</p>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>索引</tag>
-        <tag>数据库设计</tag>
-        <tag>表结构</tag>
       </tags>
   </entry>
   <entry>
@@ -3557,103 +3557,6 @@
       </tags>
   </entry>
   <entry>
-    <title>线上问题排查记录</title>
-    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
-<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
-<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
-<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
-
-<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
-<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
-<p>当时群里很快出现了几个猜测：</p>
-<ul>
-<li>刚发布的新版本有问题。</li>
-<li>数据库变慢。</li>
-<li>网络波动。</li>
-<li>线程池满了。</li>
-</ul>
-<p>值班负责人先把内容分成事实和假设：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
-
-<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
-<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
-
-<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
-<p>日志中的共同异常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
-
-<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
-<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
-
-<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
-<p>连接池指标显示：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
-
-<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
-<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
-<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
-<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
-<ol>
-<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
-<li>摘除两个异常实例，不再接收新请求。</li>
-<li>等待和终止已确认无业务写入的导出任务。</li>
-<li>逐个重启异常实例并完成健康检查。</li>
-<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
-</ol>
-<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
-<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
-<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
-
-<p>数据库查询改为每批 500 条：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
-<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
-
-<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
-<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
-<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
-<li>导出改为异步分页任务。</li>
-<li>设置导出并发上限和单用户频率限制。</li>
-<li>补充 1 万条数据的集成测试。</li>
-<li>连接池等待数进入告警。</li>
-</ul>
-<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
-<li>建立外部调用统一超时配置。</li>
-<li>Review 清单增加“事务中是否包含远程调用”。</li>
-<li>发布看板增加连接池、线程池和下游耗时。</li>
-<li>为大批量任务建立独立执行资源。</li>
-</ul>
-<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
-<li>导出任务平均和最大处理时间。</li>
-<li>每批数据大小是否需要调整。</li>
-<li>客户批量接口的失败和限流情况。</li>
-</ul>
-<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
-<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
-
-<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
-]]></content>
-      <categories>
-        <category>问题排查</category>
-      </categories>
-      <tags>
-        <tag>线上问题</tag>
-        <tag>故障排查</tag>
-        <tag>日志</tag>
-        <tag>复盘</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>开发与测试协作经验</title>
     <url>/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/</url>
     <content><![CDATA[<p><img src="/images/posts/2020/dev-test-collaboration-cover.svg" alt="开发与测试协作经验封面图"></p>
@@ -3784,6 +3687,103 @@
         <tag>Bug管理</tag>
         <tag>质量保障</tag>
         <tag>项目协作</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线上问题排查记录</title>
+    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
+<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
+<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
+
+<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
+<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
+<p>当时群里很快出现了几个猜测：</p>
+<ul>
+<li>刚发布的新版本有问题。</li>
+<li>数据库变慢。</li>
+<li>网络波动。</li>
+<li>线程池满了。</li>
+</ul>
+<p>值班负责人先把内容分成事实和假设：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
+
+<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
+<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
+
+<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
+<p>日志中的共同异常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
+
+<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
+<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+
+<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
+<p>连接池指标显示：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
+
+<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
+<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
+<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
+<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
+<ol>
+<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
+<li>摘除两个异常实例，不再接收新请求。</li>
+<li>等待和终止已确认无业务写入的导出任务。</li>
+<li>逐个重启异常实例并完成健康检查。</li>
+<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
+</ol>
+<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
+<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
+<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
+
+<p>数据库查询改为每批 500 条：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
+<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
+
+<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
+<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
+<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
+<li>导出改为异步分页任务。</li>
+<li>设置导出并发上限和单用户频率限制。</li>
+<li>补充 1 万条数据的集成测试。</li>
+<li>连接池等待数进入告警。</li>
+</ul>
+<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
+<li>建立外部调用统一超时配置。</li>
+<li>Review 清单增加“事务中是否包含远程调用”。</li>
+<li>发布看板增加连接池、线程池和下游耗时。</li>
+<li>为大批量任务建立独立执行资源。</li>
+</ul>
+<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
+<li>导出任务平均和最大处理时间。</li>
+<li>每批数据大小是否需要调整。</li>
+<li>客户批量接口的失败和限流情况。</li>
+</ul>
+<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
+<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
+
+<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
+]]></content>
+      <categories>
+        <category>问题排查</category>
+      </categories>
+      <tags>
+        <tag>线上问题</tag>
+        <tag>故障排查</tag>
+        <tag>日志</tag>
+        <tag>复盘</tag>
       </tags>
   </entry>
   <entry>
@@ -4003,119 +4003,6 @@
       </tags>
   </entry>
   <entry>
-    <title>MySQL慢查询分析</title>
-    <url>/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/</url>
-    <content><![CDATA[<p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
-<p>这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。</p>
-<p>测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。</p>
-<h2 id="实验对象"><a href="#实验对象" class="headerlink" title="实验对象"></a>实验对象</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>表上原有索引：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">KEY idx_tenant (tenant_id),</span><br><span class="line">KEY idx_status (status),</span><br><span class="line">KEY idx_created_at (created_at)</span><br></pre></td></tr></table></figure>
-
-<p>三个查询字段分别有索引，很容易产生“应该不会慢”的判断。但 MySQL 通常不会把三个单列索引自动组合成最符合过滤和排序的访问路径。</p>
-<h2 id="先固定实验方法"><a href="#先固定实验方法" class="headerlink" title="先固定实验方法"></a>先固定实验方法</h2><p>为了让结果可比较，我约定：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">数据库版本：MySQL 5.7</span><br><span class="line">数据快照：同一份脱敏数据</span><br><span class="line">结果数量：固定 50</span><br><span class="line">每个方案：预热 2 次，记录后续 5 次</span><br><span class="line">同时记录：耗时、Rows_examined、执行计划、CPU</span><br><span class="line">每轮之间：不修改其他参数</span><br></pre></td></tr></table></figure>
-
-<p>缓存冷暖会显著影响耗时，所以不能拿第一次查询和第十次查询直接比较。生产问题还要从慢查询日志确认真实频率：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line"># Query_time: 2.846  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 50  Rows_examined: 1184297</span><br></pre></td></tr></table></figure>
-
-<p>只返回 50 行却扫描 118 万行，是比单次 2.8 秒更稳定的信号。</p>
-<p>慢查询日志的全局开关会影响数据库行为，应由数据库管理员按规范操作。排查人员优先读取现有平台和日志，不在生产随意执行 <code>SET GLOBAL</code>。</p>
-<h2 id="基线：执行计划在做什么"><a href="#基线：执行计划在做什么" class="headerlink" title="基线：执行计划在做什么"></a>基线：执行计划在做什么</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>精简后的结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: range</span><br><span class="line">possible_keys: idx_tenant,idx_status,idx_created_at</span><br><span class="line">key: idx_status</span><br><span class="line">rows: 1120000</span><br><span class="line">Extra: Using index condition; Using where; Using filesort</span><br></pre></td></tr></table></figure>
-
-<p>这里重点看四项：</p>
-<ol>
-<li><code>key</code>：实际选择了哪个索引。</li>
-<li><code>rows</code>：优化器估算要检查多少行。</li>
-<li><code>Using where</code>：取出索引记录后仍需过滤。</li>
-<li><code>Using filesort</code>：结果顺序无法直接由当前索引满足。</li>
-</ol>
-<p><code>type=range</code> 不代表一定高效。状态 <code>PAID</code> 在全表中占比很高，先按状态扫描仍会读取大量不属于租户 1001 的记录。</p>
-<h2 id="假设-A：只强制使用租户索引"><a href="#假设-A：只强制使用租户索引" class="headerlink" title="假设 A：只强制使用租户索引"></a>假设 A：只强制使用租户索引</h2><p>为了验证选择性，我在隔离环境使用 <code>FORCE INDEX</code> 做对照：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>扫描从约 112 万行下降到 31 万行，平均耗时从 2.8 秒下降到 0.9 秒，但仍需要过滤和排序。</p>
-<p>这个实验说明 <code>tenant_id</code> 比 <code>status</code> 更有选择性，不说明应该把 <code>FORCE INDEX</code> 写进业务 SQL。数据分布变化后，强制策略可能比优化器更差。</p>
-<h2 id="假设-B：建立符合查询顺序的联合索引"><a href="#假设-B：建立符合查询顺序的联合索引" class="headerlink" title="假设 B：建立符合查询顺序的联合索引"></a>假设 B：建立符合查询顺序的联合索引</h2><p>查询模式是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id：等值</span><br><span class="line">status：等值</span><br><span class="line">created_at：范围 + 倒序</span><br></pre></td></tr></table></figure>
-
-<p>因此实验索引为：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
-
-<p>在生产执行该 DDL 前，必须确认数据库版本、在线 DDL 能力、表大小、额外磁盘、锁等待和复制延迟，并准备中止与回退方案。</p>
-<p>新执行计划：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: range</span><br><span class="line">key: idx_tenant_status_created</span><br><span class="line">rows: 41862</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
-
-<p><code>Using filesort</code> 消失。因为前两列是等值条件，MySQL 可以沿 <code>created_at</code> 的索引顺序取最近记录，并在满足 <code>LIMIT 50</code> 后尽早停止。</p>
-<p>五次记录：</p>
-<table>
-<thead>
-<tr>
-<th>方案</th>
-<th align="right">平均耗时</th>
-<th align="right">P95</th>
-<th align="right">Rows_examined</th>
-<th>filesort</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>原始索引</td>
-<td align="right">2.81s</td>
-<td align="right">3.06s</td>
-<td align="right">1,184,297</td>
-<td>是</td>
-</tr>
-<tr>
-<td>强制租户索引</td>
-<td align="right">0.91s</td>
-<td align="right">1.02s</td>
-<td align="right">312,460</td>
-<td>是</td>
-</tr>
-<tr>
-<td>联合索引</td>
-<td align="right">43ms</td>
-<td align="right">58ms</td>
-<td align="right">50</td>
-<td>否</td>
-</tr>
-</tbody></table>
-<p>慢查询日志里的实际 <code>Rows_examined</code> 比 <code>EXPLAIN rows</code> 更能反映本次执行。执行计划的 <code>rows</code> 是估算值，两者不应混为一谈。</p>
-<h2 id="假设-C：把所有返回列都塞进索引"><a href="#假设-C：把所有返回列都塞进索引" class="headerlink" title="假设 C：把所有返回列都塞进索引"></a>假设 C：把所有返回列都塞进索引</h2><p>有人提出把 <code>order_no</code> 和 <code>amount</code> 也加到索引，做成覆盖索引。实验中查询确实少了回表，但收益只有几毫秒，索引体积和写入成本却继续增加。</p>
-<p>这个接口只读取 50 行，回表 50 次并不是主要矛盾。最终没有扩大索引。</p>
-<p>覆盖索引适合返回列少、调用频繁、扫描量明显的场景。不能为了让 <code>Extra</code> 出现 <code>Using index</code>，就把大字段和大量业务字段都加入索引。</p>
-<h2 id="假设-D：去掉时间条件会怎样"><a href="#假设-D：去掉时间条件会怎样" class="headerlink" title="假设 D：去掉时间条件会怎样"></a>假设 D：去掉时间条件会怎样</h2><p>另一个接口复用了相同 SQL，但允许用户查询全部历史。去掉 <code>created_at</code> 条件后，联合索引仍能根据租户和状态定位，并按时间取前 50 条，因此首页仍然很快。</p>
-<p>问题出现在深分页：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>数据库必须跳过前 20 万条，耗时重新上升。解决方式不是继续加索引，而是改成游标：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (created_at <span class="operator">&lt;</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span></span><br><span class="line">       <span class="keyword">OR</span> (created_at <span class="operator">=</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span> <span class="keyword">AND</span> id <span class="operator">&lt;</span> <span class="number">2918172</span>))</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>为了让排序稳定，正式方案将 <code>id</code> 放到索引末尾并作为游标的一部分。仅按时间分页时，相同时间的记录可能重复或遗漏。</p>
-<h2 id="索引上线前后分别验证"><a href="#索引上线前后分别验证" class="headerlink" title="索引上线前后分别验证"></a>索引上线前后分别验证</h2><p>上线前：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] SQL 来自真实慢日志，不是凭印象优化</span><br><span class="line">[ ] 数据分布和生产相近</span><br><span class="line">[ ] 联合索引顺序匹配过滤与排序</span><br><span class="line">[ ] 检查已有重复索引</span><br><span class="line">[ ] 评估索引大小、写放大和复制延迟</span><br><span class="line">[ ] 准备 DDL 观察与中止方案</span><br></pre></td></tr></table></figure>
-
-<p>上线后：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 实际执行计划使用预期索引</span><br><span class="line">[ ] Rows_examined 与耗时下降</span><br><span class="line">[ ] 数据库 CPU 和 IO 没有异常上升</span><br><span class="line">[ ] INSERT、UPDATE 延迟仍在基线内</span><br><span class="line">[ ] 主从延迟正常</span><br><span class="line">[ ] 一周后复核真实查询分布</span><br></pre></td></tr></table></figure>
-
-<p>这次优化最有价值的并不是“加了一个联合索引”，而是验证过程：先用真实慢日志建立基线，再用单列索引实验理解选择性，最后让索引顺序匹配查询模式，并拒绝收益很小的过宽覆盖索引。</p>
-<p>执行计划不是一张及格证。只有扫描量、响应时间、写入成本和真实业务负载一起改善，这次调优才算完成。</p>
-]]></content>
-      <categories>
-        <category>故障排查</category>
-      </categories>
-      <tags>
-        <tag>MySQL</tag>
-        <tag>索引</tag>
-        <tag>慢查询</tag>
-        <tag>SQL优化</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>一次接口超时问题排查</title>
     <url>/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</url>
     <content><![CDATA[<p><img src="/images/posts/2021/api-timeout-cover.svg" alt="一次接口超时问题排查技术图"></p>
@@ -4249,6 +4136,119 @@
         <tag>故障排查</tag>
         <tag>接口超时</tag>
         <tag>性能分析</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySQL慢查询分析</title>
+    <url>/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/</url>
+    <content><![CDATA[<p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
+<p>这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。</p>
+<p>测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。</p>
+<h2 id="实验对象"><a href="#实验对象" class="headerlink" title="实验对象"></a>实验对象</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>表上原有索引：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">KEY idx_tenant (tenant_id),</span><br><span class="line">KEY idx_status (status),</span><br><span class="line">KEY idx_created_at (created_at)</span><br></pre></td></tr></table></figure>
+
+<p>三个查询字段分别有索引，很容易产生“应该不会慢”的判断。但 MySQL 通常不会把三个单列索引自动组合成最符合过滤和排序的访问路径。</p>
+<h2 id="先固定实验方法"><a href="#先固定实验方法" class="headerlink" title="先固定实验方法"></a>先固定实验方法</h2><p>为了让结果可比较，我约定：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">数据库版本：MySQL 5.7</span><br><span class="line">数据快照：同一份脱敏数据</span><br><span class="line">结果数量：固定 50</span><br><span class="line">每个方案：预热 2 次，记录后续 5 次</span><br><span class="line">同时记录：耗时、Rows_examined、执行计划、CPU</span><br><span class="line">每轮之间：不修改其他参数</span><br></pre></td></tr></table></figure>
+
+<p>缓存冷暖会显著影响耗时，所以不能拿第一次查询和第十次查询直接比较。生产问题还要从慢查询日志确认真实频率：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line"># Query_time: 2.846  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 50  Rows_examined: 1184297</span><br></pre></td></tr></table></figure>
+
+<p>只返回 50 行却扫描 118 万行，是比单次 2.8 秒更稳定的信号。</p>
+<p>慢查询日志的全局开关会影响数据库行为，应由数据库管理员按规范操作。排查人员优先读取现有平台和日志，不在生产随意执行 <code>SET GLOBAL</code>。</p>
+<h2 id="基线：执行计划在做什么"><a href="#基线：执行计划在做什么" class="headerlink" title="基线：执行计划在做什么"></a>基线：执行计划在做什么</h2><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>精简后的结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: range</span><br><span class="line">possible_keys: idx_tenant,idx_status,idx_created_at</span><br><span class="line">key: idx_status</span><br><span class="line">rows: 1120000</span><br><span class="line">Extra: Using index condition; Using where; Using filesort</span><br></pre></td></tr></table></figure>
+
+<p>这里重点看四项：</p>
+<ol>
+<li><code>key</code>：实际选择了哪个索引。</li>
+<li><code>rows</code>：优化器估算要检查多少行。</li>
+<li><code>Using where</code>：取出索引记录后仍需过滤。</li>
+<li><code>Using filesort</code>：结果顺序无法直接由当前索引满足。</li>
+</ol>
+<p><code>type=range</code> 不代表一定高效。状态 <code>PAID</code> 在全表中占比很高，先按状态扫描仍会读取大量不属于租户 1001 的记录。</p>
+<h2 id="假设-A：只强制使用租户索引"><a href="#假设-A：只强制使用租户索引" class="headerlink" title="假设 A：只强制使用租户索引"></a>假设 A：只强制使用租户索引</h2><p>为了验证选择性，我在隔离环境使用 <code>FORCE INDEX</code> 做对照：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>扫描从约 112 万行下降到 31 万行，平均耗时从 2.8 秒下降到 0.9 秒，但仍需要过滤和排序。</p>
+<p>这个实验说明 <code>tenant_id</code> 比 <code>status</code> 更有选择性，不说明应该把 <code>FORCE INDEX</code> 写进业务 SQL。数据分布变化后，强制策略可能比优化器更差。</p>
+<h2 id="假设-B：建立符合查询顺序的联合索引"><a href="#假设-B：建立符合查询顺序的联合索引" class="headerlink" title="假设 B：建立符合查询顺序的联合索引"></a>假设 B：建立符合查询顺序的联合索引</h2><p>查询模式是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">tenant_id：等值</span><br><span class="line">status：等值</span><br><span class="line">created_at：范围 + 倒序</span><br></pre></td></tr></table></figure>
+
+<p>因此实验索引为：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>在生产执行该 DDL 前，必须确认数据库版本、在线 DDL 能力、表大小、额外磁盘、锁等待和复制延迟，并准备中止与回退方案。</p>
+<p>新执行计划：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">type: range</span><br><span class="line">key: idx_tenant_status_created</span><br><span class="line">rows: 41862</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
+
+<p><code>Using filesort</code> 消失。因为前两列是等值条件，MySQL 可以沿 <code>created_at</code> 的索引顺序取最近记录，并在满足 <code>LIMIT 50</code> 后尽早停止。</p>
+<p>五次记录：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th align="right">平均耗时</th>
+<th align="right">P95</th>
+<th align="right">Rows_examined</th>
+<th>filesort</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始索引</td>
+<td align="right">2.81s</td>
+<td align="right">3.06s</td>
+<td align="right">1,184,297</td>
+<td>是</td>
+</tr>
+<tr>
+<td>强制租户索引</td>
+<td align="right">0.91s</td>
+<td align="right">1.02s</td>
+<td align="right">312,460</td>
+<td>是</td>
+</tr>
+<tr>
+<td>联合索引</td>
+<td align="right">43ms</td>
+<td align="right">58ms</td>
+<td align="right">50</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>慢查询日志里的实际 <code>Rows_examined</code> 比 <code>EXPLAIN rows</code> 更能反映本次执行。执行计划的 <code>rows</code> 是估算值，两者不应混为一谈。</p>
+<h2 id="假设-C：把所有返回列都塞进索引"><a href="#假设-C：把所有返回列都塞进索引" class="headerlink" title="假设 C：把所有返回列都塞进索引"></a>假设 C：把所有返回列都塞进索引</h2><p>有人提出把 <code>order_no</code> 和 <code>amount</code> 也加到索引，做成覆盖索引。实验中查询确实少了回表，但收益只有几毫秒，索引体积和写入成本却继续增加。</p>
+<p>这个接口只读取 50 行，回表 50 次并不是主要矛盾。最终没有扩大索引。</p>
+<p>覆盖索引适合返回列少、调用频繁、扫描量明显的场景。不能为了让 <code>Extra</code> 出现 <code>Using index</code>，就把大字段和大量业务字段都加入索引。</p>
+<h2 id="假设-D：去掉时间条件会怎样"><a href="#假设-D：去掉时间条件会怎样" class="headerlink" title="假设 D：去掉时间条件会怎样"></a>假设 D：去掉时间条件会怎样</h2><p>另一个接口复用了相同 SQL，但允许用户查询全部历史。去掉 <code>created_at</code> 条件后，联合索引仍能根据租户和状态定位，并按时间取前 50 条，因此首页仍然很快。</p>
+<p>问题出现在深分页：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>数据库必须跳过前 20 万条，耗时重新上升。解决方式不是继续加索引，而是改成游标：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (created_at <span class="operator">&lt;</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span></span><br><span class="line">       <span class="keyword">OR</span> (created_at <span class="operator">=</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span> <span class="keyword">AND</span> id <span class="operator">&lt;</span> <span class="number">2918172</span>))</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>为了让排序稳定，正式方案将 <code>id</code> 放到索引末尾并作为游标的一部分。仅按时间分页时，相同时间的记录可能重复或遗漏。</p>
+<h2 id="索引上线前后分别验证"><a href="#索引上线前后分别验证" class="headerlink" title="索引上线前后分别验证"></a>索引上线前后分别验证</h2><p>上线前：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] SQL 来自真实慢日志，不是凭印象优化</span><br><span class="line">[ ] 数据分布和生产相近</span><br><span class="line">[ ] 联合索引顺序匹配过滤与排序</span><br><span class="line">[ ] 检查已有重复索引</span><br><span class="line">[ ] 评估索引大小、写放大和复制延迟</span><br><span class="line">[ ] 准备 DDL 观察与中止方案</span><br></pre></td></tr></table></figure>
+
+<p>上线后：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 实际执行计划使用预期索引</span><br><span class="line">[ ] Rows_examined 与耗时下降</span><br><span class="line">[ ] 数据库 CPU 和 IO 没有异常上升</span><br><span class="line">[ ] INSERT、UPDATE 延迟仍在基线内</span><br><span class="line">[ ] 主从延迟正常</span><br><span class="line">[ ] 一周后复核真实查询分布</span><br></pre></td></tr></table></figure>
+
+<p>这次优化最有价值的并不是“加了一个联合索引”，而是验证过程：先用真实慢日志建立基线，再用单列索引实验理解选择性，最后让索引顺序匹配查询模式，并拒绝收益很小的过宽覆盖索引。</p>
+<p>执行计划不是一张及格证。只有扫描量、响应时间、写入成本和真实业务负载一起改善，这次调优才算完成。</p>
+]]></content>
+      <categories>
+        <category>故障排查</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
+        <tag>索引</tag>
+        <tag>慢查询</tag>
+        <tag>SQL优化</tag>
       </tags>
   </entry>
   <entry>
@@ -6773,137 +6773,6 @@
       </tags>
   </entry>
   <entry>
-    <title>我的AI编程工作流：让模型先读懂项目再动手</title>
-    <url>/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
-    <content><![CDATA[<p><img src="/images/posts/2025/ai-workflow-cover.png" alt="AI 编程工作流封面图"></p>
-<p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
-<p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
-<p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
-<span id="more"></span>
-
-<h2 id="入口：先给任务分级"><a href="#入口：先给任务分级" class="headerlink" title="入口：先给任务分级"></a>入口：先给任务分级</h2><p>不是每个任务都值得启动完整流程。我先按影响范围分三档：</p>
-<table>
-<thead>
-<tr>
-<th>等级</th>
-<th>例子</th>
-<th>工作方式</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>L1 可逆</td>
-<td>改文案、补测试、调整局部样式</td>
-<td>快速修改，执行局部验证</td>
-</tr>
-<tr>
-<td>L2 模块内</td>
-<td>新增接口字段、修改查询、重构 Service</td>
-<td>先读调用链，写计划，小步提交</td>
-</tr>
-<tr>
-<td>L3 高风险</td>
-<td>权限、支付、迁移、生产运维</td>
-<td>人主导设计，双人审查，演练与回滚</td>
-</tr>
-</tbody></table>
-<p>风险不只看代码行数。把按钮颜色改错通常是 L1，删除脚本即使只有一行也可能是 L3。分级决定需要多少上下文、测试和人工确认。</p>
-<p>下面的完整流程主要面向 L2。L1 可以裁剪，L3 还要叠加团队正式变更流程。</p>
-<h2 id="检查点一：把请求改写成任务说明"><a href="#检查点一：把请求改写成任务说明" class="headerlink" title="检查点一：把请求改写成任务说明"></a>检查点一：把请求改写成任务说明</h2><p>原始需求经常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">列表加一个状态筛选。</span><br></pre></td></tr></table></figure>
-
-<p>我不会直接让 AI 改代码，而是先补一张短任务卡：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">问题：运营无法只查看“等待回访”的客户。</span><br><span class="line">目标：客户列表和导出增加 followStatus 筛选。</span><br><span class="line">输入：可选枚举 PENDING、DONE；不传保持原行为。</span><br><span class="line">范围：后端查询与现有前端筛选，不改数据库。</span><br><span class="line">非目标：不重构客户状态模型，不增加批量处理。</span><br><span class="line">验收：列表与导出结果一致；非法值返回现有参数错误码。</span><br></pre></td></tr></table></figure>
-
-<p>“非目标”非常重要。模型擅长顺手完善周边，如果不写边界，一个筛选需求可能变成状态模型重构。</p>
-<p>任务卡不需要一次写对。信息缺失时，让 AI 根据现有描述列出待确认问题，我再向产品或代码事实求证。需求澄清不能由模型自问自答。</p>
-<h2 id="检查点二：只读探索仓库"><a href="#检查点二：只读探索仓库" class="headerlink" title="检查点二：只读探索仓库"></a>检查点二：只读探索仓库</h2><p>第一轮明确要求不修改文件，只回答项目现状。我通常让模型查这些位置：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">构建文件：Java、框架、依赖版本</span><br><span class="line">项目入口：模块边界和启动方式</span><br><span class="line">请求入口：Controller、路由或消息消费者</span><br><span class="line">数据流：Service、Mapper、外部客户端</span><br><span class="line">相邻实现：项目里已经完成的类似功能</span><br><span class="line">测试：当前使用的框架、夹具和断言风格</span><br><span class="line">规范：README、AGENTS.md、架构决策和 CI 配置</span><br></pre></td></tr></table></figure>
-
-<p>探索结果必须带证据，格式可以很简单：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">结论：列表和导出共用 CustomerQueryCondition。</span><br><span class="line">证据：CustomerPageService.java:48、CustomerExportService.java:62。</span><br><span class="line"></span><br><span class="line">结论：项目要求 JDK 8。</span><br><span class="line">证据：pom.xml 的 maven.compiler.source=1.8。</span><br><span class="line"></span><br><span class="line">待确认：非法枚举由全局异常处理还是 Controller 转换。</span><br></pre></td></tr></table></figure>
-
-<p>“证据”和“待确认”能阻止猜测混进结论。若模型找不到某个类，就继续搜索或明确不存在，不根据常见命名补一个出来。</p>
-<h3 id="控制上下文预算"><a href="#控制上下文预算" class="headerlink" title="控制上下文预算"></a>控制上下文预算</h3><p>读仓库不是把所有文件一次塞给模型。我会沿调用链逐层加载：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">入口文件</span><br><span class="line">  -&gt; 它直接调用的接口</span><br><span class="line">  -&gt; 对应实现与数据对象</span><br><span class="line">  -&gt; 一个最接近的参考实现</span><br><span class="line">  -&gt; 相关测试和构建配置</span><br></pre></td></tr></table></figure>
-
-<p>生成目录、压缩后的前端产物、重复日志和无关模块先排除。上下文足够大时，信息选择比信息数量更重要。</p>
-<h2 id="检查点三：修改前先审计划"><a href="#检查点三：修改前先审计划" class="headerlink" title="检查点三：修改前先审计划"></a>检查点三：修改前先审计划</h2><p>项目地图清楚后，让 AI 给出计划，但暂时不写代码。一个可审查的计划至少包含：</p>
-<ol>
-<li>实际要修改的文件；</li>
-<li>每个文件为什么要改；</li>
-<li>数据和调用路径怎样变化；</li>
-<li>空值、异常、并发与兼容边界；</li>
-<li>要新增或运行哪些测试；</li>
-<li>仍然无法确认的风险。</li>
-</ol>
-<p>计划阶段最容易发现范围膨胀。例如任务只需要复用已有查询条件，计划却新建 Repository、Assembler 和通用查询框架，这时删掉比写完后再删便宜得多。</p>
-<p>我还会要求把步骤拆到可独立验证：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 先增加请求字段和参数校验，运行接口层测试；</span><br><span class="line">2. 再增加 Mapper 条件，运行数据库测试；</span><br><span class="line">3. 接入列表并验证原行为；</span><br><span class="line">4. 接入导出并做结果对照；</span><br><span class="line">5. 最后清理重复与更新文档。</span><br></pre></td></tr></table></figure>
-
-<p>一条计划如果要同时修改二十个文件才可运行，通常还没有找到合适的切分点。</p>
-<h2 id="检查点四：按小循环实施"><a href="#检查点四：按小循环实施" class="headerlink" title="检查点四：按小循环实施"></a>检查点四：按小循环实施</h2><p>实施阶段我使用同一条循环：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">修改一个职责</span><br><span class="line">  -&gt; 格式与静态检查</span><br><span class="line">  -&gt; 运行最小相关测试</span><br><span class="line">  -&gt; 阅读版本差异</span><br><span class="line">  -&gt; 记录结果</span><br><span class="line">  -&gt; 进入下一步</span><br></pre></td></tr></table></figure>
-
-<p>这里“阅读差异”不能省。AI 有时会在目标代码之外格式化整个文件、调整错误文案或升级依赖。测试可能照样通过，但 Review 成本和回归范围已经扩大。</p>
-<p>每轮我会检查：</p>
-<ul>
-<li>是否出现任务外文件；</li>
-<li>是否复制了已有能力；</li>
-<li>是否改变公共接口或默认值；</li>
-<li>是否添加未经批准的依赖；</li>
-<li>是否打印密钥、个人数据或完整请求；</li>
-<li>是否使用项目版本不支持的语法；</li>
-<li>注释是在解释原因，还是重复代码表面含义。</li>
-</ul>
-<p>发现方向错误时，优先回到最后一个小步骤，而不是继续提示模型在错误实现上打补丁。</p>
-<h2 id="检查点五：建立验证阶梯"><a href="#检查点五：建立验证阶梯" class="headerlink" title="检查点五：建立验证阶梯"></a>检查点五：建立验证阶梯</h2><p>“已完成”需要对应证据。我把验证从便宜到昂贵排成阶梯：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">语法与格式</span><br><span class="line">  -&gt; 编译 / 类型检查</span><br><span class="line">  -&gt; 目标单元测试</span><br><span class="line">  -&gt; 模块测试</span><br><span class="line">  -&gt; 集成或端到端测试</span><br><span class="line">  -&gt; 构建生产产物</span><br><span class="line">  -&gt; 测试环境真实操作</span><br><span class="line">  -&gt; 监控与回滚演练</span><br></pre></td></tr></table></figure>
-
-<p>简单改动可以停在较低层，高风险改动必须继续向上。关键是清楚说出停在哪里，而不是把“代码看起来没问题”写成“验证通过”。</p>
-<p>Java 项目中，一组常见命令可能是：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 先跑目标测试，快速得到反馈</span></span><br><span class="line">mvn -Dtest=CustomerQueryServiceTest <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再运行模块测试并打包，确认依赖与资源完整</span></span><br><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
-
-<p>若仓库提供 Maven Wrapper，应优先使用仓库固定的 <code>./mvnw</code>。命令只是入口，真正的验收还要匹配业务，例如比较筛选前后数据、重复请求、权限用户和空记录。</p>
-<h3 id="不要让模型代替测试宣布成功"><a href="#不要让模型代替测试宣布成功" class="headerlink" title="不要让模型代替测试宣布成功"></a>不要让模型代替测试宣布成功</h3><p>我要求执行结果分三类写：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">已验证：命令真实执行，附关键结果。</span><br><span class="line">未验证：当前环境无法执行，并说明原因。</span><br><span class="line">待观察：只能上线后从监控或真实流量确认。</span><br></pre></td></tr></table></figure>
-
-<p>这三类比一句“应该没问题”诚实，也方便下一位接手的人继续。</p>
-<h2 id="检查点六：提交前进行独立-Review"><a href="#检查点六：提交前进行独立-Review" class="headerlink" title="检查点六：提交前进行独立 Review"></a>检查点六：提交前进行独立 Review</h2><p>实现对话会让人产生路径依赖：模型已经解释了为什么这样改，我也一路看着它完成，很容易默认结论正确。</p>
-<p>提交前，我会暂时不看对话，只从需求卡和最终差异重新审一遍：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求中的每条验收是否有对应代码和测试</span><br><span class="line">没有写进需求的行为是否被意外改变</span><br><span class="line">错误路径是否比正常路径更危险</span><br><span class="line">数据库和外部调用是否处在合理事务边界</span><br><span class="line">测试是否会在实现被删掉时失败</span><br><span class="line">回滚是否只需回退代码，还是涉及数据处理</span><br></pre></td></tr></table></figure>
-
-<p>这相当于给自己换一个 Reviewer 视角。复杂任务还应由另一位工程师审查，不能因为代码由 AI 生成就降低门槛。</p>
-<h2 id="检查点七：把有价值的上下文留在仓库"><a href="#检查点七：把有价值的上下文留在仓库" class="headerlink" title="检查点七：把有价值的上下文留在仓库"></a>检查点七：把有价值的上下文留在仓库</h2><p>一次任务中反复告诉模型的内容，如果下次仍然适用，应该沉淀成项目资产：</p>
-<ul>
-<li>构建和测试方式写进 README；</li>
-<li>编码约束写进项目级说明；</li>
-<li>关键架构取舍写成 ADR；</li>
-<li>容易回归的规则写成测试；</li>
-<li>发布步骤和回滚条件写进 Runbook。</li>
-</ul>
-<p>不要把对话记录当唯一文档。对话适合探索，仓库才是团队共同维护的长期上下文。</p>
-<p>我还会在提交说明中保留三个信息：为什么改、行为怎样变、用什么验证。过几个月再看历史，不需要重新翻完整对话。</p>
-<h2 id="三种常见失控方式"><a href="#三种常见失控方式" class="headerlink" title="三种常见失控方式"></a>三种常见失控方式</h2><h3 id="一直追加提示，不愿回到事实"><a href="#一直追加提示，不愿回到事实" class="headerlink" title="一直追加提示，不愿回到事实"></a>一直追加提示，不愿回到事实</h3><p>模型改错方向后，连续说“再修一下”会堆积补丁。先停止修改，重新确认入口和约束，通常更快。</p>
-<h3 id="一次交给模型整个功能"><a href="#一次交给模型整个功能" class="headerlink" title="一次交给模型整个功能"></a>一次交给模型整个功能</h3><p>任务越大，错误越晚暴露，最终差异越难 Review。把垂直功能拆成可运行的小片段，让每一步都有反馈。</p>
-<h3 id="只检查代码，不检查环境"><a href="#只检查代码，不检查环境" class="headerlink" title="只检查代码，不检查环境"></a>只检查代码，不检查环境</h3><p>代码正确不等于配置、数据库、权限和部署正确。尤其是版本、环境变量和外部接口，必须用真实构建与运行证据验证。</p>
-<h2 id="一页版流程"><a href="#一页版流程" class="headerlink" title="一页版流程"></a>一页版流程</h2><p>需要快速回忆时，我只看这七行：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 说明问题、目标、范围和验收。</span><br><span class="line">2. 只读项目，用文件与日志建立事实。</span><br><span class="line">3. 先审计划，删除不必要的改动。</span><br><span class="line">4. 一次修改一个职责，小步看差异。</span><br><span class="line">5. 从编译到真实场景逐层验证。</span><br><span class="line">6. 脱离对话，按需求独立 Review。</span><br><span class="line">7. 把稳定知识沉淀进文档和测试。</span><br></pre></td></tr></table></figure>
-
-<p>这套流程没有神奇提示词，甚至会让开始写代码的时间晚几分钟。但它减少了最昂贵的部分：在错误上下文上高速前进。</p>
-<p>模型不需要一开始就“完全读懂项目”。它需要在每个决策点看到足够的真实信息，并及时收到构建、测试和人工判断的反馈。把这条循环设计好，AI 才会从偶尔惊艳的演示，变成可以稳定复用的开发工具。</p>
-]]></content>
-      <categories>
-        <category>效率工具</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>测试</tag>
-        <tag>Context Engineering</tag>
-        <tag>AI编程</tag>
-        <tag>工作流</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>AI辅助Java重构实战：拆解一个过长Service</title>
     <url>/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/</url>
     <content><![CDATA[<p><img src="/images/posts/2025/java-refactor-cover.png" alt="AI 辅助 Java 重构封面图"></p>
@@ -7034,6 +6903,137 @@
         <tag>Spring Boot</tag>
         <tag>AI编程</tag>
         <tag>单元测试</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我的AI编程工作流：让模型先读懂项目再动手</title>
+    <url>/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
+    <content><![CDATA[<p><img src="/images/posts/2025/ai-workflow-cover.png" alt="AI 编程工作流封面图"></p>
+<p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
+<p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
+<p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
+<span id="more"></span>
+
+<h2 id="入口：先给任务分级"><a href="#入口：先给任务分级" class="headerlink" title="入口：先给任务分级"></a>入口：先给任务分级</h2><p>不是每个任务都值得启动完整流程。我先按影响范围分三档：</p>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>例子</th>
+<th>工作方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1 可逆</td>
+<td>改文案、补测试、调整局部样式</td>
+<td>快速修改，执行局部验证</td>
+</tr>
+<tr>
+<td>L2 模块内</td>
+<td>新增接口字段、修改查询、重构 Service</td>
+<td>先读调用链，写计划，小步提交</td>
+</tr>
+<tr>
+<td>L3 高风险</td>
+<td>权限、支付、迁移、生产运维</td>
+<td>人主导设计，双人审查，演练与回滚</td>
+</tr>
+</tbody></table>
+<p>风险不只看代码行数。把按钮颜色改错通常是 L1，删除脚本即使只有一行也可能是 L3。分级决定需要多少上下文、测试和人工确认。</p>
+<p>下面的完整流程主要面向 L2。L1 可以裁剪，L3 还要叠加团队正式变更流程。</p>
+<h2 id="检查点一：把请求改写成任务说明"><a href="#检查点一：把请求改写成任务说明" class="headerlink" title="检查点一：把请求改写成任务说明"></a>检查点一：把请求改写成任务说明</h2><p>原始需求经常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">列表加一个状态筛选。</span><br></pre></td></tr></table></figure>
+
+<p>我不会直接让 AI 改代码，而是先补一张短任务卡：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">问题：运营无法只查看“等待回访”的客户。</span><br><span class="line">目标：客户列表和导出增加 followStatus 筛选。</span><br><span class="line">输入：可选枚举 PENDING、DONE；不传保持原行为。</span><br><span class="line">范围：后端查询与现有前端筛选，不改数据库。</span><br><span class="line">非目标：不重构客户状态模型，不增加批量处理。</span><br><span class="line">验收：列表与导出结果一致；非法值返回现有参数错误码。</span><br></pre></td></tr></table></figure>
+
+<p>“非目标”非常重要。模型擅长顺手完善周边，如果不写边界，一个筛选需求可能变成状态模型重构。</p>
+<p>任务卡不需要一次写对。信息缺失时，让 AI 根据现有描述列出待确认问题，我再向产品或代码事实求证。需求澄清不能由模型自问自答。</p>
+<h2 id="检查点二：只读探索仓库"><a href="#检查点二：只读探索仓库" class="headerlink" title="检查点二：只读探索仓库"></a>检查点二：只读探索仓库</h2><p>第一轮明确要求不修改文件，只回答项目现状。我通常让模型查这些位置：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">构建文件：Java、框架、依赖版本</span><br><span class="line">项目入口：模块边界和启动方式</span><br><span class="line">请求入口：Controller、路由或消息消费者</span><br><span class="line">数据流：Service、Mapper、外部客户端</span><br><span class="line">相邻实现：项目里已经完成的类似功能</span><br><span class="line">测试：当前使用的框架、夹具和断言风格</span><br><span class="line">规范：README、AGENTS.md、架构决策和 CI 配置</span><br></pre></td></tr></table></figure>
+
+<p>探索结果必须带证据，格式可以很简单：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">结论：列表和导出共用 CustomerQueryCondition。</span><br><span class="line">证据：CustomerPageService.java:48、CustomerExportService.java:62。</span><br><span class="line"></span><br><span class="line">结论：项目要求 JDK 8。</span><br><span class="line">证据：pom.xml 的 maven.compiler.source=1.8。</span><br><span class="line"></span><br><span class="line">待确认：非法枚举由全局异常处理还是 Controller 转换。</span><br></pre></td></tr></table></figure>
+
+<p>“证据”和“待确认”能阻止猜测混进结论。若模型找不到某个类，就继续搜索或明确不存在，不根据常见命名补一个出来。</p>
+<h3 id="控制上下文预算"><a href="#控制上下文预算" class="headerlink" title="控制上下文预算"></a>控制上下文预算</h3><p>读仓库不是把所有文件一次塞给模型。我会沿调用链逐层加载：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">入口文件</span><br><span class="line">  -&gt; 它直接调用的接口</span><br><span class="line">  -&gt; 对应实现与数据对象</span><br><span class="line">  -&gt; 一个最接近的参考实现</span><br><span class="line">  -&gt; 相关测试和构建配置</span><br></pre></td></tr></table></figure>
+
+<p>生成目录、压缩后的前端产物、重复日志和无关模块先排除。上下文足够大时，信息选择比信息数量更重要。</p>
+<h2 id="检查点三：修改前先审计划"><a href="#检查点三：修改前先审计划" class="headerlink" title="检查点三：修改前先审计划"></a>检查点三：修改前先审计划</h2><p>项目地图清楚后，让 AI 给出计划，但暂时不写代码。一个可审查的计划至少包含：</p>
+<ol>
+<li>实际要修改的文件；</li>
+<li>每个文件为什么要改；</li>
+<li>数据和调用路径怎样变化；</li>
+<li>空值、异常、并发与兼容边界；</li>
+<li>要新增或运行哪些测试；</li>
+<li>仍然无法确认的风险。</li>
+</ol>
+<p>计划阶段最容易发现范围膨胀。例如任务只需要复用已有查询条件，计划却新建 Repository、Assembler 和通用查询框架，这时删掉比写完后再删便宜得多。</p>
+<p>我还会要求把步骤拆到可独立验证：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 先增加请求字段和参数校验，运行接口层测试；</span><br><span class="line">2. 再增加 Mapper 条件，运行数据库测试；</span><br><span class="line">3. 接入列表并验证原行为；</span><br><span class="line">4. 接入导出并做结果对照；</span><br><span class="line">5. 最后清理重复与更新文档。</span><br></pre></td></tr></table></figure>
+
+<p>一条计划如果要同时修改二十个文件才可运行，通常还没有找到合适的切分点。</p>
+<h2 id="检查点四：按小循环实施"><a href="#检查点四：按小循环实施" class="headerlink" title="检查点四：按小循环实施"></a>检查点四：按小循环实施</h2><p>实施阶段我使用同一条循环：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">修改一个职责</span><br><span class="line">  -&gt; 格式与静态检查</span><br><span class="line">  -&gt; 运行最小相关测试</span><br><span class="line">  -&gt; 阅读版本差异</span><br><span class="line">  -&gt; 记录结果</span><br><span class="line">  -&gt; 进入下一步</span><br></pre></td></tr></table></figure>
+
+<p>这里“阅读差异”不能省。AI 有时会在目标代码之外格式化整个文件、调整错误文案或升级依赖。测试可能照样通过，但 Review 成本和回归范围已经扩大。</p>
+<p>每轮我会检查：</p>
+<ul>
+<li>是否出现任务外文件；</li>
+<li>是否复制了已有能力；</li>
+<li>是否改变公共接口或默认值；</li>
+<li>是否添加未经批准的依赖；</li>
+<li>是否打印密钥、个人数据或完整请求；</li>
+<li>是否使用项目版本不支持的语法；</li>
+<li>注释是在解释原因，还是重复代码表面含义。</li>
+</ul>
+<p>发现方向错误时，优先回到最后一个小步骤，而不是继续提示模型在错误实现上打补丁。</p>
+<h2 id="检查点五：建立验证阶梯"><a href="#检查点五：建立验证阶梯" class="headerlink" title="检查点五：建立验证阶梯"></a>检查点五：建立验证阶梯</h2><p>“已完成”需要对应证据。我把验证从便宜到昂贵排成阶梯：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">语法与格式</span><br><span class="line">  -&gt; 编译 / 类型检查</span><br><span class="line">  -&gt; 目标单元测试</span><br><span class="line">  -&gt; 模块测试</span><br><span class="line">  -&gt; 集成或端到端测试</span><br><span class="line">  -&gt; 构建生产产物</span><br><span class="line">  -&gt; 测试环境真实操作</span><br><span class="line">  -&gt; 监控与回滚演练</span><br></pre></td></tr></table></figure>
+
+<p>简单改动可以停在较低层，高风险改动必须继续向上。关键是清楚说出停在哪里，而不是把“代码看起来没问题”写成“验证通过”。</p>
+<p>Java 项目中，一组常见命令可能是：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 先跑目标测试，快速得到反馈</span></span><br><span class="line">mvn -Dtest=CustomerQueryServiceTest <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再运行模块测试并打包，确认依赖与资源完整</span></span><br><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
+
+<p>若仓库提供 Maven Wrapper，应优先使用仓库固定的 <code>./mvnw</code>。命令只是入口，真正的验收还要匹配业务，例如比较筛选前后数据、重复请求、权限用户和空记录。</p>
+<h3 id="不要让模型代替测试宣布成功"><a href="#不要让模型代替测试宣布成功" class="headerlink" title="不要让模型代替测试宣布成功"></a>不要让模型代替测试宣布成功</h3><p>我要求执行结果分三类写：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">已验证：命令真实执行，附关键结果。</span><br><span class="line">未验证：当前环境无法执行，并说明原因。</span><br><span class="line">待观察：只能上线后从监控或真实流量确认。</span><br></pre></td></tr></table></figure>
+
+<p>这三类比一句“应该没问题”诚实，也方便下一位接手的人继续。</p>
+<h2 id="检查点六：提交前进行独立-Review"><a href="#检查点六：提交前进行独立-Review" class="headerlink" title="检查点六：提交前进行独立 Review"></a>检查点六：提交前进行独立 Review</h2><p>实现对话会让人产生路径依赖：模型已经解释了为什么这样改，我也一路看着它完成，很容易默认结论正确。</p>
+<p>提交前，我会暂时不看对话，只从需求卡和最终差异重新审一遍：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求中的每条验收是否有对应代码和测试</span><br><span class="line">没有写进需求的行为是否被意外改变</span><br><span class="line">错误路径是否比正常路径更危险</span><br><span class="line">数据库和外部调用是否处在合理事务边界</span><br><span class="line">测试是否会在实现被删掉时失败</span><br><span class="line">回滚是否只需回退代码，还是涉及数据处理</span><br></pre></td></tr></table></figure>
+
+<p>这相当于给自己换一个 Reviewer 视角。复杂任务还应由另一位工程师审查，不能因为代码由 AI 生成就降低门槛。</p>
+<h2 id="检查点七：把有价值的上下文留在仓库"><a href="#检查点七：把有价值的上下文留在仓库" class="headerlink" title="检查点七：把有价值的上下文留在仓库"></a>检查点七：把有价值的上下文留在仓库</h2><p>一次任务中反复告诉模型的内容，如果下次仍然适用，应该沉淀成项目资产：</p>
+<ul>
+<li>构建和测试方式写进 README；</li>
+<li>编码约束写进项目级说明；</li>
+<li>关键架构取舍写成 ADR；</li>
+<li>容易回归的规则写成测试；</li>
+<li>发布步骤和回滚条件写进 Runbook。</li>
+</ul>
+<p>不要把对话记录当唯一文档。对话适合探索，仓库才是团队共同维护的长期上下文。</p>
+<p>我还会在提交说明中保留三个信息：为什么改、行为怎样变、用什么验证。过几个月再看历史，不需要重新翻完整对话。</p>
+<h2 id="三种常见失控方式"><a href="#三种常见失控方式" class="headerlink" title="三种常见失控方式"></a>三种常见失控方式</h2><h3 id="一直追加提示，不愿回到事实"><a href="#一直追加提示，不愿回到事实" class="headerlink" title="一直追加提示，不愿回到事实"></a>一直追加提示，不愿回到事实</h3><p>模型改错方向后，连续说“再修一下”会堆积补丁。先停止修改，重新确认入口和约束，通常更快。</p>
+<h3 id="一次交给模型整个功能"><a href="#一次交给模型整个功能" class="headerlink" title="一次交给模型整个功能"></a>一次交给模型整个功能</h3><p>任务越大，错误越晚暴露，最终差异越难 Review。把垂直功能拆成可运行的小片段，让每一步都有反馈。</p>
+<h3 id="只检查代码，不检查环境"><a href="#只检查代码，不检查环境" class="headerlink" title="只检查代码，不检查环境"></a>只检查代码，不检查环境</h3><p>代码正确不等于配置、数据库、权限和部署正确。尤其是版本、环境变量和外部接口，必须用真实构建与运行证据验证。</p>
+<h2 id="一页版流程"><a href="#一页版流程" class="headerlink" title="一页版流程"></a>一页版流程</h2><p>需要快速回忆时，我只看这七行：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 说明问题、目标、范围和验收。</span><br><span class="line">2. 只读项目，用文件与日志建立事实。</span><br><span class="line">3. 先审计划，删除不必要的改动。</span><br><span class="line">4. 一次修改一个职责，小步看差异。</span><br><span class="line">5. 从编译到真实场景逐层验证。</span><br><span class="line">6. 脱离对话，按需求独立 Review。</span><br><span class="line">7. 把稳定知识沉淀进文档和测试。</span><br></pre></td></tr></table></figure>
+
+<p>这套流程没有神奇提示词，甚至会让开始写代码的时间晚几分钟。但它减少了最昂贵的部分：在错误上下文上高速前进。</p>
+<p>模型不需要一开始就“完全读懂项目”。它需要在每个决策点看到足够的真实信息，并及时收到构建、测试和人工判断的反馈。把这条循环设计好，AI 才会从偶尔惊艳的演示，变成可以稳定复用的开发工具。</p>
+]]></content>
+      <categories>
+        <category>效率工具</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>测试</tag>
+        <tag>Context Engineering</tag>
+        <tag>AI编程</tag>
+        <tag>工作流</tag>
       </tags>
   </entry>
   <entry>
@@ -8215,35 +8215,6 @@
       </tags>
   </entry>
   <entry>
-    <title>博客重新出发</title>
-    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
-    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
-<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
-<span id="more"></span>
-
-<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
-<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
-<li>Hexo：静态博客生成器</li>
-<li>NexT：Hexo 主题</li>
-<li>GitHub Pages：静态站点托管</li>
-<li>GitHub Actions：后续可用于自动构建和部署</li>
-</ul>
-<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
-<li>整理 Java 后端开发笔记</li>
-<li>梳理并发编程和 JVM 相关知识</li>
-<li>记录 Linux、Nginx、部署排查经验</li>
-<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
-</ol>
-]]></content>
-      <categories>
-        <category>随笔</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-        <tag>GitHub Pages</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>从零开始学习设计模式-第一篇</title>
     <url>/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/</url>
     <content><![CDATA[<p><img src="/images/posts/2024/design-patterns-cover.png" alt="设计模式知识梳理封面图"></p>
@@ -8281,6 +8252,35 @@
       </categories>
       <tags>
         <tag>设计模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>博客重新出发</title>
+    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
+    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
+<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
+<span id="more"></span>
+
+<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
+<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
+<li>Hexo：静态博客生成器</li>
+<li>NexT：Hexo 主题</li>
+<li>GitHub Pages：静态站点托管</li>
+<li>GitHub Actions：后续可用于自动构建和部署</li>
+</ul>
+<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
+<li>整理 Java 后端开发笔记</li>
+<li>梳理并发编程和 JVM 相关知识</li>
+<li>记录 Linux、Nginx、部署排查经验</li>
+<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
+</ol>
+]]></content>
+      <categories>
+        <category>随笔</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>GitHub Pages</tag>
       </tags>
   </entry>
   <entry>
@@ -8705,61 +8705,6 @@
       </tags>
   </entry>
   <entry>
-    <title>无外网安装nginx</title>
-    <url>/2024/05/22/%E6%97%A0%E5%A4%96%E7%BD%91%E5%AE%89%E8%A3%85nginx/</url>
-    <content><![CDATA[<p><img src="/images/posts/2024/offline-nginx-cover.png" alt="无外网安装Nginx封面图"></p>
-<blockquote>
-<p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>
-</blockquote>
-
-
-<h2 id="1-服务器情况："><a href="#1-服务器情况：" class="headerlink" title="1. 服务器情况："></a>1. 服务器情况：</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/version</span><br><span class="line">Linux version 4.19.90-23.8.v2101.ky10.x86_64</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a>2.准备工作</h2><h3 id="2-1-首先判断是否安装了nginx的三个依赖"><a href="#2-1-首先判断是否安装了nginx的三个依赖" class="headerlink" title="2.1.首先判断是否安装了nginx的三个依赖"></a>2.1.首先判断是否安装了nginx的三个依赖</h3><ol>
-<li>gcc</li>
-<li>pcre</li>
-<li>zlib</li>
-</ol>
-<p>可以访问外网的情况下可以直接命令行一键安装</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">yum -y install gcc zlib zlib-devel pcre-devel openssl </span><br></pre></td></tr></tbody></table></figure>
-
-<p>本篇就不涉及有外网了，重点在无外网。</p>
-<p>没外网的情况下，需要先手动下载上面三个依赖包，方便大家我就把整合好的地址放下面，大家有需要就自取</p>
-<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy">https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy</a><br>提取码：bpmy </p>
-<p>下载好了以后，分别把三个依赖包，和nginx，指定到自己指定的位置<br>我是把依赖包解压到了/usr/local/src下</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">这是解压命令</span><br><span class="line">tar -xvf openssl-3.0.13.tar.gz</span><br><span class="line"></span><br><span class="line">三个包手动替换的名称就好</span><br></pre></td></tr></tbody></table></figure>
-
-<blockquote>
-<p>重点！！！</p>
-</blockquote>
-<p>回到nginx的安装目录，执行下面的命令</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx   --with-pcre=/usr/local/src/pcre-7.3 --with-zlib=/usr/local/src/zlib  --with-openssl=/usr/local/src/openssl</span><br><span class="line"></span><br><span class="line">解释</span><br><span class="line">--prefix 是指定nginx的安装路径，后续的我们操作的nginx都会在这里，类似于windows的选择安装路径</span><br><span class="line">--with-xxx 指定依赖的解压路径，用来找到我们刚刚解压缩的那三个依赖。</span><br></pre></td></tr></tbody></table></figure>
-
-<p>没报错的情况下，继续执行</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line">就可以正常安装了</span><br></pre></td></tr></tbody></table></figure>
-
-<p>到这里nginx应该就安装成功了，后续就是一些优化操作</p>
-<ol>
-<li>可以删除nginx压缩包和解压目录<br>2.设置软链，后续就不用在安装nginx的目录下操作nginx</li>
-</ol>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /usr/local/webserver/nginx/sbin/nginx /usr/bin/</span><br><span class="line"></span><br><span class="line">在其他目录使用</span><br><span class="line">nginx -v</span><br><span class="line">查看是否设置成功</span><br></pre></td></tr></tbody></table></figure>
-
-<p>3.nginx常用命令</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 检查配置</span></span><br><span class="line">$ nginx -t（检查nginx.conf配置是否正确）</span><br><span class="line">$ nginx -s reload（重新载入配置文件，通常配合-t使用，在修改了nginx.conf且检查无误之后）</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">$ nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">$ ps -ef | grep nginx</span><br></pre></td></tr></tbody></table></figure>
-
-<blockquote>
-<p>之前部署项目的时候没遇到过国产系统+无内网两种情况叠加，导致踩坑了两天才调通，希望这篇文章能对后面遇到这种情况的兄弟们有所帮助！</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Linux运维</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>运维</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>服务器内存不足与OOM排查</title>
     <url>/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/</url>
     <content><![CDATA[<blockquote>
@@ -8984,6 +8929,61 @@
         <tag>OOM</tag>
         <tag>JVM</tag>
         <tag>内存排查</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>无外网安装nginx</title>
+    <url>/2024/05/22/%E6%97%A0%E5%A4%96%E7%BD%91%E5%AE%89%E8%A3%85nginx/</url>
+    <content><![CDATA[<p><img src="/images/posts/2024/offline-nginx-cover.png" alt="无外网安装Nginx封面图"></p>
+<blockquote>
+<p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>
+</blockquote>
+
+
+<h2 id="1-服务器情况："><a href="#1-服务器情况：" class="headerlink" title="1. 服务器情况："></a>1. 服务器情况：</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/version</span><br><span class="line">Linux version 4.19.90-23.8.v2101.ky10.x86_64</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a>2.准备工作</h2><h3 id="2-1-首先判断是否安装了nginx的三个依赖"><a href="#2-1-首先判断是否安装了nginx的三个依赖" class="headerlink" title="2.1.首先判断是否安装了nginx的三个依赖"></a>2.1.首先判断是否安装了nginx的三个依赖</h3><ol>
+<li>gcc</li>
+<li>pcre</li>
+<li>zlib</li>
+</ol>
+<p>可以访问外网的情况下可以直接命令行一键安装</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">yum -y install gcc zlib zlib-devel pcre-devel openssl </span><br></pre></td></tr></tbody></table></figure>
+
+<p>本篇就不涉及有外网了，重点在无外网。</p>
+<p>没外网的情况下，需要先手动下载上面三个依赖包，方便大家我就把整合好的地址放下面，大家有需要就自取</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy">https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy</a><br>提取码：bpmy </p>
+<p>下载好了以后，分别把三个依赖包，和nginx，指定到自己指定的位置<br>我是把依赖包解压到了/usr/local/src下</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">这是解压命令</span><br><span class="line">tar -xvf openssl-3.0.13.tar.gz</span><br><span class="line"></span><br><span class="line">三个包手动替换的名称就好</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>重点！！！</p>
+</blockquote>
+<p>回到nginx的安装目录，执行下面的命令</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx   --with-pcre=/usr/local/src/pcre-7.3 --with-zlib=/usr/local/src/zlib  --with-openssl=/usr/local/src/openssl</span><br><span class="line"></span><br><span class="line">解释</span><br><span class="line">--prefix 是指定nginx的安装路径，后续的我们操作的nginx都会在这里，类似于windows的选择安装路径</span><br><span class="line">--with-xxx 指定依赖的解压路径，用来找到我们刚刚解压缩的那三个依赖。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>没报错的情况下，继续执行</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line">就可以正常安装了</span><br></pre></td></tr></tbody></table></figure>
+
+<p>到这里nginx应该就安装成功了，后续就是一些优化操作</p>
+<ol>
+<li>可以删除nginx压缩包和解压目录<br>2.设置软链，后续就不用在安装nginx的目录下操作nginx</li>
+</ol>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /usr/local/webserver/nginx/sbin/nginx /usr/bin/</span><br><span class="line"></span><br><span class="line">在其他目录使用</span><br><span class="line">nginx -v</span><br><span class="line">查看是否设置成功</span><br></pre></td></tr></tbody></table></figure>
+
+<p>3.nginx常用命令</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 检查配置</span></span><br><span class="line">$ nginx -t（检查nginx.conf配置是否正确）</span><br><span class="line">$ nginx -s reload（重新载入配置文件，通常配合-t使用，在修改了nginx.conf且检查无误之后）</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">$ nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">$ ps -ef | grep nginx</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>之前部署项目的时候没遇到过国产系统+无内网两种情况叠加，导致踩坑了两天才调通，希望这篇文章能对后面遇到这种情况的兄弟们有所帮助！</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Linux运维</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>运维</tag>
       </tags>
   </entry>
   <entry>
