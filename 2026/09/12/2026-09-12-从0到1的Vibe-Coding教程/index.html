@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#111111">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手的你。 我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码">
+<meta property="og:url" content="https://swagch.github.io/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/">
+<meta property="og:site_name" content="杰尼龟的笔记">
+<meta property="og:description" content="去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手的你。 我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-starter-cover.svg">
+<meta property="article:published_time" content="2026-09-12T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-09-12T01:30:00.000Z">
+<meta property="article:author" content="无敌杰尼龟">
+<meta property="article:tag" content="入门">
+<meta property="article:tag" content="工程实践">
+<meta property="article:tag" content="AI编程">
+<meta property="article:tag" content="Vibe Coding">
+<meta property="article:tag" content="教程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-starter-cover.svg">
+
+
+<link rel="canonical" href="https://swagch.github.io/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/","path":"2026/09/12/2026-09-12-从0到1的Vibe-Coding教程/","title":"从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码 | 杰尼龟的笔记</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="/js/local-search-engine.js" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="杰尼龟的笔记" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">杰尼龟的笔记</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">首页</a></li><li class="menu-item menu-item-专题"><a href="/series/" rel="section">专题</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section">关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E4%BA%BA%E8%AF%9D%EF%BC%9AVibe-Coding-%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-text">先说人话：Vibe Coding 到底是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8F%E6%97%B6%EF%BC%9A%E8%A3%85%E5%A5%BD%E7%8E%AF%E5%A2%83%EF%BC%8C%E5%88%AB%E6%80%A5%E7%9D%80%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-text">第一个小时：装好环境，别急着写代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%EF%BC%9A%E8%AE%A9%E5%AE%83%E5%B8%AE%E6%88%91%E5%86%99%E4%B8%AA%E2%80%9D%E8%AE%B0%E8%B4%A6%E6%9C%AC%E2%80%9D"><span class="nav-text">第一个项目：让它帮我写个”记账本”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%83%E5%86%99%E5%AE%8C%E4%BA%86%EF%BC%8C%E7%84%B6%E5%90%8E%E5%91%A2%EF%BC%9F%E2%80%94%E2%80%94-%E7%81%B5%E9%AD%82%E4%B8%89%E9%97%AE"><span class="nav-text">它写完了，然后呢？—— 灵魂三问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E5%AE%83%E6%94%B9%E4%BA%86%E6%88%91%E7%9A%84%E5%93%AA%E4%BA%9B%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-text">1️⃣ 它改了我的哪些文件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%95%B0%E6%8D%AE%E4%BB%8E%E5%93%AA%E6%9D%A5%E3%80%81%E5%88%B0%E5%93%AA%E5%8E%BB%EF%BC%9F"><span class="nav-text">2️⃣ 数据从哪来、到哪去？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E8%B7%91%E5%9D%8F%E4%BA%86%E6%80%8E%E4%B9%88%E6%BB%9A%E5%9B%9E%E5%8E%BB%EF%BC%9F"><span class="nav-text">3️⃣ 跑坏了怎么滚回去？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E6%AD%A3%E7%9A%84%E9%87%8D%E7%82%B9%EF%BC%9AAI-%E5%86%99%E7%9A%84%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%B0%81%E6%98%AF%E8%B4%9F%E8%B4%A3%E4%BA%BA%EF%BC%9F"><span class="nav-text">真正的重点：AI 写的代码，谁是负责人？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%89%8B%E6%9C%80%E5%AE%B9%E6%98%93%E7%BF%BB%E8%BD%A6%E7%9A%84%E4%B8%89%E4%B8%AA%E5%9D%91"><span class="nav-text">新手最容易翻车的三个坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-1%EF%BC%9A%E6%8A%8A%E9%9C%80%E6%B1%82%E5%86%99%E5%BE%97%E5%A4%AA%E6%A8%A1%E7%B3%8A%EF%BC%8C%E7%84%B6%E5%90%8E%E6%80%AA-AI-%E4%B8%8D%E8%A1%8C"><span class="nav-text">❌ 坑 1：把需求写得太模糊，然后怪 AI 不行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-2%EF%BC%9A%E8%AE%A9%E5%AE%83%E2%80%9D%E4%B8%80%E9%94%AE%E6%90%9E%E5%AE%9A%E6%89%80%E6%9C%89%E5%8A%9F%E8%83%BD%E2%80%9D"><span class="nav-text">❌ 坑 2：让它”一键搞定所有功能”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-3%EF%BC%9A%E6%8A%8A%E2%80%9D%E8%83%BD%E8%B7%91%E2%80%9D%E5%BD%93%E6%88%90%E2%80%9D%E5%81%9A%E5%AE%8C%E4%BA%86%E2%80%9D"><span class="nav-text">❌ 坑 3：把”能跑”当成”做完了”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E5%91%A8%E5%90%8E%EF%BC%8C%E6%88%91%E4%BC%9A%E8%B5%B0%E5%88%B0%E5%93%AA%EF%BC%9F"><span class="nav-text">两周后，我会走到哪？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E4%B8%80%E5%8F%A5"><span class="nav-text">最后一句</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="无敌杰尼龟"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">无敌杰尼龟</p>
+  <div class="site-description" itemprop="description">Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">216</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/swagcH" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;swagcH" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码 | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-09-12 09:30:00" itemprop="dateCreated datePublished" datetime="2026-09-12T09:30:00+08:00">2026-09-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI%E7%BC%96%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">AI编程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2026/vibe-coding-starter-cover.svg" alt="Vibe Coding 起步教程封面图"></p>
+<p>去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个<strong>只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手</strong>的你。</p>
+<p>我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。</p>
+<span id="more"></span>
+
+<h2 id="先说人话：Vibe-Coding-到底是什么"><a href="#先说人话：Vibe-Coding-到底是什么" class="headerlink" title="先说人话：Vibe Coding 到底是什么"></a>先说人话：Vibe Coding 到底是什么</h2><p>一句话：<strong>你用嘴描述想法，AI 帮你写代码，你在旁边看着它改，直到能用。</strong></p>
+<p>2016 年我学编程的时候，是照着书一行行敲、一行行背。现在你想做一个东西，直接跟 AI 说需求就行，它生成一段代码，你复制粘贴、运行、看看对不对。</p>
+<p>听起来像魔法？确实是，但别高兴太早——<strong>魔法是你和 AI 一起变出来的，不是 AI 单方面表演</strong>。</p>
+<h2 id="第一个小时：装好环境，别急着写代码"><a href="#第一个小时：装好环境，别急着写代码" class="headerlink" title="第一个小时：装好环境，别急着写代码"></a>第一个小时：装好环境，别急着写代码</h2><p>我先花 15 分钟把战场清干净，这几样缺一不可：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>干嘛用的</th>
+<th>装哪</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Node.js 20 LTS</strong></td>
+<td>跑 JavaScript&#x2F;TypeScript 项目</td>
+<td><a target="_blank" rel="noopener" href="https://nodejs.org/">nodejs.org</a></td>
+</tr>
+<tr>
+<td><strong>VSCode</strong></td>
+<td>写代码的编辑器</td>
+<td><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">code.visualstudio.com</a></td>
+</tr>
+<tr>
+<td><strong>Git</strong></td>
+<td>存代码 + 后悔药</td>
+<td>git-scm.com</td>
+</tr>
+<tr>
+<td><strong>AI 助手插件</strong></td>
+<td>对话生成代码</td>
+<td>推荐 GitHub Copilot 或 Cursor</td>
+</tr>
+</tbody></table>
+<p>装完先验证一下环境跑得通，再开脚本域——<strong>别跳过这步</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows / Mac / Linux 都行，结果必须是三行版本号</span></span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
+
+<p>我第一次到最后一步才想起 Git 没装，结果代码全在编辑器里没版本控制，改坏了只能干瞪眼。<strong>环境问题永远比代码问题恶心，先解决它。</strong></p>
+<h2 id="第一个项目：让它帮我写个”记账本”"><a href="#第一个项目：让它帮我写个”记账本”" class="headerlink" title="第一个项目：让它帮我写个”记账本”"></a>第一个项目：让它帮我写个”记账本”</h2><p>我不空想大项目，第一个就做个小工具——<strong>一个在终端跑的记账本</strong>。这个选择很关键：范围小、能运行见效、随时能丢。</p>
+<p>我跟 AI 的第一句话是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">帮我写一个命令行记账本，用 Node.js。</span><br><span class="line">功能：</span><br><span class="line">1. 能加一条收入或支出（金额 + 备注）</span><br><span class="line">2. 能查总余额</span><br><span class="line">3. 数据存到本地文件，退出程序不丢</span><br><span class="line">先跑通最基础功能，别做花里胡哨的。</span><br></pre></td></tr></table></figure>
+
+<p>注意最后那句”<strong>别做花里胡哨的</strong>“——这是我最痛的教训。不说这句，AI 会给你加什么图表、导出 CSV、多用户，全是你不想要的东西。</p>
+<h2 id="它写完了，然后呢？——-灵魂三问"><a href="#它写完了，然后呢？——-灵魂三问" class="headerlink" title="它写完了，然后呢？—— 灵魂三问"></a>它写完了，然后呢？—— 灵魂三问</h2><p>AI 啪地贴出一段代码 + 一个 <code>npm install</code> 命令。这时候新手最容易犯的错：<strong>复制、粘贴、跑、看它成功就完事</strong>。</p>
+<p>我给每条 AI 代码都做三件事，一次没落：</p>
+<h3 id="1️⃣-它改了我的哪些文件？"><a href="#1️⃣-它改了我的哪些文件？" class="headerlink" title="1️⃣ 它改了我的哪些文件？"></a>1️⃣ 它改了我的哪些文件？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure>
+
+<p>这是我睁眼第一件事。AI 有时会”顺手”改一堆跟需求无关的文件——<strong>它很爱干这个</strong>。我看到只加了 <code>index.js</code> 和一个依赖，心里有底。</p>
+<h3 id="2️⃣-数据从哪来、到哪去？"><a href="#2️⃣-数据从哪来、到哪去？" class="headerlink" title="2️⃣ 数据从哪来、到哪去？"></a>2️⃣ 数据从哪来、到哪去？</h3><p>我不看每一行（那是大佬的事），但我至少要懂<strong>数据流</strong>：</p>
+<ul>
+<li>记账数据存到了哪个文件？<code>~/记录.json</code>？还是当前目录？</li>
+<li>如果我换个目录跑，还能读到昨天的账吗？</li>
+</ul>
+<p>这里我在代码里找到了那行 <code>fs.writeFileSync(&#39;./ledger.json&#39;)</code>——注意那个 <code>./</code>，意味着数据存在<strong>当前目录</strong>。我明白这个了，以后换目录就知道数据会丢。</p>
+<h3 id="3️⃣-跑坏了怎么滚回去？"><a href="#3️⃣-跑坏了怎么滚回去？" class="headerlink" title="3️⃣ 跑坏了怎么滚回去？"></a>3️⃣ 跑坏了怎么滚回去？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add index.js</span><br><span class="line">git commit -m <span class="string">&quot;记账本初版&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>每次改动<strong>先提交</strong>，这是最重要的后悔药。AI 生成代码你不可能完全看懂，但你能保证：<strong>每一版都留了底，改坏了可以回退</strong>。</p>
+<p>我第一次写完就急着跑，没 commit。结果 AI 后面改崩了，我恢复不了，只能从头再来一遍。血泪教训。</p>
+<h2 id="真正的重点：AI-写的代码，谁是负责人？"><a href="#真正的重点：AI-写的代码，谁是负责人？" class="headerlink" title="真正的重点：AI 写的代码，谁是负责人？"></a>真正的重点：AI 写的代码，谁是负责人？</h2><p>我必须在这个教程里反复强调这件事，连写三遍都不嫌多：</p>
+<blockquote>
+<p><strong>AI 不会参加故障复盘，也不会在凌晨两点判断要不要回滚。</strong></p>
+</blockquote>
+<p>代码是被你合进去的，commit 写的是你的名字。出了事，是<strong>你</strong>负责，不是 ChatGPT。</p>
+<p>所以我的原则很简单，就一条：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>我做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>记个账、跑一次性的脚本</td>
+<td>快速用，出了问题重来就行</td>
+</tr>
+<tr>
+<td>碰支付、权限、删数据、生产服务器</td>
+<td><strong>必须手动确认 + 测试 + 保留回滚</strong></td>
+</tr>
+</tbody></table>
+<p><strong>删数据、碰生产环境这两件事，我永远不让 AI 自动执行</strong>，哪怕它信誓旦旦说”没问题”。这不是信不信它——这是软件本来就是”数据、资金、隐私、团队维护成本”叠加的东西，AI 替你省了写代码的时间，省不掉后果。</p>
+<h2 id="新手最容易翻车的三个坑"><a href="#新手最容易翻车的三个坑" class="headerlink" title="新手最容易翻车的三个坑"></a>新手最容易翻车的三个坑</h2><h3 id="❌-坑-1：把需求写得太模糊，然后怪-AI-不行"><a href="#❌-坑-1：把需求写得太模糊，然后怪-AI-不行" class="headerlink" title="❌ 坑 1：把需求写得太模糊，然后怪 AI 不行"></a>❌ 坑 1：把需求写得太模糊，然后怪 AI 不行</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">帮我做个网站。        ← 我最初的真实需求，现在看着都脸红</span><br></pre></td></tr></table></figure>
+
+<p>AI 不是神仙，模糊需求只会放大回模糊代码。改进后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">做一个单页记账网站，用 React。</span><br><span class="line">页面左边是输入框（金额 + 说明），右边显示余额。</span><br><span class="line">数据放浏览器 localStorage，不做后端。</span><br><span class="line">先做能跑的最小版。</span><br></pre></td></tr></table></figure>
+
+<p><strong>需求越具体，AI 越靠谱。</strong> 这不是玄学，是上下文质量。</p>
+<h3 id="❌-坑-2：让它”一键搞定所有功能”"><a href="#❌-坑-2：让它”一键搞定所有功能”" class="headerlink" title="❌ 坑 2：让它”一键搞定所有功能”"></a>❌ 坑 2：让它”一键搞定所有功能”</h3><p>一次让 AI 做整个系统，就像让一个人同时搬一百个箱子——它一定会摔。</p>
+<p>正确姿势是<strong>拆成小步</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">第 1 步：先把&quot;加一条支出&quot;跑通。</span><br><span class="line">第 2 步：再加&quot;查余额&quot;。</span><br><span class="line">第 3 步：最后加&quot;删除记录&quot;。</span><br></pre></td></tr></table></figure>
+
+<p>每一步都验证、都 commit。<strong>大项目也是小步骤堆出来的。</strong></p>
+<h3 id="❌-坑-3：把”能跑”当成”做完了”"><a href="#❌-坑-3：把”能跑”当成”做完了”" class="headerlink" title="❌ 坑 3：把”能跑”当成”做完了”"></a>❌ 坑 3：把”能跑”当成”做完了”</h3><p>页面能打开、点得通，<strong>不等于</strong>功能可靠。真实故障都藏在那些你没想到的角落：重复点击、空数据、网络超时、权限绕过。</p>
+<p>我后来发现记账本有个 bug：<strong>如果直接按两次回车，会加两条相同的记录</strong>。页面看起来一切正常，但账算错了。这种问题，AI 生成的代码不会提醒你，只能靠你多测多想。</p>
+<h2 id="两周后，我会走到哪？"><a href="#两周后，我会走到哪？" class="headerlink" title="两周后，我会走到哪？"></a>两周后，我会走到哪？</h2><p>我给个诚实的时间线（我自己的真实节奏）：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>你大概能做什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 天</td>
+<td>跑通记账本、理解数据流向、学会 commit</td>
+</tr>
+<tr>
+<td>第 3 天</td>
+<td>做第二个小工具，开始自己提”更具体”的需求</td>
+</tr>
+<tr>
+<td>第 1 周</td>
+<td>敢做一个有 5 个功能的小应用，学会拆步骤</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>开始懂”哪种代码要小心”（权限、删数据、生产）</td>
+</tr>
+</tbody></table>
+<p><strong>第 2 周不是你变强了，是你变懂事了</strong>——知道哪些能让 AI 干，哪些得自己盯着。</p>
+<h2 id="最后一句"><a href="#最后一句" class="headerlink" title="最后一句"></a>最后一句</h2><p>Vibe Coding 降低的不是编程的门槛，而是**”想法到能跑的 Demo”的距离**。它让每个人都能把脑子里的东西变成屏幕上能跑的东西。</p>
+<p>但记住那句话：<strong>谁提交，谁负责。</strong> AI 帮你写代码，你负责它写得对不对、安不安全、能不能滚回去。</p>
+<p>工具会变，责任不会。希望你第二个星期，能敢用 AI 做出一个真正属于你的小东西。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%85%A5%E9%97%A8/" rel="tag"># 入门</a>
+              <a href="/tags/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" rel="tag"># 工程实践</a>
+              <a href="/tags/AI%E7%BC%96%E7%A8%8B/" rel="tag"># AI编程</a>
+              <a href="/tags/Vibe-Coding/" rel="tag"># Vibe Coding</a>
+              <a href="/tags/%E6%95%99%E7%A8%8B/" rel="tag"># 教程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/08/26/2026-08-26-%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E8%A3%85hermes%E4%BB%8E%E9%9B%B6%E5%88%B0%E8%83%BD%E8%B7%9F%E5%AE%83%E8%81%8A%E5%A4%A9/" rel="prev" title="在服务器上装 Hermes：从零到能跟它聊天，我踩了哪些坑">
+                  <i class="fa fa-angle-left"></i> 在服务器上装 Hermes：从零到能跟它聊天，我踩了哪些坑
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2024 – 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-code"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">无敌杰尼龟</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<script src="/js/custom-modern.js?v=20260717a"></script>
+
+</body>
+</html>

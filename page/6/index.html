@@ -175,13 +175,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-count">79</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -208,6 +208,162 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/02/16/2020-02-16-%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7/" class="post-title-link" itemprop="url">代码规范的重要性</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-02-16 16:42:09" itemprop="dateCreated datePublished" datetime="2020-02-16T16:42:09+08:00">2020-02-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B%E8%A7%84%E8%8C%83/" itemprop="url" rel="index"><span itemprop="name">工程规范</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/code-style-cover.svg" alt="代码规范的重要性封面图"></p>
+<blockquote>
+<p>代码规范真正节省的不是敲键盘时间，而是未来每一次阅读、Review 和故障排查的时间。格式可以交给工具，命名、边界和失败语义仍然需要团队判断。</p>
+</blockquote>
+<h2 id="一次看似普通的-Review"><a href="#一次看似普通的-Review" class="headerlink" title="一次看似普通的 Review"></a>一次看似普通的 Review</h2><p>下面的方法功能没有错，却让 Review 很难进行：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doIt</span><span class="params">(Long id, String s, Integer t)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">u</span> <span class="operator">=</span> userMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (u != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (t == <span class="number">1</span>) &#123;</span><br><span class="line">            u.setStatus(<span class="number">2</span>);</span><br><span class="line">            userMapper.updateById(u);</span><br><span class="line">            log.info(<span class="string">&quot;ok:&#123;&#125;&quot;</span>, id);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>问题不只是缩写：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">doIt 不表达业务动作</span><br><span class="line">s 没有被使用，调用方却必须传</span><br><span class="line">数字 1、2 的含义不可见</span><br><span class="line">用户不存在时静默返回</span><br><span class="line">没有说明为什么允许状态变化</span><br><span class="line">日志无法判断动作、旧状态和原因</span><br></pre></td></tr></table></figure>
+
+<p>如果团队只统一缩进，这段代码仍然难维护。规范必须覆盖业务表达和失败语义。</p>
+<h2 id="改造后的版本"><a href="#改造后的版本" class="headerlink" title="改造后的版本"></a>改造后的版本</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">freezeAccount</span><span class="params">(Long userId, String reason)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> getExistingUser(userId);</span><br><span class="line">    <span class="keyword">if</span> (UserStatus.FROZEN.equals(user.getStatus())) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    validateCanFreeze(user, reason);</span><br><span class="line">    userRepository.updateStatus(userId, UserStatus.FROZEN);</span><br><span class="line">    log.info(<span class="string">&quot;用户账号已冻结, userId=&#123;&#125;, previousStatus=&#123;&#125;, reason=&#123;&#125;&quot;</span>,</span><br><span class="line">        userId, user.getStatus(), reason);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>变化包括：方法名表达动作，魔法值变成枚举，校验提取为单一职责方法，日志包含排查所需上下文。代码多了几行，却减少了调用者和维护者的猜测。</p>
+<h2 id="1-命名是最便宜的设计"><a href="#1-命名是最便宜的设计" class="headerlink" title="1. 命名是最便宜的设计"></a>1. 命名是最便宜的设计</h2><p>变量和方法名应该回答“它代表什么”，而不是“它是什么类型”：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不清晰</span></span><br><span class="line">List&lt;Order&gt; list;</span><br><span class="line"><span class="type">boolean</span> flag;</span><br><span class="line"><span class="type">long</span> time;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更具体</span></span><br><span class="line">List&lt;Order&gt; pendingOrders;</span><br><span class="line"><span class="type">boolean</span> inventoryReserved;</span><br><span class="line"><span class="type">long</span> paymentDeadlineMillis;</span><br></pre></td></tr></table></figure>
+
+<p>命名也要保持同一业务词汇。产品文档写“冻结库存”，代码一部分叫 <code>lockStock</code>，另一部分叫 <code>occupyAmount</code>，会增加沟通成本。可以维护一份领域术语表，让接口、数据库和代码尽量使用同一语言。</p>
+<p>避免为了短而缩写。<code>ctx</code>、<code>req</code> 在局部范围可能清楚，<code>ps</code>、<code>d</code>、<code>x1</code> 通常只对作者当时清楚。</p>
+<h2 id="2-方法只处在一个抽象层次"><a href="#2-方法只处在一个抽象层次" class="headerlink" title="2. 方法只处在一个抽象层次"></a>2. 方法只处在一个抽象层次</h2><p>业务方法里同时出现流程判断、SQL 拼装和 HTTP 细节，会很难阅读：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">submitOrder</span><br><span class="line">  -&gt; validateCommand</span><br><span class="line">  -&gt; calculatePrice</span><br><span class="line">  -&gt; reserveInventory</span><br><span class="line">  -&gt; createOrder</span><br><span class="line">  -&gt; publishCreatedEvent</span><br></pre></td></tr></table></figure>
+
+<p>顶层方法应该像流程说明，具体实现下沉到对应对象。提取方法不是为了把 100 行机械拆成十个 10 行方法，而是给不同意图命名。</p>
+<p>过长参数列表也会暴露缺少业务对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 参数含义容易传错</span></span><br><span class="line">createOrder(userId, skuId, count, addressId, couponId, source);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 命令对象可以统一校验和演进</span></span><br><span class="line">createOrder(CreateOrderCommand command);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-提前返回减少嵌套"><a href="#3-提前返回减少嵌套" class="headerlink" title="3. 提前返回减少嵌套"></a>3. 提前返回减少嵌套</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> OrderView <span class="title function_">queryOrder</span><span class="params">(String orderNo)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(orderNo)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;订单号不能为空&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">Order</span> <span class="variable">order</span> <span class="operator">=</span> orderRepository.findByOrderNo(orderNo);</span><br><span class="line">    <span class="keyword">if</span> (order == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderNotFoundException</span>(orderNo);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> orderAssembler.toView(order);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数非法和对象不存在先退出，主流程保持在较低缩进层级。提前返回不是所有地方都要使用，但对校验和异常分支很有效。</p>
+<h2 id="4-异常要带业务上下文"><a href="#4-异常要带业务上下文" class="headerlink" title="4. 异常要带业务上下文"></a>4. 异常要带业务上下文</h2><p>下面的处理让故障变得不可追踪：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;支付失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至少保留原始异常和关键业务标识：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    paymentClient.pay(command);</span><br><span class="line">&#125; <span class="keyword">catch</span> (PaymentException ex) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">OrderPaymentException</span>(</span><br><span class="line">        <span class="string">&quot;订单支付失败, orderNo=&quot;</span> + command.getOrderNo(), ex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不要捕获 <code>Exception</code> 后返回成功，也不要同一个异常在每层重复打印完整堆栈。通常由最了解业务上下文的一层补充信息，在统一边界记录一次。</p>
+<h2 id="5-日志规范不是多打印"><a href="#5-日志规范不是多打印" class="headerlink" title="5. 日志规范不是多打印"></a>5. 日志规范不是多打印</h2><p>有价值的日志包含动作、结果、业务主键和必要原因：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;库存冻结成功, orderNo=&#123;&#125;, skuId=&#123;&#125;, quantity=&#123;&#125;&quot;</span>,</span><br><span class="line">    orderNo, skuId, quantity);</span><br></pre></td></tr></table></figure>
+
+<p>避免：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">进入方法</span><br><span class="line">执行成功</span><br><span class="line">参数=&#123;整个请求对象&#125;</span><br><span class="line">发生异常=&#123;只有 getMessage()&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个请求对象可能包含密码、Token 或个人信息，也会制造大量日志。规范应明确敏感字段、日志级别和采样策略。</p>
+<h2 id="6-注释解释为什么"><a href="#6-注释解释为什么" class="headerlink" title="6. 注释解释为什么"></a>6. 注释解释为什么</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 支付渠道最多查询最近 30 天记录，超过范围必须走离线对账</span></span><br><span class="line"><span class="keyword">if</span> (createdAt.isBefore(thirtyDaysAgo)) &#123;</span><br><span class="line">    <span class="keyword">return</span> offlineReconciliation(orderNo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这类注释解释业务约束，保留价值高。下面的注释只重复代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用户 ID 赋值给 userId</span></span><br><span class="line"><span class="type">Long</span> <span class="variable">userId</span> <span class="operator">=</span> user.getId();</span><br></pre></td></tr></table></figure>
+
+<p>代码变化后，过期注释比没有注释更危险。Review 时要把注释和代码当成一个整体检查。</p>
+<h2 id="7-可以自动化的全部交给工具"><a href="#7-可以自动化的全部交给工具" class="headerlink" title="7. 可以自动化的全部交给工具"></a>7. 可以自动化的全部交给工具</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">格式化：IDE Formatter / Spotless</span><br><span class="line">静态检查：Checkstyle / PMD / SpotBugs</span><br><span class="line">依赖漏洞：依赖扫描</span><br><span class="line">测试：Maven test + CI</span><br><span class="line">覆盖率：JaCoCo，作为趋势而不是唯一质量指标</span><br></pre></td></tr></table></figure>
+
+<p>统一 IDEA 格式配置并放入仓库，避免每个人手工争论空格和换行。CI 检查失败要给出明确修复命令，不能只留下一个红色任务。</p>
+<p>自动化规则不要一次开启几百条并要求全量旧代码立即通过。可以先对新增和修改代码生效，再逐步治理存量。</p>
+<h2 id="8-Review-看什么"><a href="#8-Review-看什么" class="headerlink" title="8. Review 看什么"></a>8. Review 看什么</h2><p>我会按这个顺序 Review：</p>
+<ol>
+<li>需求是否被正确理解，边界条件有没有遗漏。</li>
+<li>数据和接口是否兼容，失败后状态是否可解释。</li>
+<li>是否存在重复、过长方法、多层嵌套和不清晰命名。</li>
+<li>异常、日志和事务边界是否合理。</li>
+<li>并发、性能和安全风险是否被考虑。</li>
+<li>测试是否覆盖主要分支。</li>
+<li>最后才是格式问题，通常应由工具解决。</li>
+</ol>
+<p>Review 意见要说明原因和风险：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">不建议：这里写得不好，改一下。</span><br><span class="line"></span><br><span class="line">建议：当前先写订单再调用库存，库存失败会留下 CREATED 状态。</span><br><span class="line">请明确失败状态或补偿任务，并增加对应测试。</span><br></pre></td></tr></table></figure>
+
+<h2 id="9-规范如何在团队落地"><a href="#9-规范如何在团队落地" class="headerlink" title="9. 规范如何在团队落地"></a>9. 规范如何在团队落地</h2><p>一份没人看的文档不会自动改变代码。有效做法是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">从高频问题中提炼 10 条核心规则</span><br><span class="line">提供正反示例</span><br><span class="line">格式和静态检查进入 CI</span><br><span class="line">PR 模板加入业务、数据、测试和回滚项</span><br><span class="line">Review 中统一引用规则编号</span><br><span class="line">每季度删除无价值规则并补充新案例</span><br></pre></td></tr></table></figure>
+
+<p>规范也需要例外机制。性能热点、框架约束或兼容代码可能无法遵循普通写法，但例外应在代码或设计记录中解释原因。</p>
+<h2 id="最后看质量"><a href="#最后看质量" class="headerlink" title="最后看质量"></a>最后看质量</h2><p>规范的目标不是让所有代码看起来像一个人写的，而是让任何团队成员都能更快理解、修改和验证。真正有效的规范会减少 Review 往返、降低缺陷率、缩短新人上手时间，并让线上日志更容易使用。</p>
+<p>当团队开始讨论业务边界和失败语义，而不是反复争论括号位置，代码规范才真正发挥作用。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +409,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -453,7 +609,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -569,7 +725,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -685,7 +841,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -801,7 +957,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -917,7 +1073,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1032,7 +1188,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1147,7 +1303,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1262,7 +1418,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
+      <time title="修改时间：2026-10-08 12:09:14" itemprop="dateModified" datetime="2026-10-08T12:09:14+08:00">2026-10-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1306,121 +1462,6 @@
 <p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
 <p>对 Spring AOP初探 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/06/29/2019-06-29-Spring%20MVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E7%90%86%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/06/29/2019-06-29-Spring%20MVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E7%90%86%E8%A7%A3/" class="post-title-link" itemprop="url">Spring MVC请求流程理解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-06-29 18:42:33" itemprop="dateCreated datePublished" datetime="2019-06-29T18:42:33+08:00">2019-06-29</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-08 11:45:55" itemprop="dateModified" datetime="2026-10-08T11:45:55+08:00">2026-10-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在能写 Controller 之后，我开始追问一个问题：请求到底是怎么一步步进入方法里的。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-06 前后学习和实践 <strong>Spring MVC请求流程理解</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>Controller 方法为什么能接到参数</li>
-<li>DispatcherServlet 到底做了什么</li>
-<li>视图解析器和 JSON 返回分不清</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Spring MVC 是围绕 DispatcherServlet 展开的请求分发体系，它负责协调映射、适配、调用和响应。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserController</span> &#123;</span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;id&#125;&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="keyword">public</span> UserVO <span class="title function_">detail</span><span class="params">(<span class="meta">@PathVariable</span> Long id)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> userService.findById(id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>dispatcher<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>dispatcher<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 Spring MVC请求流程理解 的理解，我最后沉淀成几条经验：</p>
 <ul>
 <li>先理解它解决什么问题，再记具体用法；</li>
 <li>先跑通最小 Demo，再接入完整项目；</li>
