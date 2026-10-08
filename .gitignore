@@ -12,3 +12,8 @@ db.json
 .tmp-prune-images.py
 .DS_Store
 *.log
+
+# Hermes 本地文件：不入公开仓库（2026-10-08）
+.hermes.md
+parse_news.py
+parse_news2.py
