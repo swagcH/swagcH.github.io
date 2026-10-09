@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="520" viewBox="0 0 1280 520" role="img" aria-label="Vibe Coding 两周学习节奏时间线">
+  <rect width="1280" height="520" fill="#081218"/>
+  <rect x="48" y="36" width="1184" height="448" rx="18" fill="#111e25" stroke="#31505c"/>
+  <text x="88" y="92" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="20">TIMELINE / 两周的真实节奏</text>
+  <text x="88" y="128" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="19">不画大饼：每一格的判断标准都是"你能独立做完什么"</text>
+
+  <!-- 轴线 -->
+  <path d="M150 232H1130" stroke="#31505c" stroke-width="4"/>
+  <path d="M1112 223L1130 232L1112 241" fill="none" stroke="#31505c" stroke-width="4"/>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="19">
+    <!-- 节点 1 -->
+    <circle cx="240" cy="232" r="11" fill="#2dd4bf"/>
+    <text x="196" y="204" fill="#c8faf1" font-size="20" font-weight="700">第 1 天</text>
+    <rect x="128" y="270" width="224" height="118" rx="10" fill="#09161b" stroke="#2dd4bf"/>
+    <text x="150" y="306" fill="#c8faf1" font-size="17">跑通记账本</text>
+    <text x="150" y="336" fill="#9fb8be" font-size="16">看懂数据落在哪</text>
+    <text x="150" y="364" fill="#9fb8be" font-size="16">学会 commit / 回滚</text>
+
+    <!-- 节点 2 -->
+    <circle cx="530" cy="232" r="11" fill="#60a5fa"/>
+    <text x="486" y="204" fill="#d3e6fd" font-size="20" font-weight="700">第 3 天</text>
+    <rect x="418" y="270" width="224" height="118" rx="10" fill="#09161b" stroke="#60a5fa"/>
+    <text x="440" y="306" fill="#d3e6fd" font-size="17">第二个小工具</text>
+    <text x="440" y="336" fill="#9fb8be" font-size="16">开始主动提</text>
+    <text x="440" y="364" fill="#9fb8be" font-size="16">"更具体"的需求</text>
+
+    <!-- 节点 3 -->
+    <circle cx="820" cy="232" r="11" fill="#a78bfa"/>
+    <text x="776" y="204" fill="#ddd0fd" font-size="20" font-weight="700">第 1 周</text>
+    <rect x="708" y="270" width="224" height="118" rx="10" fill="#09161b" stroke="#a78bfa"/>
+    <text x="730" y="306" fill="#ddd0fd" font-size="17">5 个功能的小应用</text>
+    <text x="730" y="336" fill="#9fb8be" font-size="16">会拆垂直切片</text>
+    <text x="730" y="364" fill="#9fb8be" font-size="16">每步都留回滚点</text>
+
+    <!-- 节点 4 -->
+    <circle cx="1080" cy="232" r="11" fill="#fbbf24"/>
+    <text x="1022" y="204" fill="#f7e4a6" font-size="20" font-weight="700">第 2 周</text>
+    <rect x="968" y="270" width="224" height="118" rx="10" fill="#09161b" stroke="#fbbf24"/>
+    <text x="990" y="306" fill="#f7e4a6" font-size="17">心里有数了</text>
+    <text x="990" y="336" fill="#9fb8be" font-size="16">知道哪些能让 AI 干</text>
+    <text x="990" y="364" fill="#9fb8be" font-size="16">哪些必须自己盯</text>
+  </g>
+
+  <rect x="128" y="414" width="1064" height="52" rx="8" fill="#0b181e" stroke="#31505c"/>
+  <text x="158" y="447" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">第二周不是你变强了，是你变懂事了 —— 知道边界在哪，比会写多少代码更值钱</text>
+</svg>

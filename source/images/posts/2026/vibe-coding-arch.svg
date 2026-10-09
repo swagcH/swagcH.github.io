@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="Vibe Coding 工具链与数据流架构图">
+  <rect width="1280" height="640" fill="#081218"/>
+  <rect x="48" y="40" width="1184" height="560" rx="18" fill="#111e25" stroke="#31505c"/>
+  <text x="88" y="100" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="20">VIBE CODING / 工具链与数据流</text>
+  <text x="88" y="140" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="20">你只管说需求，但必须知道每一环落在哪</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="22">
+    <rect x="88" y="196" width="212" height="112" rx="10" fill="#09161b" stroke="#2dd4bf"/>
+    <text x="150" y="245" fill="#c8faf1">你</text>
+    <text x="120" y="281" fill="#6f8d95" font-size="17">提需求 / 定边界</text>
+
+    <rect x="352" y="196" width="232" height="112" rx="10" fill="#09161b" stroke="#60a5fa"/>
+    <text x="410" y="245" fill="#d3e6fd">AI 助手</text>
+    <text x="382" y="281" fill="#6f8d95" font-size="17">生成代码 · 不改主意</text>
+
+    <rect x="636" y="196" width="252" height="112" rx="10" fill="#09161b" stroke="#a78bfa"/>
+    <text x="690" y="245" fill="#ddd0fd">编辑器 / 文件系统</text>
+    <text x="666" y="281" fill="#6f8d95" font-size="17">代码落盘，数据也落盘</text>
+
+    <rect x="940" y="196" width="212" height="112" rx="10" fill="#09161b" stroke="#fbbf24"/>
+    <text x="988" y="245" fill="#f7e4a6">运行时</text>
+    <text x="968" y="281" fill="#6f8d95" font-size="17">node 跑起来见真章</text>
+  </g>
+
+  <g stroke="#69808a" stroke-width="3" fill="none">
+    <path d="M300 252H352"/><path d="M330 243L352 252L330 261"/>
+    <path d="M584 252H636"/><path d="M614 243L636 252L614 261"/>
+    <path d="M888 252H940"/><path d="M918 243L940 252L918 261"/>
+  </g>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="21">
+    <rect x="352" y="366" width="232" height="104" rx="10" fill="#09161b" stroke="#34d399"/>
+    <text x="404" y="412" fill="#bff3e0">Git 版本控制</text>
+    <text x="382" y="448" fill="#6f8d95" font-size="17">提交 = 回滚点</text>
+  </g>
+  <g stroke="#34d399" stroke-width="3" fill="none">
+    <path d="M762 308V418H584"/><path d="M604 409L584 418L604 427"/>
+  </g>
+
+  <rect x="636" y="366" width="516" height="104" rx="10" fill="#0b181e" stroke="#31505c"/>
+  <text x="664" y="410" fill="#9fb8be" font-family="Menlo,Consolas,monospace" font-size="18">fs.writeFileSync('./ledger.json', data)</text>
+  <text x="664" y="446" fill="#fbbf24" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">./ 表示当前工作目录（cwd）——换目录跑，就是另一个账本</text>
+
+  <rect x="88" y="510" width="1064" height="58" rx="8" fill="#0b181e" stroke="#31505c"/>
+  <text x="120" y="547" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">能跑 ≠ 能用：中间那三步（看 diff、搞清数据流、留回滚点）才是你真正要负责的部分</text>
+</svg>

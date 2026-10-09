@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600" role="img" aria-label="模糊需求与具体需求的产出对比图">
+  <rect width="1280" height="600" fill="#081218"/>
+  <rect x="48" y="36" width="1184" height="528" rx="18" fill="#111e25" stroke="#31505c"/>
+  <text x="88" y="92" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="20">SCOPE / 需求粒度决定产出质量</text>
+
+  <!-- 左：模糊 -->
+  <rect x="88" y="130" width="520" height="330" rx="12" fill="#1a1114" stroke="#fb7185"/>
+  <text x="118" y="176" fill="#fecdd3" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24" font-weight="700">✕ 一句话要一个系统</text>
+  <text x="118" y="212" fill="#9fb8be" font-family="Menlo,Consolas,monospace" font-size="18">"帮我做个网站"</text>
+
+  <g fill="#2a1519" stroke="#fb7185" stroke-width="2">
+    <rect x="118" y="248" width="140" height="62" rx="6"/>
+    <rect x="272" y="248" width="140" height="62" rx="6"/>
+    <rect x="426" y="248" width="152" height="62" rx="6"/>
+    <rect x="118" y="324" width="210" height="62" rx="6"/>
+    <rect x="342" y="324" width="236" height="62" rx="6"/>
+  </g>
+  <g fill="#fecdd3" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="17">
+    <text x="136" y="285">用户系统？</text>
+    <text x="290" y="285">支付？</text>
+    <text x="444" y="285">后台？</text>
+    <text x="136" y="361">数据存哪？</text>
+    <text x="360" y="361">要不要登录？</text>
+  </g>
+  <text x="118" y="428" fill="#fb7185" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">AI 只能猜 —— 猜错的部分你事后都要还</text>
+
+  <!-- 右：具体 -->
+  <rect x="672" y="130" width="520" height="330" rx="12" fill="#0c1a18" stroke="#34d399"/>
+  <text x="702" y="176" fill="#bff3e0" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="24" font-weight="700">✓ 垂直切片，一步一验</text>
+  <text x="702" y="212" fill="#9fb8be" font-family="Menlo,Consolas,monospace" font-size="17">"先做能跑的最小版"</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="17">
+    <rect x="702" y="242" width="190" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="720" y="275" fill="#bff3e0">1 加一条支出</text>
+    <rect x="906" y="242" width="256" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="924" y="275" fill="#bff3e0">跑通 → commit（回滚点 1）</text>
+    <rect x="702" y="308" width="190" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="720" y="341" fill="#bff3e0">2 查总余额</text>
+    <rect x="906" y="308" width="256" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="924" y="341" fill="#bff3e0">跑通 → commit（回滚点 2）</text>
+    <rect x="702" y="374" width="190" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="720" y="407" fill="#bff3e0">3 删除记录</text>
+    <rect x="906" y="374" width="256" height="52" rx="6" fill="#0f2a26" stroke="#34d399"/>
+    <text x="924" y="407" fill="#bff3e0">跑通 → commit（回滚点 3）</text>
+  </g>
+
+  <rect x="88" y="486" width="1104" height="58" rx="8" fill="#0b181e" stroke="#31505c"/>
+  <text x="118" y="523" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">同样是 5 个功能：左边是 5 个未知数，右边是 5 次可验证、可回滚的小步</text>
+</svg>
