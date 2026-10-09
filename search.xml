@@ -1497,53 +1497,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Git版本控制入门</title>
-    <url>/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/</url>
-    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从手动复制代码到使用 Git 管理版本，是我在 2019 年开始项目实践时迈出的第一步。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-01 前后学习和实践 <strong>Git版本控制入门</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>不知道 add、commit、push 分别做了什么</li>
-<li>误把 target 和 .class 文件提交到了仓库</li>
-<li>合并代码时出现冲突，不敢随便改</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Git 本质上是在本地维护一个对象数据库，工作区、暂存区、本地仓库、远程仓库是四个不同层次。理解这几层之后，很多命令就不再是死记硬背。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 初始化仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看状态</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加到暂存区</span></span><br><span class="line">git add src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库</span></span><br><span class="line">git commit -m <span class="string">&quot;feat: add user module&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关联远程仓库并推送</span></span><br><span class="line">git remote add origin https://github.com/example/demo.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target/</span><br><span class="line">*.class</span><br><span class="line">*.log</span><br><span class="line">.idea/</span><br><span class="line">*.iml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 解决冲突后的常见流程</span></span><br><span class="line">git pull origin master</span><br><span class="line"><span class="comment"># 手动编辑冲突文件</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;fix: resolve merge conflict&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 Git版本控制入门 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-]]></content>
-      <categories>
-        <category>开发工具</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>版本控制</tag>
-        <tag>GitHub</tag>
-        <tag>项目实践</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>2018年度学习总结</title>
     <url>/2018/12/30/2018-12-30-2018%E5%B9%B4%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/</url>
     <content><![CDATA[<p>现在是 2018 年 12 月 30 日深夜，窗外很安静，桌面上摊着几本书、一杯凉掉的咖啡、开着 IDE 的屏幕。刚刚跑通了一个 Spring 的小 Demo，不算什么了不起的东西，但我盯着控制台里那几行日志，愣是坐了好一会儿。</p>
@@ -1619,6 +1572,53 @@
         <tag>学习路线</tag>
         <tag>回顾</tag>
         <tag>展望</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git版本控制入门</title>
+    <url>/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从手动复制代码到使用 Git 管理版本，是我在 2019 年开始项目实践时迈出的第一步。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-01 前后学习和实践 <strong>Git版本控制入门</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>不知道 add、commit、push 分别做了什么</li>
+<li>误把 target 和 .class 文件提交到了仓库</li>
+<li>合并代码时出现冲突，不敢随便改</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Git 本质上是在本地维护一个对象数据库，工作区、暂存区、本地仓库、远程仓库是四个不同层次。理解这几层之后，很多命令就不再是死记硬背。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 初始化仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看状态</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加到暂存区</span></span><br><span class="line">git add src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库</span></span><br><span class="line">git commit -m <span class="string">&quot;feat: add user module&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关联远程仓库并推送</span></span><br><span class="line">git remote add origin https://github.com/example/demo.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">target/</span><br><span class="line">*.class</span><br><span class="line">*.log</span><br><span class="line">.idea/</span><br><span class="line">*.iml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 解决冲突后的常见流程</span></span><br><span class="line">git pull origin master</span><br><span class="line"><span class="comment"># 手动编辑冲突文件</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;fix: resolve merge conflict&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Git版本控制入门 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+]]></content>
+      <categories>
+        <category>开发工具</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>版本控制</tag>
+        <tag>GitHub</tag>
+        <tag>项目实践</tag>
       </tags>
   </entry>
   <entry>
@@ -1761,6 +1761,51 @@
       </tags>
   </entry>
   <entry>
+    <title>Tomcat部署项目</title>
+    <url>/2019/05/19/2019-05-19-Tomcat%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE/</url>
+    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>把项目从本地 IDE 跑到 Tomcat 服务器上，是我第一次真正感受到部署这件事。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-05 前后学习和实践 <strong>Tomcat部署项目</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>IDE 能跑，部署到 Tomcat 就 404</li>
+<li>war 包路径和 context path 搞混</li>
+<li>端口 8080 被占用</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>部署失败多数不是代码问题，而是路径、端口、依赖、配置和运行环境不一致。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mvn clean package</span><br><span class="line"><span class="built_in">cp</span> target/student-system.war /usr/local/tomcat/webapps/</span><br><span class="line"><span class="built_in">cd</span> /usr/local/tomcat/bin</span><br><span class="line">./startup.sh</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看端口占用</span></span><br><span class="line">lsof -i:8080</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看启动日志</span></span><br><span class="line"><span class="built_in">tail</span> -f /usr/local/tomcat/logs/catalina.out</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Tomcat部署项目 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+]]></content>
+      <categories>
+        <category>项目实践</category>
+      </categories>
+      <tags>
+        <tag>服务器</tag>
+        <tag>Java Web</tag>
+        <tag>Tomcat</tag>
+        <tag>部署</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JSP开发笔记</title>
     <url>/2019/04/14/2019-04-14-JSP%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><img src="/images/posts/2019/jsp-notes-cover.svg" alt="JSP开发笔记封面图"></p>
@@ -1804,51 +1849,6 @@
         <tag>Java Web</tag>
         <tag>JSP</tag>
         <tag>页面渲染</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat部署项目</title>
-    <url>/2019/05/19/2019-05-19-Tomcat%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE/</url>
-    <content><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>把项目从本地 IDE 跑到 Tomcat 服务器上，是我第一次真正感受到部署这件事。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-05 前后学习和实践 <strong>Tomcat部署项目</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>IDE 能跑，部署到 Tomcat 就 404</li>
-<li>war 包路径和 context path 搞混</li>
-<li>端口 8080 被占用</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>部署失败多数不是代码问题，而是路径、端口、依赖、配置和运行环境不一致。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mvn clean package</span><br><span class="line"><span class="built_in">cp</span> target/student-system.war /usr/local/tomcat/webapps/</span><br><span class="line"><span class="built_in">cd</span> /usr/local/tomcat/bin</span><br><span class="line">./startup.sh</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看端口占用</span></span><br><span class="line">lsof -i:8080</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看启动日志</span></span><br><span class="line"><span class="built_in">tail</span> -f /usr/local/tomcat/logs/catalina.out</span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 Tomcat部署项目 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-]]></content>
-      <categories>
-        <category>项目实践</category>
-      </categories>
-      <tags>
-        <tag>服务器</tag>
-        <tag>Java Web</tag>
-        <tag>Tomcat</tag>
-        <tag>部署</tag>
       </tags>
   </entry>
   <entry>
@@ -3452,103 +3452,6 @@
       </tags>
   </entry>
   <entry>
-    <title>线上问题排查记录</title>
-    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
-<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
-<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
-<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
-
-<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
-<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
-<p>当时群里很快出现了几个猜测：</p>
-<ul>
-<li>刚发布的新版本有问题。</li>
-<li>数据库变慢。</li>
-<li>网络波动。</li>
-<li>线程池满了。</li>
-</ul>
-<p>值班负责人先把内容分成事实和假设：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
-
-<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
-<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
-
-<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
-<p>日志中的共同异常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
-
-<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
-<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
-
-<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
-<p>连接池指标显示：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
-
-<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
-<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
-<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
-<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
-<ol>
-<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
-<li>摘除两个异常实例，不再接收新请求。</li>
-<li>等待和终止已确认无业务写入的导出任务。</li>
-<li>逐个重启异常实例并完成健康检查。</li>
-<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
-</ol>
-<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
-<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
-<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
-
-<p>数据库查询改为每批 500 条：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
-<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
-
-<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
-<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
-<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
-<li>导出改为异步分页任务。</li>
-<li>设置导出并发上限和单用户频率限制。</li>
-<li>补充 1 万条数据的集成测试。</li>
-<li>连接池等待数进入告警。</li>
-</ul>
-<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
-<li>建立外部调用统一超时配置。</li>
-<li>Review 清单增加“事务中是否包含远程调用”。</li>
-<li>发布看板增加连接池、线程池和下游耗时。</li>
-<li>为大批量任务建立独立执行资源。</li>
-</ul>
-<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
-<li>导出任务平均和最大处理时间。</li>
-<li>每批数据大小是否需要调整。</li>
-<li>客户批量接口的失败和限流情况。</li>
-</ul>
-<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
-<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
-
-<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
-]]></content>
-      <categories>
-        <category>问题排查</category>
-      </categories>
-      <tags>
-        <tag>线上问题</tag>
-        <tag>故障排查</tag>
-        <tag>日志</tag>
-        <tag>复盘</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>项目部署标准化流程</title>
     <url>/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/</url>
     <content><![CDATA[<p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
@@ -3651,6 +3554,103 @@
         <tag>项目部署</tag>
         <tag>标准化流程</tag>
         <tag>发布</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线上问题排查记录</title>
+    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
+<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
+<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
+
+<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
+<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
+<p>当时群里很快出现了几个猜测：</p>
+<ul>
+<li>刚发布的新版本有问题。</li>
+<li>数据库变慢。</li>
+<li>网络波动。</li>
+<li>线程池满了。</li>
+</ul>
+<p>值班负责人先把内容分成事实和假设：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
+
+<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
+<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
+
+<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
+<p>日志中的共同异常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
+
+<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
+<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+
+<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
+<p>连接池指标显示：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
+
+<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
+<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
+<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
+<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
+<ol>
+<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
+<li>摘除两个异常实例，不再接收新请求。</li>
+<li>等待和终止已确认无业务写入的导出任务。</li>
+<li>逐个重启异常实例并完成健康检查。</li>
+<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
+</ol>
+<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
+<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
+<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
+
+<p>数据库查询改为每批 500 条：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
+<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
+
+<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
+<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
+<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
+<li>导出改为异步分页任务。</li>
+<li>设置导出并发上限和单用户频率限制。</li>
+<li>补充 1 万条数据的集成测试。</li>
+<li>连接池等待数进入告警。</li>
+</ul>
+<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
+<li>建立外部调用统一超时配置。</li>
+<li>Review 清单增加“事务中是否包含远程调用”。</li>
+<li>发布看板增加连接池、线程池和下游耗时。</li>
+<li>为大批量任务建立独立执行资源。</li>
+</ul>
+<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
+<li>导出任务平均和最大处理时间。</li>
+<li>每批数据大小是否需要调整。</li>
+<li>客户批量接口的失败和限流情况。</li>
+</ul>
+<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
+<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
+
+<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
+]]></content>
+      <categories>
+        <category>问题排查</category>
+      </categories>
+      <tags>
+        <tag>线上问题</tag>
+        <tag>故障排查</tag>
+        <tag>日志</tag>
+        <tag>复盘</tag>
       </tags>
   </entry>
   <entry>
@@ -4936,6 +4936,86 @@
       </tags>
   </entry>
   <entry>
+    <title>死锁问题定位过程</title>
+    <url>/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/</url>
+    <content><![CDATA[<p><img src="/images/posts/2021/deadlock-debug-cover.svg" alt="死锁问题定位过程技术图"></p>
+<p>一次批量任务上线后，服务没有崩溃，CPU 和内存也都正常，但部分请求一直处于 pending。重启可以短暂恢复，过一段时间又出现。</p>
+<p>这类现象很容易被误判成下游超时。真正的证据来自线程 dump：两个线程分别持有一把锁，同时等待对方手中的锁，JVM 已经明确报告 Java 级死锁。</p>
+<h2 id="现场信息"><a href="#现场信息" class="headerlink" title="现场信息"></a>现场信息</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现象：批量调拨任务不再推进，相关查询逐渐超时</span><br><span class="line">CPU：22%</span><br><span class="line">堆内存：46%，无持续增长</span><br><span class="line">GC：正常</span><br><span class="line">HTTP 工作线程：大量 WAITING / BLOCKED</span><br><span class="line">数据库连接池：未满</span><br><span class="line">开始时间：19:17 左右</span><br></pre></td></tr></table></figure>
+
+<p>监控只说明资源没有明显耗尽，无法证明线程正在正常工作。重启前，我们先在一个异常实例保存现场。</p>
+<h2 id="第一步：连续抓取线程-dump"><a href="#第一步：连续抓取线程-dump" class="headerlink" title="第一步：连续抓取线程 dump"></a>第一步：连续抓取线程 dump</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jps -l</span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-1.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-2.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-3.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>三次采集间隔约 10 秒。连续快照可以区分“正在执行一段较慢代码”和“始终停在同一等待点”。</p>
+<p>生产线程 dump 可能包含类名、业务标识和内部地址，应由授权人员采集并安全保存。采集命令通常开销可控，但仍要观察繁忙进程状态，避免高频循环抓取。</p>
+<p>先按线程状态做粗略统计：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rg <span class="string">&#x27;java.lang.Thread.State&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c</span><br></pre></td></tr></table></figure>
+
+<p>结果中 <code>BLOCKED</code> 数量持续增加。继续搜索 JVM 的死锁结论：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rg -n <span class="string">&#x27;deadlock|waiting to lock|locked &lt;&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>文件末尾出现：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Found one Java-level deadlock:</span><br><span class="line">=============================</span><br><span class="line">&quot;transfer-worker-7&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000001</span><br><span class="line">  which is held by &quot;transfer-worker-12&quot;</span><br><span class="line"></span><br><span class="line">&quot;transfer-worker-12&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000002</span><br><span class="line">  which is held by &quot;transfer-worker-7&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这已经不是“可能死锁”，而是 JVM 给出的闭环证据。</p>
+<h2 id="第二步：还原两条锁链"><a href="#第二步：还原两条锁链" class="headerlink" title="第二步：还原两条锁链"></a>第二步：还原两条锁链</h2><p>线程 7 的关键栈：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">&quot;transfer-worker-7&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000b&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000a&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
+
+<p>线程 12：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">&quot;transfer-worker-12&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000a&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000b&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
+
+<p>画成等待图：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">worker-7  持有仓库 A 锁 -&gt; 等待仓库 B 锁</span><br><span class="line">worker-12 持有仓库 B 锁 -&gt; 等待仓库 A 锁</span><br><span class="line">                         ^              |</span><br><span class="line">                         +--------------+</span><br></pre></td></tr></table></figure>
+
+<p>两个线程都不会主动释放已持有锁，因此相关任务永久等待。随着更多请求等待这两个仓库，工作线程也逐渐被占满。</p>
+<h2 id="第三步：对应到代码"><a href="#第三步：对应到代码" class="headerlink" title="第三步：对应到代码"></a>第三步：对应到代码</h2><p>简化后的旧实现：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">sourceLock</span> <span class="operator">=</span> lockRegistry.get(sourceWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">targetLock</span> <span class="operator">=</span> lockRegistry.get(targetWarehouseId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (sourceLock) &#123;</span><br><span class="line">        checkAndDecrease(sourceWarehouseId, productId, quantity);</span><br><span class="line">        <span class="keyword">synchronized</span> (targetLock) &#123;</span><br><span class="line">            increase(targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请求 <code>A -&gt; B</code> 先锁 A 后锁 B；另一个请求 <code>B -&gt; A</code> 先锁 B 后锁 A。代码单独看没有语法问题，并发组合后形成循环等待。</p>
+<p>还要确认 <code>lockRegistry</code> 对同一个仓库 ID 是否始终返回同一个对象。如果每次 <code>new Object()</code>，锁根本无法提供互斥；如果 registry 无界增长，又会产生内存问题。</p>
+<h2 id="临时恢复"><a href="#临时恢复" class="headerlink" title="临时恢复"></a>临时恢复</h2><p>死锁中的线程无法通过业务超时自动恢复。我们先停止批量任务入口，保存三份 dump 和相关任务号，再摘除异常实例并正常重启。</p>
+<p>重启会打断当前任务，执行前确认：</p>
+<ul>
+<li>调拨操作是否有事务。</li>
+<li>已执行步骤能否幂等重试。</li>
+<li>消息是否会重新投递。</li>
+<li>是否存在需要人工核对的中间状态。</li>
+</ul>
+<p>不能只看接口恢复就重新打开批量入口，否则同一组相反方向任务会再次触发。</p>
+<h2 id="修复一：所有调用使用稳定锁顺序"><a href="#修复一：所有调用使用稳定锁顺序" class="headerlink" title="修复一：所有调用使用稳定锁顺序"></a>修复一：所有调用使用稳定锁顺序</h2><p>按仓库 ID 从小到大获取锁，与调拨方向无关：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (sourceWarehouseId.equals(targetWarehouseId)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;SAME_WAREHOUSE_TRANSFER&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Long</span> <span class="variable">firstId</span> <span class="operator">=</span> Math.min(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Long</span> <span class="variable">secondId</span> <span class="operator">=</span> Math.max(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">firstLock</span> <span class="operator">=</span> lockRegistry.get(firstId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">secondLock</span> <span class="operator">=</span> lockRegistry.get(secondId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (firstLock) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (secondLock) &#123;</span><br><span class="line">            <span class="comment">// 获取顺序固定后，再按真实业务方向更新</span></span><br><span class="line">            doTransfer(sourceWarehouseId, targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>A -&gt; B</code> 和 <code>B -&gt; A</code> 都先获取编号较小的锁，不再形成环。</p>
+<p>锁内只保留必要计算和本地数据更新，不执行远程调用、文件 IO 或不受控重试。持锁时间越长，吞吐越低，故障影响也越大。</p>
+<h2 id="修复二：增加有限等待和可观察性"><a href="#修复二：增加有限等待和可观察性" class="headerlink" title="修复二：增加有限等待和可观察性"></a>修复二：增加有限等待和可观察性</h2><p>一致顺序解决当前死锁，但线程仍可能因其他缺陷长时间等待。对于需要超时能力的场景，可以使用 <code>ReentrantLock.tryLock</code>：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">firstAcquired</span> <span class="operator">=</span> firstLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line"><span class="keyword">if</span> (!firstAcquired) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">secondAcquired</span> <span class="operator">=</span> secondLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">    <span class="keyword">if</span> (!secondAcquired) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        doTransfer(sourceId, targetId, productId, quantity);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        secondLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    firstLock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获取失败要返回可处理的业务结果或进入重试队列，不能无限紧循环重试。所有成功获取都必须在 <code>finally</code> 中释放。</p>
+<p>实际项目将锁等待次数、等待耗时和失败仓库编号做成指标，日志只记录脱敏业务 ID，不输出完整请求对象。</p>
+<h2 id="单元测试要主动制造相反顺序"><a href="#单元测试要主动制造相反顺序" class="headerlink" title="单元测试要主动制造相反顺序"></a>单元测试要主动制造相反顺序</h2><p>普通串行测试永远不会触发。我们使用两个线程同时执行 <code>A -&gt; B</code> 和 <code>B -&gt; A</code>，并设置测试超时：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test(timeout = 3000)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">oppositeTransfersShouldCompleteWithoutDeadlock</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">start</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    Future&lt;?&gt; first = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">1L</span>, <span class="number">2L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    Future&lt;?&gt; second = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">2L</span>, <span class="number">1L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    start.countDown();</span><br><span class="line">    first.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">    second.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个测试证明当前实现不会永久等待，但并发测试仍可能受调度影响。还需要代码 Review 检查锁顺序，并在压测中重复运行更多随机组合。</p>
+<h2 id="JVM-锁解决不了多实例一致性"><a href="#JVM-锁解决不了多实例一致性" class="headerlink" title="JVM 锁解决不了多实例一致性"></a>JVM 锁解决不了多实例一致性</h2><p>服务部署多个实例后，实例 A 的 <code>synchronized</code> 无法阻止实例 B 同时修改相同库存。真实库存一致性最终要依赖数据库条件更新、事务、版本号或经过设计的分布式协调。</p>
+<p>例如扣减可以让数据库原子判断：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> warehouse_stock</span><br><span class="line"><span class="keyword">SET</span> available <span class="operator">=</span> available <span class="operator">-</span> :quantity,</span><br><span class="line">    version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">WHERE</span> warehouse_id <span class="operator">=</span> :warehouseId</span><br><span class="line">  <span class="keyword">AND</span> product_id <span class="operator">=</span> :productId</span><br><span class="line">  <span class="keyword">AND</span> available <span class="operator">&gt;=</span> :quantity</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> :version;</span><br></pre></td></tr></table></figure>
+
+<p>受影响行数为 0 时重新读取并按业务决定重试或失败。不要因为修复了单 JVM 死锁，就误以为分布式并发也已解决。</p>
+<h2 id="取证报告的最终结论"><a href="#取证报告的最终结论" class="headerlink" title="取证报告的最终结论"></a>取证报告的最终结论</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">直接证据：JVM 报告 Java-level deadlock</span><br><span class="line">线程闭环：worker-7 持 A 等 B，worker-12 持 B 等 A</span><br><span class="line">代码原因：锁顺序跟随业务参数方向</span><br><span class="line">触发条件：两个仓库同时发生相反方向调拨</span><br><span class="line">短期恢复：停止入口、保存现场、摘流重启</span><br><span class="line">长期修复：按仓库 ID 固定加锁顺序，增加有限等待与并发测试</span><br><span class="line">额外风险：JVM 锁不覆盖多实例</span><br></pre></td></tr></table></figure>
+
+<p>这次定位过程并不依赖猜测。线程状态、对象地址、持有关系和源码行号组成了完整证据链。遇到“CPU 不高但请求不动”时，先保留线程现场，往往比反复重启更接近答案。</p>
+]]></content>
+      <categories>
+        <category>故障排查</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>死锁</tag>
+        <tag>线程 dump</tag>
+        <tag>并发问题</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>RabbitMQ消息丢失排查</title>
     <url>/2021/10/24/2021-10-24-RabbitMQ%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E6%8E%92%E6%9F%A5/</url>
     <content><![CDATA[<p><img src="/images/posts/2021/rabbitmq-message-loss-cover.svg" alt="RabbitMQ消息丢失排查技术图"></p>
@@ -5031,86 +5111,6 @@
         <tag>消息队列</tag>
         <tag>消息丢失</tag>
         <tag>可靠性</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>死锁问题定位过程</title>
-    <url>/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/</url>
-    <content><![CDATA[<p><img src="/images/posts/2021/deadlock-debug-cover.svg" alt="死锁问题定位过程技术图"></p>
-<p>一次批量任务上线后，服务没有崩溃，CPU 和内存也都正常，但部分请求一直处于 pending。重启可以短暂恢复，过一段时间又出现。</p>
-<p>这类现象很容易被误判成下游超时。真正的证据来自线程 dump：两个线程分别持有一把锁，同时等待对方手中的锁，JVM 已经明确报告 Java 级死锁。</p>
-<h2 id="现场信息"><a href="#现场信息" class="headerlink" title="现场信息"></a>现场信息</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现象：批量调拨任务不再推进，相关查询逐渐超时</span><br><span class="line">CPU：22%</span><br><span class="line">堆内存：46%，无持续增长</span><br><span class="line">GC：正常</span><br><span class="line">HTTP 工作线程：大量 WAITING / BLOCKED</span><br><span class="line">数据库连接池：未满</span><br><span class="line">开始时间：19:17 左右</span><br></pre></td></tr></table></figure>
-
-<p>监控只说明资源没有明显耗尽，无法证明线程正在正常工作。重启前，我们先在一个异常实例保存现场。</p>
-<h2 id="第一步：连续抓取线程-dump"><a href="#第一步：连续抓取线程-dump" class="headerlink" title="第一步：连续抓取线程 dump"></a>第一步：连续抓取线程 dump</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jps -l</span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-1.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-2.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-3.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
-
-<p>三次采集间隔约 10 秒。连续快照可以区分“正在执行一段较慢代码”和“始终停在同一等待点”。</p>
-<p>生产线程 dump 可能包含类名、业务标识和内部地址，应由授权人员采集并安全保存。采集命令通常开销可控，但仍要观察繁忙进程状态，避免高频循环抓取。</p>
-<p>先按线程状态做粗略统计：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rg <span class="string">&#x27;java.lang.Thread.State&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c</span><br></pre></td></tr></table></figure>
-
-<p>结果中 <code>BLOCKED</code> 数量持续增加。继续搜索 JVM 的死锁结论：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rg -n <span class="string">&#x27;deadlock|waiting to lock|locked &lt;&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
-
-<p>文件末尾出现：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Found one Java-level deadlock:</span><br><span class="line">=============================</span><br><span class="line">&quot;transfer-worker-7&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000001</span><br><span class="line">  which is held by &quot;transfer-worker-12&quot;</span><br><span class="line"></span><br><span class="line">&quot;transfer-worker-12&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000002</span><br><span class="line">  which is held by &quot;transfer-worker-7&quot;</span><br></pre></td></tr></table></figure>
-
-<p>这已经不是“可能死锁”，而是 JVM 给出的闭环证据。</p>
-<h2 id="第二步：还原两条锁链"><a href="#第二步：还原两条锁链" class="headerlink" title="第二步：还原两条锁链"></a>第二步：还原两条锁链</h2><p>线程 7 的关键栈：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">&quot;transfer-worker-7&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000b&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000a&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
-
-<p>线程 12：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">&quot;transfer-worker-12&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000a&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000b&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
-
-<p>画成等待图：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">worker-7  持有仓库 A 锁 -&gt; 等待仓库 B 锁</span><br><span class="line">worker-12 持有仓库 B 锁 -&gt; 等待仓库 A 锁</span><br><span class="line">                         ^              |</span><br><span class="line">                         +--------------+</span><br></pre></td></tr></table></figure>
-
-<p>两个线程都不会主动释放已持有锁，因此相关任务永久等待。随着更多请求等待这两个仓库，工作线程也逐渐被占满。</p>
-<h2 id="第三步：对应到代码"><a href="#第三步：对应到代码" class="headerlink" title="第三步：对应到代码"></a>第三步：对应到代码</h2><p>简化后的旧实现：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">sourceLock</span> <span class="operator">=</span> lockRegistry.get(sourceWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">targetLock</span> <span class="operator">=</span> lockRegistry.get(targetWarehouseId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (sourceLock) &#123;</span><br><span class="line">        checkAndDecrease(sourceWarehouseId, productId, quantity);</span><br><span class="line">        <span class="keyword">synchronized</span> (targetLock) &#123;</span><br><span class="line">            increase(targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>请求 <code>A -&gt; B</code> 先锁 A 后锁 B；另一个请求 <code>B -&gt; A</code> 先锁 B 后锁 A。代码单独看没有语法问题，并发组合后形成循环等待。</p>
-<p>还要确认 <code>lockRegistry</code> 对同一个仓库 ID 是否始终返回同一个对象。如果每次 <code>new Object()</code>，锁根本无法提供互斥；如果 registry 无界增长，又会产生内存问题。</p>
-<h2 id="临时恢复"><a href="#临时恢复" class="headerlink" title="临时恢复"></a>临时恢复</h2><p>死锁中的线程无法通过业务超时自动恢复。我们先停止批量任务入口，保存三份 dump 和相关任务号，再摘除异常实例并正常重启。</p>
-<p>重启会打断当前任务，执行前确认：</p>
-<ul>
-<li>调拨操作是否有事务。</li>
-<li>已执行步骤能否幂等重试。</li>
-<li>消息是否会重新投递。</li>
-<li>是否存在需要人工核对的中间状态。</li>
-</ul>
-<p>不能只看接口恢复就重新打开批量入口，否则同一组相反方向任务会再次触发。</p>
-<h2 id="修复一：所有调用使用稳定锁顺序"><a href="#修复一：所有调用使用稳定锁顺序" class="headerlink" title="修复一：所有调用使用稳定锁顺序"></a>修复一：所有调用使用稳定锁顺序</h2><p>按仓库 ID 从小到大获取锁，与调拨方向无关：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (sourceWarehouseId.equals(targetWarehouseId)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;SAME_WAREHOUSE_TRANSFER&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Long</span> <span class="variable">firstId</span> <span class="operator">=</span> Math.min(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Long</span> <span class="variable">secondId</span> <span class="operator">=</span> Math.max(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">firstLock</span> <span class="operator">=</span> lockRegistry.get(firstId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">secondLock</span> <span class="operator">=</span> lockRegistry.get(secondId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (firstLock) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (secondLock) &#123;</span><br><span class="line">            <span class="comment">// 获取顺序固定后，再按真实业务方向更新</span></span><br><span class="line">            doTransfer(sourceWarehouseId, targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>A -&gt; B</code> 和 <code>B -&gt; A</code> 都先获取编号较小的锁，不再形成环。</p>
-<p>锁内只保留必要计算和本地数据更新，不执行远程调用、文件 IO 或不受控重试。持锁时间越长，吞吐越低，故障影响也越大。</p>
-<h2 id="修复二：增加有限等待和可观察性"><a href="#修复二：增加有限等待和可观察性" class="headerlink" title="修复二：增加有限等待和可观察性"></a>修复二：增加有限等待和可观察性</h2><p>一致顺序解决当前死锁，但线程仍可能因其他缺陷长时间等待。对于需要超时能力的场景，可以使用 <code>ReentrantLock.tryLock</code>：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">firstAcquired</span> <span class="operator">=</span> firstLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line"><span class="keyword">if</span> (!firstAcquired) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">secondAcquired</span> <span class="operator">=</span> secondLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">    <span class="keyword">if</span> (!secondAcquired) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        doTransfer(sourceId, targetId, productId, quantity);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        secondLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    firstLock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>获取失败要返回可处理的业务结果或进入重试队列，不能无限紧循环重试。所有成功获取都必须在 <code>finally</code> 中释放。</p>
-<p>实际项目将锁等待次数、等待耗时和失败仓库编号做成指标，日志只记录脱敏业务 ID，不输出完整请求对象。</p>
-<h2 id="单元测试要主动制造相反顺序"><a href="#单元测试要主动制造相反顺序" class="headerlink" title="单元测试要主动制造相反顺序"></a>单元测试要主动制造相反顺序</h2><p>普通串行测试永远不会触发。我们使用两个线程同时执行 <code>A -&gt; B</code> 和 <code>B -&gt; A</code>，并设置测试超时：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test(timeout = 3000)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">oppositeTransfersShouldCompleteWithoutDeadlock</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">start</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    Future&lt;?&gt; first = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">1L</span>, <span class="number">2L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    Future&lt;?&gt; second = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">2L</span>, <span class="number">1L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    start.countDown();</span><br><span class="line">    first.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">    second.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个测试证明当前实现不会永久等待，但并发测试仍可能受调度影响。还需要代码 Review 检查锁顺序，并在压测中重复运行更多随机组合。</p>
-<h2 id="JVM-锁解决不了多实例一致性"><a href="#JVM-锁解决不了多实例一致性" class="headerlink" title="JVM 锁解决不了多实例一致性"></a>JVM 锁解决不了多实例一致性</h2><p>服务部署多个实例后，实例 A 的 <code>synchronized</code> 无法阻止实例 B 同时修改相同库存。真实库存一致性最终要依赖数据库条件更新、事务、版本号或经过设计的分布式协调。</p>
-<p>例如扣减可以让数据库原子判断：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> warehouse_stock</span><br><span class="line"><span class="keyword">SET</span> available <span class="operator">=</span> available <span class="operator">-</span> :quantity,</span><br><span class="line">    version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">WHERE</span> warehouse_id <span class="operator">=</span> :warehouseId</span><br><span class="line">  <span class="keyword">AND</span> product_id <span class="operator">=</span> :productId</span><br><span class="line">  <span class="keyword">AND</span> available <span class="operator">&gt;=</span> :quantity</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> :version;</span><br></pre></td></tr></table></figure>
-
-<p>受影响行数为 0 时重新读取并按业务决定重试或失败。不要因为修复了单 JVM 死锁，就误以为分布式并发也已解决。</p>
-<h2 id="取证报告的最终结论"><a href="#取证报告的最终结论" class="headerlink" title="取证报告的最终结论"></a>取证报告的最终结论</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">直接证据：JVM 报告 Java-level deadlock</span><br><span class="line">线程闭环：worker-7 持 A 等 B，worker-12 持 B 等 A</span><br><span class="line">代码原因：锁顺序跟随业务参数方向</span><br><span class="line">触发条件：两个仓库同时发生相反方向调拨</span><br><span class="line">短期恢复：停止入口、保存现场、摘流重启</span><br><span class="line">长期修复：按仓库 ID 固定加锁顺序，增加有限等待与并发测试</span><br><span class="line">额外风险：JVM 锁不覆盖多实例</span><br></pre></td></tr></table></figure>
-
-<p>这次定位过程并不依赖猜测。线程状态、对象地址、持有关系和源码行号组成了完整证据链。遇到“CPU 不高但请求不动”时，先保留线程现场，往往比反复重启更接近答案。</p>
-]]></content>
-      <categories>
-        <category>故障排查</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>死锁</tag>
-        <tag>线程 dump</tag>
-        <tag>并发问题</tag>
       </tags>
   </entry>
   <entry>
@@ -5676,116 +5676,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Docker基础部署，Docker Compose实践</title>
-    <url>/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/</url>
-    <content><![CDATA[<blockquote>
-<p>这篇做一个可以实际运行的部署练习：把 JDK 8 的 Spring Boot 应用构建成镜像，再使用 Docker Compose 启动应用、MySQL 和 Redis。重点不只是 <code>up -d</code>，还包括网络、健康检查、数据卷、日志和排障。</p>
-</blockquote>
-<h2 id="0-最终目录"><a href="#0-最终目录" class="headerlink" title="0. 最终目录"></a>0. 最终目录</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">demo-app</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── .dockerignore</span><br><span class="line">├── compose.yaml</span><br><span class="line">├── .env.example</span><br><span class="line">├── pom.xml</span><br><span class="line">└── src</span><br></pre></td></tr></table></figure>
-
-<p>Docker Compose V2 推荐使用 <code>docker compose</code> 命令。旧环境可能仍然使用独立的 <code>docker-compose</code>。新版 Compose 文件可以省略顶层 <code>version</code>，旧项目中的 <code>version: &quot;3.8&quot;</code> 仍然常见，但不要把它和 Docker Engine 版本混为一谈。</p>
-<h2 id="1-先理解四个对象"><a href="#1-先理解四个对象" class="headerlink" title="1. 先理解四个对象"></a>1. 先理解四个对象</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Image：只读构建产物</span><br><span class="line">Container：镜像运行后的进程和隔离环境</span><br><span class="line">Network：容器之间的通信空间和 DNS</span><br><span class="line">Volume：独立于容器生命周期的数据存储</span><br></pre></td></tr></table></figure>
-
-<p>容器不是轻量虚拟机。一个容器通常运行一个主要前台进程，进程退出，容器也会停止。容器内写入层可以保存临时文件，但删除容器后数据会消失，因此 MySQL 数据必须放在 Volume。</p>
-<h2 id="2-为-Spring-Boot-编写-Dockerfile"><a href="#2-为-Spring-Boot-编写-Dockerfile" class="headerlink" title="2. 为 Spring Boot 编写 Dockerfile"></a>2. 为 Spring Boot 编写 Dockerfile</h2><p>使用多阶段构建，第一阶段通过 Maven 打包，第二阶段只保留 JRE 和 Jar：</p>
-<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> maven:<span class="number">3.8</span>.<span class="number">8</span>-eclipse-temurin-<span class="number">8</span> AS build</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /workspace</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> pom.xml ./</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B dependency:go-offline</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> src ./src</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B -DskipTests package</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> eclipse-temurin:<span class="number">8</span>-jre</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> groupadd --system app \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; useradd --system --gid app --home-dir /app app</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=build /workspace/target/*.jar /app/app.jar</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> app</span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>, <span class="string">&quot;-jar&quot;</span>, <span class="string">&quot;/app/app.jar&quot;</span>]</span></span><br></pre></td></tr></table></figure>
-
-<p>这里有几个目的：</p>
-<ol>
-<li>构建环境和运行环境分开，运行镜像不包含 Maven 缓存和源代码。</li>
-<li>先复制 <code>pom.xml</code> 下载依赖，依赖不变时可以复用构建缓存。</li>
-<li>应用使用非 root 用户运行。</li>
-<li>Jar 名称在镜像中固定为 <code>app.jar</code>，启动命令不依赖版本号。</li>
-</ol>
-<p>基础镜像标签应该固定到经过验证的版本或 digest。示例标签用于说明结构，正式项目需要经过漏洞扫描和升级流程。</p>
-<p>如果项目打包目录里可能有多个 Jar，<code>target/*.jar</code> 会匹配多个文件并导致构建失败。可以在 Maven 中固定 <code>finalName</code>，或者在构建脚本中明确选择可执行 Jar。</p>
-<h2 id="3-减少无关构建上下文"><a href="#3-减少无关构建上下文" class="headerlink" title="3. 减少无关构建上下文"></a>3. 减少无关构建上下文</h2><p><code>.dockerignore</code>：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">.git</span><br><span class="line">.idea</span><br><span class="line">target</span><br><span class="line">logs</span><br><span class="line">*.iml</span><br><span class="line">README.md</span><br><span class="line">compose.yaml</span><br><span class="line">.env</span><br></pre></td></tr></table></figure>
-
-<p>Docker 构建会把上下文发送给 daemon。忽略 <code>target</code>、日志和本地环境文件可以提升速度，也能避免把密钥误打进镜像层。</p>
-<p>构建并检查：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker build -t demo-app:1.0.0 .</span><br><span class="line">docker image inspect demo-app:1.0.0</span><br><span class="line">docker <span class="built_in">history</span> demo-app:1.0.0</span><br></pre></td></tr></table></figure>
-
-<p>不要只使用永久不变的 <code>latest</code>。至少同时保留不可变版本标签，方便回滚和追踪实际部署内容。</p>
-<h2 id="4-编写-Compose"><a href="#4-编写-Compose" class="headerlink" title="4. 编写 Compose"></a>4. 编写 Compose</h2><p><code>.env.example</code> 只保留变量名和示例值，真实 <code>.env</code> 不提交：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">MYSQL_ROOT_PASSWORD=change-me</span><br><span class="line">MYSQL_APP_PASSWORD=change-me</span><br></pre></td></tr></table></figure>
-
-<p><code>compose.yaml</code>：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mysql:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0.36</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">$&#123;MYSQL_ROOT_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_USER:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">TZ:</span> <span class="string">Asia/Shanghai</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-data:/var/lib/mysql</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD-SHELL&quot;</span>, <span class="string">&quot;mysqladmin ping -h 127.0.0.1 -p$$&#123;MYSQL_ROOT_PASSWORD&#125;&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">start_period:</span> <span class="string">30s</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:6.2.14</span></span><br><span class="line">    <span class="attr">command:</span> [<span class="string">&quot;redis-server&quot;</span>, <span class="string">&quot;--appendonly&quot;</span>, <span class="string">&quot;yes&quot;</span>]</span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis-data:/data</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;redis-cli&quot;</span>, <span class="string">&quot;ping&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">3s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">demo-app:1.0.0</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_USERNAME:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_PORT:</span> <span class="number">6379</span></span><br><span class="line">      <span class="attr">JAVA_TOOL_OPTIONS:</span> <span class="string">-Xms256m</span> <span class="string">-Xmx512m</span> <span class="string">-XX:+ExitOnOutOfMemoryError</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">      <span class="attr">redis:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    <span class="attr">logging:</span></span><br><span class="line">      <span class="attr">driver:</span> <span class="string">json-file</span></span><br><span class="line">      <span class="attr">options:</span></span><br><span class="line">        <span class="attr">max-size:</span> <span class="string">100m</span></span><br><span class="line">        <span class="attr">max-file:</span> <span class="string">&quot;5&quot;</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">mysql-data:</span></span><br><span class="line">  <span class="attr">redis-data:</span></span><br></pre></td></tr></table></figure>
-
-<p>示例没有把 MySQL 和 Redis 端口映射到宿主机，因为只有应用容器需要访问它们。减少端口暴露可以降低误访问风险。本地确实需要客户端连接时，再显式增加 <code>127.0.0.1:3306:3306</code>，避免监听所有网卡。</p>
-<p><code>depends_on</code> 的健康条件需要较新的 Compose 实现。旧版本可能只保证启动顺序，不等待服务真正可用，因此应用自身仍应有有限重试和明确的启动失败日志。</p>
-<p><code>-XX:+ExitOnOutOfMemoryError</code> 需要较新的 JDK 8 update，使用前要通过实际基础镜像验证。JVM 堆也不能等于容器全部内存，还要给 Metaspace、线程栈和堆外内存留空间。</p>
-<h2 id="5-为什么容器里不能用-localhost"><a href="#5-为什么容器里不能用-localhost" class="headerlink" title="5. 为什么容器里不能用 localhost"></a>5. 为什么容器里不能用 localhost</h2><p>Compose 默认会创建一个项目网络，服务名自动成为 DNS 名称：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">app -&gt; mysql:3306</span><br><span class="line">app -&gt; redis:6379</span><br></pre></td></tr></table></figure>
-
-<p>应用容器里的 <code>localhost</code> 只指向应用容器自己，不是宿主机，也不是 MySQL 容器。因此：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo</span></span><br><span class="line"><span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br></pre></td></tr></table></figure>
-
-<p>从应用容器检查 DNS 和端口：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose <span class="built_in">exec</span> app getent hosts mysql</span><br><span class="line">docker run --<span class="built_in">rm</span> --network demo-app_default busybox:1.36.1 nc -zv mysql 3306</span><br></pre></td></tr></table></figure>
-
-<p>基础镜像不一定包含 <code>curl</code>、<code>ping</code> 或 <code>nc</code>。调试时不要为了一个命令永久把大量工具装进运行镜像，可以临时启动同网络的诊断容器。示例网络名会随 Compose 项目名变化，应先通过 <code>docker network ls</code> 确认。</p>
-<h2 id="6-启动与验证"><a href="#6-启动与验证" class="headerlink" title="6. 启动与验证"></a>6. 启动与验证</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose config</span><br><span class="line">docker compose up -d</span><br><span class="line">docker compose ps</span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=200 app</span><br></pre></td></tr></table></figure>
-
-<p><code>docker compose config</code> 会解析变量并校验最终配置。输出可能包含展开后的密码，不要把完整结果贴到公开工单或日志平台。</p>
-<p>验证健康接口：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br></pre></td></tr></table></figure>
-
-<p>再查看容器资源：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker stats --no-stream</span><br><span class="line">docker compose top</span><br></pre></td></tr></table></figure>
-
-<p>启动成功的标准不是三个容器都显示 <code>Up</code>，而是应用健康检查正常，数据库连接可用，Redis 读写成功，并且日志没有持续重连。</p>
-<h2 id="7-验证数据卷"><a href="#7-验证数据卷" class="headerlink" title="7. 验证数据卷"></a>7. 验证数据卷</h2><p>先写入一条测试数据，再重建容器：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose down</span><br><span class="line">docker compose up -d</span><br></pre></td></tr></table></figure>
-
-<p>不带 <code>-v</code> 时，命名 Volume 会保留。确认数据仍存在以后，再检查卷位置：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line">docker volume inspect demo-app_mysql-data</span><br></pre></td></tr></table></figure>
-
-<p>下面的命令会同时删除容器和声明的 Volume，数据不可恢复：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose down -v</span><br></pre></td></tr></table></figure>
-
-<p>只能在确认数据可删除的开发环境使用。生产数据还需要独立备份，Volume 本身不是备份。</p>
-<h2 id="8-五个常见故障"><a href="#8-五个常见故障" class="headerlink" title="8. 五个常见故障"></a>8. 五个常见故障</h2><h3 id="8-1-容器反复重启"><a href="#8-1-容器反复重启" class="headerlink" title="8.1 容器反复重启"></a>8.1 容器反复重启</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose ps</span><br><span class="line">APP_CONTAINER=$(docker compose ps -q app)</span><br><span class="line">docker inspect --format <span class="string">&#x27;&#123;&#123;.State.ExitCode&#125;&#125; &#123;&#123;.State.Error&#125;&#125;&#x27;</span> <span class="string">&quot;<span class="variable">$APP_CONTAINER</span>&quot;</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=300 app</span><br></pre></td></tr></table></figure>
-
-<p>先看退出码和最后一段日志。<code>restart: unless-stopped</code> 会不断拉起失败进程，容易让真正的首次异常滚出日志窗口。</p>
-<h3 id="8-2-MySQL-一直不健康"><a href="#8-2-MySQL-一直不健康" class="headerlink" title="8.2 MySQL 一直不健康"></a>8.2 MySQL 一直不健康</h3><p>检查密码变量是否正确展开、数据目录权限、旧数据卷与新版本是否兼容。MySQL 初始化只在空数据目录执行，修改环境变量不会自动修改已有数据库用户密码。</p>
-<h3 id="8-3-应用能解析服务名但连不上"><a href="#8-3-应用能解析服务名但连不上" class="headerlink" title="8.3 应用能解析服务名但连不上"></a>8.3 应用能解析服务名但连不上</h3><p>检查服务是否在同一个网络、目标进程是否监听 <code>0.0.0.0</code>，以及端口使用的是容器端口还是宿主机映射端口。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker network <span class="built_in">ls</span></span><br><span class="line">docker network inspect demo-app_default</span><br></pre></td></tr></table></figure>
-
-<h3 id="8-4-磁盘被日志写满"><a href="#8-4-磁盘被日志写满" class="headerlink" title="8.4 磁盘被日志写满"></a>8.4 磁盘被日志写满</h3><p>Docker <code>json-file</code> 默认可能持续增长。Compose 中已经限制单文件和数量，仍要监控 Docker 根目录和应用自身文件日志，避免两套日志重复写盘。</p>
-<h3 id="8-5-镜像在另一台机器无法运行"><a href="#8-5-镜像在另一台机器无法运行" class="headerlink" title="8.5 镜像在另一台机器无法运行"></a>8.5 镜像在另一台机器无法运行</h3><p>确认 CPU 架构、镜像是否成功推送、私有仓库认证和配置文件来源。Apple Silicon 本地构建的镜像部署到 x86 服务器时，尤其要检查目标平台。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker image inspect demo-app:1.0.0 --format <span class="string">&#x27;&#123;&#123;.Architecture&#125;&#125;/&#123;&#123;.Os&#125;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="9-配置和密钥"><a href="#9-配置和密钥" class="headerlink" title="9. 配置和密钥"></a>9. 配置和密钥</h2><p>Compose 环境变量适合本地练习，但生产环境不能把密码直接写进仓库。至少做到：</p>
-<ul>
-<li><code>.env</code> 加入 <code>.gitignore</code>。</li>
-<li>使用独立的应用数据库账号，不使用 root。</li>
-<li>密钥通过受控平台、挂载文件或 Secrets 管理。</li>
-<li>日志禁止打印数据库 URL 中的密码和 Token。</li>
-<li>配置变更有审计和回滚版本。</li>
-</ul>
-<p>Docker 镜像应当只包含通用应用，不把某个环境的 <code>application-prod.yml</code> 和密钥烘焙进去。</p>
-<h2 id="10-Compose-的适用边界"><a href="#10-Compose-的适用边界" class="headerlink" title="10. Compose 的适用边界"></a>10. Compose 的适用边界</h2><p>Compose 很适合本地开发、自动化测试和单机多容器部署。它能把依赖关系固化成代码，也方便复现环境。</p>
-<p>生产环境还需要考虑：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">多机调度和节点故障</span><br><span class="line">滚动升级与自动回滚</span><br><span class="line">集中式 Secrets</span><br><span class="line">服务发现和负载均衡</span><br><span class="line">资源限制与配额</span><br><span class="line">日志、指标和告警</span><br><span class="line">数据备份与恢复</span><br></pre></td></tr></table></figure>
-
-<p>这些问题不是再写几行 Compose 就能全部解决的。是否进入 Kubernetes 等平台，要根据服务规模和运维能力决定。</p>
-<h2 id="收尾命令"><a href="#收尾命令" class="headerlink" title="收尾命令"></a>收尾命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看最终状态</span></span><br><span class="line">docker compose ps</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看最近日志</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=100 app mysql redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止但保留数据卷</span></span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure>
-
-<p>这次实践真正解决的不是“会用 Docker 命令”，而是把构建、网络、配置、依赖和数据生命周期写成了一个可以重复执行的环境。能够在另一台干净机器上用同一份配置启动并验证，才是容器化带来的环境一致性。</p>
-]]></content>
-      <categories>
-        <category>架构成长</category>
-      </categories>
-      <tags>
-        <tag>部署</tag>
-        <tag>Docker</tag>
-        <tag>Docker Compose</tag>
-        <tag>容器化</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Redis高可用架构</title>
     <url>/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/</url>
     <content><![CDATA[<blockquote>
@@ -5920,6 +5810,116 @@
         <tag>高可用</tag>
         <tag>缓存架构</tag>
         <tag>哨兵模式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker基础部署，Docker Compose实践</title>
+    <url>/2022/08/14/2022-08-14-Docker%E5%9F%BA%E7%A1%80%E9%83%A8%E7%BD%B2%EF%BC%8CDocker%20Compose%E5%AE%9E%E8%B7%B5/</url>
+    <content><![CDATA[<blockquote>
+<p>这篇做一个可以实际运行的部署练习：把 JDK 8 的 Spring Boot 应用构建成镜像，再使用 Docker Compose 启动应用、MySQL 和 Redis。重点不只是 <code>up -d</code>，还包括网络、健康检查、数据卷、日志和排障。</p>
+</blockquote>
+<h2 id="0-最终目录"><a href="#0-最终目录" class="headerlink" title="0. 最终目录"></a>0. 最终目录</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">demo-app</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── .dockerignore</span><br><span class="line">├── compose.yaml</span><br><span class="line">├── .env.example</span><br><span class="line">├── pom.xml</span><br><span class="line">└── src</span><br></pre></td></tr></table></figure>
+
+<p>Docker Compose V2 推荐使用 <code>docker compose</code> 命令。旧环境可能仍然使用独立的 <code>docker-compose</code>。新版 Compose 文件可以省略顶层 <code>version</code>，旧项目中的 <code>version: &quot;3.8&quot;</code> 仍然常见，但不要把它和 Docker Engine 版本混为一谈。</p>
+<h2 id="1-先理解四个对象"><a href="#1-先理解四个对象" class="headerlink" title="1. 先理解四个对象"></a>1. 先理解四个对象</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Image：只读构建产物</span><br><span class="line">Container：镜像运行后的进程和隔离环境</span><br><span class="line">Network：容器之间的通信空间和 DNS</span><br><span class="line">Volume：独立于容器生命周期的数据存储</span><br></pre></td></tr></table></figure>
+
+<p>容器不是轻量虚拟机。一个容器通常运行一个主要前台进程，进程退出，容器也会停止。容器内写入层可以保存临时文件，但删除容器后数据会消失，因此 MySQL 数据必须放在 Volume。</p>
+<h2 id="2-为-Spring-Boot-编写-Dockerfile"><a href="#2-为-Spring-Boot-编写-Dockerfile" class="headerlink" title="2. 为 Spring Boot 编写 Dockerfile"></a>2. 为 Spring Boot 编写 Dockerfile</h2><p>使用多阶段构建，第一阶段通过 Maven 打包，第二阶段只保留 JRE 和 Jar：</p>
+<figure class="highlight dockerfile"><table><tr><td class="code"><pre><span class="line"><span class="keyword">FROM</span> maven:<span class="number">3.8</span>.<span class="number">8</span>-eclipse-temurin-<span class="number">8</span> AS build</span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /workspace</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> pom.xml ./</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B dependency:go-offline</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> src ./src</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> mvn -B -DskipTests package</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> eclipse-temurin:<span class="number">8</span>-jre</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> groupadd --system app \</span></span><br><span class="line"><span class="language-bash">    &amp;&amp; useradd --system --gid app --home-dir /app app</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> --from=build /workspace/target/*.jar /app/app.jar</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">USER</span> app</span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>, <span class="string">&quot;-jar&quot;</span>, <span class="string">&quot;/app/app.jar&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>这里有几个目的：</p>
+<ol>
+<li>构建环境和运行环境分开，运行镜像不包含 Maven 缓存和源代码。</li>
+<li>先复制 <code>pom.xml</code> 下载依赖，依赖不变时可以复用构建缓存。</li>
+<li>应用使用非 root 用户运行。</li>
+<li>Jar 名称在镜像中固定为 <code>app.jar</code>，启动命令不依赖版本号。</li>
+</ol>
+<p>基础镜像标签应该固定到经过验证的版本或 digest。示例标签用于说明结构，正式项目需要经过漏洞扫描和升级流程。</p>
+<p>如果项目打包目录里可能有多个 Jar，<code>target/*.jar</code> 会匹配多个文件并导致构建失败。可以在 Maven 中固定 <code>finalName</code>，或者在构建脚本中明确选择可执行 Jar。</p>
+<h2 id="3-减少无关构建上下文"><a href="#3-减少无关构建上下文" class="headerlink" title="3. 减少无关构建上下文"></a>3. 减少无关构建上下文</h2><p><code>.dockerignore</code>：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">.git</span><br><span class="line">.idea</span><br><span class="line">target</span><br><span class="line">logs</span><br><span class="line">*.iml</span><br><span class="line">README.md</span><br><span class="line">compose.yaml</span><br><span class="line">.env</span><br></pre></td></tr></table></figure>
+
+<p>Docker 构建会把上下文发送给 daemon。忽略 <code>target</code>、日志和本地环境文件可以提升速度，也能避免把密钥误打进镜像层。</p>
+<p>构建并检查：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker build -t demo-app:1.0.0 .</span><br><span class="line">docker image inspect demo-app:1.0.0</span><br><span class="line">docker <span class="built_in">history</span> demo-app:1.0.0</span><br></pre></td></tr></table></figure>
+
+<p>不要只使用永久不变的 <code>latest</code>。至少同时保留不可变版本标签，方便回滚和追踪实际部署内容。</p>
+<h2 id="4-编写-Compose"><a href="#4-编写-Compose" class="headerlink" title="4. 编写 Compose"></a>4. 编写 Compose</h2><p><code>.env.example</code> 只保留变量名和示例值，真实 <code>.env</code> 不提交：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">MYSQL_ROOT_PASSWORD=change-me</span><br><span class="line">MYSQL_APP_PASSWORD=change-me</span><br></pre></td></tr></table></figure>
+
+<p><code>compose.yaml</code>：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mysql:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0.36</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">$&#123;MYSQL_ROOT_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_USER:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">MYSQL_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">TZ:</span> <span class="string">Asia/Shanghai</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-data:/var/lib/mysql</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD-SHELL&quot;</span>, <span class="string">&quot;mysqladmin ping -h 127.0.0.1 -p$$&#123;MYSQL_ROOT_PASSWORD&#125;&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">10</span></span><br><span class="line">      <span class="attr">start_period:</span> <span class="string">30s</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis:6.2.14</span></span><br><span class="line">    <span class="attr">command:</span> [<span class="string">&quot;redis-server&quot;</span>, <span class="string">&quot;--appendonly&quot;</span>, <span class="string">&quot;yes&quot;</span>]</span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">redis-data:/data</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;redis-cli&quot;</span>, <span class="string">&quot;ping&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">3s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">demo-app:1.0.0</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=Asia/Shanghai</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_USERNAME:</span> <span class="string">demo</span></span><br><span class="line">      <span class="attr">SPRING_DATASOURCE_PASSWORD:</span> <span class="string">$&#123;MYSQL_APP_PASSWORD&#125;</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br><span class="line">      <span class="attr">SPRING_REDIS_PORT:</span> <span class="number">6379</span></span><br><span class="line">      <span class="attr">JAVA_TOOL_OPTIONS:</span> <span class="string">-Xms256m</span> <span class="string">-Xmx512m</span> <span class="string">-XX:+ExitOnOutOfMemoryError</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">      <span class="attr">redis:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line">    <span class="attr">logging:</span></span><br><span class="line">      <span class="attr">driver:</span> <span class="string">json-file</span></span><br><span class="line">      <span class="attr">options:</span></span><br><span class="line">        <span class="attr">max-size:</span> <span class="string">100m</span></span><br><span class="line">        <span class="attr">max-file:</span> <span class="string">&quot;5&quot;</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">unless-stopped</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span></span><br><span class="line">  <span class="attr">mysql-data:</span></span><br><span class="line">  <span class="attr">redis-data:</span></span><br></pre></td></tr></table></figure>
+
+<p>示例没有把 MySQL 和 Redis 端口映射到宿主机，因为只有应用容器需要访问它们。减少端口暴露可以降低误访问风险。本地确实需要客户端连接时，再显式增加 <code>127.0.0.1:3306:3306</code>，避免监听所有网卡。</p>
+<p><code>depends_on</code> 的健康条件需要较新的 Compose 实现。旧版本可能只保证启动顺序，不等待服务真正可用，因此应用自身仍应有有限重试和明确的启动失败日志。</p>
+<p><code>-XX:+ExitOnOutOfMemoryError</code> 需要较新的 JDK 8 update，使用前要通过实际基础镜像验证。JVM 堆也不能等于容器全部内存，还要给 Metaspace、线程栈和堆外内存留空间。</p>
+<h2 id="5-为什么容器里不能用-localhost"><a href="#5-为什么容器里不能用-localhost" class="headerlink" title="5. 为什么容器里不能用 localhost"></a>5. 为什么容器里不能用 localhost</h2><p>Compose 默认会创建一个项目网络，服务名自动成为 DNS 名称：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">app -&gt; mysql:3306</span><br><span class="line">app -&gt; redis:6379</span><br></pre></td></tr></table></figure>
+
+<p>应用容器里的 <code>localhost</code> 只指向应用容器自己，不是宿主机，也不是 MySQL 容器。因此：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">SPRING_DATASOURCE_URL:</span> <span class="string">jdbc:mysql://mysql:3306/demo</span></span><br><span class="line"><span class="attr">SPRING_REDIS_HOST:</span> <span class="string">redis</span></span><br></pre></td></tr></table></figure>
+
+<p>从应用容器检查 DNS 和端口：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose <span class="built_in">exec</span> app getent hosts mysql</span><br><span class="line">docker run --<span class="built_in">rm</span> --network demo-app_default busybox:1.36.1 nc -zv mysql 3306</span><br></pre></td></tr></table></figure>
+
+<p>基础镜像不一定包含 <code>curl</code>、<code>ping</code> 或 <code>nc</code>。调试时不要为了一个命令永久把大量工具装进运行镜像，可以临时启动同网络的诊断容器。示例网络名会随 Compose 项目名变化，应先通过 <code>docker network ls</code> 确认。</p>
+<h2 id="6-启动与验证"><a href="#6-启动与验证" class="headerlink" title="6. 启动与验证"></a>6. 启动与验证</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose config</span><br><span class="line">docker compose up -d</span><br><span class="line">docker compose ps</span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=200 app</span><br></pre></td></tr></table></figure>
+
+<p><code>docker compose config</code> 会解析变量并校验最终配置。输出可能包含展开后的密码，不要把完整结果贴到公开工单或日志平台。</p>
+<p>验证健康接口：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl http://127.0.0.1:8080/actuator/health</span><br></pre></td></tr></table></figure>
+
+<p>再查看容器资源：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker stats --no-stream</span><br><span class="line">docker compose top</span><br></pre></td></tr></table></figure>
+
+<p>启动成功的标准不是三个容器都显示 <code>Up</code>，而是应用健康检查正常，数据库连接可用，Redis 读写成功，并且日志没有持续重连。</p>
+<h2 id="7-验证数据卷"><a href="#7-验证数据卷" class="headerlink" title="7. 验证数据卷"></a>7. 验证数据卷</h2><p>先写入一条测试数据，再重建容器：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose down</span><br><span class="line">docker compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>不带 <code>-v</code> 时，命名 Volume 会保留。确认数据仍存在以后，再检查卷位置：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line">docker volume inspect demo-app_mysql-data</span><br></pre></td></tr></table></figure>
+
+<p>下面的命令会同时删除容器和声明的 Volume，数据不可恢复：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose down -v</span><br></pre></td></tr></table></figure>
+
+<p>只能在确认数据可删除的开发环境使用。生产数据还需要独立备份，Volume 本身不是备份。</p>
+<h2 id="8-五个常见故障"><a href="#8-五个常见故障" class="headerlink" title="8. 五个常见故障"></a>8. 五个常见故障</h2><h3 id="8-1-容器反复重启"><a href="#8-1-容器反复重启" class="headerlink" title="8.1 容器反复重启"></a>8.1 容器反复重启</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker compose ps</span><br><span class="line">APP_CONTAINER=$(docker compose ps -q app)</span><br><span class="line">docker inspect --format <span class="string">&#x27;&#123;&#123;.State.ExitCode&#125;&#125; &#123;&#123;.State.Error&#125;&#125;&#x27;</span> <span class="string">&quot;<span class="variable">$APP_CONTAINER</span>&quot;</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=300 app</span><br></pre></td></tr></table></figure>
+
+<p>先看退出码和最后一段日志。<code>restart: unless-stopped</code> 会不断拉起失败进程，容易让真正的首次异常滚出日志窗口。</p>
+<h3 id="8-2-MySQL-一直不健康"><a href="#8-2-MySQL-一直不健康" class="headerlink" title="8.2 MySQL 一直不健康"></a>8.2 MySQL 一直不健康</h3><p>检查密码变量是否正确展开、数据目录权限、旧数据卷与新版本是否兼容。MySQL 初始化只在空数据目录执行，修改环境变量不会自动修改已有数据库用户密码。</p>
+<h3 id="8-3-应用能解析服务名但连不上"><a href="#8-3-应用能解析服务名但连不上" class="headerlink" title="8.3 应用能解析服务名但连不上"></a>8.3 应用能解析服务名但连不上</h3><p>检查服务是否在同一个网络、目标进程是否监听 <code>0.0.0.0</code>，以及端口使用的是容器端口还是宿主机映射端口。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker network <span class="built_in">ls</span></span><br><span class="line">docker network inspect demo-app_default</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-4-磁盘被日志写满"><a href="#8-4-磁盘被日志写满" class="headerlink" title="8.4 磁盘被日志写满"></a>8.4 磁盘被日志写满</h3><p>Docker <code>json-file</code> 默认可能持续增长。Compose 中已经限制单文件和数量，仍要监控 Docker 根目录和应用自身文件日志，避免两套日志重复写盘。</p>
+<h3 id="8-5-镜像在另一台机器无法运行"><a href="#8-5-镜像在另一台机器无法运行" class="headerlink" title="8.5 镜像在另一台机器无法运行"></a>8.5 镜像在另一台机器无法运行</h3><p>确认 CPU 架构、镜像是否成功推送、私有仓库认证和配置文件来源。Apple Silicon 本地构建的镜像部署到 x86 服务器时，尤其要检查目标平台。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker image inspect demo-app:1.0.0 --format <span class="string">&#x27;&#123;&#123;.Architecture&#125;&#125;/&#123;&#123;.Os&#125;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="9-配置和密钥"><a href="#9-配置和密钥" class="headerlink" title="9. 配置和密钥"></a>9. 配置和密钥</h2><p>Compose 环境变量适合本地练习，但生产环境不能把密码直接写进仓库。至少做到：</p>
+<ul>
+<li><code>.env</code> 加入 <code>.gitignore</code>。</li>
+<li>使用独立的应用数据库账号，不使用 root。</li>
+<li>密钥通过受控平台、挂载文件或 Secrets 管理。</li>
+<li>日志禁止打印数据库 URL 中的密码和 Token。</li>
+<li>配置变更有审计和回滚版本。</li>
+</ul>
+<p>Docker 镜像应当只包含通用应用，不把某个环境的 <code>application-prod.yml</code> 和密钥烘焙进去。</p>
+<h2 id="10-Compose-的适用边界"><a href="#10-Compose-的适用边界" class="headerlink" title="10. Compose 的适用边界"></a>10. Compose 的适用边界</h2><p>Compose 很适合本地开发、自动化测试和单机多容器部署。它能把依赖关系固化成代码，也方便复现环境。</p>
+<p>生产环境还需要考虑：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">多机调度和节点故障</span><br><span class="line">滚动升级与自动回滚</span><br><span class="line">集中式 Secrets</span><br><span class="line">服务发现和负载均衡</span><br><span class="line">资源限制与配额</span><br><span class="line">日志、指标和告警</span><br><span class="line">数据备份与恢复</span><br></pre></td></tr></table></figure>
+
+<p>这些问题不是再写几行 Compose 就能全部解决的。是否进入 Kubernetes 等平台，要根据服务规模和运维能力决定。</p>
+<h2 id="收尾命令"><a href="#收尾命令" class="headerlink" title="收尾命令"></a>收尾命令</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看最终状态</span></span><br><span class="line">docker compose ps</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看最近日志</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=100 app mysql redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止但保留数据卷</span></span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure>
+
+<p>这次实践真正解决的不是“会用 Docker 命令”，而是把构建、网络、配置、依赖和数据生命周期写成了一个可以重复执行的环境。能够在另一台干净机器上用同一份配置启动并验证，才是容器化带来的环境一致性。</p>
+]]></content>
+      <categories>
+        <category>架构成长</category>
+      </categories>
+      <tags>
+        <tag>部署</tag>
+        <tag>Docker</tag>
+        <tag>Docker Compose</tag>
+        <tag>容器化</tag>
       </tags>
   </entry>
   <entry>
@@ -6773,6 +6773,137 @@
       </tags>
   </entry>
   <entry>
+    <title>我的AI编程工作流：让模型先读懂项目再动手</title>
+    <url>/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
+    <content><![CDATA[<p><img src="/images/posts/2025/ai-workflow-cover.png" alt="AI 编程工作流封面图"></p>
+<p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
+<p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
+<p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
+<span id="more"></span>
+
+<h2 id="入口：先给任务分级"><a href="#入口：先给任务分级" class="headerlink" title="入口：先给任务分级"></a>入口：先给任务分级</h2><p>不是每个任务都值得启动完整流程。我先按影响范围分三档：</p>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>例子</th>
+<th>工作方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1 可逆</td>
+<td>改文案、补测试、调整局部样式</td>
+<td>快速修改，执行局部验证</td>
+</tr>
+<tr>
+<td>L2 模块内</td>
+<td>新增接口字段、修改查询、重构 Service</td>
+<td>先读调用链，写计划，小步提交</td>
+</tr>
+<tr>
+<td>L3 高风险</td>
+<td>权限、支付、迁移、生产运维</td>
+<td>人主导设计，双人审查，演练与回滚</td>
+</tr>
+</tbody></table>
+<p>风险不只看代码行数。把按钮颜色改错通常是 L1，删除脚本即使只有一行也可能是 L3。分级决定需要多少上下文、测试和人工确认。</p>
+<p>下面的完整流程主要面向 L2。L1 可以裁剪，L3 还要叠加团队正式变更流程。</p>
+<h2 id="检查点一：把请求改写成任务说明"><a href="#检查点一：把请求改写成任务说明" class="headerlink" title="检查点一：把请求改写成任务说明"></a>检查点一：把请求改写成任务说明</h2><p>原始需求经常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">列表加一个状态筛选。</span><br></pre></td></tr></table></figure>
+
+<p>我不会直接让 AI 改代码，而是先补一张短任务卡：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">问题：运营无法只查看“等待回访”的客户。</span><br><span class="line">目标：客户列表和导出增加 followStatus 筛选。</span><br><span class="line">输入：可选枚举 PENDING、DONE；不传保持原行为。</span><br><span class="line">范围：后端查询与现有前端筛选，不改数据库。</span><br><span class="line">非目标：不重构客户状态模型，不增加批量处理。</span><br><span class="line">验收：列表与导出结果一致；非法值返回现有参数错误码。</span><br></pre></td></tr></table></figure>
+
+<p>“非目标”非常重要。模型擅长顺手完善周边，如果不写边界，一个筛选需求可能变成状态模型重构。</p>
+<p>任务卡不需要一次写对。信息缺失时，让 AI 根据现有描述列出待确认问题，我再向产品或代码事实求证。需求澄清不能由模型自问自答。</p>
+<h2 id="检查点二：只读探索仓库"><a href="#检查点二：只读探索仓库" class="headerlink" title="检查点二：只读探索仓库"></a>检查点二：只读探索仓库</h2><p>第一轮明确要求不修改文件，只回答项目现状。我通常让模型查这些位置：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">构建文件：Java、框架、依赖版本</span><br><span class="line">项目入口：模块边界和启动方式</span><br><span class="line">请求入口：Controller、路由或消息消费者</span><br><span class="line">数据流：Service、Mapper、外部客户端</span><br><span class="line">相邻实现：项目里已经完成的类似功能</span><br><span class="line">测试：当前使用的框架、夹具和断言风格</span><br><span class="line">规范：README、AGENTS.md、架构决策和 CI 配置</span><br></pre></td></tr></table></figure>
+
+<p>探索结果必须带证据，格式可以很简单：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">结论：列表和导出共用 CustomerQueryCondition。</span><br><span class="line">证据：CustomerPageService.java:48、CustomerExportService.java:62。</span><br><span class="line"></span><br><span class="line">结论：项目要求 JDK 8。</span><br><span class="line">证据：pom.xml 的 maven.compiler.source=1.8。</span><br><span class="line"></span><br><span class="line">待确认：非法枚举由全局异常处理还是 Controller 转换。</span><br></pre></td></tr></table></figure>
+
+<p>“证据”和“待确认”能阻止猜测混进结论。若模型找不到某个类，就继续搜索或明确不存在，不根据常见命名补一个出来。</p>
+<h3 id="控制上下文预算"><a href="#控制上下文预算" class="headerlink" title="控制上下文预算"></a>控制上下文预算</h3><p>读仓库不是把所有文件一次塞给模型。我会沿调用链逐层加载：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">入口文件</span><br><span class="line">  -&gt; 它直接调用的接口</span><br><span class="line">  -&gt; 对应实现与数据对象</span><br><span class="line">  -&gt; 一个最接近的参考实现</span><br><span class="line">  -&gt; 相关测试和构建配置</span><br></pre></td></tr></table></figure>
+
+<p>生成目录、压缩后的前端产物、重复日志和无关模块先排除。上下文足够大时，信息选择比信息数量更重要。</p>
+<h2 id="检查点三：修改前先审计划"><a href="#检查点三：修改前先审计划" class="headerlink" title="检查点三：修改前先审计划"></a>检查点三：修改前先审计划</h2><p>项目地图清楚后，让 AI 给出计划，但暂时不写代码。一个可审查的计划至少包含：</p>
+<ol>
+<li>实际要修改的文件；</li>
+<li>每个文件为什么要改；</li>
+<li>数据和调用路径怎样变化；</li>
+<li>空值、异常、并发与兼容边界；</li>
+<li>要新增或运行哪些测试；</li>
+<li>仍然无法确认的风险。</li>
+</ol>
+<p>计划阶段最容易发现范围膨胀。例如任务只需要复用已有查询条件，计划却新建 Repository、Assembler 和通用查询框架，这时删掉比写完后再删便宜得多。</p>
+<p>我还会要求把步骤拆到可独立验证：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 先增加请求字段和参数校验，运行接口层测试；</span><br><span class="line">2. 再增加 Mapper 条件，运行数据库测试；</span><br><span class="line">3. 接入列表并验证原行为；</span><br><span class="line">4. 接入导出并做结果对照；</span><br><span class="line">5. 最后清理重复与更新文档。</span><br></pre></td></tr></table></figure>
+
+<p>一条计划如果要同时修改二十个文件才可运行，通常还没有找到合适的切分点。</p>
+<h2 id="检查点四：按小循环实施"><a href="#检查点四：按小循环实施" class="headerlink" title="检查点四：按小循环实施"></a>检查点四：按小循环实施</h2><p>实施阶段我使用同一条循环：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">修改一个职责</span><br><span class="line">  -&gt; 格式与静态检查</span><br><span class="line">  -&gt; 运行最小相关测试</span><br><span class="line">  -&gt; 阅读版本差异</span><br><span class="line">  -&gt; 记录结果</span><br><span class="line">  -&gt; 进入下一步</span><br></pre></td></tr></table></figure>
+
+<p>这里“阅读差异”不能省。AI 有时会在目标代码之外格式化整个文件、调整错误文案或升级依赖。测试可能照样通过，但 Review 成本和回归范围已经扩大。</p>
+<p>每轮我会检查：</p>
+<ul>
+<li>是否出现任务外文件；</li>
+<li>是否复制了已有能力；</li>
+<li>是否改变公共接口或默认值；</li>
+<li>是否添加未经批准的依赖；</li>
+<li>是否打印密钥、个人数据或完整请求；</li>
+<li>是否使用项目版本不支持的语法；</li>
+<li>注释是在解释原因，还是重复代码表面含义。</li>
+</ul>
+<p>发现方向错误时，优先回到最后一个小步骤，而不是继续提示模型在错误实现上打补丁。</p>
+<h2 id="检查点五：建立验证阶梯"><a href="#检查点五：建立验证阶梯" class="headerlink" title="检查点五：建立验证阶梯"></a>检查点五：建立验证阶梯</h2><p>“已完成”需要对应证据。我把验证从便宜到昂贵排成阶梯：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">语法与格式</span><br><span class="line">  -&gt; 编译 / 类型检查</span><br><span class="line">  -&gt; 目标单元测试</span><br><span class="line">  -&gt; 模块测试</span><br><span class="line">  -&gt; 集成或端到端测试</span><br><span class="line">  -&gt; 构建生产产物</span><br><span class="line">  -&gt; 测试环境真实操作</span><br><span class="line">  -&gt; 监控与回滚演练</span><br></pre></td></tr></table></figure>
+
+<p>简单改动可以停在较低层，高风险改动必须继续向上。关键是清楚说出停在哪里，而不是把“代码看起来没问题”写成“验证通过”。</p>
+<p>Java 项目中，一组常见命令可能是：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 先跑目标测试，快速得到反馈</span></span><br><span class="line">mvn -Dtest=CustomerQueryServiceTest <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再运行模块测试并打包，确认依赖与资源完整</span></span><br><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
+
+<p>若仓库提供 Maven Wrapper，应优先使用仓库固定的 <code>./mvnw</code>。命令只是入口，真正的验收还要匹配业务，例如比较筛选前后数据、重复请求、权限用户和空记录。</p>
+<h3 id="不要让模型代替测试宣布成功"><a href="#不要让模型代替测试宣布成功" class="headerlink" title="不要让模型代替测试宣布成功"></a>不要让模型代替测试宣布成功</h3><p>我要求执行结果分三类写：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">已验证：命令真实执行，附关键结果。</span><br><span class="line">未验证：当前环境无法执行，并说明原因。</span><br><span class="line">待观察：只能上线后从监控或真实流量确认。</span><br></pre></td></tr></table></figure>
+
+<p>这三类比一句“应该没问题”诚实，也方便下一位接手的人继续。</p>
+<h2 id="检查点六：提交前进行独立-Review"><a href="#检查点六：提交前进行独立-Review" class="headerlink" title="检查点六：提交前进行独立 Review"></a>检查点六：提交前进行独立 Review</h2><p>实现对话会让人产生路径依赖：模型已经解释了为什么这样改，我也一路看着它完成，很容易默认结论正确。</p>
+<p>提交前，我会暂时不看对话，只从需求卡和最终差异重新审一遍：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求中的每条验收是否有对应代码和测试</span><br><span class="line">没有写进需求的行为是否被意外改变</span><br><span class="line">错误路径是否比正常路径更危险</span><br><span class="line">数据库和外部调用是否处在合理事务边界</span><br><span class="line">测试是否会在实现被删掉时失败</span><br><span class="line">回滚是否只需回退代码，还是涉及数据处理</span><br></pre></td></tr></table></figure>
+
+<p>这相当于给自己换一个 Reviewer 视角。复杂任务还应由另一位工程师审查，不能因为代码由 AI 生成就降低门槛。</p>
+<h2 id="检查点七：把有价值的上下文留在仓库"><a href="#检查点七：把有价值的上下文留在仓库" class="headerlink" title="检查点七：把有价值的上下文留在仓库"></a>检查点七：把有价值的上下文留在仓库</h2><p>一次任务中反复告诉模型的内容，如果下次仍然适用，应该沉淀成项目资产：</p>
+<ul>
+<li>构建和测试方式写进 README；</li>
+<li>编码约束写进项目级说明；</li>
+<li>关键架构取舍写成 ADR；</li>
+<li>容易回归的规则写成测试；</li>
+<li>发布步骤和回滚条件写进 Runbook。</li>
+</ul>
+<p>不要把对话记录当唯一文档。对话适合探索，仓库才是团队共同维护的长期上下文。</p>
+<p>我还会在提交说明中保留三个信息：为什么改、行为怎样变、用什么验证。过几个月再看历史，不需要重新翻完整对话。</p>
+<h2 id="三种常见失控方式"><a href="#三种常见失控方式" class="headerlink" title="三种常见失控方式"></a>三种常见失控方式</h2><h3 id="一直追加提示，不愿回到事实"><a href="#一直追加提示，不愿回到事实" class="headerlink" title="一直追加提示，不愿回到事实"></a>一直追加提示，不愿回到事实</h3><p>模型改错方向后，连续说“再修一下”会堆积补丁。先停止修改，重新确认入口和约束，通常更快。</p>
+<h3 id="一次交给模型整个功能"><a href="#一次交给模型整个功能" class="headerlink" title="一次交给模型整个功能"></a>一次交给模型整个功能</h3><p>任务越大，错误越晚暴露，最终差异越难 Review。把垂直功能拆成可运行的小片段，让每一步都有反馈。</p>
+<h3 id="只检查代码，不检查环境"><a href="#只检查代码，不检查环境" class="headerlink" title="只检查代码，不检查环境"></a>只检查代码，不检查环境</h3><p>代码正确不等于配置、数据库、权限和部署正确。尤其是版本、环境变量和外部接口，必须用真实构建与运行证据验证。</p>
+<h2 id="一页版流程"><a href="#一页版流程" class="headerlink" title="一页版流程"></a>一页版流程</h2><p>需要快速回忆时，我只看这七行：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 说明问题、目标、范围和验收。</span><br><span class="line">2. 只读项目，用文件与日志建立事实。</span><br><span class="line">3. 先审计划，删除不必要的改动。</span><br><span class="line">4. 一次修改一个职责，小步看差异。</span><br><span class="line">5. 从编译到真实场景逐层验证。</span><br><span class="line">6. 脱离对话，按需求独立 Review。</span><br><span class="line">7. 把稳定知识沉淀进文档和测试。</span><br></pre></td></tr></table></figure>
+
+<p>这套流程没有神奇提示词，甚至会让开始写代码的时间晚几分钟。但它减少了最昂贵的部分：在错误上下文上高速前进。</p>
+<p>模型不需要一开始就“完全读懂项目”。它需要在每个决策点看到足够的真实信息，并及时收到构建、测试和人工判断的反馈。把这条循环设计好，AI 才会从偶尔惊艳的演示，变成可以稳定复用的开发工具。</p>
+]]></content>
+      <categories>
+        <category>效率工具</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+        <tag>测试</tag>
+        <tag>Context Engineering</tag>
+        <tag>AI编程</tag>
+        <tag>工作流</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AI辅助Java重构实战：拆解一个过长Service</title>
     <url>/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/</url>
     <content><![CDATA[<p><img src="/images/posts/2025/java-refactor-cover.png" alt="AI 辅助 Java 重构封面图"></p>
@@ -6903,137 +7034,6 @@
         <tag>Spring Boot</tag>
         <tag>AI编程</tag>
         <tag>单元测试</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>我的AI编程工作流：让模型先读懂项目再动手</title>
-    <url>/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
-    <content><![CDATA[<p><img src="/images/posts/2025/ai-workflow-cover.png" alt="AI 编程工作流封面图"></p>
-<p>AI 编程最浪费时间的场景，不是模型写不出代码，而是它在错误的项目理解上连续工作了半小时：改错入口、重复已有工具类、使用不兼容版本，最后生成一大份很难审查的差异。</p>
-<p>我逐渐把使用方式从“想到什么问什么”改成了一条固定工作流。它不绑定某个模型或编辑器，核心只有一句话：<strong>先让模型用证据还原项目，再让它在明确边界内修改。</strong></p>
-<p>这篇按 Runbook 来写，可以直接拿一个小需求跟着走一遍。</p>
-<span id="more"></span>
-
-<h2 id="入口：先给任务分级"><a href="#入口：先给任务分级" class="headerlink" title="入口：先给任务分级"></a>入口：先给任务分级</h2><p>不是每个任务都值得启动完整流程。我先按影响范围分三档：</p>
-<table>
-<thead>
-<tr>
-<th>等级</th>
-<th>例子</th>
-<th>工作方式</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>L1 可逆</td>
-<td>改文案、补测试、调整局部样式</td>
-<td>快速修改，执行局部验证</td>
-</tr>
-<tr>
-<td>L2 模块内</td>
-<td>新增接口字段、修改查询、重构 Service</td>
-<td>先读调用链，写计划，小步提交</td>
-</tr>
-<tr>
-<td>L3 高风险</td>
-<td>权限、支付、迁移、生产运维</td>
-<td>人主导设计，双人审查，演练与回滚</td>
-</tr>
-</tbody></table>
-<p>风险不只看代码行数。把按钮颜色改错通常是 L1，删除脚本即使只有一行也可能是 L3。分级决定需要多少上下文、测试和人工确认。</p>
-<p>下面的完整流程主要面向 L2。L1 可以裁剪，L3 还要叠加团队正式变更流程。</p>
-<h2 id="检查点一：把请求改写成任务说明"><a href="#检查点一：把请求改写成任务说明" class="headerlink" title="检查点一：把请求改写成任务说明"></a>检查点一：把请求改写成任务说明</h2><p>原始需求经常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">列表加一个状态筛选。</span><br></pre></td></tr></table></figure>
-
-<p>我不会直接让 AI 改代码，而是先补一张短任务卡：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">问题：运营无法只查看“等待回访”的客户。</span><br><span class="line">目标：客户列表和导出增加 followStatus 筛选。</span><br><span class="line">输入：可选枚举 PENDING、DONE；不传保持原行为。</span><br><span class="line">范围：后端查询与现有前端筛选，不改数据库。</span><br><span class="line">非目标：不重构客户状态模型，不增加批量处理。</span><br><span class="line">验收：列表与导出结果一致；非法值返回现有参数错误码。</span><br></pre></td></tr></table></figure>
-
-<p>“非目标”非常重要。模型擅长顺手完善周边，如果不写边界，一个筛选需求可能变成状态模型重构。</p>
-<p>任务卡不需要一次写对。信息缺失时，让 AI 根据现有描述列出待确认问题，我再向产品或代码事实求证。需求澄清不能由模型自问自答。</p>
-<h2 id="检查点二：只读探索仓库"><a href="#检查点二：只读探索仓库" class="headerlink" title="检查点二：只读探索仓库"></a>检查点二：只读探索仓库</h2><p>第一轮明确要求不修改文件，只回答项目现状。我通常让模型查这些位置：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">构建文件：Java、框架、依赖版本</span><br><span class="line">项目入口：模块边界和启动方式</span><br><span class="line">请求入口：Controller、路由或消息消费者</span><br><span class="line">数据流：Service、Mapper、外部客户端</span><br><span class="line">相邻实现：项目里已经完成的类似功能</span><br><span class="line">测试：当前使用的框架、夹具和断言风格</span><br><span class="line">规范：README、AGENTS.md、架构决策和 CI 配置</span><br></pre></td></tr></table></figure>
-
-<p>探索结果必须带证据，格式可以很简单：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">结论：列表和导出共用 CustomerQueryCondition。</span><br><span class="line">证据：CustomerPageService.java:48、CustomerExportService.java:62。</span><br><span class="line"></span><br><span class="line">结论：项目要求 JDK 8。</span><br><span class="line">证据：pom.xml 的 maven.compiler.source=1.8。</span><br><span class="line"></span><br><span class="line">待确认：非法枚举由全局异常处理还是 Controller 转换。</span><br></pre></td></tr></table></figure>
-
-<p>“证据”和“待确认”能阻止猜测混进结论。若模型找不到某个类，就继续搜索或明确不存在，不根据常见命名补一个出来。</p>
-<h3 id="控制上下文预算"><a href="#控制上下文预算" class="headerlink" title="控制上下文预算"></a>控制上下文预算</h3><p>读仓库不是把所有文件一次塞给模型。我会沿调用链逐层加载：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">入口文件</span><br><span class="line">  -&gt; 它直接调用的接口</span><br><span class="line">  -&gt; 对应实现与数据对象</span><br><span class="line">  -&gt; 一个最接近的参考实现</span><br><span class="line">  -&gt; 相关测试和构建配置</span><br></pre></td></tr></table></figure>
-
-<p>生成目录、压缩后的前端产物、重复日志和无关模块先排除。上下文足够大时，信息选择比信息数量更重要。</p>
-<h2 id="检查点三：修改前先审计划"><a href="#检查点三：修改前先审计划" class="headerlink" title="检查点三：修改前先审计划"></a>检查点三：修改前先审计划</h2><p>项目地图清楚后，让 AI 给出计划，但暂时不写代码。一个可审查的计划至少包含：</p>
-<ol>
-<li>实际要修改的文件；</li>
-<li>每个文件为什么要改；</li>
-<li>数据和调用路径怎样变化；</li>
-<li>空值、异常、并发与兼容边界；</li>
-<li>要新增或运行哪些测试；</li>
-<li>仍然无法确认的风险。</li>
-</ol>
-<p>计划阶段最容易发现范围膨胀。例如任务只需要复用已有查询条件，计划却新建 Repository、Assembler 和通用查询框架，这时删掉比写完后再删便宜得多。</p>
-<p>我还会要求把步骤拆到可独立验证：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 先增加请求字段和参数校验，运行接口层测试；</span><br><span class="line">2. 再增加 Mapper 条件，运行数据库测试；</span><br><span class="line">3. 接入列表并验证原行为；</span><br><span class="line">4. 接入导出并做结果对照；</span><br><span class="line">5. 最后清理重复与更新文档。</span><br></pre></td></tr></table></figure>
-
-<p>一条计划如果要同时修改二十个文件才可运行，通常还没有找到合适的切分点。</p>
-<h2 id="检查点四：按小循环实施"><a href="#检查点四：按小循环实施" class="headerlink" title="检查点四：按小循环实施"></a>检查点四：按小循环实施</h2><p>实施阶段我使用同一条循环：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">修改一个职责</span><br><span class="line">  -&gt; 格式与静态检查</span><br><span class="line">  -&gt; 运行最小相关测试</span><br><span class="line">  -&gt; 阅读版本差异</span><br><span class="line">  -&gt; 记录结果</span><br><span class="line">  -&gt; 进入下一步</span><br></pre></td></tr></table></figure>
-
-<p>这里“阅读差异”不能省。AI 有时会在目标代码之外格式化整个文件、调整错误文案或升级依赖。测试可能照样通过，但 Review 成本和回归范围已经扩大。</p>
-<p>每轮我会检查：</p>
-<ul>
-<li>是否出现任务外文件；</li>
-<li>是否复制了已有能力；</li>
-<li>是否改变公共接口或默认值；</li>
-<li>是否添加未经批准的依赖；</li>
-<li>是否打印密钥、个人数据或完整请求；</li>
-<li>是否使用项目版本不支持的语法；</li>
-<li>注释是在解释原因，还是重复代码表面含义。</li>
-</ul>
-<p>发现方向错误时，优先回到最后一个小步骤，而不是继续提示模型在错误实现上打补丁。</p>
-<h2 id="检查点五：建立验证阶梯"><a href="#检查点五：建立验证阶梯" class="headerlink" title="检查点五：建立验证阶梯"></a>检查点五：建立验证阶梯</h2><p>“已完成”需要对应证据。我把验证从便宜到昂贵排成阶梯：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">语法与格式</span><br><span class="line">  -&gt; 编译 / 类型检查</span><br><span class="line">  -&gt; 目标单元测试</span><br><span class="line">  -&gt; 模块测试</span><br><span class="line">  -&gt; 集成或端到端测试</span><br><span class="line">  -&gt; 构建生产产物</span><br><span class="line">  -&gt; 测试环境真实操作</span><br><span class="line">  -&gt; 监控与回滚演练</span><br></pre></td></tr></table></figure>
-
-<p>简单改动可以停在较低层，高风险改动必须继续向上。关键是清楚说出停在哪里，而不是把“代码看起来没问题”写成“验证通过”。</p>
-<p>Java 项目中，一组常见命令可能是：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 先跑目标测试，快速得到反馈</span></span><br><span class="line">mvn -Dtest=CustomerQueryServiceTest <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 再运行模块测试并打包，确认依赖与资源完整</span></span><br><span class="line">mvn clean package</span><br></pre></td></tr></table></figure>
-
-<p>若仓库提供 Maven Wrapper，应优先使用仓库固定的 <code>./mvnw</code>。命令只是入口，真正的验收还要匹配业务，例如比较筛选前后数据、重复请求、权限用户和空记录。</p>
-<h3 id="不要让模型代替测试宣布成功"><a href="#不要让模型代替测试宣布成功" class="headerlink" title="不要让模型代替测试宣布成功"></a>不要让模型代替测试宣布成功</h3><p>我要求执行结果分三类写：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">已验证：命令真实执行，附关键结果。</span><br><span class="line">未验证：当前环境无法执行，并说明原因。</span><br><span class="line">待观察：只能上线后从监控或真实流量确认。</span><br></pre></td></tr></table></figure>
-
-<p>这三类比一句“应该没问题”诚实，也方便下一位接手的人继续。</p>
-<h2 id="检查点六：提交前进行独立-Review"><a href="#检查点六：提交前进行独立-Review" class="headerlink" title="检查点六：提交前进行独立 Review"></a>检查点六：提交前进行独立 Review</h2><p>实现对话会让人产生路径依赖：模型已经解释了为什么这样改，我也一路看着它完成，很容易默认结论正确。</p>
-<p>提交前，我会暂时不看对话，只从需求卡和最终差异重新审一遍：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求中的每条验收是否有对应代码和测试</span><br><span class="line">没有写进需求的行为是否被意外改变</span><br><span class="line">错误路径是否比正常路径更危险</span><br><span class="line">数据库和外部调用是否处在合理事务边界</span><br><span class="line">测试是否会在实现被删掉时失败</span><br><span class="line">回滚是否只需回退代码，还是涉及数据处理</span><br></pre></td></tr></table></figure>
-
-<p>这相当于给自己换一个 Reviewer 视角。复杂任务还应由另一位工程师审查，不能因为代码由 AI 生成就降低门槛。</p>
-<h2 id="检查点七：把有价值的上下文留在仓库"><a href="#检查点七：把有价值的上下文留在仓库" class="headerlink" title="检查点七：把有价值的上下文留在仓库"></a>检查点七：把有价值的上下文留在仓库</h2><p>一次任务中反复告诉模型的内容，如果下次仍然适用，应该沉淀成项目资产：</p>
-<ul>
-<li>构建和测试方式写进 README；</li>
-<li>编码约束写进项目级说明；</li>
-<li>关键架构取舍写成 ADR；</li>
-<li>容易回归的规则写成测试；</li>
-<li>发布步骤和回滚条件写进 Runbook。</li>
-</ul>
-<p>不要把对话记录当唯一文档。对话适合探索，仓库才是团队共同维护的长期上下文。</p>
-<p>我还会在提交说明中保留三个信息：为什么改、行为怎样变、用什么验证。过几个月再看历史，不需要重新翻完整对话。</p>
-<h2 id="三种常见失控方式"><a href="#三种常见失控方式" class="headerlink" title="三种常见失控方式"></a>三种常见失控方式</h2><h3 id="一直追加提示，不愿回到事实"><a href="#一直追加提示，不愿回到事实" class="headerlink" title="一直追加提示，不愿回到事实"></a>一直追加提示，不愿回到事实</h3><p>模型改错方向后，连续说“再修一下”会堆积补丁。先停止修改，重新确认入口和约束，通常更快。</p>
-<h3 id="一次交给模型整个功能"><a href="#一次交给模型整个功能" class="headerlink" title="一次交给模型整个功能"></a>一次交给模型整个功能</h3><p>任务越大，错误越晚暴露，最终差异越难 Review。把垂直功能拆成可运行的小片段，让每一步都有反馈。</p>
-<h3 id="只检查代码，不检查环境"><a href="#只检查代码，不检查环境" class="headerlink" title="只检查代码，不检查环境"></a>只检查代码，不检查环境</h3><p>代码正确不等于配置、数据库、权限和部署正确。尤其是版本、环境变量和外部接口，必须用真实构建与运行证据验证。</p>
-<h2 id="一页版流程"><a href="#一页版流程" class="headerlink" title="一页版流程"></a>一页版流程</h2><p>需要快速回忆时，我只看这七行：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1. 说明问题、目标、范围和验收。</span><br><span class="line">2. 只读项目，用文件与日志建立事实。</span><br><span class="line">3. 先审计划，删除不必要的改动。</span><br><span class="line">4. 一次修改一个职责，小步看差异。</span><br><span class="line">5. 从编译到真实场景逐层验证。</span><br><span class="line">6. 脱离对话，按需求独立 Review。</span><br><span class="line">7. 把稳定知识沉淀进文档和测试。</span><br></pre></td></tr></table></figure>
-
-<p>这套流程没有神奇提示词，甚至会让开始写代码的时间晚几分钟。但它减少了最昂贵的部分：在错误上下文上高速前进。</p>
-<p>模型不需要一开始就“完全读懂项目”。它需要在每个决策点看到足够的真实信息，并及时收到构建、测试和人工判断的反馈。把这条循环设计好，AI 才会从偶尔惊艳的演示，变成可以稳定复用的开发工具。</p>
-]]></content>
-      <categories>
-        <category>效率工具</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-        <tag>测试</tag>
-        <tag>Context Engineering</tag>
-        <tag>AI编程</tag>
-        <tag>工作流</tag>
       </tags>
   </entry>
   <entry>
@@ -7680,25 +7680,27 @@
     <title>从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码</title>
     <url>/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/</url>
     <content><![CDATA[<p><img src="/images/posts/2026/vibe-coding-starter-cover.svg" alt="Vibe Coding 起步教程封面图"></p>
-<p>去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个<strong>只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手</strong>的你。</p>
-<p>我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。</p>
+<p>去年我还在跟同事争”AI 写的代码能不能上生产”，今年我已经用它攒了三四个小工具，其中一个还真跑在我自己的服务器上。</p>
+<p>这篇不是给架构师的，是给<strong>只会写 Hello World、或者刷了一堆教程但没真动过手</strong>的你。我把从 0 到 1 的全过程摊开讲，包括踩的坑，以及那些讲 AI 编程的文章通常不会提的事。</p>
 <span id="more"></span>
 
-<h2 id="先说人话：Vibe-Coding-到底是什么"><a href="#先说人话：Vibe-Coding-到底是什么" class="headerlink" title="先说人话：Vibe Coding 到底是什么"></a>先说人话：Vibe Coding 到底是什么</h2><p>一句话：<strong>你用嘴描述想法，AI 帮你写代码，你在旁边看着它改，直到能用。</strong></p>
-<p>2016 年我学编程的时候，是照着书一行行敲、一行行背。现在你想做一个东西，直接跟 AI 说需求就行，它生成一段代码，你复制粘贴、运行、看看对不对。</p>
-<p>听起来像魔法？确实是，但别高兴太早——<strong>魔法是你和 AI 一起变出来的，不是 AI 单方面表演</strong>。</p>
-<h2 id="第一个小时：装好环境，别急着写代码"><a href="#第一个小时：装好环境，别急着写代码" class="headerlink" title="第一个小时：装好环境，别急着写代码"></a>第一个小时：装好环境，别急着写代码</h2><p>我先花 15 分钟把战场清干净，这几样缺一不可：</p>
+<h2 id="一句话说清-Vibe-Coding-是什么"><a href="#一句话说清-Vibe-Coding-是什么" class="headerlink" title="一句话说清 Vibe Coding 是什么"></a>一句话说清 Vibe Coding 是什么</h2><p><strong>你用大白话描述需求，AI 把代码写出来，你在旁边盯着它改，直到真能用。</strong></p>
+<p>2016 年我学编程，是照着书一行行敲、一行行背。现在你想做点东西，直接说需求就行。</p>
+<p>听着很爽，但别急着高兴。更准确的说法是：<strong>你多了个手速极快、记性极好、但不懂你的业务、也绝不替你担责的实习生</strong>。它产出的东西，一律要过你这一关。</p>
+<p>术语上讲，它是个高吞吐、低置信度的代码生成器 —— 吞吐高所以省时间，置信度低所以必须 review。这两句话你得同时记住，只记前半句就是灾难的开始。</p>
+<p><img src="/images/posts/2026/vibe-coding-arch.svg" alt="Vibe Coding 的工具链与数据流"></p>
+<h2 id="第一个小时：先把环境弄干净，别急着写代码"><a href="#第一个小时：先把环境弄干净，别急着写代码" class="headerlink" title="第一个小时：先把环境弄干净，别急着写代码"></a>第一个小时：先把环境弄干净，别急着写代码</h2><p>我先花 15 分钟清战场。这几样缺一个都难受：</p>
 <table>
 <thead>
 <tr>
 <th>工具</th>
-<th>干嘛用的</th>
-<th>装哪</th>
+<th>干什么的</th>
+<th>去哪装</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><strong>Node.js 20 LTS</strong></td>
-<td>跑 JavaScript&#x2F;TypeScript 项目</td>
+<td>跑 JavaScript &#x2F; TypeScript 项目</td>
 <td><a href="https://nodejs.org/">nodejs.org</a></td>
 </tr>
 <tr>
@@ -7708,104 +7710,115 @@
 </tr>
 <tr>
 <td><strong>Git</strong></td>
-<td>存代码 + 后悔药</td>
+<td>版本控制，也就是后悔药</td>
 <td>git-scm.com</td>
 </tr>
 <tr>
-<td><strong>AI 助手插件</strong></td>
+<td><strong>AI 助手</strong></td>
 <td>对话生成代码</td>
-<td>推荐 GitHub Copilot 或 Cursor</td>
+<td>GitHub Copilot 或 Cursor 都行</td>
 </tr>
 </tbody></table>
-<p>装完先验证一下环境跑得通，再开脚本域——<strong>别跳过这步</strong>：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Windows / Mac / Linux 都行，结果必须是三行版本号</span></span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
+<p>装完先验一下，<strong>别跳过</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Windows / Mac / Linux 都一样，正常的话是三行版本号</span></span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
 
-<p>我第一次到最后一步才想起 Git 没装，结果代码全在编辑器里没版本控制，改坏了只能干瞪眼。<strong>环境问题永远比代码问题恶心，先解决它。</strong></p>
-<h2 id="第一个项目：让它帮我写个”记账本”"><a href="#第一个项目：让它帮我写个”记账本”" class="headerlink" title="第一个项目：让它帮我写个”记账本”"></a>第一个项目：让它帮我写个”记账本”</h2><p>我不空想大项目，第一个就做个小工具——<strong>一个在终端跑的记账本</strong>。这个选择很关键：范围小、能运行见效、随时能丢。</p>
-<p>我跟 AI 的第一句话是：</p>
+<p>我第一次就是嫌麻烦没验 Git，等到最后才发现没装。结果代码全躺在编辑器里没有版本控制，改崩了只能干瞪眼。</p>
+<p>顺带说一个后面会反复用到的概念：<strong>依赖要锁版本</strong>。项目里那个 <code>package-lock.json</code> 别删，别人（以及半年后的你）靠它才能装出跟你一模一样的环境。团队协作里，<code>npm ci</code> 比 <code>npm install</code> 靠谱 —— 前者严格照 lock 文件装，后者可能悄悄给你升级。</p>
+<h2 id="第一个项目：让它帮我写个记账本"><a href="#第一个项目：让它帮我写个记账本" class="headerlink" title="第一个项目：让它帮我写个记账本"></a>第一个项目：让它帮我写个记账本</h2><p>我不空想大项目，第一个就做个小工具：<strong>终端里跑的记账本</strong>。这个选择很关键 —— 范围小、能跑出结果、随时能扔。</p>
+<p>我跟 AI 说的第一句话是：</p>
 <figure class="highlight text"><table><tr><td class="code"><pre><span class="line">帮我写一个命令行记账本，用 Node.js。</span><br><span class="line">功能：</span><br><span class="line">1. 能加一条收入或支出（金额 + 备注）</span><br><span class="line">2. 能查总余额</span><br><span class="line">3. 数据存到本地文件，退出程序不丢</span><br><span class="line">先跑通最基础功能，别做花里胡哨的。</span><br></pre></td></tr></table></figure>
 
-<p>注意最后那句”<strong>别做花里胡哨的</strong>“——这是我最痛的教训。不说这句，AI 会给你加什么图表、导出 CSV、多用户，全是你不想要的东西。</p>
-<h2 id="它写完了，然后呢？——-灵魂三问"><a href="#它写完了，然后呢？——-灵魂三问" class="headerlink" title="它写完了，然后呢？—— 灵魂三问"></a>它写完了，然后呢？—— 灵魂三问</h2><p>AI 啪地贴出一段代码 + 一个 <code>npm install</code> 命令。这时候新手最容易犯的错：<strong>复制、粘贴、跑、看它成功就完事</strong>。</p>
-<p>我给每条 AI 代码都做三件事，一次没落：</p>
-<h3 id="1️⃣-它改了我的哪些文件？"><a href="#1️⃣-它改了我的哪些文件？" class="headerlink" title="1️⃣ 它改了我的哪些文件？"></a>1️⃣ 它改了我的哪些文件？</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure>
+<p>注意最后那句”<strong>别做花里胡哨的</strong>“。这是我最痛的教训：不写这句，它会顺手给你加上图表、导出 CSV、多用户，全是你没要的东西。你每多要一个功能，它的出错面就大一圈。</p>
+<h2 id="代码到手，先问三件事"><a href="#代码到手，先问三件事" class="headerlink" title="代码到手，先问三件事"></a>代码到手，先问三件事</h2><p>AI 啪地贴出一段代码，外加一个 <code>npm install</code>。新手最容易犯的错就在这：复制、粘贴、跑、看到没报错就收工。</p>
+<p>我每条 AI 代码都过这三关，一次没落下。</p>
+<h3 id="第一件：它动了哪些文件？"><a href="#第一件：它动了哪些文件？" class="headerlink" title="第一件：它动了哪些文件？"></a>第一件：它动了哪些文件？</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git status</span><br><span class="line">git diff</span><br></pre></td></tr></table></figure>
 
-<p>这是我睁眼第一件事。AI 有时会”顺手”改一堆跟需求无关的文件——<strong>它很爱干这个</strong>。我看到只加了 <code>index.js</code> 和一个依赖，心里有底。</p>
-<h3 id="2️⃣-数据从哪来、到哪去？"><a href="#2️⃣-数据从哪来、到哪去？" class="headerlink" title="2️⃣ 数据从哪来、到哪去？"></a>2️⃣ 数据从哪来、到哪去？</h3><p>我不看每一行（那是大佬的事），但我至少要懂<strong>数据流</strong>：</p>
+<p><code>git status</code> 看改动面，<code>git diff</code> 看具体改了哪几行。AI 有时会”顺手”改一堆跟你需求无关的文件，<strong>它很爱干这个</strong>。我那次看到只多了 <code>index.js</code> 和一个依赖声明，心里就有底了。</p>
+<p>这一步的专业叫法就是 diff review。你不用逐行读懂（那是资深工程师的活），但<strong>必须知道改动落在哪几个文件、动了什么类型的东西</strong>。</p>
+<h3 id="第二件：数据从哪来、到哪去？"><a href="#第二件：数据从哪来、到哪去？" class="headerlink" title="第二件：数据从哪来、到哪去？"></a>第二件：数据从哪来、到哪去？</h3><p>我不逐行看代码，但一定搞清楚<strong>数据流</strong>：</p>
 <ul>
-<li>记账数据存到了哪个文件？<code>~/记录.json</code>？还是当前目录？</li>
-<li>如果我换个目录跑，还能读到昨天的账吗？</li>
+<li>账记到哪个文件了？<code>~/ledger.json</code>？还是当前目录？</li>
+<li>我换个目录再跑，还读得到昨天的账吗？</li>
 </ul>
-<p>这里我在代码里找到了那行 <code>fs.writeFileSync(&#39;./ledger.json&#39;)</code>——注意那个 <code>./</code>，意味着数据存在<strong>当前目录</strong>。我明白这个了，以后换目录就知道数据会丢。</p>
-<h3 id="3️⃣-跑坏了怎么滚回去？"><a href="#3️⃣-跑坏了怎么滚回去？" class="headerlink" title="3️⃣ 跑坏了怎么滚回去？"></a>3️⃣ 跑坏了怎么滚回去？</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add index.js</span><br><span class="line">git commit -m <span class="string">&quot;记账本初版&quot;</span></span><br></pre></td></tr></table></figure>
+<p>我在代码里翻到那一行：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">fs.<span class="title function_">writeFileSync</span>(<span class="string">&#x27;./ledger.json&#x27;</span>, data)</span><br></pre></td></tr></table></figure>
 
-<p>每次改动<strong>先提交</strong>，这是最重要的后悔药。AI 生成代码你不可能完全看懂，但你能保证：<strong>每一版都留了底，改坏了可以回退</strong>。</p>
-<p>我第一次写完就急着跑，没 commit。结果 AI 后面改崩了，我恢复不了，只能从头再来一遍。血泪教训。</p>
-<h2 id="真正的重点：AI-写的代码，谁是负责人？"><a href="#真正的重点：AI-写的代码，谁是负责人？" class="headerlink" title="真正的重点：AI 写的代码，谁是负责人？"></a>真正的重点：AI 写的代码，谁是负责人？</h2><p>我必须在这个教程里反复强调这件事，连写三遍都不嫌多：</p>
+<p>关键在那个 <code>./</code> —— 它意味着数据写在<strong>当前工作目录</strong>（cwd）。所以我 <code>cd</code> 到别的目录再跑，等于开了个新账本，昨天的记录看着就像丢了。</p>
+<p>搞明白这点之后，我把它改成读环境变量或配置文件里的绝对路径。这就叫<strong>可移植性</strong>：程序在哪个目录被启动，行为都不该变。</p>
+<h3 id="第三件：跑坏了怎么滚回去？"><a href="#第三件：跑坏了怎么滚回去？" class="headerlink" title="第三件：跑坏了怎么滚回去？"></a>第三件：跑坏了怎么滚回去？</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add index.js</span><br><span class="line">git commit -m <span class="string">&quot;记账本初版：加记录 + 查余额&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>每完成一小步就提交，这是最重要的后悔药。AI 写的代码你不可能全看懂，但你能保证<strong>每一版都留了回滚点</strong>。</p>
+<p>我第一次写完就急着跑，没提交。后来 AI 改崩了，我回不去，只能从头再来。从那以后我定了个规矩：<strong>一个可验证的功能 &#x3D; 一次提交</strong>。别攒一大堆改动一起提交，那样回滚点也是模糊的。</p>
+<p><img src="/images/posts/2026/vibe-coding-loop.svg" alt="一次迭代的闭环：提需求 → 生成 → 看 diff → 跑 → 提交或回滚"></p>
+<h2 id="责任这件事，没有灰色地带"><a href="#责任这件事，没有灰色地带" class="headerlink" title="责任这件事，没有灰色地带"></a>责任这件事，没有灰色地带</h2><p>这句话我在这篇里要说三遍：</p>
 <blockquote>
 <p><strong>AI 不会参加故障复盘，也不会在凌晨两点判断要不要回滚。</strong></p>
 </blockquote>
-<p>代码是被你合进去的，commit 写的是你的名字。出了事，是<strong>你</strong>负责，不是 ChatGPT。</p>
-<p>所以我的原则很简单，就一条：</p>
+<p>代码是你合进去的，<code>commit</code> 上写的是你的名字。出事的时候，是你的问题，不是 ChatGPT 的。</p>
+<p>所以我的原则只有一条，按风险分档：</p>
 <table>
 <thead>
 <tr>
 <th>场景</th>
-<th>我做什么</th>
+<th>我的做法</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>记个账、跑一次性的脚本</td>
-<td>快速用，出了问题重来就行</td>
+<td>记个账、跑一次性脚本、本地小工具</td>
+<td>快速用，坏了重来就是</td>
 </tr>
 <tr>
 <td>碰支付、权限、删数据、生产服务器</td>
-<td><strong>必须手动确认 + 测试 + 保留回滚</strong></td>
+<td><strong>手动确认 + 测试 + 留回滚预案，一样不能少</strong></td>
 </tr>
 </tbody></table>
-<p><strong>删数据、碰生产环境这两件事，我永远不让 AI 自动执行</strong>，哪怕它信誓旦旦说”没问题”。这不是信不信它——这是软件本来就是”数据、资金、隐私、团队维护成本”叠加的东西，AI 替你省了写代码的时间，省不掉后果。</p>
-<h2 id="新手最容易翻车的三个坑"><a href="#新手最容易翻车的三个坑" class="headerlink" title="新手最容易翻车的三个坑"></a>新手最容易翻车的三个坑</h2><h3 id="❌-坑-1：把需求写得太模糊，然后怪-AI-不行"><a href="#❌-坑-1：把需求写得太模糊，然后怪-AI-不行" class="headerlink" title="❌ 坑 1：把需求写得太模糊，然后怪 AI 不行"></a>❌ 坑 1：把需求写得太模糊，然后怪 AI 不行</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">帮我做个网站。        ← 我最初的真实需求，现在看着都脸红</span><br></pre></td></tr></table></figure>
+<p>删数据和碰生产这两件事，我永远不让 AI 自动执行，哪怕它信誓旦旦说”没问题”。这不是信不信它的问题 —— 软件本来就是”数据 + 资金 + 隐私 + 团队维护成本”叠出来的东西，AI 省掉的是你敲代码的时间，省不掉后果。</p>
+<p>顺便提一个很实用的词：<strong>幂等</strong>。同一个操作重复执行，结果应该一致。这个坑我在下一节就踩到了。</p>
+<h2 id="新手最容易翻车的三个坑"><a href="#新手最容易翻车的三个坑" class="headerlink" title="新手最容易翻车的三个坑"></a>新手最容易翻车的三个坑</h2><h3 id="坑-1：需求写得太模糊，然后怪-AI-不行"><a href="#坑-1：需求写得太模糊，然后怪-AI-不行" class="headerlink" title="坑 1：需求写得太模糊，然后怪 AI 不行"></a>坑 1：需求写得太模糊，然后怪 AI 不行</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">帮我做个网站。        ← 我最初的真实需求，现在看着都脸红</span><br></pre></td></tr></table></figure>
 
-<p>AI 不是神仙，模糊需求只会放大回模糊代码。改进后：</p>
+<p>AI 不是神仙，模糊的输入只会换回模糊的代码。改一版：</p>
 <figure class="highlight text"><table><tr><td class="code"><pre><span class="line">做一个单页记账网站，用 React。</span><br><span class="line">页面左边是输入框（金额 + 说明），右边显示余额。</span><br><span class="line">数据放浏览器 localStorage，不做后端。</span><br><span class="line">先做能跑的最小版。</span><br></pre></td></tr></table></figure>
 
-<p><strong>需求越具体，AI 越靠谱。</strong> 这不是玄学，是上下文质量。</p>
-<h3 id="❌-坑-2：让它”一键搞定所有功能”"><a href="#❌-坑-2：让它”一键搞定所有功能”" class="headerlink" title="❌ 坑 2：让它”一键搞定所有功能”"></a>❌ 坑 2：让它”一键搞定所有功能”</h3><p>一次让 AI 做整个系统，就像让一个人同时搬一百个箱子——它一定会摔。</p>
-<p>正确姿势是<strong>拆成小步</strong>：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">第 1 步：先把&quot;加一条支出&quot;跑通。</span><br><span class="line">第 2 步：再加&quot;查余额&quot;。</span><br><span class="line">第 3 步：最后加&quot;删除记录&quot;。</span><br></pre></td></tr></table></figure>
+<p><strong>需求越具体，AI 越靠谱。</strong> 这不是玄学，是上下文质量 —— 你给它的约束越硬，它自由发挥（也就是跑偏）的空间越小。</p>
+<h3 id="坑-2：想让它”一键搞定所有功能”"><a href="#坑-2：想让它”一键搞定所有功能”" class="headerlink" title="坑 2：想让它”一键搞定所有功能”"></a>坑 2：想让它”一键搞定所有功能”</h3><p>一次让 AI 写完整个系统，就像让一个人同时搬一百个箱子，必然摔。</p>
+<p>正确姿势是<strong>拆成垂直切片</strong>：每一步都是一个”从界面到数据”能跑通的小功能，而不是”先写完全部后端再写前端”。</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">第 1 步：先把&quot;加一条支出&quot;从输入到落盘跑通。</span><br><span class="line">第 2 步：再加&quot;查余额&quot;。</span><br><span class="line">第 3 步：最后加&quot;删除记录&quot;。</span><br></pre></td></tr></table></figure>
 
-<p>每一步都验证、都 commit。<strong>大项目也是小步骤堆出来的。</strong></p>
-<h3 id="❌-坑-3：把”能跑”当成”做完了”"><a href="#❌-坑-3：把”能跑”当成”做完了”" class="headerlink" title="❌ 坑 3：把”能跑”当成”做完了”"></a>❌ 坑 3：把”能跑”当成”做完了”</h3><p>页面能打开、点得通，<strong>不等于</strong>功能可靠。真实故障都藏在那些你没想到的角落：重复点击、空数据、网络超时、权限绕过。</p>
-<p>我后来发现记账本有个 bug：<strong>如果直接按两次回车，会加两条相同的记录</strong>。页面看起来一切正常，但账算错了。这种问题，AI 生成的代码不会提醒你，只能靠你多测多想。</p>
-<h2 id="两周后，我会走到哪？"><a href="#两周后，我会走到哪？" class="headerlink" title="两周后，我会走到哪？"></a>两周后，我会走到哪？</h2><p>我给个诚实的时间线（我自己的真实节奏）：</p>
+<p>每一步都验证、都提交。大项目也是小步骤堆出来的，区别只在于步骤数量。</p>
+<h3 id="坑-3：把”能跑”当成”做完了”"><a href="#坑-3：把”能跑”当成”做完了”" class="headerlink" title="坑 3：把”能跑”当成”做完了”"></a>坑 3：把”能跑”当成”做完了”</h3><p>页面能打开、按钮点得通，<strong>不等于</strong>功能可靠。真实故障都藏在你没想到的角落：重复点击、空数据、网络超时、权限绕过。</p>
+<p>我的记账本就有一个：<strong>连按两次回车，会记两笔一模一样的账</strong>。界面看着一切正常，账却是错的。这就是典型的<strong>幂等缺失</strong> —— 重复提交没有被拦住。</p>
+<p>这类问题 AI 不会主动提醒你，只能靠你多测两下、多想一步。<strong>边界条件才是故障高发区</strong>，正常路径反而是最不容易出事的。</p>
+<p><img src="/images/posts/2026/vibe-coding-scope.svg" alt="模糊需求 vs 具体需求：产出质量的差距从提问就决定了"></p>
+<h2 id="两周之后，你大概在哪"><a href="#两周之后，你大概在哪" class="headerlink" title="两周之后，你大概在哪"></a>两周之后，你大概在哪</h2><p>不画大饼，这是我自己走过的真实节奏：</p>
 <table>
 <thead>
 <tr>
 <th>时间</th>
-<th>你大概能做什么</th>
+<th>你大概能做到</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>第 1 天</td>
-<td>跑通记账本、理解数据流向、学会 commit</td>
+<td>跑通记账本，看懂数据流向，学会提交和回滚</td>
 </tr>
 <tr>
 <td>第 3 天</td>
-<td>做第二个小工具，开始自己提”更具体”的需求</td>
+<td>做出第二个小工具，开始主动提”更具体”的需求</td>
 </tr>
 <tr>
 <td>第 1 周</td>
-<td>敢做一个有 5 个功能的小应用，学会拆步骤</td>
+<td>敢做一个五个功能的小应用，会拆步骤</td>
 </tr>
 <tr>
 <td>第 2 周</td>
-<td>开始懂”哪种代码要小心”（权限、删数据、生产）</td>
+<td>心里有数了：哪种代码要小心（权限、删数据、生产环境）</td>
 </tr>
 </tbody></table>
-<p><strong>第 2 周不是你变强了，是你变懂事了</strong>——知道哪些能让 AI 干，哪些得自己盯着。</p>
-<h2 id="最后一句"><a href="#最后一句" class="headerlink" title="最后一句"></a>最后一句</h2><p>Vibe Coding 降低的不是编程的门槛，而是**”想法到能跑的 Demo”的距离**。它让每个人都能把脑子里的东西变成屏幕上能跑的东西。</p>
-<p>但记住那句话：<strong>谁提交，谁负责。</strong> AI 帮你写代码，你负责它写得对不对、安不安全、能不能滚回去。</p>
-<p>工具会变，责任不会。希望你第二个星期，能敢用 AI 做出一个真正属于你的小东西。</p>
+<p><strong>第二周不是你变强了，是你变懂事了</strong> —— 知道哪些能让 AI 干，哪些必须自己盯着。</p>
+<p><img src="/images/posts/2026/vibe-coding-timeline.svg" alt="两周节奏时间线"></p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>Vibe Coding 真正缩短的，不是”编程的门槛”，而是<strong>从想法到能跑的 Demo 的距离</strong>。它让更多人有能力把脑子里的东西变成屏幕上能跑的东西。</p>
+<p>但那条线一直在：<strong>谁提交，谁负责。</strong> AI 负责写，你负责它写得对不对、安不安全、出事能不能滚回去。</p>
+<p>工具会换，这条线不会。</p>
 ]]></content>
       <categories>
         <category>AI编程</category>
@@ -8397,6 +8410,35 @@
       </tags>
   </entry>
   <entry>
+    <title>博客重新出发</title>
+    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
+    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
+<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
+<span id="more"></span>
+
+<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
+<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
+<li>Hexo：静态博客生成器</li>
+<li>NexT：Hexo 主题</li>
+<li>GitHub Pages：静态站点托管</li>
+<li>GitHub Actions：后续可用于自动构建和部署</li>
+</ul>
+<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
+<li>整理 Java 后端开发笔记</li>
+<li>梳理并发编程和 JVM 相关知识</li>
+<li>记录 Linux、Nginx、部署排查经验</li>
+<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
+</ol>
+]]></content>
+      <categories>
+        <category>随笔</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>GitHub Pages</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JUC并发编程知识点梳理</title>
     <url>/2024/05/02/juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3/</url>
     <content><![CDATA[<p><img src="/images/posts/2024/juc-notes-cover.png" alt="JUC并发编程知识点封面图"></p>
@@ -8815,35 +8857,6 @@
       <tags>
         <tag>Java</tag>
         <tag>并发编程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>博客重新出发</title>
-    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
-    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
-<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
-<span id="more"></span>
-
-<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
-<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
-<li>Hexo：静态博客生成器</li>
-<li>NexT：Hexo 主题</li>
-<li>GitHub Pages：静态站点托管</li>
-<li>GitHub Actions：后续可用于自动构建和部署</li>
-</ul>
-<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
-<li>整理 Java 后端开发笔记</li>
-<li>梳理并发编程和 JVM 相关知识</li>
-<li>记录 Linux、Nginx、部署排查经验</li>
-<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
-</ol>
-]]></content>
-      <categories>
-        <category>随笔</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-        <tag>GitHub Pages</tag>
       </tags>
   </entry>
   <entry>

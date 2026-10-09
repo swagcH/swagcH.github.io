@@ -18,16 +18,20 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手的你。 我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。">
+    <meta name="description" content="去年我还在跟同事争”AI 写的代码能不能上生产”，今年我已经用它攒了三四个小工具，其中一个还真跑在我自己的服务器上。 这篇不是给架构师的，是给只会写 Hello World、或者刷了一堆教程但没真动过手的你。我把从 0 到 1 的全过程摊开讲，包括踩的坑，以及那些讲 AI 编程的文章通常不会提的事。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从 0 到 1 的 Vibe Coding 教程：当 AI 开始替我写代码">
 <meta property="og:url" content="https://swagch.github.io/2026/09/12/2026-09-12-%E4%BB%8E0%E5%88%B01%E7%9A%84Vibe-Coding%E6%95%99%E7%A8%8B/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手的你。 我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。">
+<meta property="og:description" content="去年我还在跟同事争”AI 写的代码能不能上生产”，今年我已经用它攒了三四个小工具，其中一个还真跑在我自己的服务器上。 这篇不是给架构师的，是给只会写 Hello World、或者刷了一堆教程但没真动过手的你。我把从 0 到 1 的全过程摊开讲，包括踩的坑，以及那些讲 AI 编程的文章通常不会提的事。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-starter-cover.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-arch.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-loop.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-scope.svg">
+<meta property="og:image" content="https://swagch.github.io/images/posts/2026/vibe-coding-timeline.svg">
 <meta property="article:published_time" content="2026-09-12T01:30:00.000Z">
-<meta property="article:modified_time" content="2026-09-12T01:30:00.000Z">
+<meta property="article:modified_time" content="2026-10-09T02:30:00.000Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="入门">
 <meta property="article:tag" content="工程实践">
@@ -164,7 +168,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E4%BA%BA%E8%AF%9D%EF%BC%9AVibe-Coding-%E5%88%B0%E5%BA%95%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-text">先说人话：Vibe Coding 到底是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8F%E6%97%B6%EF%BC%9A%E8%A3%85%E5%A5%BD%E7%8E%AF%E5%A2%83%EF%BC%8C%E5%88%AB%E6%80%A5%E7%9D%80%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-text">第一个小时：装好环境，别急着写代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%EF%BC%9A%E8%AE%A9%E5%AE%83%E5%B8%AE%E6%88%91%E5%86%99%E4%B8%AA%E2%80%9D%E8%AE%B0%E8%B4%A6%E6%9C%AC%E2%80%9D"><span class="nav-text">第一个项目：让它帮我写个”记账本”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%83%E5%86%99%E5%AE%8C%E4%BA%86%EF%BC%8C%E7%84%B6%E5%90%8E%E5%91%A2%EF%BC%9F%E2%80%94%E2%80%94-%E7%81%B5%E9%AD%82%E4%B8%89%E9%97%AE"><span class="nav-text">它写完了，然后呢？—— 灵魂三问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E5%AE%83%E6%94%B9%E4%BA%86%E6%88%91%E7%9A%84%E5%93%AA%E4%BA%9B%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-text">1️⃣ 它改了我的哪些文件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%95%B0%E6%8D%AE%E4%BB%8E%E5%93%AA%E6%9D%A5%E3%80%81%E5%88%B0%E5%93%AA%E5%8E%BB%EF%BC%9F"><span class="nav-text">2️⃣ 数据从哪来、到哪去？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E8%B7%91%E5%9D%8F%E4%BA%86%E6%80%8E%E4%B9%88%E6%BB%9A%E5%9B%9E%E5%8E%BB%EF%BC%9F"><span class="nav-text">3️⃣ 跑坏了怎么滚回去？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9C%9F%E6%AD%A3%E7%9A%84%E9%87%8D%E7%82%B9%EF%BC%9AAI-%E5%86%99%E7%9A%84%E4%BB%A3%E7%A0%81%EF%BC%8C%E8%B0%81%E6%98%AF%E8%B4%9F%E8%B4%A3%E4%BA%BA%EF%BC%9F"><span class="nav-text">真正的重点：AI 写的代码，谁是负责人？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%89%8B%E6%9C%80%E5%AE%B9%E6%98%93%E7%BF%BB%E8%BD%A6%E7%9A%84%E4%B8%89%E4%B8%AA%E5%9D%91"><span class="nav-text">新手最容易翻车的三个坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-1%EF%BC%9A%E6%8A%8A%E9%9C%80%E6%B1%82%E5%86%99%E5%BE%97%E5%A4%AA%E6%A8%A1%E7%B3%8A%EF%BC%8C%E7%84%B6%E5%90%8E%E6%80%AA-AI-%E4%B8%8D%E8%A1%8C"><span class="nav-text">❌ 坑 1：把需求写得太模糊，然后怪 AI 不行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-2%EF%BC%9A%E8%AE%A9%E5%AE%83%E2%80%9D%E4%B8%80%E9%94%AE%E6%90%9E%E5%AE%9A%E6%89%80%E6%9C%89%E5%8A%9F%E8%83%BD%E2%80%9D"><span class="nav-text">❌ 坑 2：让它”一键搞定所有功能”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-%E5%9D%91-3%EF%BC%9A%E6%8A%8A%E2%80%9D%E8%83%BD%E8%B7%91%E2%80%9D%E5%BD%93%E6%88%90%E2%80%9D%E5%81%9A%E5%AE%8C%E4%BA%86%E2%80%9D"><span class="nav-text">❌ 坑 3：把”能跑”当成”做完了”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E5%91%A8%E5%90%8E%EF%BC%8C%E6%88%91%E4%BC%9A%E8%B5%B0%E5%88%B0%E5%93%AA%EF%BC%9F"><span class="nav-text">两周后，我会走到哪？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E4%B8%80%E5%8F%A5"><span class="nav-text">最后一句</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E8%AF%B4%E6%B8%85-Vibe-Coding-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-text">一句话说清 Vibe Coding 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%B0%8F%E6%97%B6%EF%BC%9A%E5%85%88%E6%8A%8A%E7%8E%AF%E5%A2%83%E5%BC%84%E5%B9%B2%E5%87%80%EF%BC%8C%E5%88%AB%E6%80%A5%E7%9D%80%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-text">第一个小时：先把环境弄干净，别急着写代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%EF%BC%9A%E8%AE%A9%E5%AE%83%E5%B8%AE%E6%88%91%E5%86%99%E4%B8%AA%E8%AE%B0%E8%B4%A6%E6%9C%AC"><span class="nav-text">第一个项目：让它帮我写个记账本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%88%B0%E6%89%8B%EF%BC%8C%E5%85%88%E9%97%AE%E4%B8%89%E4%BB%B6%E4%BA%8B"><span class="nav-text">代码到手，先问三件事</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E4%BB%B6%EF%BC%9A%E5%AE%83%E5%8A%A8%E4%BA%86%E5%93%AA%E4%BA%9B%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-text">第一件：它动了哪些文件？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E4%BB%B6%EF%BC%9A%E6%95%B0%E6%8D%AE%E4%BB%8E%E5%93%AA%E6%9D%A5%E3%80%81%E5%88%B0%E5%93%AA%E5%8E%BB%EF%BC%9F"><span class="nav-text">第二件：数据从哪来、到哪去？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E4%BB%B6%EF%BC%9A%E8%B7%91%E5%9D%8F%E4%BA%86%E6%80%8E%E4%B9%88%E6%BB%9A%E5%9B%9E%E5%8E%BB%EF%BC%9F"><span class="nav-text">第三件：跑坏了怎么滚回去？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%A3%E4%BB%BB%E8%BF%99%E4%BB%B6%E4%BA%8B%EF%BC%8C%E6%B2%A1%E6%9C%89%E7%81%B0%E8%89%B2%E5%9C%B0%E5%B8%A6"><span class="nav-text">责任这件事，没有灰色地带</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%89%8B%E6%9C%80%E5%AE%B9%E6%98%93%E7%BF%BB%E8%BD%A6%E7%9A%84%E4%B8%89%E4%B8%AA%E5%9D%91"><span class="nav-text">新手最容易翻车的三个坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-1%EF%BC%9A%E9%9C%80%E6%B1%82%E5%86%99%E5%BE%97%E5%A4%AA%E6%A8%A1%E7%B3%8A%EF%BC%8C%E7%84%B6%E5%90%8E%E6%80%AA-AI-%E4%B8%8D%E8%A1%8C"><span class="nav-text">坑 1：需求写得太模糊，然后怪 AI 不行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-2%EF%BC%9A%E6%83%B3%E8%AE%A9%E5%AE%83%E2%80%9D%E4%B8%80%E9%94%AE%E6%90%9E%E5%AE%9A%E6%89%80%E6%9C%89%E5%8A%9F%E8%83%BD%E2%80%9D"><span class="nav-text">坑 2：想让它”一键搞定所有功能”</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%91-3%EF%BC%9A%E6%8A%8A%E2%80%9D%E8%83%BD%E8%B7%91%E2%80%9D%E5%BD%93%E6%88%90%E2%80%9D%E5%81%9A%E5%AE%8C%E4%BA%86%E2%80%9D"><span class="nav-text">坑 3：把”能跑”当成”做完了”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E5%91%A8%E4%B9%8B%E5%90%8E%EF%BC%8C%E4%BD%A0%E5%A4%A7%E6%A6%82%E5%9C%A8%E5%93%AA"><span class="nav-text">两周之后，你大概在哪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%90%8E"><span class="nav-text">最后</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -255,6 +259,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-09 10:30:00" itemprop="dateModified" datetime="2026-10-09T10:30:00+08:00">2026-10-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -280,25 +291,27 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><img src="/images/posts/2026/vibe-coding-starter-cover.svg" alt="Vibe Coding 起步教程封面图"></p>
-<p>去年我还在跟人争论”AI 写的代码能不能用”，今年我已经在用它写完三四个小工具了。这篇不是给大佬的，是给那个<strong>只会写 Hello World、或者在某个自学的晚上刷到无数教程却没动过手</strong>的你。</p>
-<p>我把从 0 到 1 的全部过程拆给你看，包括我踩过的坑，和那些没人会告诉你的、关于”AI 替你写代码”的真相。</p>
+<p>去年我还在跟同事争”AI 写的代码能不能上生产”，今年我已经用它攒了三四个小工具，其中一个还真跑在我自己的服务器上。</p>
+<p>这篇不是给架构师的，是给<strong>只会写 Hello World、或者刷了一堆教程但没真动过手</strong>的你。我把从 0 到 1 的全过程摊开讲，包括踩的坑，以及那些讲 AI 编程的文章通常不会提的事。</p>
 <span id="more"></span>
 
-<h2 id="先说人话：Vibe-Coding-到底是什么"><a href="#先说人话：Vibe-Coding-到底是什么" class="headerlink" title="先说人话：Vibe Coding 到底是什么"></a>先说人话：Vibe Coding 到底是什么</h2><p>一句话：<strong>你用嘴描述想法，AI 帮你写代码，你在旁边看着它改，直到能用。</strong></p>
-<p>2016 年我学编程的时候，是照着书一行行敲、一行行背。现在你想做一个东西，直接跟 AI 说需求就行，它生成一段代码，你复制粘贴、运行、看看对不对。</p>
-<p>听起来像魔法？确实是，但别高兴太早——<strong>魔法是你和 AI 一起变出来的，不是 AI 单方面表演</strong>。</p>
-<h2 id="第一个小时：装好环境，别急着写代码"><a href="#第一个小时：装好环境，别急着写代码" class="headerlink" title="第一个小时：装好环境，别急着写代码"></a>第一个小时：装好环境，别急着写代码</h2><p>我先花 15 分钟把战场清干净，这几样缺一不可：</p>
+<h2 id="一句话说清-Vibe-Coding-是什么"><a href="#一句话说清-Vibe-Coding-是什么" class="headerlink" title="一句话说清 Vibe Coding 是什么"></a>一句话说清 Vibe Coding 是什么</h2><p><strong>你用大白话描述需求，AI 把代码写出来，你在旁边盯着它改，直到真能用。</strong></p>
+<p>2016 年我学编程，是照着书一行行敲、一行行背。现在你想做点东西，直接说需求就行。</p>
+<p>听着很爽，但别急着高兴。更准确的说法是：<strong>你多了个手速极快、记性极好、但不懂你的业务、也绝不替你担责的实习生</strong>。它产出的东西，一律要过你这一关。</p>
+<p>术语上讲，它是个高吞吐、低置信度的代码生成器 —— 吞吐高所以省时间，置信度低所以必须 review。这两句话你得同时记住，只记前半句就是灾难的开始。</p>
+<p><img src="/images/posts/2026/vibe-coding-arch.svg" alt="Vibe Coding 的工具链与数据流"></p>
+<h2 id="第一个小时：先把环境弄干净，别急着写代码"><a href="#第一个小时：先把环境弄干净，别急着写代码" class="headerlink" title="第一个小时：先把环境弄干净，别急着写代码"></a>第一个小时：先把环境弄干净，别急着写代码</h2><p>我先花 15 分钟清战场。这几样缺一个都难受：</p>
 <table>
 <thead>
 <tr>
 <th>工具</th>
-<th>干嘛用的</th>
-<th>装哪</th>
+<th>干什么的</th>
+<th>去哪装</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><strong>Node.js 20 LTS</strong></td>
-<td>跑 JavaScript&#x2F;TypeScript 项目</td>
+<td>跑 JavaScript &#x2F; TypeScript 项目</td>
 <td><a target="_blank" rel="noopener" href="https://nodejs.org/">nodejs.org</a></td>
 </tr>
 <tr>
@@ -308,104 +321,115 @@
 </tr>
 <tr>
 <td><strong>Git</strong></td>
-<td>存代码 + 后悔药</td>
+<td>版本控制，也就是后悔药</td>
 <td>git-scm.com</td>
 </tr>
 <tr>
-<td><strong>AI 助手插件</strong></td>
+<td><strong>AI 助手</strong></td>
 <td>对话生成代码</td>
-<td>推荐 GitHub Copilot 或 Cursor</td>
+<td>GitHub Copilot 或 Cursor 都行</td>
 </tr>
 </tbody></table>
-<p>装完先验证一下环境跑得通，再开脚本域——<strong>别跳过这步</strong>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows / Mac / Linux 都行，结果必须是三行版本号</span></span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
+<p>装完先验一下，<strong>别跳过</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows / Mac / Linux 都一样，正常的话是三行版本号</span></span><br><span class="line">node -v</span><br><span class="line">npm -v</span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
 
-<p>我第一次到最后一步才想起 Git 没装，结果代码全在编辑器里没版本控制，改坏了只能干瞪眼。<strong>环境问题永远比代码问题恶心，先解决它。</strong></p>
-<h2 id="第一个项目：让它帮我写个”记账本”"><a href="#第一个项目：让它帮我写个”记账本”" class="headerlink" title="第一个项目：让它帮我写个”记账本”"></a>第一个项目：让它帮我写个”记账本”</h2><p>我不空想大项目，第一个就做个小工具——<strong>一个在终端跑的记账本</strong>。这个选择很关键：范围小、能运行见效、随时能丢。</p>
-<p>我跟 AI 的第一句话是：</p>
+<p>我第一次就是嫌麻烦没验 Git，等到最后才发现没装。结果代码全躺在编辑器里没有版本控制，改崩了只能干瞪眼。</p>
+<p>顺带说一个后面会反复用到的概念：<strong>依赖要锁版本</strong>。项目里那个 <code>package-lock.json</code> 别删，别人（以及半年后的你）靠它才能装出跟你一模一样的环境。团队协作里，<code>npm ci</code> 比 <code>npm install</code> 靠谱 —— 前者严格照 lock 文件装，后者可能悄悄给你升级。</p>
+<h2 id="第一个项目：让它帮我写个记账本"><a href="#第一个项目：让它帮我写个记账本" class="headerlink" title="第一个项目：让它帮我写个记账本"></a>第一个项目：让它帮我写个记账本</h2><p>我不空想大项目，第一个就做个小工具：<strong>终端里跑的记账本</strong>。这个选择很关键 —— 范围小、能跑出结果、随时能扔。</p>
+<p>我跟 AI 说的第一句话是：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">帮我写一个命令行记账本，用 Node.js。</span><br><span class="line">功能：</span><br><span class="line">1. 能加一条收入或支出（金额 + 备注）</span><br><span class="line">2. 能查总余额</span><br><span class="line">3. 数据存到本地文件，退出程序不丢</span><br><span class="line">先跑通最基础功能，别做花里胡哨的。</span><br></pre></td></tr></table></figure>
 
-<p>注意最后那句”<strong>别做花里胡哨的</strong>“——这是我最痛的教训。不说这句，AI 会给你加什么图表、导出 CSV、多用户，全是你不想要的东西。</p>
-<h2 id="它写完了，然后呢？——-灵魂三问"><a href="#它写完了，然后呢？——-灵魂三问" class="headerlink" title="它写完了，然后呢？—— 灵魂三问"></a>它写完了，然后呢？—— 灵魂三问</h2><p>AI 啪地贴出一段代码 + 一个 <code>npm install</code> 命令。这时候新手最容易犯的错：<strong>复制、粘贴、跑、看它成功就完事</strong>。</p>
-<p>我给每条 AI 代码都做三件事，一次没落：</p>
-<h3 id="1️⃣-它改了我的哪些文件？"><a href="#1️⃣-它改了我的哪些文件？" class="headerlink" title="1️⃣ 它改了我的哪些文件？"></a>1️⃣ 它改了我的哪些文件？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure>
+<p>注意最后那句”<strong>别做花里胡哨的</strong>“。这是我最痛的教训：不写这句，它会顺手给你加上图表、导出 CSV、多用户，全是你没要的东西。你每多要一个功能，它的出错面就大一圈。</p>
+<h2 id="代码到手，先问三件事"><a href="#代码到手，先问三件事" class="headerlink" title="代码到手，先问三件事"></a>代码到手，先问三件事</h2><p>AI 啪地贴出一段代码，外加一个 <code>npm install</code>。新手最容易犯的错就在这：复制、粘贴、跑、看到没报错就收工。</p>
+<p>我每条 AI 代码都过这三关，一次没落下。</p>
+<h3 id="第一件：它动了哪些文件？"><a href="#第一件：它动了哪些文件？" class="headerlink" title="第一件：它动了哪些文件？"></a>第一件：它动了哪些文件？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git diff</span><br></pre></td></tr></table></figure>
 
-<p>这是我睁眼第一件事。AI 有时会”顺手”改一堆跟需求无关的文件——<strong>它很爱干这个</strong>。我看到只加了 <code>index.js</code> 和一个依赖，心里有底。</p>
-<h3 id="2️⃣-数据从哪来、到哪去？"><a href="#2️⃣-数据从哪来、到哪去？" class="headerlink" title="2️⃣ 数据从哪来、到哪去？"></a>2️⃣ 数据从哪来、到哪去？</h3><p>我不看每一行（那是大佬的事），但我至少要懂<strong>数据流</strong>：</p>
+<p><code>git status</code> 看改动面，<code>git diff</code> 看具体改了哪几行。AI 有时会”顺手”改一堆跟你需求无关的文件，<strong>它很爱干这个</strong>。我那次看到只多了 <code>index.js</code> 和一个依赖声明，心里就有底了。</p>
+<p>这一步的专业叫法就是 diff review。你不用逐行读懂（那是资深工程师的活），但<strong>必须知道改动落在哪几个文件、动了什么类型的东西</strong>。</p>
+<h3 id="第二件：数据从哪来、到哪去？"><a href="#第二件：数据从哪来、到哪去？" class="headerlink" title="第二件：数据从哪来、到哪去？"></a>第二件：数据从哪来、到哪去？</h3><p>我不逐行看代码，但一定搞清楚<strong>数据流</strong>：</p>
 <ul>
-<li>记账数据存到了哪个文件？<code>~/记录.json</code>？还是当前目录？</li>
-<li>如果我换个目录跑，还能读到昨天的账吗？</li>
+<li>账记到哪个文件了？<code>~/ledger.json</code>？还是当前目录？</li>
+<li>我换个目录再跑，还读得到昨天的账吗？</li>
 </ul>
-<p>这里我在代码里找到了那行 <code>fs.writeFileSync(&#39;./ledger.json&#39;)</code>——注意那个 <code>./</code>，意味着数据存在<strong>当前目录</strong>。我明白这个了，以后换目录就知道数据会丢。</p>
-<h3 id="3️⃣-跑坏了怎么滚回去？"><a href="#3️⃣-跑坏了怎么滚回去？" class="headerlink" title="3️⃣ 跑坏了怎么滚回去？"></a>3️⃣ 跑坏了怎么滚回去？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add index.js</span><br><span class="line">git commit -m <span class="string">&quot;记账本初版&quot;</span></span><br></pre></td></tr></table></figure>
+<p>我在代码里翻到那一行：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fs.<span class="title function_">writeFileSync</span>(<span class="string">&#x27;./ledger.json&#x27;</span>, data)</span><br></pre></td></tr></table></figure>
 
-<p>每次改动<strong>先提交</strong>，这是最重要的后悔药。AI 生成代码你不可能完全看懂，但你能保证：<strong>每一版都留了底，改坏了可以回退</strong>。</p>
-<p>我第一次写完就急着跑，没 commit。结果 AI 后面改崩了，我恢复不了，只能从头再来一遍。血泪教训。</p>
-<h2 id="真正的重点：AI-写的代码，谁是负责人？"><a href="#真正的重点：AI-写的代码，谁是负责人？" class="headerlink" title="真正的重点：AI 写的代码，谁是负责人？"></a>真正的重点：AI 写的代码，谁是负责人？</h2><p>我必须在这个教程里反复强调这件事，连写三遍都不嫌多：</p>
+<p>关键在那个 <code>./</code> —— 它意味着数据写在<strong>当前工作目录</strong>（cwd）。所以我 <code>cd</code> 到别的目录再跑，等于开了个新账本，昨天的记录看着就像丢了。</p>
+<p>搞明白这点之后，我把它改成读环境变量或配置文件里的绝对路径。这就叫<strong>可移植性</strong>：程序在哪个目录被启动，行为都不该变。</p>
+<h3 id="第三件：跑坏了怎么滚回去？"><a href="#第三件：跑坏了怎么滚回去？" class="headerlink" title="第三件：跑坏了怎么滚回去？"></a>第三件：跑坏了怎么滚回去？</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add index.js</span><br><span class="line">git commit -m <span class="string">&quot;记账本初版：加记录 + 查余额&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>每完成一小步就提交，这是最重要的后悔药。AI 写的代码你不可能全看懂，但你能保证<strong>每一版都留了回滚点</strong>。</p>
+<p>我第一次写完就急着跑，没提交。后来 AI 改崩了，我回不去，只能从头再来。从那以后我定了个规矩：<strong>一个可验证的功能 &#x3D; 一次提交</strong>。别攒一大堆改动一起提交，那样回滚点也是模糊的。</p>
+<p><img src="/images/posts/2026/vibe-coding-loop.svg" alt="一次迭代的闭环：提需求 → 生成 → 看 diff → 跑 → 提交或回滚"></p>
+<h2 id="责任这件事，没有灰色地带"><a href="#责任这件事，没有灰色地带" class="headerlink" title="责任这件事，没有灰色地带"></a>责任这件事，没有灰色地带</h2><p>这句话我在这篇里要说三遍：</p>
 <blockquote>
 <p><strong>AI 不会参加故障复盘，也不会在凌晨两点判断要不要回滚。</strong></p>
 </blockquote>
-<p>代码是被你合进去的，commit 写的是你的名字。出了事，是<strong>你</strong>负责，不是 ChatGPT。</p>
-<p>所以我的原则很简单，就一条：</p>
+<p>代码是你合进去的，<code>commit</code> 上写的是你的名字。出事的时候，是你的问题，不是 ChatGPT 的。</p>
+<p>所以我的原则只有一条，按风险分档：</p>
 <table>
 <thead>
 <tr>
 <th>场景</th>
-<th>我做什么</th>
+<th>我的做法</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>记个账、跑一次性的脚本</td>
-<td>快速用，出了问题重来就行</td>
+<td>记个账、跑一次性脚本、本地小工具</td>
+<td>快速用，坏了重来就是</td>
 </tr>
 <tr>
 <td>碰支付、权限、删数据、生产服务器</td>
-<td><strong>必须手动确认 + 测试 + 保留回滚</strong></td>
+<td><strong>手动确认 + 测试 + 留回滚预案，一样不能少</strong></td>
 </tr>
 </tbody></table>
-<p><strong>删数据、碰生产环境这两件事，我永远不让 AI 自动执行</strong>，哪怕它信誓旦旦说”没问题”。这不是信不信它——这是软件本来就是”数据、资金、隐私、团队维护成本”叠加的东西，AI 替你省了写代码的时间，省不掉后果。</p>
-<h2 id="新手最容易翻车的三个坑"><a href="#新手最容易翻车的三个坑" class="headerlink" title="新手最容易翻车的三个坑"></a>新手最容易翻车的三个坑</h2><h3 id="❌-坑-1：把需求写得太模糊，然后怪-AI-不行"><a href="#❌-坑-1：把需求写得太模糊，然后怪-AI-不行" class="headerlink" title="❌ 坑 1：把需求写得太模糊，然后怪 AI 不行"></a>❌ 坑 1：把需求写得太模糊，然后怪 AI 不行</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">帮我做个网站。        ← 我最初的真实需求，现在看着都脸红</span><br></pre></td></tr></table></figure>
+<p>删数据和碰生产这两件事，我永远不让 AI 自动执行，哪怕它信誓旦旦说”没问题”。这不是信不信它的问题 —— 软件本来就是”数据 + 资金 + 隐私 + 团队维护成本”叠出来的东西，AI 省掉的是你敲代码的时间，省不掉后果。</p>
+<p>顺便提一个很实用的词：<strong>幂等</strong>。同一个操作重复执行，结果应该一致。这个坑我在下一节就踩到了。</p>
+<h2 id="新手最容易翻车的三个坑"><a href="#新手最容易翻车的三个坑" class="headerlink" title="新手最容易翻车的三个坑"></a>新手最容易翻车的三个坑</h2><h3 id="坑-1：需求写得太模糊，然后怪-AI-不行"><a href="#坑-1：需求写得太模糊，然后怪-AI-不行" class="headerlink" title="坑 1：需求写得太模糊，然后怪 AI 不行"></a>坑 1：需求写得太模糊，然后怪 AI 不行</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">帮我做个网站。        ← 我最初的真实需求，现在看着都脸红</span><br></pre></td></tr></table></figure>
 
-<p>AI 不是神仙，模糊需求只会放大回模糊代码。改进后：</p>
+<p>AI 不是神仙，模糊的输入只会换回模糊的代码。改一版：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">做一个单页记账网站，用 React。</span><br><span class="line">页面左边是输入框（金额 + 说明），右边显示余额。</span><br><span class="line">数据放浏览器 localStorage，不做后端。</span><br><span class="line">先做能跑的最小版。</span><br></pre></td></tr></table></figure>
 
-<p><strong>需求越具体，AI 越靠谱。</strong> 这不是玄学，是上下文质量。</p>
-<h3 id="❌-坑-2：让它”一键搞定所有功能”"><a href="#❌-坑-2：让它”一键搞定所有功能”" class="headerlink" title="❌ 坑 2：让它”一键搞定所有功能”"></a>❌ 坑 2：让它”一键搞定所有功能”</h3><p>一次让 AI 做整个系统，就像让一个人同时搬一百个箱子——它一定会摔。</p>
-<p>正确姿势是<strong>拆成小步</strong>：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">第 1 步：先把&quot;加一条支出&quot;跑通。</span><br><span class="line">第 2 步：再加&quot;查余额&quot;。</span><br><span class="line">第 3 步：最后加&quot;删除记录&quot;。</span><br></pre></td></tr></table></figure>
+<p><strong>需求越具体，AI 越靠谱。</strong> 这不是玄学，是上下文质量 —— 你给它的约束越硬，它自由发挥（也就是跑偏）的空间越小。</p>
+<h3 id="坑-2：想让它”一键搞定所有功能”"><a href="#坑-2：想让它”一键搞定所有功能”" class="headerlink" title="坑 2：想让它”一键搞定所有功能”"></a>坑 2：想让它”一键搞定所有功能”</h3><p>一次让 AI 写完整个系统，就像让一个人同时搬一百个箱子，必然摔。</p>
+<p>正确姿势是<strong>拆成垂直切片</strong>：每一步都是一个”从界面到数据”能跑通的小功能，而不是”先写完全部后端再写前端”。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">第 1 步：先把&quot;加一条支出&quot;从输入到落盘跑通。</span><br><span class="line">第 2 步：再加&quot;查余额&quot;。</span><br><span class="line">第 3 步：最后加&quot;删除记录&quot;。</span><br></pre></td></tr></table></figure>
 
-<p>每一步都验证、都 commit。<strong>大项目也是小步骤堆出来的。</strong></p>
-<h3 id="❌-坑-3：把”能跑”当成”做完了”"><a href="#❌-坑-3：把”能跑”当成”做完了”" class="headerlink" title="❌ 坑 3：把”能跑”当成”做完了”"></a>❌ 坑 3：把”能跑”当成”做完了”</h3><p>页面能打开、点得通，<strong>不等于</strong>功能可靠。真实故障都藏在那些你没想到的角落：重复点击、空数据、网络超时、权限绕过。</p>
-<p>我后来发现记账本有个 bug：<strong>如果直接按两次回车，会加两条相同的记录</strong>。页面看起来一切正常，但账算错了。这种问题，AI 生成的代码不会提醒你，只能靠你多测多想。</p>
-<h2 id="两周后，我会走到哪？"><a href="#两周后，我会走到哪？" class="headerlink" title="两周后，我会走到哪？"></a>两周后，我会走到哪？</h2><p>我给个诚实的时间线（我自己的真实节奏）：</p>
+<p>每一步都验证、都提交。大项目也是小步骤堆出来的，区别只在于步骤数量。</p>
+<h3 id="坑-3：把”能跑”当成”做完了”"><a href="#坑-3：把”能跑”当成”做完了”" class="headerlink" title="坑 3：把”能跑”当成”做完了”"></a>坑 3：把”能跑”当成”做完了”</h3><p>页面能打开、按钮点得通，<strong>不等于</strong>功能可靠。真实故障都藏在你没想到的角落：重复点击、空数据、网络超时、权限绕过。</p>
+<p>我的记账本就有一个：<strong>连按两次回车，会记两笔一模一样的账</strong>。界面看着一切正常，账却是错的。这就是典型的<strong>幂等缺失</strong> —— 重复提交没有被拦住。</p>
+<p>这类问题 AI 不会主动提醒你，只能靠你多测两下、多想一步。<strong>边界条件才是故障高发区</strong>，正常路径反而是最不容易出事的。</p>
+<p><img src="/images/posts/2026/vibe-coding-scope.svg" alt="模糊需求 vs 具体需求：产出质量的差距从提问就决定了"></p>
+<h2 id="两周之后，你大概在哪"><a href="#两周之后，你大概在哪" class="headerlink" title="两周之后，你大概在哪"></a>两周之后，你大概在哪</h2><p>不画大饼，这是我自己走过的真实节奏：</p>
 <table>
 <thead>
 <tr>
 <th>时间</th>
-<th>你大概能做什么</th>
+<th>你大概能做到</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>第 1 天</td>
-<td>跑通记账本、理解数据流向、学会 commit</td>
+<td>跑通记账本，看懂数据流向，学会提交和回滚</td>
 </tr>
 <tr>
 <td>第 3 天</td>
-<td>做第二个小工具，开始自己提”更具体”的需求</td>
+<td>做出第二个小工具，开始主动提”更具体”的需求</td>
 </tr>
 <tr>
 <td>第 1 周</td>
-<td>敢做一个有 5 个功能的小应用，学会拆步骤</td>
+<td>敢做一个五个功能的小应用，会拆步骤</td>
 </tr>
 <tr>
 <td>第 2 周</td>
-<td>开始懂”哪种代码要小心”（权限、删数据、生产）</td>
+<td>心里有数了：哪种代码要小心（权限、删数据、生产环境）</td>
 </tr>
 </tbody></table>
-<p><strong>第 2 周不是你变强了，是你变懂事了</strong>——知道哪些能让 AI 干，哪些得自己盯着。</p>
-<h2 id="最后一句"><a href="#最后一句" class="headerlink" title="最后一句"></a>最后一句</h2><p>Vibe Coding 降低的不是编程的门槛，而是**”想法到能跑的 Demo”的距离**。它让每个人都能把脑子里的东西变成屏幕上能跑的东西。</p>
-<p>但记住那句话：<strong>谁提交，谁负责。</strong> AI 帮你写代码，你负责它写得对不对、安不安全、能不能滚回去。</p>
-<p>工具会变，责任不会。希望你第二个星期，能敢用 AI 做出一个真正属于你的小东西。</p>
+<p><strong>第二周不是你变强了，是你变懂事了</strong> —— 知道哪些能让 AI 干，哪些必须自己盯着。</p>
+<p><img src="/images/posts/2026/vibe-coding-timeline.svg" alt="两周节奏时间线"></p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>Vibe Coding 真正缩短的，不是”编程的门槛”，而是<strong>从想法到能跑的 Demo 的距离</strong>。它让更多人有能力把脑子里的东西变成屏幕上能跑的东西。</p>
+<p>但那条线一直在：<strong>谁提交，谁负责。</strong> AI 负责写，你负责它写得对不对、安不安全、出事能不能滚回去。</p>
+<p>工具会换，这条线不会。</p>
 
     </div>
 

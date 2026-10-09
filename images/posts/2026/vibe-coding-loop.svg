@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="620" viewBox="0 0 1280 620" role="img" aria-label="一次 Vibe Coding 迭代的闭环流程图">
+  <rect width="1280" height="620" fill="#081218"/>
+  <rect x="48" y="36" width="1184" height="548" rx="18" fill="#111e25" stroke="#31505c"/>
+  <text x="88" y="94" fill="#2dd4bf" font-family="Menlo,Consolas,monospace" font-size="20">LOOP / 一次迭代的闭环</text>
+  <text x="88" y="132" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="20">跑通一次只要几分钟，但每一步都有出口</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="21">
+    <rect x="86" y="186" width="186" height="98" rx="10" fill="#09161b" stroke="#2dd4bf"/>
+    <text x="126" y="230" fill="#c8faf1">① 提需求</text>
+    <text x="106" y="262" fill="#6f8d95" font-size="16">写清边界</text>
+
+    <rect x="318" y="186" width="196" height="98" rx="10" fill="#09161b" stroke="#60a5fa"/>
+    <text x="352" y="230" fill="#d3e6fd">② AI 生成</text>
+    <text x="338" y="262" fill="#6f8d95" font-size="16">可能多给东西</text>
+
+    <rect x="560" y="186" width="216" height="98" rx="10" fill="#09161b" stroke="#a78bfa"/>
+    <text x="594" y="230" fill="#ddd0fd">③ 看 git diff</text>
+    <text x="580" y="262" fill="#6f8d95" font-size="16">改动面 + 数据流</text>
+
+    <rect x="822" y="186" width="176" height="98" rx="10" fill="#09161b" stroke="#fbbf24"/>
+    <text x="856" y="230" fill="#f7e4a6">④ 跑起来</text>
+    <text x="840" y="262" fill="#6f8d95" font-size="16">真跑，不靠猜</text>
+
+    <rect x="1044" y="186" width="152" height="98" rx="10" fill="#09161b" stroke="#f0fdfa"/>
+    <text x="1074" y="230" fill="#f0fdfa">⑤ 能用？</text>
+    <text x="1064" y="262" fill="#6f8d95" font-size="16">你说了算</text>
+  </g>
+
+  <g stroke="#69808a" stroke-width="3" fill="none">
+    <path d="M272 235H318"/><path d="M296 226L318 235L296 244"/>
+    <path d="M514 235H560"/><path d="M538 226L560 235L538 244"/>
+    <path d="M776 235H822"/><path d="M800 226L822 235L800 244"/>
+    <path d="M998 235H1044"/><path d="M1022 226L1044 235L1022 244"/>
+  </g>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="20">
+    <rect x="1044" y="360" width="152" height="92" rx="10" fill="#09161b" stroke="#34d399"/>
+    <text x="1078" y="400" fill="#bff3e0">git commit</text>
+    <text x="1066" y="432" fill="#6f8d95" font-size="16">留下回滚点</text>
+
+    <rect x="560" y="360" width="216" height="92" rx="10" fill="#09161b" stroke="#fb7185"/>
+    <text x="600" y="400" fill="#fecdd3">回滚 / 重写需求</text>
+    <text x="586" y="432" fill="#6f8d95" font-size="16">git checkout -- .</text>
+  </g>
+  <g stroke="#34d399" stroke-width="3" fill="none"><path d="M1120 284V360"/></g>
+  <g stroke="#fb7185" stroke-width="3" fill="none"><path d="M668 284V360"/></g>
+
+  <path d="M560 406H300V284" stroke="#fb7185" stroke-width="3" fill="none"/>
+  <path d="M291 304L300 284L309 304" fill="none" stroke="#fb7185" stroke-width="3"/>
+  <text x="316" y="352" fill="#fecdd3" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="17">改了再问一遍，别在崩掉的代码上继续叠</text>
+
+  <rect x="86" y="486" width="1110" height="66" rx="8" fill="#0b181e" stroke="#31505c"/>
+  <text x="118" y="526" fill="#9fb8be" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">成功的出口是 commit（可回滚），失败的出口是回滚（别硬修）—— 两个出口都必须存在</text>
+</svg>
