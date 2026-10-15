@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">SHARDING / ARCHITECTURE</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">ShardingSphere-JDBC 接入位置</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="20">
+    <rect x="72" y="176" width="300" height="104" rx="10" fill="#101a29" stroke="#294158"/>
+    <text x="100" y="212" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">APPLICATION</text>
+    <text x="100" y="246" fill="#f2f7fb">业务代码（SQL 写法不变）</text>
+
+    <rect x="72" y="316" width="300" height="150" rx="10" fill="#101a29" stroke="#fbbf24" stroke-width="2"/>
+    <text x="100" y="352" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="16">SHARDINGSPHERE-JDBC</text>
+    <text x="100" y="386" fill="#f2f7fb">SQL 解析 → 路由计算</text>
+    <text x="100" y="416" fill="#f2f7fb">→ 改写 → 归并</text>
+    <text x="100" y="446" fill="#9eb0c2" font-size="16">以 jar 包嵌入，无独立进程</text>
+
+    <rect x="520" y="176" width="688" height="290" rx="12" fill="#0b1522" stroke="#294158"/>
+    <text x="552" y="212" fill="#9eb0c2" font-family="Menlo,Consolas,monospace" font-size="16">PHYSICAL SHARDS</text>
+
+    <rect x="552" y="236" width="192" height="88" rx="8" fill="#101a29" stroke="#22d3ee"/>
+    <text x="580" y="270" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">ds0</text>
+    <text x="580" y="300" fill="#c9d6e2" font-size="17">order_0 / order_1</text>
+
+    <rect x="768" y="236" width="192" height="88" rx="8" fill="#101a29" stroke="#22d3ee"/>
+    <text x="796" y="270" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">ds1</text>
+    <text x="796" y="300" fill="#c9d6e2" font-size="17">order_2 / order_3</text>
+
+    <rect x="984" y="236" width="192" height="88" rx="8" fill="#101a29" stroke="#22d3ee"/>
+    <text x="1012" y="270" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">ds2</text>
+    <text x="1012" y="300" fill="#c9d6e2" font-size="17">order_4 / order_5</text>
+
+    <rect x="552" y="344" width="624" height="98" rx="8" fill="#101a29" stroke="#34d399"/>
+    <text x="580" y="378" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">BROADCAST / BINDING</text>
+    <text x="580" y="410" fill="#f2f7fb" font-size="18">广播表（字典、配置）：每库一份，JOIN 无需跨片</text>
+    <text x="580" y="434" fill="#f2f7fb" font-size="18">绑定表（分片规则一致）：JOIN 按分片对齐，避免笛卡尔积</text>
+
+    <rect x="72" y="508" width="1136" height="88" rx="10" fill="#101a29" stroke="#fb7185"/>
+    <text x="104" y="542" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">WATCH OUT</text>
+    <text x="104" y="574" fill="#f2f7fb" font-size="20">不带分片键的查询会路由到所有分片，再由中间件归并——比单表更慢</text>
+
+    <rect x="72" y="622" width="1136" height="66" rx="10" fill="#0b1522" stroke="#294158"/>
+    <text x="104" y="662" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="19">shard key: high cardinality + almost always in WHERE + evenly distributed</text>
+  </g>
+
+  <path d="M222 280V316" stroke="#70869b" stroke-width="3"/>
+  <path d="M213 304L222 316L231 304" fill="none" stroke="#70869b" stroke-width="3"/>
+  <path d="M372 391H446V280H520" stroke="#70869b" stroke-width="3" fill="none"/>
+  <path d="M508 271L520 280L508 289" fill="none" stroke="#70869b" stroke-width="3"/>
+</svg>
