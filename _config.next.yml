@@ -8,6 +8,7 @@ darkmode: false
 
 menu:
   home: /
+  作品集: /portfolio/
   专题: /series/
   archives: /archives/
   categories: /categories/

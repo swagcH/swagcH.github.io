@@ -98,6 +98,43 @@ type: about
     </div>
   </section>
 
+  <section class="about-section career-history-section">
+    <header class="section-heading">
+      <h2>工作经历</h2>
+      <span></span>
+    </header>
+    <div class="experience-list">
+      <article>
+        <time>2024.05 - 2026.03</time>
+        <div>
+          <h3>深圳市潮向科技有限公司 · Java 开发工程师</h3>
+          <p>担任后端技术负责人，主导集团级数据大屏的技术选型与架构设计。负责 9 个异构系统的数据集成、4 台服务器的高可用部署，以及 MinIO 对象存储的引入与落地。</p>
+        </div>
+      </article>
+      <article>
+        <time>2022.03 - 2024.04</time>
+        <div>
+          <h3>深圳小信科技有限公司 · Java 开发工程师（研发部）</h3>
+          <p>担任医院电子通行证系统与病案无纸化系统的后端主程。负责核心模块设计与开发，主导分库分表、消息解耦、缓存设计等性能优化，并参与技术选型与代码评审。</p>
+        </div>
+      </article>
+      <article>
+        <time>2020.07 - 2022.02</time>
+        <div>
+          <h3>珠海析码数据技术有限公司 · Java 开发工程师</h3>
+          <p>参与业务系统后端开发与维护，完成接口开发、数据库设计与业务逻辑实现，使用 MySQL、Redis 处理数据存储与缓存，参与代码评审与技术文档编写。</p>
+        </div>
+      </article>
+      <article>
+        <time>2026.03 - 至今</time>
+        <div>
+          <h3>主动学习期 · 独立项目实践</h3>
+          <p>把工作之外的时间投入到两个方向：一是补强工程能力，独立完成从设计、开发、测试到部署上线的全栈项目；二是把 AI 从"能用"推进到"可用于生产"，搭建统一模型网关与运维自动化体系。<a href="/portfolio/">作品集 →</a></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
   <section class="about-section experience-section">
     <header class="section-heading">
       <h2>成长路径</h2>
@@ -114,7 +151,7 @@ type: about
       </article>
       <article>
         <time>2025 - 至今</time>
-        <div><h3>探索 AI 进入真实开发流程</h3><p>围绕上下文工程、Vibe Coding、Java 重构和个人工作流，验证 AI 的效率收益与责任边界。</p></div>
+        <div><h3>探索 AI 进入真实开发流程</h3><p>围绕上下文工程、Vibe Coding、Java 重构和个人工作流，验证 AI 的效率收益与责任边界；并把验证结果沉淀为可复用的基础设施与工程方法。</p></div>
       </article>
     </div>
   </section>
@@ -127,6 +164,7 @@ type: about
     <p class="contact-intro">你可以通过 GitHub 了解我的公开内容，也可以从专题和归档快速判断关注方向是否与你的团队或问题匹配。</p>
     <div class="contact-links">
       <a href="https://github.com/swagcH" rel="noopener" target="_blank"><i class="fab fa-github"></i><span>GitHub<strong>@swagcH</strong></span></a>
+      <a href="/portfolio/"><i class="fa fa-layer-group"></i><span>作品集<strong>六个项目的完整拆解</strong></span></a>
       <a href="/series/"><i class="fa fa-layer-group"></i><span>代表专题<strong>浏览三条能力路径</strong></span></a>
       <a href="/atom.xml"><i class="fa fa-rss"></i><span>RSS<strong>订阅文章更新</strong></span></a>
       <a href="/archives/"><i class="fa fa-book-open"></i><span>文章归档<strong>浏览全部笔记</strong></span></a>

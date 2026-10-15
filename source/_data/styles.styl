@@ -3563,3 +3563,136 @@ mark.search-keyword {
     grid-template-columns: 108px minmax(0, 1fr);
   }
 }
+
+/* ---------- 作品集页面 ---------- */
+.portfolio-page {
+  background: var(--paper);
+}
+
+.portfolio-section {
+  border-top: 1px solid var(--line);
+  padding: 64px 40px 72px;
+}
+
+.portfolio-section .section-heading,
+.portfolio-section .project-card,
+.portfolio-section .skill-groups {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 900px;
+}
+
+.project-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-bottom: 22px;
+  padding: 30px 32px 26px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.project-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 28px rgba(21, 21, 23, .06);
+}
+
+.project-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.project-head h3 {
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 6px;
+}
+
+.project-role {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  margin: 0;
+}
+
+.project-head time {
+  color: var(--faint);
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding-top: 4px;
+  white-space: nowrap;
+}
+
+.project-desc {
+  color: var(--ink-soft);
+  font-size: 14.5px;
+  line-height: 1.85;
+  margin: 0 0 18px;
+}
+
+.project-meta {
+  border-top: 1px dashed var(--line);
+  margin: 0;
+  padding-top: 16px;
+}
+
+.project-meta dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  margin-bottom: 5px;
+}
+
+.project-meta dd {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.85;
+  margin: 0 0 16px;
+}
+
+.project-meta dd:last-child {
+  margin-bottom: 0;
+}
+
+.project-meta strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .portfolio-section {
+    padding: 44px 16px 52px;
+  }
+
+  .project-card {
+    border-radius: 12px;
+    padding: 22px 18px 20px;
+  }
+
+  .project-head {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .project-head time {
+    padding-top: 0;
+  }
+
+  .project-head h3 {
+    font-size: 18px;
+  }
+
+  .project-desc,
+  .project-meta dd {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+}
