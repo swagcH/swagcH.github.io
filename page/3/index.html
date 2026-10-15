@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-count">81</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">219</span>
+        <span class="site-state-item-count">221</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,178 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">从单体到微服务总结</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-12-25 23:31:18" itemprop="dateCreated datePublished" datetime="2022-12-25T23:31:18+08:00">2022-12-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>2022 年最后一篇不再写组件配置，想回头看一看这一年的技术路线。年初我关心的是“一个系统怎么拆成多个服务”，到年末更关心“团队能不能长期维护拆完以后的复杂度”。这个变化比多会几个框架更重要。</p>
+</blockquote>
+<h2 id="年初的理解：服务越独立越先进"><a href="#年初的理解：服务越独立越先进" class="headerlink" title="年初的理解：服务越独立越先进"></a>年初的理解：服务越独立越先进</h2><p>最开始看到单体应用的问题很直接：工程越来越大，发布越来越慢，模块之间相互影响。微服务看起来给出了一个明确答案：把用户、订单、库存、支付拆开，每个服务独立数据库、独立部署、独立扩容。</p>
+<p>这个方向没有错，但太容易忽略前提。服务从一个进程拆成四个进程以后，原来隐藏的成本全部显性化：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">本地调用变成网络调用</span><br><span class="line">本地事务变成跨服务状态协调</span><br><span class="line">一个配置文件变成多环境配置管理</span><br><span class="line">一份日志变成跨实例检索</span><br><span class="line">一次发布变成多服务版本兼容</span><br></pre></td></tr></table></figure>
+
+<p>系统不是被拆小了，而是把代码复杂度的一部分换成了分布式系统和组织协作复杂度。</p>
+<h2 id="这一年的实际路线"><a href="#这一年的实际路线" class="headerlink" title="这一年的实际路线"></a>这一年的实际路线</h2><p>回看文章顺序，基本就是我对微服务认识逐渐完整的过程：</p>
+<h3 id="一月：先讨论边界"><a href="#一月：先讨论边界" class="headerlink" title="一月：先讨论边界"></a>一月：先讨论边界</h3><p>第一步不是引入注册中心，而是判断用户、订单、库存和支付的数据归属。边界不清楚时，服务拆得越快，后面跨服务修改越多。</p>
+<p>这一阶段最大的收获是“服务按业务能力拆，不按 Controller 或数据库表数量拆”。如果订单服务仍然直接更新库存表，两个仓库并没有形成两个边界。</p>
+<h3 id="二月至三月：补服务治理"><a href="#二月至三月：补服务治理" class="headerlink" title="二月至三月：补服务治理"></a>二月至三月：补服务治理</h3><p>服务数量增加以后，固定 IP 调用很快失效，于是接触 Nacos、Gateway 和 OpenFeign。它们分别解决服务位置、统一入口和声明式调用，但也引入 namespace、路由、超时和版本兼容问题。</p>
+<p>这让我意识到组件只有放在故障链路里才有意义。注册中心不是为了控制台里出现服务名，而是让调用方能在实例变化后继续找到可用地址；网关不是为了统一加一个前缀，而是为了入口治理和流量控制。</p>
+<h3 id="六月至七月：开始面对异步和高可用"><a href="#六月至七月：开始面对异步和高可用" class="headerlink" title="六月至七月：开始面对异步和高可用"></a>六月至七月：开始面对异步和高可用</h3><p>RabbitMQ 把非核心动作从订单主流程拆出去，响应更快了，但消息丢失、重复消费和最终一致性成为新的责任。Redis 主从和 Sentinel 提升了可用性，却仍然存在异步复制窗口、客户端重连和数据库回源风险。</p>
+<p>从这一阶段开始，我不再把“中间件集群已部署”当成完成，而会继续追问：</p>
+<ul>
+<li>数据有没有可能丢。</li>
+<li>故障以后多久恢复。</li>
+<li>重试会不会制造重复结果。</li>
+<li>整个组件不可用时业务怎么降级。</li>
+</ul>
+<h3 id="八月：让环境可以重复"><a href="#八月：让环境可以重复" class="headerlink" title="八月：让环境可以重复"></a>八月：让环境可以重复</h3><p>Docker 和 Compose 解决了本地、测试环境反复安装依赖的问题。镜像把运行环境固化，Compose 把服务关系写成配置。</p>
+<p>但容器化不是把 Jar 放进镜像就结束。数据卷、容器网络、健康检查、日志轮转、资源边界和密钥管理都需要重新设计。环境一致性提高了，部署规范的重要性反而更高了。</p>
+<h3 id="十月至十一月：补上可观测性"><a href="#十月至十一月：补上可观测性" class="headerlink" title="十月至十一月：补上可观测性"></a>十月至十一月：补上可观测性</h3><p>服务拆开以后，排查问题最明显的痛点出现了：不知道请求经过了哪些实例，也不知道系统是在偶发报错还是整体变慢。</p>
+<p>ELK 让分散日志可以通过 traceId 关联，Prometheus 让请求速率、错误率、延迟和资源饱和度形成趋势。直到这一步，我才真正感受到“可观测性应该先于大规模拆分”。没有日志和指标，微服务的故障隔离只是架构图上的描述。</p>
+<h2 id="单体和微服务不是二选一"><a href="#单体和微服务不是二选一" class="headerlink" title="单体和微服务不是二选一"></a>单体和微服务不是二选一</h2><p>现在再比较两者，我不会简单列优缺点，而会看系统正处于什么阶段。</p>
+<table>
+<thead>
+<tr>
+<th>判断维度</th>
+<th>更适合模块化单体</th>
+<th>可以考虑微服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>团队</td>
+<td>单一小团队</td>
+<td>多团队需要独立交付</td>
+</tr>
+<tr>
+<td>业务边界</td>
+<td>仍在频繁变化</td>
+<td>能形成稳定业务能力</td>
+</tr>
+<tr>
+<td>发布</td>
+<td>整体发布仍可接受</td>
+<td>不同模块发布相互阻塞</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>各模块负载接近</td>
+<td>部分能力需要独立扩容</td>
+</tr>
+<tr>
+<td>故障</td>
+<td>影响范围可控</td>
+<td>需要明确隔离关键链路</td>
+</tr>
+<tr>
+<td>工程能力</td>
+<td>自动化和监控较弱</td>
+<td>CI&#x2F;CD、监控、治理已具备</td>
+</tr>
+</tbody></table>
+<p>模块化单体不是失败的微服务。模块边界、数据所有权和依赖方向做得好，未来要拆时成本更低；如果业务一直不需要拆，它本身也可以是长期架构。</p>
+<h2 id="这一年踩过的几个认知坑"><a href="#这一年踩过的几个认知坑" class="headerlink" title="这一年踩过的几个认知坑"></a>这一年踩过的几个认知坑</h2><h3 id="1-把“服务数量”当作架构成熟度"><a href="#1-把“服务数量”当作架构成熟度" class="headerlink" title="1. 把“服务数量”当作架构成熟度"></a>1. 把“服务数量”当作架构成熟度</h3><p>服务很多不代表边界合理。拆得过细会增加接口数量、部署单元和跨服务事务。成熟度更应该看发布成功率、恢复时间、故障影响范围和团队交付效率。</p>
+<h3 id="2-先引入组件，再寻找问题"><a href="#2-先引入组件，再寻找问题" class="headerlink" title="2. 先引入组件，再寻找问题"></a>2. 先引入组件，再寻找问题</h3><p>注册中心、消息队列、缓存和监控都有适用场景。为了技术栈完整而引入，会让团队维护一组没有明确收益的基础设施。</p>
+<p>更合理的顺序是：先描述当前痛点和目标，再选择最小能力解决它，并定义如何验证收益。</p>
+<h3 id="3-认为重试可以提升稳定性"><a href="#3-认为重试可以提升稳定性" class="headerlink" title="3. 认为重试可以提升稳定性"></a>3. 认为重试可以提升稳定性</h3><p>没有超时预算、退避和幂等的重试，会把一次失败放大成多次流量。下游已经过载时，上游同时重试只会让恢复更慢。</p>
+<p>重试是一种有成本的恢复手段，不是异常处理的默认模板。</p>
+<h3 id="4-只设计正常流程"><a href="#4-只设计正常流程" class="headerlink" title="4. 只设计正常流程"></a>4. 只设计正常流程</h3><p>架构图通常只画成功箭头，但线上问题都发生在箭头中间：网络超时、部分成功、实例重启、消息重复、配置未刷新。</p>
+<p>现在设计接口时，我会同时写失败状态、幂等键、补偿方式和可观测字段。能解释失败后的状态，比成功时少几毫秒更重要。</p>
+<h3 id="5-低估团队协作成本"><a href="#5-低估团队协作成本" class="headerlink" title="5. 低估团队协作成本"></a>5. 低估团队协作成本</h3><p>服务边界也是团队边界。接口变更、错误码、数据库迁移和发布顺序都需要约定。没有明确负责人时，独立服务很容易变成“所有人都能改，但没人真正维护”。</p>
+<h2 id="我现在理解的演进顺序"><a href="#我现在理解的演进顺序" class="headerlink" title="我现在理解的演进顺序"></a>我现在理解的演进顺序</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">整理单体模块边界</span><br><span class="line">  -&gt; 明确数据所有权和依赖方向</span><br><span class="line">  -&gt; 建立自动化测试、部署和回滚</span><br><span class="line">  -&gt; 补齐日志、指标和接口契约</span><br><span class="line">  -&gt; 拆出边界稳定且收益明确的服务</span><br><span class="line">  -&gt; 对真实故障做限流、降级、幂等和补偿</span><br><span class="line">  -&gt; 根据运行数据继续调整边界</span><br></pre></td></tr></table></figure>
+
+<p>这不是所有项目必须照走的路线，但顺序背后有一个原则：先获得控制复杂度的能力，再增加分布式复杂度。</p>
+<h2 id="还有哪些没有解决"><a href="#还有哪些没有解决" class="headerlink" title="还有哪些没有解决"></a>还有哪些没有解决</h2><p>到 2022 年底，系统能运行不等于治理已经成熟。下一阶段仍然要补：</p>
+<ol>
+<li>接口版本和兼容性管理，避免服务独立发布后相互破坏。</li>
+<li>数据一致性对账，不能只依赖消息“应该会到”。</li>
+<li>容量评估和压测，让限流阈值有数据依据。</li>
+<li>告警分级和 Runbook，让监控真正进入故障处理。</li>
+<li>交付指标，验证微服务是否真的缩短了发布时间。</li>
+<li>定期故障演练，验证文档中的恢复方案是否可执行。</li>
+</ol>
+<h2 id="年末结论"><a href="#年末结论" class="headerlink" title="年末结论"></a>年末结论</h2><p>这一年最大的变化，不是系统从单体变成了微服务，而是看待架构的角度从“用了什么技术”转向“解决了什么约束”。技术组件可以快速学习，边界、数据和失败语义需要在实践中反复调整。</p>
+<p>微服务不是一个终点。它只是当业务、团队和交付方式发展到一定阶段后，用来重新分配复杂度的手段。真正值得追求的仍然是可理解、可交付、可观察、可恢复的系统。只要这四件事在变好，架构就在向正确方向演进。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +425,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -427,7 +599,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -590,7 +762,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -770,7 +942,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -977,7 +1149,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1140,7 +1312,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1314,7 +1486,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1489,7 +1661,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1686,7 +1858,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1845,176 +2017,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/10/24/2021-10-24-RabbitMQ%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E6%8E%92%E6%9F%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/10/24/2021-10-24-RabbitMQ%E6%B6%88%E6%81%AF%E4%B8%A2%E5%A4%B1%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">RabbitMQ消息丢失排查</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-10-24 17:33:46" itemprop="dateCreated datePublished" datetime="2021-10-24T17:33:46+08:00">2021-10-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2021/rabbitmq-message-loss-cover.svg" alt="RabbitMQ消息丢失排查技术图"></p>
-<p>现象是订单已经支付，积分却没有到账。支付服务日志里有“message sent”，积分消费者没有任何记录，队列的 <code>ready</code> 和 <code>unacked</code> 都是 0。</p>
-<p>排查消息丢失时，不能只问“RabbitMQ 里有没有”。一条消息要经过业务事务、生产者、交换机、队列、消费者和消费结果六段。我们为这笔支付建立了一条消息轨迹，逐段确认最后一次成功在哪里。</p>
-<h2 id="先确定唯一消息身份"><a href="#先确定唯一消息身份" class="headerlink" title="先确定唯一消息身份"></a>先确定唯一消息身份</h2><p>本次业务信息：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">paymentNo=P202110240091</span><br><span class="line">orderNo=O202110240318</span><br><span class="line">eventType=PAYMENT_SUCCEEDED</span><br><span class="line">messageId=01FJQ6D7C2M4P8</span><br><span class="line">occurredAt=2021-10-24T15:41:22</span><br></pre></td></tr></table></figure>
-
-<p><code>messageId</code> 是每次业务事件的唯一标识，应该进入：</p>
-<ul>
-<li>生产事件表。</li>
-<li>消息 Header。</li>
-<li>Producer 日志。</li>
-<li>Broker confirm 和 return 回调。</li>
-<li>Consumer 日志。</li>
-<li>消费幂等表。</li>
-</ul>
-<p>只有订单号不够。一笔订单可能有支付成功、退款、关闭等多种事件，也可能重试发送同一个事件。</p>
-<h2 id="第一站：业务事务是否真的生成事件"><a href="#第一站：业务事务是否真的生成事件" class="headerlink" title="第一站：业务事务是否真的生成事件"></a>第一站：业务事务是否真的生成事件</h2><p>支付表显示状态已经成功，但旧实现直接在事务里发送消息：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">completePayment</span><span class="params">(PaymentCallback callback)</span> &#123;</span><br><span class="line">    paymentRepository.markSuccess(callback.getPaymentNo());</span><br><span class="line">    rabbitTemplate.convertAndSend(</span><br><span class="line">            <span class="string">&quot;payment.events&quot;</span>,</span><br><span class="line">            <span class="string">&quot;points.payment.success&quot;</span>,</span><br><span class="line">            buildEvent(callback)</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里存在两个相反窗口：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">数据库提交成功，发送失败 -&gt; 支付成功但没有积分事件</span><br><span class="line">消息发送成功，数据库回滚 -&gt; 积分收到一个不存在的成功事件</span><br></pre></td></tr></table></figure>
-
-<p>当前日志说明代码执行过 <code>convertAndSend</code>，但“方法没有抛异常”只表示消息交给了客户端发送流程，不等于已经进入目标队列。</p>
-<h2 id="第二站：Broker-是否确认接收"><a href="#第二站：Broker-是否确认接收" class="headerlink" title="第二站：Broker 是否确认接收"></a>第二站：Broker 是否确认接收</h2><p>检查配置发现 Publisher Confirm 没有开启，因此没有证据说明 Broker 接受了这条消息。</p>
-<p>开启：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">publisher-confirm-type:</span> <span class="string">correlated</span></span><br><span class="line">    <span class="attr">publisher-returns:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">template:</span></span><br><span class="line">      <span class="attr">mandatory:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<p>发送时关联 messageId：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CorrelationData</span> <span class="variable">correlationData</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CorrelationData</span>(event.getMessageId());</span><br><span class="line">rabbitTemplate.convertAndSend(</span><br><span class="line">        PAYMENT_EXCHANGE,</span><br><span class="line">        PAYMENT_SUCCESS_ROUTING_KEY,</span><br><span class="line">        event,</span><br><span class="line">        message -&gt; &#123;</span><br><span class="line">            message.getMessageProperties()</span><br><span class="line">                    .setMessageId(event.getMessageId());</span><br><span class="line">            <span class="keyword">return</span> message;</span><br><span class="line">        &#125;,</span><br><span class="line">        correlationData</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>Confirm 回答“交换机是否收到”：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.setConfirmCallback((correlation, ack, cause) -&gt; &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">messageId</span> <span class="operator">=</span> correlation == <span class="literal">null</span></span><br><span class="line">            ? <span class="literal">null</span></span><br><span class="line">            : correlation.getId();</span><br><span class="line">    <span class="keyword">if</span> (ack) &#123;</span><br><span class="line">        messageTraceService.markBrokerConfirmed(messageId);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// nack 必须进入可重试状态，不能只打印日志</span></span><br><span class="line">    messageTraceService.markPublishFailed(messageId, cause);</span><br><span class="line">    log.error(<span class="string">&quot;message_publish_nacked messageId=&#123;&#125; cause=&#123;&#125;&quot;</span>,</span><br><span class="line">            messageId, cause);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>Confirm 是异步结果。业务线程返回成功时，回调可能还没有执行，所以发送状态要持久化，并由后台任务处理长时间未确认的记录。</p>
-<h2 id="第三站：交换机能否路由到队列"><a href="#第三站：交换机能否路由到队列" class="headerlink" title="第三站：交换机能否路由到队列"></a>第三站：交换机能否路由到队列</h2><p>继续核对应用实际配置：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">交换机：payment.events</span><br><span class="line">生产 routing key：points.payment.sucess</span><br><span class="line">队列绑定 key：points.payment.success</span><br></pre></td></tr></table></figure>
-
-<p>生产 key 中的 <code>success</code> 少了一个 <code>c</code>。交换机存在，因此 Broker 可以返回 confirm ack；但没有任何队列匹配 routing key。</p>
-<p>旧配置 <code>mandatory=false</code>，无法路由的消息被 Broker 丢弃，生产者也收不到 Return。队列 <code>ready=0</code> 正好符合这个路径。</p>
-<p>开启 mandatory 后，ReturnsCallback 记录路由失败：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">rabbitTemplate.setReturnCallback((message, replyCode, replyText,</span><br><span class="line">                                  exchange, routingKey) -&gt; &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">messageId</span> <span class="operator">=</span></span><br><span class="line">            message.getMessageProperties().getMessageId();</span><br><span class="line">    messageTraceService.markUnroutable(</span><br><span class="line">            messageId, exchange, routingKey, replyText);</span><br><span class="line">    log.error(</span><br><span class="line">            <span class="string">&quot;message_unroutable messageId=&#123;&#125; exchange=&#123;&#125; routingKey=&#123;&#125; reply=&#123;&#125;&quot;</span>,</span><br><span class="line">            messageId, exchange, routingKey, replyText</span><br><span class="line">    );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-
-<p>Return 回答“交换机收到了，但有没有队列接住”。Confirm ack 不能代替 Return。</p>
-<p>本次直接根因就是 routing key 拼写错误，加上未启用 Return，导致消息在交换机阶段静默消失。</p>
-<h2 id="第四站：队列是否具备持久化条件"><a href="#第四站：队列是否具备持久化条件" class="headerlink" title="第四站：队列是否具备持久化条件"></a>第四站：队列是否具备持久化条件</h2><p>修正路由后，还要检查：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">exchange 是否 durable</span><br><span class="line">queue 是否 durable</span><br><span class="line">message deliveryMode 是否 persistent</span><br><span class="line">绑定是否与预期一致</span><br><span class="line">是否配置 TTL、最大长度和溢出策略</span><br><span class="line">队列删除或重建是否经过变更流程</span><br></pre></td></tr></table></figure>
-
-<p>队列持久化、消息持久化和 Broker 磁盘可靠性是不同层面。只设置消息持久化，但发送到临时队列，Broker 重启后队列仍会消失。</p>
-<p>Publisher Confirm 表示 Broker 按当前配置接收并处理，具体持久化保证要结合 RabbitMQ 集群类型、镜像或 Quorum Queue 配置评估。</p>
-<h2 id="第五站：消费者什么时候-ack"><a href="#第五站：消费者什么时候-ack" class="headerlink" title="第五站：消费者什么时候 ack"></a>第五站：消费者什么时候 ack</h2><p>另一类“消息丢失”发生在消费者。旧消费者使用自动确认，业务处理抛异常前消息已经被确认，队列不会再投递。</p>
-<p>手动确认的基本顺序：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RabbitListener(queues = POINTS_PAYMENT_QUEUE, ackMode = &quot;MANUAL&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(PaymentSucceededEvent event,</span></span><br><span class="line"><span class="params">                    Message message,</span></span><br><span class="line"><span class="params">                    Channel channel)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">deliveryTag</span> <span class="operator">=</span></span><br><span class="line">            message.getMessageProperties().getDeliveryTag();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        pointsService.grantOnce(event);</span><br><span class="line">        <span class="comment">// 业务事务成功后才确认</span></span><br><span class="line">        channel.basicAck(deliveryTag, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RetryableException exception) &#123;</span><br><span class="line">        <span class="comment">// 当前消息重新入队；需要配合重试次数，防止无限热循环</span></span><br><span class="line">        channel.basicNack(deliveryTag, <span class="literal">false</span>, <span class="literal">true</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">        <span class="comment">// 不可重试错误送往死信路径，等待人工或补偿处理</span></span><br><span class="line">        channel.basicNack(deliveryTag, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果 <code>pointsService</code> 已提交数据库，但进程在 <code>basicAck</code> 前退出，消息会重复投递。因此可靠消费一定会面对重复。</p>
-<h2 id="第六站：消费端必须幂等"><a href="#第六站：消费端必须幂等" class="headerlink" title="第六站：消费端必须幂等"></a>第六站：消费端必须幂等</h2><p>积分服务用 <code>message_id</code> 建立唯一处理记录：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> consumed_message (</span><br><span class="line">    message_id <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    event_type <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    consumed_at DATETIME <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (message_id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>积分写入和消费记录放在同一个本地事务：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">grantOnce</span><span class="params">(PaymentSucceededEvent event)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (consumedMessageRepository.exists(event.getMessageId())) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pointsRepository.grant(</span><br><span class="line">            event.getUserId(),</span><br><span class="line">            event.getPoints(),</span><br><span class="line">            event.getOrderNo()</span><br><span class="line">    );</span><br><span class="line">    <span class="comment">// 唯一约束是并发重复消费的最终防线</span></span><br><span class="line">    consumedMessageRepository.save(</span><br><span class="line">            event.getMessageId(),</span><br><span class="line">            event.getEventType()</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>先查再写仍有并发窗口，必须依赖唯一约束并把重复键转换成“已处理”。幂等键要对应业务事件，不能用每次重试都变化的新 UUID。</p>
-<h2 id="用-Outbox-补上数据库与发送之间的空隙"><a href="#用-Outbox-补上数据库与发送之间的空隙" class="headerlink" title="用 Outbox 补上数据库与发送之间的空隙"></a>用 Outbox 补上数据库与发送之间的空隙</h2><p>支付状态和待发送事件写入同一个数据库事务：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">支付回调事务：</span><br><span class="line">  更新 payment=SUCCESS</span><br><span class="line">  插入 outbox_event=PENDING</span><br><span class="line">  一起提交</span><br><span class="line"></span><br><span class="line">发布任务：</span><br><span class="line">  读取 PENDING</span><br><span class="line">  发送 RabbitMQ</span><br><span class="line">  等待 Confirm / Return</span><br><span class="line">  更新 SENT 或 RETRY</span><br></pre></td></tr></table></figure>
-
-<p>这样只要支付成功事件已经提交，就能被后续任务再次发现。它仍然可能重复发送，因此消费者幂等不能省略。</p>
-<p>Outbox 表需要：</p>
-<ul>
-<li>唯一事件 ID。</li>
-<li>状态与重试次数。</li>
-<li>下一次重试时间。</li>
-<li>错误摘要。</li>
-<li>创建和确认时间。</li>
-<li>分页扫描索引和归档策略。</li>
-</ul>
-<p>重试使用退避，不要在 Broker 不可用时不停查询和发送。</p>
-<h2 id="最终消息轨迹"><a href="#最终消息轨迹" class="headerlink" title="最终消息轨迹"></a>最终消息轨迹</h2><p>修复后，一条消息可以查到：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">15:41:22.104 BUSINESS_COMMITTED</span><br><span class="line">15:41:22.181 PUBLISH_STARTED</span><br><span class="line">15:41:22.196 BROKER_CONFIRMED</span><br><span class="line">15:41:22.214 CONSUME_STARTED</span><br><span class="line">15:41:22.247 BUSINESS_APPLIED</span><br><span class="line">15:41:22.251 CONSUMER_ACKED</span><br></pre></td></tr></table></figure>
-
-<p>超过正常时间仍停在某一阶段时，监控直接告警：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PENDING 太久          -&gt; 发布任务或 Broker</span><br><span class="line">PUBLISH_STARTED 无确认 -&gt; 网络、连接或 Confirm</span><br><span class="line">UNROUTABLE             -&gt; exchange、routing key、binding</span><br><span class="line">队列 ready 持续增长    -&gt; 消费能力不足</span><br><span class="line">unacked 持续增长       -&gt; 消费慢、卡住或未确认</span><br><span class="line">死信增长               -&gt; 不可重试异常或次数耗尽</span><br></pre></td></tr></table></figure>
-
-<h2 id="可靠消息检查表"><a href="#可靠消息检查表" class="headerlink" title="可靠消息检查表"></a>可靠消息检查表</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 每个业务事件有稳定 messageId</span><br><span class="line">[ ] 业务状态与 Outbox 同事务提交</span><br><span class="line">[ ] Publisher Confirm 持久化处理结果</span><br><span class="line">[ ] mandatory + Return 发现无法路由</span><br><span class="line">[ ] exchange、queue、message 持久化配置明确</span><br><span class="line">[ ] 消费成功后才 ack</span><br><span class="line">[ ] 重试有次数、退避和死信出口</span><br><span class="line">[ ] 消费端以业务事件做幂等</span><br><span class="line">[ ] 每个阶段都有可查询状态和超时告警</span><br></pre></td></tr></table></figure>
-
-<p>消息系统很难提供真正的“只处理一次”。工程上更可行的目标是：生产至少送达，消费允许重复但结果幂等，每个阶段都能追踪和补偿。做到这些，“消息丢了”才会变成一个能够准确定位到站点的问题。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

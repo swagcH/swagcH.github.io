@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-count">81</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">219</span>
+        <span class="site-state-item-count">221</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,275 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/" class="post-title-link" itemprop="url">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-16 09:00:00" itemprop="dateCreated datePublished" datetime="2026-10-16T09:00:00+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>“缓存穿透、击穿、雪崩”这三个词几乎每份面经都会出现，但实际项目里出问题的往往不是概念本身，而是<strong>方案选型时的取舍没想清楚</strong>：加布隆过滤器要不要考虑误判？互斥锁会不会把可用性问题变成响应时间问题？先删缓存还是先更数据库？</p>
+<p>这篇文章按”现象 → 方案 → 代价”的方式整理一遍，最后给出我在项目里的实际做法。</p>
+<h2 id="先把三个概念分清"><a href="#先把三个概念分清" class="headerlink" title="先把三个概念分清"></a>先把三个概念分清</h2><p>三者经常被混着说，但触发条件完全不同：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>触发条件</th>
+<th>直接后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>穿透</strong></td>
+<td>查询<strong>根本不存在</strong>的数据</td>
+<td>请求绕过缓存，每次都打到数据库</td>
+</tr>
+<tr>
+<td><strong>击穿</strong></td>
+<td><strong>单个热点 key</strong> 过期瞬间</td>
+<td>大量并发同时去数据库重建同一个 key</td>
+</tr>
+<tr>
+<td><strong>雪崩</strong></td>
+<td><strong>大量 key 同时失效</strong>，或 Redis 整体不可用</td>
+<td>数据库瞬间承接全部流量</td>
+</tr>
+</tbody></table>
+<p>一句话区分：<strong>穿透是”数据不存在”，击穿是”一个热点没了”，雪崩是”一大片同时没了”。</strong></p>
+<p><img src="/images/posts/2026/redis-three-problems.svg" alt="缓存穿透、击穿、雪崩的触发条件对比"></p>
+<h2 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h2><h3 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h3><p>请求查询一个数据库里也不存在的 key（比如不存在的用户 ID、被删除的商品），缓存不会命中，请求直接落到数据库。</p>
+<p><strong>正常业务流量下这不是问题</strong>，但如果有人恶意用随机 ID 刷接口，每次都能绕过缓存，数据库就成了第一道防线。</p>
+<h3 id="方案与代价"><a href="#方案与代价" class="headerlink" title="方案与代价"></a>方案与代价</h3><p><strong>方案一：缓存空对象</strong></p>
+<p>查不到也往缓存里写一个空值（或特殊标记），并设置较短的过期时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;user:&quot;</span> + id;</span><br><span class="line">    <span class="type">String</span> <span class="variable">cached</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> EMPTY_FLAG.equals(cached) ? <span class="literal">null</span> : JSON.parseObject(cached, User.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.selectById(id);</span><br><span class="line">    <span class="keyword">if</span> (user == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 缓存空值，过期时间要短：避免大量不存在的 key 长期占用内存</span></span><br><span class="line">        redis.setex(key, <span class="number">60</span>, EMPTY_FLAG);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    redis.setex(key, <span class="number">3600</span>, JSON.toJSONString(user));</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代价</strong>：如果攻击者用<strong>大量不同的随机 ID</strong> 刷，每个都会写入一个空值，内存会被打满。所以过期时间必须短，且最好配合下面的方案。</p>
+<p><strong>方案二：布隆过滤器</strong></p>
+<p>在缓存之前加一层布隆过滤器，把数据库里存在的 key 预先写进去。查询时先问布隆过滤器”这个 key 可能存在吗”，不存在就直接返回。</p>
+<p><strong>代价（这三个必须知道）</strong>：</p>
+<ol>
+<li><strong>有误判率</strong>：说”可能存在”时可能是误判（实际不存在），所以布隆过滤器只能挡住”确定不存在”的请求，不能替代真实查询</li>
+<li><strong>不支持删除</strong>：标准布隆过滤器删不掉元素。数据删除后过滤器里还在，会导致”明明删了却还被放行”。可以用计数布隆过滤器，或者定期重建</li>
+<li><strong>需要预热和同步</strong>：新增数据时要同步写入，否则新数据会被误挡</li>
+</ol>
+<p><strong>方案三：入口参数校验</strong></p>
+<p>最便宜的一层：ID 格式不对、超出范围、必填参数缺失的请求，在 Controller 层就拒掉，连缓存都不查。</p>
+<h3 id="我的实际做法"><a href="#我的实际做法" class="headerlink" title="我的实际做法"></a>我的实际做法</h3><p><strong>参数校验 + 缓存空值（短过期）</strong>，没用布隆过滤器。原因：</p>
+<ul>
+<li>我们的 key 空间是可枚举的（用户 ID、设备 ID），攻击者能构造的”不存在 key”数量有限</li>
+<li>引入布隆过滤器需要额外的预热和同步逻辑，收益不匹配</li>
+<li>如果以后出现大规模随机 key 攻击，再上布隆过滤器</li>
+</ul>
+<p><strong>这不是”布隆过滤器不好”，而是”当前场景用不上”。</strong> 面试时被问到，说清楚这个判断过程比背方案更有说服力。</p>
+<h2 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h2><h3 id="现象-1"><a href="#现象-1" class="headerlink" title="现象"></a>现象</h3><p>某个<strong>热点 key</strong>（比如首页配置、秒杀商品）过期的那一瞬间，大量并发请求同时发现缓存没了，一起去数据库查询并重建缓存。</p>
+<p>注意：**击穿的前提是”热点”**。一个普通 key 过期，就算有几十个请求同时打过来，数据库也扛得住。</p>
+<h3 id="方案与代价-1"><a href="#方案与代价-1" class="headerlink" title="方案与代价"></a>方案与代价</h3><p><strong>方案一：互斥锁重建</strong></p>
+<p>只让一个线程去查数据库并回填缓存，其他线程等待后重试。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">getProduct</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + id;</span><br><span class="line">    <span class="type">String</span> <span class="variable">cached</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) <span class="keyword">return</span> JSON.parseObject(cached, Product.class);</span><br><span class="line"></span><br><span class="line">    <span class="type">String</span> <span class="variable">lockKey</span> <span class="operator">=</span> <span class="string">&quot;lock:product:&quot;</span> + id;</span><br><span class="line">    <span class="comment">// 用 setIfAbsent 实现互斥；过期时间防止持锁线程崩溃导致死锁</span></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">locked</span> <span class="operator">=</span> redis.setIfAbsent(lockKey, <span class="string">&quot;1&quot;</span>, <span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">    <span class="keyword">if</span> (!locked) &#123;</span><br><span class="line">        <span class="comment">// 没抢到锁：短暂等待后重试（而不是直接查库，否则等于没锁）</span></span><br><span class="line">        sleep(<span class="number">50</span>);</span><br><span class="line">        <span class="keyword">return</span> getProduct(id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 双重检查：可能已经有其他线程回填了</span></span><br><span class="line">        cached = redis.get(key);</span><br><span class="line">        <span class="keyword">if</span> (cached != <span class="literal">null</span>) <span class="keyword">return</span> JSON.parseObject(cached, Product.class);</span><br><span class="line"></span><br><span class="line">        <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productMapper.selectById(id);</span><br><span class="line">        redis.setex(key, <span class="number">3600</span>, JSON.toJSONString(product));</span><br><span class="line">        <span class="keyword">return</span> product;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        redis.delete(lockKey);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代价</strong>：</p>
+<ul>
+<li><strong>响应时间变长</strong>：没抢到锁的请求要等待。热点 key 重建如果本身很慢（比如要聚合多个服务），等待会很明显</li>
+<li><strong>有死锁风险</strong>：必须给锁设过期时间，且要考虑业务执行超过锁时间的情况</li>
+<li><strong>重试逻辑要防雪崩</strong>：如果重试太密集，等待的线程会形成新的压力</li>
+</ul>
+<p><strong>方案二：逻辑过期（不阻塞读）</strong></p>
+<p>缓存里存的 value 带一个过期时间字段，<strong>Redis 层面不设过期</strong>。读到发现逻辑过期时，返回旧值，同时异步触发一个线程去更新。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">getProduct</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + id;</span><br><span class="line">    <span class="type">String</span> <span class="variable">cached</span> <span class="operator">=</span> redis.get(key);</span><br><span class="line">    <span class="keyword">if</span> (cached == <span class="literal">null</span>) <span class="keyword">return</span> loadFromDb(id);   <span class="comment">// 缓存不存在，走正常加载</span></span><br><span class="line"></span><br><span class="line">    CacheWrapper&lt;Product&gt; wrapper = JSON.parseObject(cached, ...);</span><br><span class="line">    <span class="keyword">if</span> (wrapper.getExpireAt() &gt; System.currentTimeMillis()) &#123;</span><br><span class="line">        <span class="keyword">return</span> wrapper.getData();                 <span class="comment">// 未过期，直接返回</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 已逻辑过期：返回旧值（保证响应时间），异步更新</span></span><br><span class="line">    <span class="keyword">if</span> (redis.setIfAbsent(<span class="string">&quot;lock:refresh:&quot;</span> + id, <span class="string">&quot;1&quot;</span>, <span class="number">30</span>, TimeUnit.SECONDS)) &#123;</span><br><span class="line">        asyncExecutor.execute(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="type">Product</span> <span class="variable">fresh</span> <span class="operator">=</span> productMapper.selectById(id);</span><br><span class="line">                redis.set(key, JSON.toJSONString(<span class="keyword">new</span> <span class="title class_">CacheWrapper</span>&lt;&gt;(fresh, ...)));</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                redis.delete(<span class="string">&quot;lock:refresh:&quot;</span> + id);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> wrapper.getData();                     <span class="comment">// 关键：返回旧值，不阻塞</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代价</strong>：</p>
+<ul>
+<li><strong>会返回旧数据</strong>：业务必须能接受短暂的数据延迟（大部分场景可以，涉及金额的不行）</li>
+<li><strong>实现更复杂</strong>：需要额外的线程池和锁管理</li>
+<li><strong>缓存不会自动清理</strong>：逻辑过期不会删除 key，需要额外的清理策略</li>
+</ul>
+<h3 id="怎么选"><a href="#怎么选" class="headerlink" title="怎么选"></a>怎么选</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据一致性要求高，能接受短暂等待</td>
+<td><strong>互斥锁重建</strong></td>
+</tr>
+<tr>
+<td>响应时间敏感，能接受短暂旧数据</td>
+<td><strong>逻辑过期</strong></td>
+</tr>
+<tr>
+<td>key 极少且几乎不变</td>
+<td>干脆<strong>不设过期</strong>，变更时主动更新</td>
+</tr>
+</tbody></table>
+<h2 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h2><p>雪崩有两种成因，处理方式完全不同。</p>
+<h3 id="成因一：大量-key-同时过期"><a href="#成因一：大量-key-同时过期" class="headerlink" title="成因一：大量 key 同时过期"></a>成因一：大量 key 同时过期</h3><p>常见于”凌晨批量刷新缓存”的实现——如果所有 key 都设 <code>expire = 3600</code>，那么一小时后它们会同时失效。</p>
+<p><strong>方案：过期时间加随机偏移</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不要这样</span></span><br><span class="line">redis.setex(key, <span class="number">3600</span>, value);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 而是这样：在基础过期时间上叠加随机值，把失效时间打散</span></span><br><span class="line"><span class="type">int</span> <span class="variable">ttl</span> <span class="operator">=</span> <span class="number">3600</span> + ThreadLocalRandom.current().nextInt(<span class="number">600</span>);   <span class="comment">// 3600 ~ 4200 秒</span></span><br><span class="line">redis.setex(key, ttl, value);</span><br></pre></td></tr></table></figure>
+
+<p><strong>这是成本最低、收益最高的一条</strong>，几乎零成本就能避免大部分雪崩。</p>
+<h3 id="成因二：Redis-整体不可用"><a href="#成因二：Redis-整体不可用" class="headerlink" title="成因二：Redis 整体不可用"></a>成因二：Redis 整体不可用</h3><p>单实例 Redis 宕机或网络分区，所有请求同时落到数据库。</p>
+<p><strong>方案（分层防御）</strong>：</p>
+<ol>
+<li><strong>高可用部署</strong>：哨兵（主从自动切换）或集群（分片 + 高可用）。这是基础，不是可选项</li>
+<li><strong>多级缓存</strong>：本地缓存（Caffeine）作为一级，Redis 作为二级。Redis 挂了本地还能挡一部分</li>
+<li><strong>熔断降级</strong>：检测到 Redis 不可用时，直接返回降级数据（默认值、静态兜底、友好提示），而不是让请求穿透到数据库</li>
+<li><strong>限流</strong>：对数据库的访问做并发限制，宁可拒绝部分请求，也不让数据库被打死</li>
+</ol>
+<p><strong>关键认知：数据库是最后的防线，任何方案的目标都是”不要让数据库裸奔”。</strong></p>
+<h2 id="缓存与数据库的一致性"><a href="#缓存与数据库的一致性" class="headerlink" title="缓存与数据库的一致性"></a>缓存与数据库的一致性</h2><p>这是比”三兄弟”更容易出问题的地方。</p>
+<h3 id="Cache-Aside（最常用）"><a href="#Cache-Aside（最常用）" class="headerlink" title="Cache Aside（最常用）"></a>Cache Aside（最常用）</h3><ul>
+<li><strong>读</strong>：先读缓存，命中返回；未命中读数据库，然后写回缓存</li>
+<li><strong>写</strong>：<strong>先更新数据库，再删除缓存</strong>（不是更新缓存）</li>
+</ul>
+<p><strong>为什么是”删除”而不是”更新”？</strong></p>
+<p>更新缓存有两个问题：</p>
+<ol>
+<li>如果缓存值需要复杂计算，每次写都更新会浪费（很多写操作后根本没人读）</li>
+<li>并发写时，两个线程的更新顺序可能和数据库提交顺序不一致，导致缓存里是旧值</li>
+</ol>
+<p>删除更简单：下次读的时候自然会加载最新值。</p>
+<p><strong>为什么是”先更库再删缓存”？</strong></p>
+<p>反过来（先删缓存再更库）的问题：删除后、更新前，如果有读请求进来，会把<strong>旧值</strong>重新加载进缓存，然后数据库才更新——缓存里留下的是旧值，且不会自动纠正。</p>
+<p>先更库再删缓存的不一致窗口更小（只在”更新完成、删除前”有极短时间）。</p>
+<h3 id="延迟双删"><a href="#延迟双删" class="headerlink" title="延迟双删"></a>延迟双删</h3><p>即使先更库再删缓存，仍有极小概率不一致。延迟双删的思路是：更新数据库后删一次缓存，<strong>延迟一段时间再删一次</strong>，把中间可能被写回的旧值清掉。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">updateUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">    userMapper.updateById(user);</span><br><span class="line">    redis.delete(<span class="string">&quot;user:&quot;</span> + user.getId());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 延迟再删一次，清掉&quot;更新期间被读请求写回的旧值&quot;</span></span><br><span class="line">    scheduledExecutor.schedule(</span><br><span class="line">        () -&gt; redis.delete(<span class="string">&quot;user:&quot;</span> + user.getId()),</span><br><span class="line">        <span class="number">500</span>, TimeUnit.MILLISECONDS</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代价</strong>：延迟时间不好定（太短没用，太长影响一致性），且引入了异步任务。</p>
+<h3 id="更彻底的方案：订阅-binlog"><a href="#更彻底的方案：订阅-binlog" class="headerlink" title="更彻底的方案：订阅 binlog"></a>更彻底的方案：订阅 binlog</h3><p>用 Canal 之类的工具订阅 MySQL binlog，数据变更时异步删除对应缓存。</p>
+<p><strong>优点</strong>：业务代码完全不用管缓存，一致性由数据变更事件驱动<br><strong>代价</strong>：引入额外组件和运维成本</p>
+<p><strong>我的选择</strong>：普通业务用 <strong>Cache Aside + 短过期时间</strong>。短过期是最后的兜底——即使中间出现不一致，最长一个过期周期后也会自动恢复。</p>
+<h2 id="几个容易被忽略的点"><a href="#几个容易被忽略的点" class="headerlink" title="几个容易被忽略的点"></a>几个容易被忽略的点</h2><p><strong>大 key</strong></p>
+<p>单个 key 的 value 过大（比如几 MB 的列表），会导致：</p>
+<ul>
+<li>读取时网络传输慢，阻塞其他命令</li>
+<li>删除时阻塞（Redis 单线程）</li>
+</ul>
+<p><strong>处理</strong>：拆分 key、控制集合大小、用 <code>SCAN</code> 分批处理而不是一次性取全部。</p>
+<p><strong>热 key</strong></p>
+<p>单个 key 的 QPS 过高，单实例 CPU 会成为瓶颈。</p>
+<p><strong>处理</strong>：本地缓存挡住大部分读、key 加随机后缀分散到多个实例（读时聚合）。</p>
+<p><strong>缓存预热</strong></p>
+<p>服务发布后缓存是空的，第一波流量会全打到数据库。</p>
+<p><strong>处理</strong>：发布后异步预热核心数据，或者用灰度发布控制流量爬升速度。</p>
+<p><strong>监控指标</strong></p>
+<p>光有方案不够，得能看到问题：</p>
+<ul>
+<li>缓存命中率（低说明 key 设计或过期策略有问题）</li>
+<li>慢查询（<code>slowlog</code>）</li>
+<li>内存使用与淘汰情况</li>
+<li>连接数与超时</li>
+</ul>
+<h2 id="落地检查清单"><a href="#落地检查清单" class="headerlink" title="落地检查清单"></a>落地检查清单</h2><ul>
+<li><input disabled="" type="checkbox"> 缓存穿透：有参数校验；对不存在的 key 缓存空值（短过期）或使用布隆过滤器</li>
+<li><input disabled="" type="checkbox"> 缓存击穿：热点 key 有互斥重建或逻辑过期方案</li>
+<li><input disabled="" type="checkbox"> 缓存雪崩：过期时间<strong>已加随机偏移</strong>（最低成本的一条）</li>
+<li><input disabled="" type="checkbox"> Redis 高可用：哨兵或集群，且验证过故障切换</li>
+<li><input disabled="" type="checkbox"> 降级方案：Redis 不可用时有兜底数据，而不是直接打数据库</li>
+<li><input disabled="" type="checkbox"> 一致性策略明确：Cache Aside 顺序正确（先更库再删缓存）</li>
+<li><input disabled="" type="checkbox"> 有短过期时间兜底，不依赖”永远一致”</li>
+<li><input disabled="" type="checkbox"> 大 key &#x2F; 热 key 有监控和拆分方案</li>
+<li><input disabled="" type="checkbox"> 发布后有预热策略</li>
+<li><input disabled="" type="checkbox"> 监控覆盖命中率、慢查询、内存、连接数</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>缓存问题的核心不是”背下几个方案”，而是<strong>知道每个方案的代价，并判断当前场景能不能接受</strong>：</p>
+<ul>
+<li>缓存空值 → 代价是内存（用短过期控制）</li>
+<li>布隆过滤器 → 代价是误判和运维复杂度</li>
+<li>互斥锁 → 代价是响应时间</li>
+<li>逻辑过期 → 代价是短暂旧数据</li>
+<li>延迟双删 → 代价是时间窗口不好定</li>
+</ul>
+<p><strong>我现在的默认组合是</strong>：参数校验 + 短过期兜底 + 过期时间加随机 + Redis 高可用 + 明确的降级策略。这几条覆盖了绝大多数问题，剩下的按具体场景再加。</p>
+<hr>
+<p><em>相关文章：</em></p>
+<ul>
+<li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
+<li><a href="#">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="#">RabbitMQ 在微服务解耦中的正确用法</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -247,7 +516,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：17:52:03" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：17:59:45" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1192,102 +1461,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/" class="post-title-link" itemprop="url">从Prompt Engineering到Context Engineering：一次提示词改造实验</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-02-23 16:20:00" itemprop="dateCreated datePublished" datetime="2025-02-23T16:20:00+08:00">2025-02-23</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/context-engineering-cover.png" alt="Context Engineering 实验封面图"></p>
-<p>刚开始用 AI 写代码时，我把主要精力放在“怎么写出更厉害的提示词”上：你是一名资深工程师、请深入思考、请给出最佳实践。它们偶尔有用，但面对真实项目，决定结果的往往不是形容词，而是模型到底看到了哪些事实。</p>
-<p>为了确认这个判断，我拿一个相同的小需求做了三轮实验。任务是给 Spring Boot 项目的订单查询接口增加一个 <code>deliveryStatus</code> 字段。三轮使用同一个模型，只改变输入上下文，不手工修正中间结果。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>

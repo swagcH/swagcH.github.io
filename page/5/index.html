@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-count">81</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">219</span>
+        <span class="site-state-item-count">221</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,221 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/11/28/2020-11-28-%E6%8A%80%E6%9C%AF%E5%80%BA%E6%B2%BB%E7%90%86%E6%80%9D%E8%80%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/11/28/2020-11-28-%E6%8A%80%E6%9C%AF%E5%80%BA%E6%B2%BB%E7%90%86%E6%80%9D%E8%80%83/" class="post-title-link" itemprop="url">技术债治理思考</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-28 20:58:33" itemprop="dateCreated datePublished" datetime="2020-11-28T20:58:33+08:00">2020-11-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BB%8F%E9%AA%8C%E6%B2%89%E6%B7%80/" itemprop="url" rel="index"><span itemprop="name">经验沉淀</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/tech-debt-cover.svg" alt="技术债治理思考封面图"></p>
+<p>“这块代码太乱，应该重构”很容易获得技术上的认同，却很难获得真实排期。原因是这句话只表达了开发感受，没有说明它正在造成什么损失、何时会放大，以及投入以后怎样判断有效。</p>
+<p>我逐渐把技术债当成一个投资组合来管理：有些债可以继续持有，有些要在下一次需求中顺手偿还，有些已经变成稳定性风险，必须立刻处理。治理的关键不是清零，而是让有限时间优先花在利息最高的地方。</p>
+<h2 id="技术债不等于所有不完美"><a href="#技术债不等于所有不完美" class="headerlink" title="技术债不等于所有不完美"></a>技术债不等于所有不完美</h2><p>以下情况经常被混在一起：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>示例</th>
+<th>是否一定要处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>审美差异</td>
+<td>命名风格不完全一致</td>
+<td>否</td>
+</tr>
+<tr>
+<td>工具欠账</td>
+<td>格式检查未进入 CI</td>
+<td>视重复成本而定</td>
+</tr>
+<tr>
+<td>设计欠账</td>
+<td>一个类承担订单、支付、通知</td>
+<td>需求频繁时优先</td>
+</tr>
+<tr>
+<td>质量欠账</td>
+<td>核心规则没有自动测试</td>
+<td>风险较高</td>
+</tr>
+<tr>
+<td>架构欠账</td>
+<td>同步链路无法承受增长</td>
+<td>结合容量计划</td>
+</tr>
+<tr>
+<td>安全欠账</td>
+<td>密钥入库、越权路径</td>
+<td>立即处理</td>
+</tr>
+</tbody></table>
+<p>一段代码不够优雅，但多年不改、运行稳定，也没有明显安全和维护成本，优先级可能很低。相反，一个只有几十行的重复支付逻辑如果每月引发故障，就是高利息债务。</p>
+<h2 id="先建立债务台账"><a href="#先建立债务台账" class="headerlink" title="先建立债务台账"></a>先建立债务台账</h2><p>台账不写“代码很乱”，而写可以验证的事实：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">编号：TD-2020-017</span><br><span class="line">位置：订单状态流转</span><br><span class="line">事实：</span><br><span class="line">- 相同状态判断散落在 6 个入口</span><br><span class="line">- 近三个月出现 3 次规则遗漏</span><br><span class="line">- 每次需求需要修改 4 至 7 个文件</span><br><span class="line"></span><br><span class="line">可能后果：</span><br><span class="line">- 取消订单被异步任务重新改为处理中</span><br><span class="line">- Review 和回归范围持续扩大</span><br><span class="line"></span><br><span class="line">触发时机：</span><br><span class="line">- 下一次新增订单状态之前</span><br><span class="line"></span><br><span class="line">建议动作：</span><br><span class="line">- 提取唯一状态迁移入口</span><br><span class="line">- 数据库更新增加旧状态条件</span><br><span class="line">- 补齐状态矩阵测试</span><br><span class="line"></span><br><span class="line">预计投入：2 人日</span><br><span class="line">负责人：订单模块</span><br><span class="line">验证：修改点由 6 处降到 1 处，状态测试覆盖全部合法迁移</span><br></pre></td></tr></table></figure>
+
+<p>台账让讨论从“要不要重构”变成“是否愿意继续承担这些成本”。</p>
+<h2 id="用利息判断优先级"><a href="#用利息判断优先级" class="headerlink" title="用利息判断优先级"></a>用利息判断优先级</h2><p>我会从五个维度粗略评分，每项 1 到 5 分：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">发生频率：相关模块多久修改一次</span><br><span class="line">单次成本：每次多花多少开发、测试和排查时间</span><br><span class="line">故障风险：是否可能造成数据、安全或核心业务问题</span><br><span class="line">扩散速度：问题是否会被新代码继续复制</span><br><span class="line">处理窗口：现在是否正好有需求和测试覆盖</span><br></pre></td></tr></table></figure>
+
+<p>评分不是精确数学，而是帮助团队比较。例如：</p>
+<table>
+<thead>
+<tr>
+<th>债务</th>
+<th align="right">频率</th>
+<th align="right">风险</th>
+<th align="right">扩散</th>
+<th>处理建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>订单状态分散</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">4</td>
+<td>当前迭代处理</td>
+</tr>
+<tr>
+<td>老后台 CSS 重复</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td>暂缓</td>
+</tr>
+<tr>
+<td>配置含默认密码</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">3</td>
+<td>立即处理</td>
+</tr>
+<tr>
+<td>构建需要手工复制 Jar</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td>尽快自动化</td>
+</tr>
+</tbody></table>
+<p>安全和数据风险不应被低频掩盖。即使只发生一次，后果不可接受，也要提高优先级。</p>
+<h2 id="四种治理策略"><a href="#四种治理策略" class="headerlink" title="四种治理策略"></a>四种治理策略</h2><h3 id="立即偿还"><a href="#立即偿还" class="headerlink" title="立即偿还"></a>立即偿还</h3><p>适用于安全漏洞、数据一致性风险、频繁故障和已经阻塞交付的问题。处理时要冻结范围，避免以紧急治理为名重写整个系统。</p>
+<h3 id="随需求偿还"><a href="#随需求偿还" class="headerlink" title="随需求偿还"></a>随需求偿还</h3><p>当下一次需求正好进入该模块，可以把必要重构放进同一方案。先建立测试，再调整结构，最后实现需求。这样上下文、测试和业务价值都在场。</p>
+<h3 id="隔离利息"><a href="#隔离利息" class="headerlink" title="隔离利息"></a>隔离利息</h3><p>暂时无法重构时，用边界减少扩散：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">旧接口外增加适配层</span><br><span class="line">新代码禁止直接依赖遗留模型</span><br><span class="line">公共入口增加参数与状态校验</span><br><span class="line">为高风险路径补监控和测试</span><br></pre></td></tr></table></figure>
+
+<p>隔离不是偿还，但能阻止新需求继续复制问题。</p>
+<h3 id="接受并观察"><a href="#接受并观察" class="headerlink" title="接受并观察"></a>接受并观察</h3><p>对于低频、低风险、即将下线的模块，明确接受可能比重构更合理。记录接受期限和触发条件，避免它永久处于“以后再说”。</p>
+<h2 id="让业务听懂技术债的成本"><a href="#让业务听懂技术债的成本" class="headerlink" title="让业务听懂技术债的成本"></a>让业务听懂技术债的成本</h2><p>技术描述：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OrderService 有 2,300 行，违反单一职责，需要拆分。</span><br></pre></td></tr></table></figure>
+
+<p>业务可决策描述：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">近三个订单需求平均有 40% 时间用于确认重复规则，</span><br><span class="line">两次遗漏导致返工。下个季度还会新增售后状态。</span><br><span class="line">投入 3 人日统一状态入口，预计后续每个需求减少</span><br><span class="line">约 1 人日回归，并降低错误状态写入风险。</span><br></pre></td></tr></table></figure>
+
+<p>后者没有回避技术问题，但把投入、收益和时机放在了一起。排期讨论需要的是可比较选择，不是架构术语。</p>
+<h2 id="重构任务也要小步交付"><a href="#重构任务也要小步交付" class="headerlink" title="重构任务也要小步交付"></a>重构任务也要小步交付</h2><p>一次可控治理通常按以下顺序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">记录当前指标和缺陷</span><br><span class="line">补特征测试锁定现有行为</span><br><span class="line">提取边界，不改变业务结果</span><br><span class="line">让新旧路径短期兼容</span><br><span class="line">小范围切流并观察</span><br><span class="line">删除旧路径</span><br><span class="line">复测指标并关闭债务项</span><br></pre></td></tr></table></figure>
+
+<p>结构调整与业务行为修改尽量分成不同提交。这样 Review 能看清，出现问题也更容易判断应该回退哪一步。</p>
+<p>例如统一订单状态时，先把散落判断迁移到 <code>OrderStateMachine</code>，不同时新增售后状态；结构稳定并通过测试后，再单独做新需求。</p>
+<h2 id="没有测试的重构先买保险"><a href="#没有测试的重构先买保险" class="headerlink" title="没有测试的重构先买保险"></a>没有测试的重构先买保险</h2><p>核心链路缺少测试时，不应该因为“无法保证”而永远不动，也不应该直接大改。可以按风险补三类保护：</p>
+<ol>
+<li>特征测试：锁定输入、输出和异常。</li>
+<li>数据校验：对比新旧路径的计算结果。</li>
+<li>运行观测：灰度期间记录差异但不影响用户。</li>
+</ol>
+<p>如果新旧实现可以短期并行，可以让旧结果继续生效，只记录两者差异。确认样本稳定后再切换。对有副作用的写操作不能简单双跑，需要使用影子数据或只对纯计算部分对比。</p>
+<h2 id="治理也可能制造新债"><a href="#治理也可能制造新债" class="headerlink" title="治理也可能制造新债"></a>治理也可能制造新债</h2><p>这些信号说明项目正在失控：</p>
+<ul>
+<li>目标从解决具体问题变成“顺便统一所有模块”。</li>
+<li>新抽象只有一个实现，却引入五层接口。</li>
+<li>重构分支持续数月，无法合并主线。</li>
+<li>没有行为基线，只能靠人工判断是否一致。</li>
+<li>新框架引入后，团队缺少维护能力。</li>
+<li>旧代码未删除，新旧两套长期并存。</li>
+</ul>
+<p>此时应该暂停扩张，重新收缩到可验证结果。治理不是技术展示，新增复杂度也要支付利息。</p>
+<h2 id="每季度做一次组合盘点"><a href="#每季度做一次组合盘点" class="headerlink" title="每季度做一次组合盘点"></a>每季度做一次组合盘点</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 删除已经下线或失效的债务项</span><br><span class="line">[ ] 更新发生频率和实际损失</span><br><span class="line">[ ] 标出安全、数据和稳定性红线</span><br><span class="line">[ ] 找到与未来需求重合的处理窗口</span><br><span class="line">[ ] 检查临时兼容层和功能开关是否到期</span><br><span class="line">[ ] 复核已治理项目是否真的降低指标</span><br><span class="line">[ ] 明确本季度接受不处理的项目</span><br></pre></td></tr></table></figure>
+
+<p>技术债永远不会归零，因为系统和业务都在变化。成熟的治理不是发起一次大扫除，而是持续知道债务在哪里、正在支付多少利息，以及下一笔工程投入为什么值得。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +468,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -456,7 +671,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -623,7 +838,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -798,7 +1013,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -981,7 +1196,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1141,7 +1356,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1334,7 +1549,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1551,7 +1766,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1758,7 +1973,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:59:45" itemprop="dateModified" datetime="2026-10-15T17:59:45+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1903,195 +2118,8 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/04/19/2020-04-19-%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/04/19/2020-04-19-%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">接口文档管理实践</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-04-19 22:06:17" itemprop="dateCreated datePublished" datetime="2020-04-19T22:06:17+08:00">2020-04-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 17:52:03" itemprop="dateModified" datetime="2026-10-15T17:52:03+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">接口设计</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/api-docs-cover.svg" alt="接口文档管理实践封面图"></p>
-<blockquote>
-<p>接口文档不是开发完成后的说明书，而是前端、后端、测试和调用方共同依赖的契约。文档与代码分离维护时，最常见的结果不是“有人忘记更新”，而是团队没有机制证明两者一致。</p>
-</blockquote>
-<h2 id="一个联调现场"><a href="#一个联调现场" class="headerlink" title="一个联调现场"></a>一个联调现场</h2><p>前端按照文档提交：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;orderNo&quot;</span><span class="punctuation">:</span> <span class="string">&quot;202004190001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;reason&quot;</span><span class="punctuation">:</span> <span class="string">&quot;地址填写错误&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>接口却返回：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">40013</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;reasonCode不能为空&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>后端代码两天前新增了 <code>reasonCode</code>，文档没有更新，测试用例只验证了旧参数。三方花了半小时确认，真正修复只有一行字段说明。</p>
-<p>这类浪费说明接口管理要覆盖设计、实现、测试、变更和下线，而不只是生成一个 Swagger 页面。</p>
-<h2 id="1-一份完整契约包含什么"><a href="#1-一份完整契约包含什么" class="headerlink" title="1. 一份完整契约包含什么"></a>1. 一份完整契约包含什么</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用途和调用方</span><br><span class="line">HTTP 方法与路径</span><br><span class="line">认证和权限</span><br><span class="line">请求头、路径、查询和请求体参数</span><br><span class="line">字段类型、必填、长度、枚举和示例</span><br><span class="line">成功响应</span><br><span class="line">业务错误码和处理建议</span><br><span class="line">幂等、分页、限流与超时语义</span><br><span class="line">版本和变更记录</span><br><span class="line">负责人</span><br></pre></td></tr></table></figure>
-
-<p>只给一个请求 JSON 不够。调用方还需要知道字段为空、重复提交、权限不足和下游超时时会发生什么。</p>
-<h2 id="2-先写契约再实现"><a href="#2-先写契约再实现" class="headerlink" title="2. 先写契约再实现"></a>2. 先写契约再实现</h2><p>订单查询示例：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">paths:</span></span><br><span class="line">  <span class="string">/api/orders/&#123;orderNo&#125;:</span></span><br><span class="line">    <span class="attr">get:</span></span><br><span class="line">      <span class="attr">summary:</span> <span class="string">查询订单详情</span></span><br><span class="line">      <span class="attr">operationId:</span> <span class="string">getOrder</span></span><br><span class="line">      <span class="attr">parameters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">orderNo</span></span><br><span class="line">          <span class="attr">in:</span> <span class="string">path</span></span><br><span class="line">          <span class="attr">required:</span> <span class="literal">true</span></span><br><span class="line">          <span class="attr">schema:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">            <span class="attr">maxLength:</span> <span class="number">32</span></span><br><span class="line">      <span class="attr">responses:</span></span><br><span class="line">        <span class="attr">&#x27;200&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">查询成功</span></span><br><span class="line">        <span class="attr">&#x27;404&#x27;:</span></span><br><span class="line">          <span class="attr">description:</span> <span class="string">订单不存在或当前用户无权查看</span></span><br></pre></td></tr></table></figure>
-
-<p>评审阶段先确认契约，前端可以基于 Mock 开发，测试可以提前编写用例，后端实现也有清晰边界。</p>
-<p>OpenAPI 文件应进入版本库，和代码一起 Review。只存在运行时页面中的文档无法比较历史，也很难在 CI 中检查破坏性变更。</p>
-<h2 id="3-Schema-要复用但不能万能化"><a href="#3-Schema-要复用但不能万能化" class="headerlink" title="3. Schema 要复用但不能万能化"></a>3. Schema 要复用但不能万能化</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">components:</span></span><br><span class="line">  <span class="attr">schemas:</span></span><br><span class="line">    <span class="attr">OrderSummary:</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">object</span></span><br><span class="line">      <span class="attr">required:</span> [<span class="string">orderNo</span>, <span class="string">status</span>, <span class="string">totalAmount</span>, <span class="string">createdAt</span>]</span><br><span class="line">      <span class="attr">properties:</span></span><br><span class="line">        <span class="attr">orderNo:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;202004190001&#x27;</span></span><br><span class="line">        <span class="attr">status:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">enum:</span> [<span class="string">CREATED</span>, <span class="string">PAID</span>, <span class="string">SHIPPED</span>, <span class="string">FINISHED</span>, <span class="string">CANCELLED</span>]</span><br><span class="line">        <span class="attr">totalAmount:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">example:</span> <span class="string">&#x27;199.00&#x27;</span></span><br><span class="line">        <span class="attr">createdAt:</span></span><br><span class="line">          <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">          <span class="attr">format:</span> <span class="string">date-time</span></span><br></pre></td></tr></table></figure>
-
-<p>公共分页结构、错误结构可以复用，但不要建立一个包含所有业务字段的 <code>CommonResponseData</code>。过度复用会让一个字段修改影响大量无关接口。</p>
-<p>金额是否用字符串或数字需要团队统一。JSON Number 没有十进制精度语义，跨语言调用时尤其要谨慎。</p>
-<h2 id="4-错误码必须可行动"><a href="#4-错误码必须可行动" class="headerlink" title="4. 错误码必须可行动"></a>4. 错误码必须可行动</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORDER_NOT_FOUND&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;订单不存在&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;traceId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;f4cc2b1d03b14d12&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;details&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>错误码表至少说明：</p>
-<table>
-<thead>
-<tr>
-<th>错误码</th>
-<th>含义</th>
-<th align="right">HTTP 状态</th>
-<th>调用方动作</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>ORDER_NOT_FOUND</code></td>
-<td>订单不存在或无权查看</td>
-<td align="right">404</td>
-<td>提示并停止重试</td>
-</tr>
-<tr>
-<td><code>ORDER_STATUS_CONFLICT</code></td>
-<td>当前状态不允许操作</td>
-<td align="right">409</td>
-<td>刷新订单状态</td>
-</tr>
-<tr>
-<td><code>RATE_LIMITED</code></td>
-<td>请求过于频繁</td>
-<td align="right">429</td>
-<td>按 <code>Retry-After</code> 重试</td>
-</tr>
-</tbody></table>
-<p>不要所有业务失败都返回 HTTP 200，也不要所有异常都返回 500。HTTP 状态表达协议层结果，业务错误码提供领域细节。</p>
-<p>错误信息不能泄露 SQL、内部 IP 和完整异常栈。<code>traceId</code> 用于关联服务端日志。</p>
-<h2 id="5-分页语义要写清楚"><a href="#5-分页语义要写清楚" class="headerlink" title="5. 分页语义要写清楚"></a>5. 分页语义要写清楚</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">page:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">size:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">integer</span></span><br><span class="line">  <span class="attr">minimum:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maximum:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">default:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">sort:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">string</span></span><br><span class="line">  <span class="attr">enum:</span> [<span class="string">createdAt</span>, <span class="string">updatedAt</span>]</span><br></pre></td></tr></table></figure>
-
-<p>响应需要说明总数是否精确、排序是否稳定、同一时间新增数据是否影响翻页。大数据量使用游标分页时，游标是否过期、能否反向翻页也属于契约。</p>
-<h2 id="6-写接口说明幂等"><a href="#6-写接口说明幂等" class="headerlink" title="6. 写接口说明幂等"></a>6. 写接口说明幂等</h2><p>订单创建可以要求幂等头：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Idempotency-Key: 0fcaf3a1-4d54-4d4d-9ae2-80d99df2be5d</span><br></pre></td></tr></table></figure>
-
-<p>文档明确：</p>
-<ul>
-<li>同一个用户和 Key 在多久内有效。</li>
-<li>请求体不同时是否返回冲突。</li>
-<li>首次请求处理中再次提交返回什么。</li>
-<li>原请求成功后是否返回同一结果。</li>
-</ul>
-<p>只写“接口支持幂等”没有可执行意义。</p>
-<h2 id="7-认证和权限不是一句“需要-Token”"><a href="#7-认证和权限不是一句“需要-Token”" class="headerlink" title="7. 认证和权限不是一句“需要 Token”"></a>7. 认证和权限不是一句“需要 Token”</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">认证方式：Bearer Token</span><br><span class="line">权限：order:read</span><br><span class="line">数据范围：只能访问当前租户订单</span><br><span class="line">Token 过期：401</span><br><span class="line">权限不足：403</span><br><span class="line">资源不存在或不可见：404</span><br></pre></td></tr></table></figure>
-
-<p>上传接口还要说明文件类型、大小、病毒扫描和存储时限。Webhook 要说明签名算法、防重放时间窗口和重试策略。</p>
-<p>示例中不能放真实 Token、手机号或客户数据。</p>
-<h2 id="8-文档和代码如何保持一致"><a href="#8-文档和代码如何保持一致" class="headerlink" title="8. 文档和代码如何保持一致"></a>8. 文档和代码如何保持一致</h2><p>两种常见方式：</p>
-<h3 id="Code-First"><a href="#Code-First" class="headerlink" title="Code First"></a>Code First</h3><p>通过 Spring 注解从实现生成 OpenAPI。优点是靠近代码，缺点是设计容易滞后到实现阶段，复杂说明仍需人工维护。</p>
-<h3 id="Design-First"><a href="#Design-First" class="headerlink" title="Design First"></a>Design First</h3><p>先维护 OpenAPI，再生成服务端接口或客户端。优点是契约先行，缺点是需要处理生成代码和业务实现边界。</p>
-<p>无论选择哪种，都应该在 CI 中：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">生成最新 OpenAPI</span><br><span class="line">与仓库基线比较</span><br><span class="line">检查语法和引用</span><br><span class="line">识别删除字段、修改类型等破坏性变更</span><br><span class="line">发布带版本的文档</span><br></pre></td></tr></table></figure>
-
-<p>文档生成失败不能被静默忽略，否则线上页面可能一直停留在旧版本。</p>
-<h2 id="9-变更分类"><a href="#9-变更分类" class="headerlink" title="9. 变更分类"></a>9. 变更分类</h2><p>通常兼容的变化：</p>
-<ul>
-<li>新增可选请求字段。</li>
-<li>新增响应字段，前提是调用方能忽略未知字段。</li>
-<li>新增错误码并有默认处理。</li>
-</ul>
-<p>通常破坏兼容的变化：</p>
-<ul>
-<li>删除或重命名字段。</li>
-<li>修改字段类型、单位或含义。</li>
-<li>可选字段改为必填。</li>
-<li>修改枚举值语义。</li>
-<li>改变分页、排序或幂等行为。</li>
-</ul>
-<p>破坏性变更应通过新版本、双写兼容或迁移窗口发布，不能只在群里通知。</p>
-<h2 id="10-文档的生命周期"><a href="#10-文档的生命周期" class="headerlink" title="10. 文档的生命周期"></a>10. 文档的生命周期</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">草稿：正在评审，不允许生产调用</span><br><span class="line">已发布：与某个服务版本对应</span><br><span class="line">已废弃：标明替代接口和停止时间</span><br><span class="line">已下线：文档保留历史，但不再出现在默认入口</span><br></pre></td></tr></table></figure>
-
-<p>每个接口要有负责人。没有负责人时，文档问题、兼容问题和调用咨询都会变成公共群里的随机响应。</p>
-<h2 id="11-Review-清单"><a href="#11-Review-清单" class="headerlink" title="11. Review 清单"></a>11. Review 清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 路径和 HTTP 方法符合语义</span><br><span class="line">[ ] 请求字段包含类型、约束和示例</span><br><span class="line">[ ] 成功与失败响应都有定义</span><br><span class="line">[ ] 错误码能指导调用方动作</span><br><span class="line">[ ] 权限、数据范围和敏感字段明确</span><br><span class="line">[ ] 分页、幂等、超时和重试语义明确</span><br><span class="line">[ ] 变更兼容性经过检查</span><br><span class="line">[ ] 文档、Mock、测试和代码使用同一契约</span><br><span class="line">[ ] 负责人和下线策略明确</span><br></pre></td></tr></table></figure>
-
-<p>接口文档的最终价值不是页面好看，而是减少口头确认，让实现、测试和调用方对同一个行为达成一致。当契约可以被 Review、测试和自动比较时，文档才从附属材料变成工程资产。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
   <nav class="pagination">
-    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" title="上一页" aria-label="上一页" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" title="下一页" aria-label="下一页" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 </div>
