@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">RABBITMQ / EXCHANGE TYPES</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">三种交换机：路由能力的差异</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <!-- direct -->
+    <rect x="72" y="180" width="360" height="330" rx="12" fill="#101a29" stroke="#22d3ee" stroke-width="2"/>
+    <text x="100" y="218" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="18">DIRECT</text>
+    <text x="100" y="254" fill="#f2f7fb" font-size="20" font-weight="700">精确匹配 Routing Key</text>
+    <text x="100" y="288" fill="#9eb0c2" font-size="16">routingKey = "device.control"</text>
+
+    <rect x="100" y="308" width="304" height="1" fill="#294158"/>
+    <text x="100" y="342" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">key=device.control → 队列A ✅</text>
+    <text x="100" y="374" fill="#6f8497" font-size="16" font-family="Menlo,Consolas,monospace">key=device.query   → 队列B</text>
+    <text x="100" y="406" fill="#6f8497" font-size="16" font-family="Menlo,Consolas,monospace">key=alarm.push     → 队列C</text>
+
+    <text x="100" y="452" fill="#9eb0c2" font-size="15">适合：点对点的业务指令</text>
+    <text x="100" y="478" fill="#6f8497" font-size="14">我们用它下发设备控制指令</text>
+
+    <!-- topic -->
+    <rect x="460" y="180" width="360" height="330" rx="12" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+    <text x="488" y="218" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="18">TOPIC</text>
+    <text x="488" y="254" fill="#f2f7fb" font-size="20" font-weight="700">通配符匹配</text>
+    <text x="488" y="288" fill="#9eb0c2" font-size="16">绑定：device.*.alarm</text>
+
+    <rect x="488" y="308" width="304" height="1" fill="#294158"/>
+    <text x="488" y="342" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">device.A.alarm → ✅</text>
+    <text x="488" y="374" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">device.B.alarm → ✅</text>
+    <text x="488" y="406" fill="#6f8497" font-size="16" font-family="Menlo,Consolas,monospace">device.A.query → ❌</text>
+
+    <text x="488" y="452" fill="#9eb0c2" font-size="15">* 匹配一个词，  # 匹配多个词</text>
+    <text x="488" y="478" fill="#6f8497" font-size="14">适合：按维度订阅（院区/设备类型）</text>
+
+    <!-- fanout -->
+    <rect x="848" y="180" width="360" height="330" rx="12" fill="#101a29" stroke="#a78bfa" stroke-width="2"/>
+    <text x="876" y="218" fill="#a78bfa" font-family="Menlo,Consolas,monospace" font-size="18">FANOUT</text>
+    <text x="876" y="254" fill="#f2f7fb" font-size="20" font-weight="700">广播到所有绑定队列</text>
+    <text x="876" y="288" fill="#9eb0c2" font-size="16">忽略 Routing Key</text>
+
+    <rect x="876" y="308" width="304" height="1" fill="#294158"/>
+    <text x="876" y="342" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">队列A（短信通知）→ ✅</text>
+    <text x="876" y="374" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">队列B（数据统计）→ ✅</text>
+    <text x="876" y="406" fill="#c9d6e2" font-size="16" font-family="Menlo,Consolas,monospace">队列C（日志归档）→ ✅</text>
+
+    <text x="876" y="452" fill="#9eb0c2" font-size="15">适合：一个事件多个下游响应</text>
+    <text x="876" y="478" fill="#6f8497" font-size="14">新增下游只需加队列，不改生产端</text>
+  </g>
+
+  <rect x="72" y="548" width="1136" height="60" rx="10" fill="#0b1522" stroke="#294158"/>
+  <text x="104" y="585" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="17">路由能力越强，越需要清晰的命名约定 —— routing key 就是契约</text>
+</svg>
