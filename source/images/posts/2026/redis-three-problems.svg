@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="740" viewBox="0 0 1280 740">
+  <rect width="1280" height="740" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">REDIS / THREE PROBLEMS</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">触发条件完全不同，方案也不通用</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+
+    <!-- 穿透 -->
+    <rect x="72" y="170" width="360" height="400" rx="12" fill="#101a29" stroke="#fb7185"/>
+    <text x="100" y="210" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="18">PENETRATION</text>
+    <text x="100" y="252" fill="#f2f7fb" font-size="28" font-weight="700">穿透</text>
+    <text x="100" y="288" fill="#9eb0c2" font-size="17">数据根本不存在</text>
+
+    <rect x="100" y="314" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="118" y="341" fill="#c9d6e2" font-size="16">请求不存在的 key</text>
+
+    <path d="M252 356V392" stroke="#70869b" stroke-width="3"/>
+    <path d="M243 380L252 392L261 380" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="100" y="392" width="304" height="42" rx="6" fill="#07111d" stroke="#fb7185"/>
+    <text x="118" y="419" fill="#fb7185" font-size="16">缓存必然不命中</text>
+
+    <path d="M252 434V470" stroke="#70869b" stroke-width="3"/>
+    <path d="M243 458L252 470L261 458" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="100" y="470" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="118" y="497" fill="#c9d6e2" font-size="16">每次都打到数据库</text>
+
+    <text x="100" y="545" fill="#9eb0c2" font-size="15">方案：参数校验 · 缓存空值 · 布隆过滤器</text>
+
+    <!-- 击穿 -->
+    <rect x="460" y="170" width="360" height="400" rx="12" fill="#101a29" stroke="#fbbf24"/>
+    <text x="488" y="210" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="18">BREAKDOWN</text>
+    <text x="488" y="252" fill="#f2f7fb" font-size="28" font-weight="700">击穿</text>
+    <text x="488" y="288" fill="#9eb0c2" font-size="17">单个热点 key 过期</text>
+
+    <rect x="488" y="314" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="506" y="341" fill="#c9d6e2" font-size="16">大量并发同时到达</text>
+
+    <path d="M640 356V392" stroke="#70869b" stroke-width="3"/>
+    <path d="M631 380L640 392L649 380" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="488" y="392" width="304" height="42" rx="6" fill="#07111d" stroke="#fbbf24"/>
+    <text x="506" y="419" fill="#fbbf24" font-size="16">热点 key 恰好失效</text>
+
+    <path d="M640 434V470" stroke="#70869b" stroke-width="3"/>
+    <path d="M631 458L640 470L649 458" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="488" y="470" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="506" y="497" fill="#c9d6e2" font-size="16">并发重建同一个 key</text>
+
+    <text x="488" y="545" fill="#9eb0c2" font-size="15">方案：互斥锁重建 · 逻辑过期</text>
+
+    <!-- 雪崩 -->
+    <rect x="848" y="170" width="360" height="400" rx="12" fill="#101a29" stroke="#a78bfa"/>
+    <text x="876" y="210" fill="#a78bfa" font-family="Menlo,Consolas,monospace" font-size="18">AVALANCHE</text>
+    <text x="876" y="252" fill="#f2f7fb" font-size="28" font-weight="700">雪崩</text>
+    <text x="876" y="288" fill="#9eb0c2" font-size="17">大量 key 同时失效</text>
+
+    <rect x="876" y="314" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="894" y="341" fill="#c9d6e2" font-size="16">批量刷新 / 统一过期</text>
+
+    <path d="M1028 356V392" stroke="#70869b" stroke-width="3"/>
+    <path d="M1019 380L1028 392L1037 380" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="876" y="392" width="304" height="42" rx="6" fill="#07111d" stroke="#a78bfa"/>
+    <text x="894" y="419" fill="#a78bfa" font-size="16">一整片缓存同时消失</text>
+
+    <path d="M1028 434V470" stroke="#70869b" stroke-width="3"/>
+    <path d="M1019 458L1028 470L1037 458" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <rect x="876" y="470" width="304" height="42" rx="6" fill="#07111d" stroke="#294158"/>
+    <text x="894" y="497" fill="#c9d6e2" font-size="16">数据库承接全部流量</text>
+
+    <text x="876" y="545" fill="#9eb0c2" font-size="15">方案：过期加随机 · 高可用 · 降级限流</text>
+
+    <!-- 底部结论 -->
+    <rect x="72" y="600" width="1136" height="72" rx="10" fill="#0b1522" stroke="#294158"/>
+    <text x="104" y="634" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="18">穿透 = 数据不存在　·　击穿 = 一个热点没了　·　雪崩 = 一大片同时没了</text>
+    <text x="104" y="660" fill="#6f8497" font-family="Menlo,Consolas,monospace" font-size="16">数据库是最后防线 —— 所有方案的目标都是不让它裸奔</text>
+  </g>
+</svg>
