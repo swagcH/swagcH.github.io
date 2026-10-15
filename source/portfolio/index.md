@@ -8,7 +8,7 @@ comments: false
   <section class="page-hero portfolio-hero">
     <h1>作品集</h1>
     <span class="page-hero-line"></span>
-    <p>六个项目，三条能力线：生产系统交付 · 稳定性治理 · AI 工程化落地</p>
+    <p>五个项目，两条能力线：生产系统交付 · 稳定性治理与 AI 工程化</p>
   </section>
   <section class="portfolio-section">
     <header class="section-heading">
@@ -138,44 +138,6 @@ comments: false
         <dd>定位为客户端版本与服务端的能力依赖不匹配，属于上游兼容性缺口，非配置问题。停止继续投入，回退方案并完整清理已部署组件，恢复防火墙策略与访问白名单，验证外部端口全部关闭。</dd>
         <dt>体现的能力</dt>
         <dd>分层排除法 · 抓包取证 · 日志关联分析 · 源码验证 · 及时止损的判断</dd>
-      </dl>
-    </article>
-  </section>
-  <section class="portfolio-section">
-    <header class="section-heading">
-      <h2>完整项目实践</h2>
-      <span></span>
-    </header>
-    <article class="project-card">
-      <div class="project-head">
-        <div>
-          <h3>德州扑克策略训练站</h3>
-          <p class="project-role">独立设计、开发与部署</p>
-        </div>
-        <time>2026.09 - 2026.10</time>
-      </div>
-      <p class="project-desc">
-        面向策略训练的全栈应用：完整的规则引擎、可玩的交互界面、AI 对手与决策复盘系统。已部署上线，整站带访问密码保护。
-      </p>
-      <dl class="project-meta">
-        <dt>技术栈</dt>
-        <dd>React 19 · TypeScript · Tailwind 4 · Zustand · Vitest · Node.js · Docker</dd>
-        <dt>工程亮点</dt>
-        <dd>
-          <strong>测试覆盖</strong>：245 个单元测试，覆盖规则引擎、AI 决策、鉴权与数据计算<br>
-          <strong>确定性设计</strong>：所有随机行为由种子派生，同一分享链接可完整复现同一局牌，为回放与复盘提供基础<br>
-          <strong>AI 对手</strong>：本地决策引擎（按牌力、底池赔率、SPR 计算动作分布）+ 大模型生成对手人格，兼顾实时性与多样性<br>
-          <strong>可解释复盘</strong>：把决策依据可视化（胜率构成、底池赔率与实际胜率对比、动作分布），并区分"靠对手弃牌获胜"与"靠牌力摊牌获胜"两类结局<br>
-          <strong>成本控制</strong>：模型调用按内容哈希缓存，重复查看不重复计费
-        </dd>
-        <dt>踩坑与修复</dt>
-        <dd>
-          <strong>CDN 缓存绕过访问控制</strong>：静态资源原使用可被 CDN 缓存的头，导致未登录用户可直接从 CDN 取到资源。改为不参与 CDN 缓存后修复，并用响应头验证<br>
-          <strong>进程级崩溃</strong>：中间件回调语义理解错误导致响应重复写入，单个请求异常会使整个进程退出。修正判断逻辑并补充异常兜底<br>
-          <strong>移动端适配</strong>：桌面端布局在手机上座位卡重叠，按断点重构牌桌比例与卡片尺寸
-        </dd>
-        <dt>量化规模</dt>
-        <dd>245 个单测 · 40+ 模型调用场景 · 完整部署流水线</dd>
       </dl>
     </article>
   </section>
