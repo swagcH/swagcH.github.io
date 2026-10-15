@@ -253,7 +253,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:13:59" itemprop="dateModified" datetime="2026-10-15T18:13:59+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:16:08" itemprop="dateModified" datetime="2026-10-15T18:16:08+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -329,6 +329,34 @@
 <li><strong>延迟低</strong>：相比 Kafka 的批量设计，RabbitMQ 的单条投递延迟更低</li>
 </ol>
 <p><strong>如果消息量到十万级 QPS，或者需要消息回放（重新消费历史消息），就该选 Kafka。</strong></p>
+<h2 id="交换机类型：路由能力的差异"><a href="#交换机类型：路由能力的差异" class="headerlink" title="交换机类型：路由能力的差异"></a>交换机类型：路由能力的差异</h2><p>RabbitMQ 的路由能力来自 <strong>Exchange + Routing Key</strong> 的组合，三种常用类型：</p>
+<p><img src="/images/posts/2026/rabbitmq-exchange-types.svg" alt="direct / topic / fanout 三种交换机的路由能力对比"></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>路由规则</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>direct</strong></td>
+<td>精确匹配 Routing Key</td>
+<td>点对点业务指令</td>
+</tr>
+<tr>
+<td><strong>topic</strong></td>
+<td>通配符匹配（<code>*</code> 一个词，<code>#</code> 多个词）</td>
+<td>按维度订阅（院区、设备类型）</td>
+</tr>
+<tr>
+<td><strong>fanout</strong></td>
+<td>忽略 Routing Key，广播到所有绑定队列</td>
+<td>一个事件多个下游响应</td>
+</tr>
+</tbody></table>
+<p><strong>routing key 就是契约。</strong> 路由能力越强，命名约定越要提前定清楚，否则后期会变成一堆含义不明的字符串。</p>
+<p><strong>我们在通行证系统里的用法</strong>：设备控制指令用 <code>direct</code>（精确投递到目标设备类型的队列）；通行事件用 <code>topic</code>（<code>pass.&#123;院区&#125;.&#123;设备类型&#125;</code>，方便按院区或按设备类型订阅）；系统通知用 <code>fanout</code>（短信、统计、日志三个下游各一个队列，新增下游不用改生产端）。</p>
 <h2 id="可靠投递：三个环节都可能丢消息"><a href="#可靠投递：三个环节都可能丢消息" class="headerlink" title="可靠投递：三个环节都可能丢消息"></a>可靠投递：三个环节都可能丢消息</h2><p><strong>这是本文的核心。</strong> 消息从生产者到消费者，中间有三个可能丢失的环节：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">生产者 ──①──&gt; Broker（交换机/队列） ──②──&gt; 消费者 ──③──&gt; 处理成功</span><br><span class="line">        可能丢：网络抖动            可能丢：Broker宕机   可能丢：消费失败</span><br></pre></td></tr></table></figure>
 
@@ -540,7 +568,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:13:59" itemprop="dateModified" datetime="2026-10-15T18:13:59+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:16:08" itemprop="dateModified" datetime="2026-10-15T18:16:08+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -849,7 +877,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:13:59" itemprop="dateModified" datetime="2026-10-15T18:13:59+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:16:08" itemprop="dateModified" datetime="2026-10-15T18:16:08+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1112,7 +1140,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：18:13:59" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：18:16:08" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
