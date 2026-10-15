@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="700" viewBox="0 0 1280 700">
+  <rect width="1280" height="700" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">SHARDING / DECISION PATH</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">先排除更简单的方案，再考虑分片</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="20">
+    <rect x="72" y="176" width="1136" height="86" rx="10" fill="#101a29" stroke="#fb7185"/>
+    <text x="104" y="212" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="17">TRIGGER</text>
+    <text x="104" y="242" fill="#f2f7fb">单表数据量增长，查询或写入明显变慢</text>
+
+    <rect x="72" y="288" width="266" height="112" rx="10" fill="#101a29" stroke="#34d399"/>
+    <text x="100" y="324" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">STEP 1</text>
+    <text x="100" y="354" fill="#f2f7fb">加索引 · 改写慢 SQL</text>
+    <text x="100" y="382" fill="#9eb0c2" font-size="16">多数慢查询是缺索引或全表扫</text>
+
+    <rect x="362" y="288" width="266" height="112" rx="10" fill="#101a29" stroke="#34d399"/>
+    <text x="390" y="324" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">STEP 2</text>
+    <text x="390" y="354" fill="#f2f7fb">冷热分离 · 归档</text>
+    <text x="390" y="382" fill="#9eb0c2" font-size="16">历史数据移出热表</text>
+
+    <rect x="652" y="288" width="266" height="112" rx="10" fill="#101a29" stroke="#34d399"/>
+    <text x="680" y="324" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">STEP 3</text>
+    <text x="680" y="354" fill="#f2f7fb">读写分离</text>
+    <text x="680" y="382" fill="#9eb0c2" font-size="16">读多写少时加从库</text>
+
+    <rect x="942" y="288" width="266" height="112" rx="10" fill="#101a29" stroke="#34d399"/>
+    <text x="970" y="324" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">STEP 4</text>
+    <text x="970" y="354" fill="#f2f7fb">加缓存</text>
+    <text x="970" y="382" fill="#9eb0c2" font-size="16">字典 / 热点数据入 Redis</text>
+
+    <rect x="72" y="444" width="1136" height="90" rx="10" fill="#101a29" stroke="#22d3ee" stroke-width="2"/>
+    <text x="104" y="480" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="17">STILL NOT ENOUGH</text>
+    <text x="104" y="512" fill="#f2f7fb" font-size="22">单实例写入撑不住 · 且存在高基数、查询必带的分片键 → 才进入分库分表</text>
+
+    <rect x="72" y="568" width="1136" height="96" rx="10" fill="#0b1522" stroke="#fbbf24"/>
+    <text x="104" y="602" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="17">COST</text>
+    <text x="104" y="634" fill="#c9d6e2" font-size="19">分片后需要重新处理：跨分片事务 · 跨片查询 · 深分页 · 全局 ID · 关联查询</text>
+  </g>
+
+  <path d="M338 344H362M628 344H652M918 344H942" stroke="#70869b" stroke-width="3"/>
+  <path d="M350 335L362 344L350 353M640 335L652 344L640 353M930 335L942 344L930 353" fill="none" stroke="#70869b" stroke-width="3"/>
+</svg>

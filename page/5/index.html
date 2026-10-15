@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">216</span>
+        <span class="site-state-item-count">219</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,209 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/" class="post-title-link" itemprop="url">开发与测试协作经验</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-15 16:37:20" itemprop="dateCreated datePublished" datetime="2020-11-15T16:37:20+08:00">2020-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/" itemprop="url" rel="index"><span itemprop="name">项目协作</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/dev-test-collaboration-cover.svg" alt="开发与测试协作经验封面图"></p>
+<p>有一次测试提了一个缺陷：“优惠券使用失败。”开发看完回复：“我这里正常，无法复现。”两句话都是真的，但没有推动问题前进一步。测试看到的是某组环境和数据下的失败，开发验证的是另一组条件下的成功。</p>
+<p>后来回看，这不是谁描述得不认真，而是双方没有共享同一套上下文。开发与测试的协作，核心不是把缺陷在系统里来回指派，而是共同缩小“预期”和“实际”之间的差异。</p>
+<h2 id="同一个问题的两个视角"><a href="#同一个问题的两个视角" class="headerlink" title="同一个问题的两个视角"></a>同一个问题的两个视角</h2><p>测试首先关心：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户做了什么</span><br><span class="line">预期看到什么</span><br><span class="line">实际发生什么</span><br><span class="line">哪些条件下稳定复现</span><br><span class="line">还可能影响哪些场景</span><br></pre></td></tr></table></figure>
+
+<p>开发首先关心：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">请求进入哪个版本和实例</span><br><span class="line">参数、身份和数据状态是什么</span><br><span class="line">代码走到哪个分支</span><br><span class="line">日志、异常和下游返回是什么</span><br><span class="line">最小改动会影响哪些调用方</span><br></pre></td></tr></table></figure>
+
+<p>两边并不冲突。测试提供可观察行为，开发补充内部证据，合在一起才是一份可定位的问题。</p>
+<h2 id="把“优惠券失败”补完整"><a href="#把“优惠券失败”补完整" class="headerlink" title="把“优惠券失败”补完整"></a>把“优惠券失败”补完整</h2><p>一份可以直接开始排查的缺陷记录应该像这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">标题：新用户券在商品金额等于门槛时提示不可用</span><br><span class="line">环境：test，order-service 1.11.3</span><br><span class="line">账号：测试账号 U10027</span><br><span class="line">前置数据：</span><br><span class="line">- 优惠券满 100 减 20，未使用，未过期</span><br><span class="line">- 商品原价 100，无其他优惠</span><br><span class="line"></span><br><span class="line">步骤：</span><br><span class="line">1. 加入商品并进入结算页</span><br><span class="line">2. 选择该优惠券</span><br><span class="line">3. 提交订单</span><br><span class="line"></span><br><span class="line">预期：应抵扣 20，实付 80</span><br><span class="line">实际：返回 COUPON_THRESHOLD_NOT_REACHED</span><br><span class="line">时间：2020-11-15 14:32:18</span><br><span class="line">traceId：b3f1078a92</span><br><span class="line">频率：重复 5 次均出现</span><br><span class="line">对照：商品金额 101 时可以使用</span><br></pre></td></tr></table></figure>
+
+<p>“100 失败、101 成功”比一张错误截图更接近根因。开发沿 traceId 查到门槛判断使用了 <code>amount &gt; threshold</code>，而需求是大于等于。</p>
+<p>截图可以保留界面现象，但文本字段必须可搜索、可复制。密码、Token 和真实用户信息不能作为附件上传。</p>
+<h2 id="测试开始前，开发交付什么"><a href="#测试开始前，开发交付什么" class="headerlink" title="测试开始前，开发交付什么"></a>测试开始前，开发交付什么</h2><p>提测不能只有一个分支名。开发至少说明：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">改动目的和范围</span><br><span class="line">明确未实现的内容</span><br><span class="line">接口、数据库、配置变化</span><br><span class="line">主流程与异常流程</span><br><span class="line">自测结果</span><br><span class="line">已知风险</span><br><span class="line">日志和监控入口</span><br><span class="line">回退方式</span><br></pre></td></tr></table></figure>
+
+<p>对于优惠券需求，开发自测不只验证“能用”：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>金额</td>
+<td>99.99、100、100.01</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>生效前、有效期内、刚过期</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>未使用、已锁定、已核销</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>重复提交、超时重试</td>
+</tr>
+<tr>
+<td>组合</td>
+<td>与会员价、满减是否互斥</td>
+</tr>
+<tr>
+<td>权限</td>
+<td>是否属于当前用户</td>
+</tr>
+</tbody></table>
+<p>边界表能让双方在提测前对齐重点，也减少低成本问题进入测试队列。</p>
+<h2 id="测试不是最后一站"><a href="#测试不是最后一站" class="headerlink" title="测试不是最后一站"></a>测试不是最后一站</h2><p>协作应该从需求评审开始。测试在评审阶段提出“金额等于门槛怎么算”“支付失败后券是否释放”，通常比代码完成后发现便宜得多。</p>
+<p>我习惯把工作拆成四个交接点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需求评审：共同补边界和验收标准</span><br><span class="line">方案评审：测试了解状态、依赖和风险</span><br><span class="line">开发阶段：关键用例先自动化，环境提前准备</span><br><span class="line">提测之后：按证据定位、验证修复并补回归</span><br></pre></td></tr></table></figure>
+
+<p>测试也不必理解所有代码，但知道数据状态和系统边界后，能够设计出比页面点击更有效的场景。</p>
+<h2 id="发现缺陷后先做分诊"><a href="#发现缺陷后先做分诊" class="headerlink" title="发现缺陷后先做分诊"></a>发现缺陷后先做分诊</h2><p>不是每个失败都立刻归为代码 Bug。先判断属于哪类：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>证据</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>需求歧义</td>
+<td>验收标准没有定义边界</td>
+<td>产品确认并更新需求</td>
+</tr>
+<tr>
+<td>代码缺陷</td>
+<td>行为与已确认规则不符</td>
+<td>开发修复并补测试</td>
+</tr>
+<tr>
+<td>环境问题</td>
+<td>版本、配置或依赖异常</td>
+<td>恢复环境并记录差异</td>
+</tr>
+<tr>
+<td>数据问题</td>
+<td>测试前置状态不成立</td>
+<td>修复数据构造方式</td>
+</tr>
+<tr>
+<td>自动化问题</td>
+<td>用例假设过期或不稳定</td>
+<td>更新脚本并定位波动</td>
+</tr>
+</tbody></table>
+<p>分诊不是推卸，而是找到真正应该改变的地方。把配置错误改成一段业务兼容代码，短期能过测试，长期会让问题更隐蔽。</p>
+<p>优先级也要基于影响：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">阻塞：核心流程不可用，无替代方案</span><br><span class="line">高：重要功能错误、数据或安全风险</span><br><span class="line">中：局部功能错误，有明确绕行方式</span><br><span class="line">低：展示、文案或低频体验问题</span><br></pre></td></tr></table></figure>
+
+<p>“我提的 Bug 必须最高”会让优先级失去意义。由产品影响、用户范围、恢复成本和上线时间共同决定。</p>
+<h2 id="开发收到缺陷后的回复方式"><a href="#开发收到缺陷后的回复方式" class="headerlink" title="开发收到缺陷后的回复方式"></a>开发收到缺陷后的回复方式</h2><p>有效回复不是“不是我的问题”，而是给出当前判断和下一步：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">已在 test 1.11.3 复现。</span><br><span class="line">定位到 CouponRule 第 48 行使用了严格大于判断。</span><br><span class="line">需求确认门槛应包含等于场景。</span><br><span class="line">计划补充 99.99、100、100.01 三个单元测试后修复。</span><br><span class="line">预计 17:00 提供版本，影响所有满额券计算。</span><br></pre></td></tr></table></figure>
+
+<p>暂时无法复现时也可以明确缺什么：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当前使用相同账号和版本执行 3 次未出现。</span><br><span class="line">请补充失败时间或 traceId，以确认请求实例和当时配置。</span><br><span class="line">我会同时检查 14:30 前后的券锁定日志。</span><br></pre></td></tr></table></figure>
+
+<p>这样问题仍在向前推进。</p>
+<h2 id="修复不能只让原步骤通过"><a href="#修复不能只让原步骤通过" class="headerlink" title="修复不能只让原步骤通过"></a>修复不能只让原步骤通过</h2><p>修复完成后至少做三层验证：</p>
+<ol>
+<li>原失败步骤已经恢复。</li>
+<li>相邻边界没有被破坏。</li>
+<li>相同规则的其他入口保持一致。</li>
+</ol>
+<p>优惠券可能在下单、购物车试算和运营后台预览中分别计算。如果只改下单接口，用户会在页面看到“可用”，提交时又失败，或者相反。</p>
+<p>开发应补自动测试锁定规则；测试根据影响范围回归。两者不是重复工作：自动测试保护以后每次构建，探索性测试继续寻找未被想到的组合。</p>
+<h2 id="对环境争议建立统一答案"><a href="#对环境争议建立统一答案" class="headerlink" title="对环境争议建立统一答案"></a>对环境争议建立统一答案</h2><p>“我本地正常”通常说明环境缺少可比性。团队应让每次测试都能确认：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">前端与后端版本</span><br><span class="line">Git 提交或构建号</span><br><span class="line">数据库迁移版本</span><br><span class="line">关键配置版本</span><br><span class="line">依赖服务状态</span><br><span class="line">测试数据创建方式</span><br></pre></td></tr></table></figure>
+
+<p>服务提供版本接口，部署系统展示变更历史，测试数据使用脚本创建。这样环境问题不再依赖逐个人询问。</p>
+<h2 id="一次缺陷的关闭标准"><a href="#一次缺陷的关闭标准" class="headerlink" title="一次缺陷的关闭标准"></a>一次缺陷的关闭标准</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 根因和影响范围已记录</span><br><span class="line">[ ] 修复提交与部署版本可追溯</span><br><span class="line">[ ] 原用例和相邻边界验证通过</span><br><span class="line">[ ] 必要自动测试已补充</span><br><span class="line">[ ] 临时数据、开关和调试日志已清理</span><br><span class="line">[ ] 需求或接口文档同步更新</span><br><span class="line">[ ] 线上观察项与负责人明确</span><br></pre></td></tr></table></figure>
+
+<p>开发和测试并不是前后两个工位。一个更关注系统如何实现，一个更关注系统如何失败，这两种视角本来就应该互相补充。当双方用版本、数据、traceId 和边界条件说话时，讨论会从“在我这里是否正常”变成“在哪个条件下不符合共同确认的规则”。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +456,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -420,7 +623,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -595,7 +798,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -778,7 +981,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -938,7 +1141,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1131,7 +1334,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1348,7 +1551,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1555,7 +1758,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1744,7 +1947,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1869,160 +2072,6 @@
 <h2 id="11-Review-清单"><a href="#11-Review-清单" class="headerlink" title="11. Review 清单"></a>11. Review 清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] 路径和 HTTP 方法符合语义</span><br><span class="line">[ ] 请求字段包含类型、约束和示例</span><br><span class="line">[ ] 成功与失败响应都有定义</span><br><span class="line">[ ] 错误码能指导调用方动作</span><br><span class="line">[ ] 权限、数据范围和敏感字段明确</span><br><span class="line">[ ] 分页、幂等、超时和重试语义明确</span><br><span class="line">[ ] 变更兼容性经过检查</span><br><span class="line">[ ] 文档、Mock、测试和代码使用同一契约</span><br><span class="line">[ ] 负责人和下线策略明确</span><br></pre></td></tr></table></figure>
 
 <p>接口文档的最终价值不是页面好看，而是减少口头确认，让实现、测试和调用方对同一个行为达成一致。当契约可以被 Review、测试和自动比较时，文档才从附属材料变成工程资产。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/03/14/2020-03-14-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">数据库设计经验总结</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-03-14 20:31:55" itemprop="dateCreated datePublished" datetime="2020-03-14T20:31:55+08:00">2020-03-14</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/db-design-cover.svg" alt="数据库设计经验总结封面图"></p>
-<blockquote>
-<p>数据库结构承载的是业务事实。代码写错可以快速回滚，错误表结构一旦积累大量数据，修改会同时影响迁移、兼容、性能和历史报表。这篇用一次订单表评审整理设计时真正需要问的问题。</p>
-</blockquote>
-<h2 id="先从业务事实开始"><a href="#先从业务事实开始" class="headerlink" title="先从业务事实开始"></a>先从业务事实开始</h2><p>设计订单表前，不急着列字段，先确认：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">订单由谁创建</span><br><span class="line">一个订单包含哪些商品</span><br><span class="line">金额在哪个时间点确定</span><br><span class="line">状态有哪些合法流转</span><br><span class="line">取消、退款和删除是否保留历史</span><br><span class="line">订单号是否需要对外展示</span><br><span class="line">查询主要按用户、状态还是时间</span><br><span class="line">预计数据量和保留年限</span><br></pre></td></tr></table></figure>
-
-<p>“用户可以买商品”不足以支撑表设计。金额是否允许调整、订单是否拆单、退款能否部分发生，都会改变数据模型。</p>
-<h2 id="1-主键和业务编号分开"><a href="#1-主键和业务编号分开" class="headerlink" title="1. 主键和业务编号分开"></a>1. 主键和业务编号分开</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_info (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_no <span class="type">VARCHAR</span>(<span class="number">32</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    user_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status TINYINT UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    paid_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0.00</span>,</span><br><span class="line">    version <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_order_no (order_no),</span><br><span class="line">    KEY idx_user_created (user_id, created_at),</span><br><span class="line">    KEY idx_status_created (status, created_at)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
-
-<p><code>id</code> 是数据库内部主键，适合聚簇索引和关联；<code>order_no</code> 是稳定的业务编号，可以暴露给外部。不要把自增 ID 直接当公开订单号，也不要让一个过长随机字符串承担所有关联主键成本。</p>
-<p>业务编号生成要考虑全局唯一、趋势性、时钟回拨和信息泄露。使用雪花算法、号段或数据库序列都可以，但要明确失败和重复检测方式。</p>
-<h2 id="2-数据类型按语义选择"><a href="#2-数据类型按语义选择" class="headerlink" title="2. 数据类型按语义选择"></a>2. 数据类型按语义选择</h2><h3 id="金额"><a href="#金额" class="headerlink" title="金额"></a>金额</h3><p>使用 <code>DECIMAL</code> 或最小货币单位整数，不使用浮点数：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total_amount <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
-
-<p>同时记录币种时，金额精度不能假设永远是两位小数。跨币种系统需要专门的 Money 设计。</p>
-<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">updated_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span></span><br></pre></td></tr></table></figure>
-
-<p>团队必须约定数据库时区和应用转换方式。<code>TIMESTAMP</code> 与 <code>DATETIME</code> 的范围、时区行为不同，不能只因为示例常见就随意选择。</p>
-<h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><p><code>TINYINT</code> 节省空间，但数据库里看到 <code>3</code> 不直观。需要在代码、文档和数据字典中维护同一映射：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">10 CREATED</span><br><span class="line">20 PAID</span><br><span class="line">30 SHIPPED</span><br><span class="line">40 FINISHED</span><br><span class="line">90 CANCELLED</span><br></pre></td></tr></table></figure>
-
-<p>给状态值留间隔，后续可以插入中间状态。不要复用已经废弃的数字表示新含义，否则历史数据会被重新解释。</p>
-<h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>字段长度来自业务约束，而不是统一写 <code>VARCHAR(255)</code>。手机号、订单号、外部流水号的长度和字符集不同。超长正文放 <code>TEXT</code> 时，也要考虑是否真的需要频繁查询和索引。</p>
-<h2 id="3-NULL-和默认值要表达真实含义"><a href="#3-NULL-和默认值要表达真实含义" class="headerlink" title="3. NULL 和默认值要表达真实含义"></a>3. NULL 和默认值要表达真实含义</h2><p><code>NULL</code> 应该表示“未知或不存在”，不是“开发暂时没想好”。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">paid_at = NULL：尚未支付</span><br><span class="line">cancel_reason = NULL：没有取消</span><br><span class="line">paid_amount = 0.00：已知支付金额为零</span><br></pre></td></tr></table></figure>
-
-<p>把所有字符串默认成空串，会让“未填写”和“明确为空”无法区分。反过来，所有字段都允许 NULL 也会把校验压力推给每个查询。</p>
-<h2 id="4-订单明细单独建表"><a href="#4-订单明细单独建表" class="headerlink" title="4. 订单明细单独建表"></a>4. 订单明细单独建表</h2><p>不要把商品列表保存成逗号字符串：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> order_item (</span><br><span class="line">    id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span> AUTO_INCREMENT,</span><br><span class="line">    order_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_id <span class="type">BIGINT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    sku_name <span class="type">VARCHAR</span>(<span class="number">200</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    unit_price <span class="type">DECIMAL</span>(<span class="number">12</span>, <span class="number">2</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    quantity <span class="type">INT</span> UNSIGNED <span class="keyword">NOT NULL</span>,</span><br><span class="line">    created_at DATETIME(<span class="number">3</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">    KEY idx_order_id (order_id)</span><br><span class="line">) ENGINE<span class="operator">=</span>InnoDB <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8mb4;</span><br></pre></td></tr></table></figure>
-
-<p><code>sku_name</code> 和成交单价是下单时快照。商品后来改名或改价，历史订单仍应保持当时事实。是否同时保存规格、图片和税费，要根据展示和对账需求决定。</p>
-<h2 id="5-索引从查询模式出发"><a href="#5-索引从查询模式出发" class="headerlink" title="5. 索引从查询模式出发"></a>5. 索引从查询模式出发</h2><p>先列高频查询：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 用户订单列表</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, status, total_amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 待处理订单扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> id, order_no</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&lt;</span> ?</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at</span><br><span class="line">LIMIT <span class="number">500</span>;</span><br></pre></td></tr></table></figure>
-
-<p>对应索引 <code>(user_id, created_at)</code> 和 <code>(status, created_at)</code>。索引字段顺序要匹配过滤和排序，不是简单把区分度最高的字段放最前面。</p>
-<p>每个二级索引都会保存主键，并增加写入、存储和维护成本。下面几类索引需要重点检查：</p>
-<ul>
-<li>被联合索引前缀覆盖的重复索引。</li>
-<li>低区分度单列索引。</li>
-<li>为一次临时报表增加、长期无人使用的索引。</li>
-<li>包含过多长字符串的“万能覆盖索引”。</li>
-</ul>
-<p>上线前使用真实数据量查看执行计划，不能只在几十行测试数据上验证。</p>
-<h2 id="6-唯一约束是业务防线"><a href="#6-唯一约束是业务防线" class="headerlink" title="6. 唯一约束是业务防线"></a>6. 唯一约束是业务防线</h2><p>应用先查询“订单号是否存在”再插入，在并发下仍可能重复。数据库唯一索引提供最终保证：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_order_no (order_no)</span><br></pre></td></tr></table></figure>
-
-<p>幂等请求也可以建立唯一约束：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UNIQUE</span> KEY uk_user_request (user_id, request_id)</span><br></pre></td></tr></table></figure>
-
-<p>捕获唯一键冲突后，要查询并返回原业务结果，而不是统一转换成“系统异常”。</p>
-<h2 id="7-外键是否使用"><a href="#7-外键是否使用" class="headerlink" title="7. 外键是否使用"></a>7. 外键是否使用</h2><p>外键能保护引用完整性，但会增加迁移、写入和跨表操作约束。单体且表关系稳定时可以使用；高并发、分库分表或跨服务数据所有权场景通常由应用和对账保证。</p>
-<p>无论是否创建数据库外键，关系都必须明确：删除用户后订单如何保留，删除商品后订单快照是否还可展示。没有外键不代表没有约束。</p>
-<h2 id="8-逻辑删除不能滥用"><a href="#8-逻辑删除不能滥用" class="headerlink" title="8. 逻辑删除不能滥用"></a>8. 逻辑删除不能滥用</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">deleted TINYINT <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-<p>逻辑删除方便恢复和审计，但会影响唯一索引、所有查询条件和数据量。订单通常不是“删除”，而是取消或关闭；用业务状态表达比统一 <code>deleted=1</code> 更准确。</p>
-<p>真正需要删除的临时数据，应有明确生命周期和归档任务。不要让所有表永久增长。</p>
-<h2 id="9-乐观锁和并发更新"><a href="#9-乐观锁和并发更新" class="headerlink" title="9. 乐观锁和并发更新"></a>9. 乐观锁和并发更新</h2><p>订单状态更新可以带版本号：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> order_info</span><br><span class="line"><span class="keyword">SET</span> status <span class="operator">=</span> ?, version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span>, updated_at <span class="operator">=</span> NOW(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
-
-<p>检查受影响行数，零行表示状态已变化或版本冲突。这样比先查后改更能保护合法状态流转。</p>
-<p>乐观锁不适合所有高冲突场景。冲突频繁时要重新审视业务串行化、队列或数据库锁策略。</p>
-<h2 id="10-表结构变更要可回退"><a href="#10-表结构变更要可回退" class="headerlink" title="10. 表结构变更要可回退"></a>10. 表结构变更要可回退</h2><p>开发环境能瞬间执行的 DDL，在线上大表可能锁表、占满磁盘或造成复制延迟。</p>
-<p>变更前确认：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">表大小和增长速度</span><br><span class="line">MySQL 版本及 Online DDL 能力</span><br><span class="line">新增索引的磁盘空间</span><br><span class="line">主从复制和延迟</span><br><span class="line">应用新旧版本兼容窗口</span><br><span class="line">失败后的回退方式</span><br></pre></td></tr></table></figure>
-
-<p>新增字段优先做到新旧代码都能运行：先加可兼容字段，再发布写入，再迁移历史数据，最后切换读取。不要把表变更和代码行为切换压在同一秒完成。</p>
-<h2 id="11-评审清单"><a href="#11-评审清单" class="headerlink" title="11. 评审清单"></a>11. 评审清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ ] 表名和字段使用统一业务术语</span><br><span class="line">[ ] 主键与公开业务编号分离</span><br><span class="line">[ ] 金额、时间、状态类型符合语义</span><br><span class="line">[ ] NULL 与默认值有明确含义</span><br><span class="line">[ ] 唯一约束覆盖并发重复风险</span><br><span class="line">[ ] 索引来自真实查询和排序</span><br><span class="line">[ ] 历史快照不会被主数据变化污染</span><br><span class="line">[ ] 状态迁移和并发更新有保护</span><br><span class="line">[ ] 数据保留、归档和删除策略明确</span><br><span class="line">[ ] DDL 有容量评估和回退方案</span><br></pre></td></tr></table></figure>
-
-<p>好的数据库设计不是一次把未来所有字段都猜出来，而是准确表达当前业务事实，同时为常见演进保留空间。表结构越接近业务语言，后续查询、接口和故障排查就越少依赖口头解释。</p>
 
       
     </div>

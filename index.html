@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">216</span>
+        <span class="site-state-item-count">219</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,244 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">ShardingSphere 分库分表实践：从选型到踩坑</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：17:46:28" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>分库分表最容易被当成一个”数据量大了就上”的开关，但它实际上会改变事务边界、查询方式和运维复杂度。我在两个项目里用过 ShardingSphere（医院通行证系统、能源大屏），这篇文章记录选型依据、分片键的设计过程，以及分片之后被迫重新考虑的那些事。</p>
+<h2 id="先说结论：什么时候不该分"><a href="#先说结论：什么时候不该分" class="headerlink" title="先说结论：什么时候不该分"></a>先说结论：什么时候不该分</h2><p>很多团队把分库分表当成性能问题的第一选择，但它的代价经常被低估。先排除掉不该分的场景，能省掉大量返工。</p>
+<p><strong>优先做这些，而不是分片：</strong></p>
+<ul>
+<li>加索引、改写慢 SQL。很多”数据量大导致的慢查询”，实际是全表扫描或缺索引</li>
+<li>冷热分离。历史数据归档到独立的归档表或冷存储，热表自然瘦身</li>
+<li>读写分离。读多写少的场景，加从库比拆分简单得多</li>
+<li>加缓存。字典、配置、热点数据放 Redis，减少落到数据库的查询</li>
+<li>升级硬件或调参数。在单表千万级以内，这通常够用</li>
+</ul>
+<p><strong>真正需要分片的信号：</strong></p>
+<ul>
+<li>单表数据量到了<strong>千万级以上</strong>，且索引优化后写入或查询仍然明显变慢</li>
+<li>写入量已经超过单实例的处理能力（不只是慢，是撑不住）</li>
+<li>数据有明确的、稳定的拆分维度（比如按时间、按租户、按用户 ID）</li>
+<li>业务能接受分片带来的限制（下面会讲这些限制是什么）</li>
+</ul>
+<p>最后一条最关键。<strong>如果找不到一个高基数、且几乎所有查询都会带上的分片键，分片会带来比收益更大的麻烦。</strong></p>
+<p><img src="/images/posts/2026/sharding-decision.svg" alt="分库分表决策路径：先排除更简单的方案，再考虑分片"></p>
+<h2 id="选型：为什么用-ShardingSphere"><a href="#选型：为什么用-ShardingSphere" class="headerlink" title="选型：为什么用 ShardingSphere"></a>选型：为什么用 ShardingSphere</h2><p>当时对比了几个方向：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>特点</th>
+<th>适合的场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ShardingSphere-JDBC</strong></td>
+<td>以 jar 包形式嵌入应用，走 JDBC 层，无额外部署</td>
+<td>Java 应用，希望零额外运维成本</td>
+</tr>
+<tr>
+<td><strong>ShardingSphere-Proxy</strong></td>
+<td>独立进程，对应用透明（像连一个 MySQL）</td>
+<td>多语言技术栈，或希望不改应用代码</td>
+</tr>
+<tr>
+<td><strong>MyCat</strong></td>
+<td>独立代理，社区活跃度下降</td>
+<td>存量系统</td>
+</tr>
+<tr>
+<td><strong>自己写路由</strong></td>
+<td>完全可控</td>
+<td>分片逻辑极简单且团队有能力维护</td>
+</tr>
+<tr>
+<td><strong>云厂商中间件</strong></td>
+<td>托管，省运维</td>
+<td>已绑定云生态</td>
+</tr>
+</tbody></table>
+<p>我们选 <strong>ShardingSphere-JDBC</strong>，理由很直接：</p>
+<ol>
+<li>技术栈是纯 Java，没有跨语言代理的需求</li>
+<li>不想为分片额外部署和运维一个中间件进程</li>
+<li>JDBC 层接入对业务代码侵入小，SQL 写法基本不用改</li>
+</ol>
+<p>代价是：<strong>分片规则在应用侧，每个需要访问分片表的服务都要引入依赖并配置规则</strong>。如果服务很多，规则同步会成为一个维护点。这种情况 Proxy 更合适。</p>
+<p><img src="/images/posts/2026/sharding-arch.svg" alt="ShardingSphere-JDBC 的接入位置与物理分片结构"></p>
+<h2 id="分片键怎么选"><a href="#分片键怎么选" class="headerlink" title="分片键怎么选"></a>分片键怎么选</h2><p>这是整个分片方案里最重要、也最容易做错的一步。分片键选错，后面所有优化都是在补救。</p>
+<p><strong>选择原则：</strong></p>
+<p><strong>1. 高基数</strong></p>
+<p>分片键的取值要足够分散，否则数据会倾斜到少数分片。用状态字段（只有几个值）做分片键是典型错误。</p>
+<p><strong>2. 查询必带</strong></p>
+<p>理想情况是”绝大多数查询都会带上这个字段”。因为<strong>不带分片键的查询会路由到所有分片</strong>，然后由中间件归并结果——这比单表查询更慢。</p>
+<p><strong>3. 数据分布均匀</strong></p>
+<p>自增 ID 做分片键会有写入热点（新数据总是落在最后一个分片）；用户 ID、租户 ID 这类天然离散的字段更好。</p>
+<p><strong>4. 业务上不会变</strong></p>
+<p>分片键一旦确定，改它的成本极高（等于全量数据重新分布）。</p>
+<p><strong>我们的实际选择：</strong></p>
+<p>医院通行证系统的通行记录有两类主要查询：<strong>按人查历史</strong>、<strong>按时间段查</strong>。</p>
+<ul>
+<li>选 <code>user_id</code> 做分片键 → 按人查能精确定位，但按时间查要扫全部分片</li>
+<li>选 <code>create_time</code> 做分片键 → 按时间查快，但按人查要扫全部</li>
+<li>最终选 <code>user_id</code>，因为”查某个人的通行历史”是高频操作，时间范围查询可以通过额外的查询条件缩小范围</li>
+</ul>
+<p>能源大屏的指标数据则是另一种情况：查询几乎总是带<strong>设备&#x2F;企业维度</strong>，所以分片键选企业维度，保证按企业查询能路由到单片。</p>
+<p><strong>这一步没有标准答案，只能按真实查询模式来定。</strong> 建议先统计线上 SQL 的执行频率，再决定。</p>
+<h2 id="分片之后必须重新考虑的五件事"><a href="#分片之后必须重新考虑的五件事" class="headerlink" title="分片之后必须重新考虑的五件事"></a>分片之后必须重新考虑的五件事</h2><p>分片不是”配置好就完事”。下面每一项都会在分片后变成新问题。</p>
+<h3 id="1-本地事务失效"><a href="#1-本地事务失效" class="headerlink" title="1. 本地事务失效"></a>1. 本地事务失效</h3><p>跨分片的写入无法用本地事务保证。这是最容易出事的地方。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分片前：一个 @Transactional 就够了</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long fromUserId, Long toUserId, BigDecimal amount)</span> &#123;</span><br><span class="line">    accountMapper.decrease(fromUserId, amount);</span><br><span class="line">    accountMapper.increase(toUserId, amount);   <span class="comment">// 分片后：可能在不同库</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分片后 <code>fromUserId</code> 和 <code>toUserId</code> 可能落在不同库，本地事务只能保证其中一边。</p>
+<p><strong>应对策略，按推荐顺序：</strong></p>
+<ul>
+<li><strong>优先改设计</strong>：让需要保证一致的数据落在同一个分片。比如把”账户变更”和”流水记录”用同一个分片键，保证同库</li>
+<li><strong>柔性事务</strong>：接受最终一致，用本地消息表 + 定时补偿</li>
+<li><strong>分布式事务框架</strong>：Seata 等。能保证强一致，但性能损耗和运维复杂度都要评估</li>
+</ul>
+<p>我们的选择是<strong>改设计 + 柔性事务</strong>。跨分片的强一致场景尽量在设计阶段就消除掉。</p>
+<h3 id="2-跨片查询与全路由"><a href="#2-跨片查询与全路由" class="headerlink" title="2. 跨片查询与全路由"></a>2. 跨片查询与全路由</h3><p>没有分片键的查询会变成全路由。比如按手机号查通行记录，而分片键是 <code>user_id</code>，就只能查所有分片再归并。</p>
+<p><strong>应对：</strong></p>
+<ul>
+<li>给常用查询建<strong>映射表</strong>（手机号 → user_id），先查映射再路由</li>
+<li>或者用 ElasticSearch 承载多维度检索，数据库只负责按主键取详情（我们在通行证系统里就是这么做的：ES 负责查询，MySQL 负责存储）</li>
+</ul>
+<h3 id="3-深分页"><a href="#3-深分页" class="headerlink" title="3. 深分页"></a>3. 深分页</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 每页 20 条，查第 5000 页</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> record <span class="keyword">ORDER</span> <span class="keyword">BY</span> create_time <span class="keyword">DESC</span> LIMIT <span class="number">100000</span>, <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>分片后每个分片都要取出前 100020 条，再在内存里归并排序取最后 20 条。<strong>页数越深，内存和耗时增长越快。</strong></p>
+<p><strong>应对：</strong></p>
+<ul>
+<li><strong>游标分页</strong>（推荐）：用上一页最后一条的 <code>create_time</code> 作为下一页的起点，避免大 offset</li>
+<li><strong>限制最大页数</strong>：产品上接受”最多翻到第 N 页”，深翻走导出或检索</li>
+<li><strong>禁止跨片排序</strong>：如果业务允许，把排序维度也纳入分片键</li>
+</ul>
+<h3 id="4-全局唯一-ID"><a href="#4-全局唯一-ID" class="headerlink" title="4. 全局唯一 ID"></a>4. 全局唯一 ID</h3><p>分片后自增主键不再全局唯一。ShardingSphere 内置了雪花算法：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">shardingsphere:</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="attr">sharding:</span></span><br><span class="line">        <span class="attr">key-generators:</span></span><br><span class="line">          <span class="attr">snowflake:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">SNOWFLAKE</span></span><br></pre></td></tr></table></figure>
+
+<p>雪花 ID 是有序的，对索引友好，但要注意<strong>时钟回拨</strong>问题（机器时间回退会生成重复 ID，ShardingSphere 有处理但需要关注）。</p>
+<h3 id="5-关联查询与笛卡尔积"><a href="#5-关联查询与笛卡尔积" class="headerlink" title="5. 关联查询与笛卡尔积"></a>5. 关联查询与笛卡尔积</h3><p>分片表之间的 JOIN，如果分片规则不一致，会退化成笛卡尔积（每个分片互相 JOIN）。</p>
+<p><strong>应对：</strong></p>
+<ul>
+<li><strong>绑定表</strong>：把分片规则完全一致的表配成绑定表，JOIN 时能按分片对齐，避免笛卡尔积</li>
+<li><strong>广播表</strong>：字典、配置这类小表，每个库都存一份，JOIN 时无需跨片</li>
+<li><strong>避免跨片 JOIN</strong>：能在应用层组装就在应用层做</li>
+</ul>
+<h2 id="几个具体踩坑"><a href="#几个具体踩坑" class="headerlink" title="几个具体踩坑"></a>几个具体踩坑</h2><p><strong>坑 1：分片键为 null 的写入</strong></p>
+<p>写入时如果分片键没值，ShardingSphere 无法计算路由，会直接报错或落到默认分片。我们在数据接入层加了校验，<strong>分片键为 null 的数据直接拒绝入库</strong>，避免脏数据分散在各处。</p>
+<p><strong>坑 2：<code>COUNT(*)</code> 变慢</strong></p>
+<p>分片后 <code>COUNT(*)</code> 需要在所有分片上执行再求和。数据量大时，这个操作会显著变慢。</p>
+<p>应对：维护计数表（增量更新），或者接受近似值，或者从检索系统（ES）取统计。</p>
+<p><strong>坑 3：扩容没有想象中简单</strong></p>
+<p><code>MOD</code> 分片算法（取模）在扩容时需要重新分布几乎所有数据。如果预期会扩容，一开始就考虑：</p>
+<ul>
+<li><strong>一致性哈希</strong>：扩容时只迁移部分数据</li>
+<li><strong>预分片</strong>：一开始就分足够的片（比如 64 片），扩的是物理库而不是逻辑片数</li>
+<li><strong>双倍扩容</strong>：4 库扩到 8 库时，每个旧库拆一半到新库，迁移量可控</li>
+</ul>
+<p>我们用的是<strong>预分片</strong>思路——按较细的粒度规划逻辑分片，前期映射到较少的物理库，扩容时只改映射。</p>
+<p><strong>坑 4：分片规则改了但数据没迁</strong></p>
+<p>改分片配置不会自动迁移已有数据。<strong>规则变更必须配套数据迁移脚本和校验</strong>，否则会出现”按新规则查不到老数据”。这类问题往往在线上才暴露。</p>
+<h2 id="落地检查清单"><a href="#落地检查清单" class="headerlink" title="落地检查清单"></a>落地检查清单</h2><p>如果你正在评估或实施分库分表，可以按这个顺序确认：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 已排除加索引、冷热分离、读写分离、加缓存这些更简单的方案</li>
+<li><input disabled="" type="checkbox"> 分片键基数足够高，且大部分查询会带上它</li>
+<li><input disabled="" type="checkbox"> 统计过线上 SQL 的执行频率，确认分片键选择有依据</li>
+<li><input disabled="" type="checkbox"> 跨分片事务有明确策略（优先改设计消除，其次柔性事务）</li>
+<li><input disabled="" type="checkbox"> 深分页有方案（游标分页优先）</li>
+<li><input disabled="" type="checkbox"> 全局 ID 生成方案确定，时钟回拨有处理</li>
+<li><input disabled="" type="checkbox"> 关联查询用绑定表&#x2F;广播表处理，或改为应用层组装</li>
+<li><input disabled="" type="checkbox"> 扩容方案想清楚（一致性哈希 &#x2F; 预分片 &#x2F; 双倍扩容）</li>
+<li><input disabled="" type="checkbox"> 分片规则变更的迁移与校验流程已就位</li>
+<li><input disabled="" type="checkbox"> 监控覆盖：各分片数据量是否均衡、慢查询、路由命中情况</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>分库分表解决的是<strong>单实例处理能力的上限问题</strong>，不是”查询慢”的通用解法。它把问题从”一台机器扛不住”转换成”分布式带来的一致性、查询与运维复杂度”。</p>
+<p>我现在的判断顺序是：<strong>先优化 SQL 和索引，再考虑缓存和读写分离，最后才动分片</strong>。真到了必须分片的时候，把时间花在<strong>分片键选择</strong>和<strong>事务边界设计</strong>上，比花在配置调优上回报高得多。</p>
+<hr>
+<p><em>相关文章：</em></p>
+<ul>
+<li><a href="#">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
+<li><a href="#">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="#">RabbitMQ 在微服务解耦中的正确用法</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1026,100 +1264,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/02/23/2025-02-23-%E4%BB%8EPrompt-Engineering%E5%88%B0Context-Engineering/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/" class="post-title-link" itemprop="url">大模型入门：从Token、上下文到幻觉</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-01-12 20:30:00" itemprop="dateCreated datePublished" datetime="2025-01-12T20:30:00+08:00">2025-01-12</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/llm-basics-cover.png" alt="大模型入门封面图"></p>
-<p>第一次使用大模型时，我把它当成了一个更聪明的搜索框：输入问题，等待正确答案。用了一段时间后才发现，这个理解会制造很多误判。模型不是从知识库里查出一段标准答案，而是在已有上下文后面，持续预测更可能出现的下一个 Token。</p>
-<p>这句话看起来抽象，却能解释日常使用中的大部分现象：为什么同一个问题会得到不同答案，为什么一段无关日志会让结果变差，为什么模型能写出语法正确但根本不存在的 API，也能解释为什么“把需求说清楚”比反复要求它聪明一点更有效。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/01/12/2025-01-12-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%85%A5%E9%97%A8-%E4%BB%8EToken%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0%E5%B9%BB%E8%A7%89/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

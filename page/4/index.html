@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">79</span>
+          <span class="site-state-item-count">80</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">216</span>
+        <span class="site-state-item-count">219</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,156 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/09/19/2021-09-19-%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">死锁问题定位过程</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-09-19 20:42:53" itemprop="dateCreated datePublished" datetime="2021-09-19T20:42:53+08:00">2021-09-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2021/deadlock-debug-cover.svg" alt="死锁问题定位过程技术图"></p>
+<p>一次批量任务上线后，服务没有崩溃，CPU 和内存也都正常，但部分请求一直处于 pending。重启可以短暂恢复，过一段时间又出现。</p>
+<p>这类现象很容易被误判成下游超时。真正的证据来自线程 dump：两个线程分别持有一把锁，同时等待对方手中的锁，JVM 已经明确报告 Java 级死锁。</p>
+<h2 id="现场信息"><a href="#现场信息" class="headerlink" title="现场信息"></a>现场信息</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">现象：批量调拨任务不再推进，相关查询逐渐超时</span><br><span class="line">CPU：22%</span><br><span class="line">堆内存：46%，无持续增长</span><br><span class="line">GC：正常</span><br><span class="line">HTTP 工作线程：大量 WAITING / BLOCKED</span><br><span class="line">数据库连接池：未满</span><br><span class="line">开始时间：19:17 左右</span><br></pre></td></tr></table></figure>
+
+<p>监控只说明资源没有明显耗尽，无法证明线程正在正常工作。重启前，我们先在一个异常实例保存现场。</p>
+<h2 id="第一步：连续抓取线程-dump"><a href="#第一步：连续抓取线程-dump" class="headerlink" title="第一步：连续抓取线程 dump"></a>第一步：连续抓取线程 dump</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jps -l</span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-1.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-2.<span class="built_in">log</span></span><br><span class="line">jstack -l &lt;pid&gt; &gt; /tmp/thread-1919-3.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>三次采集间隔约 10 秒。连续快照可以区分“正在执行一段较慢代码”和“始终停在同一等待点”。</p>
+<p>生产线程 dump 可能包含类名、业务标识和内部地址，应由授权人员采集并安全保存。采集命令通常开销可控，但仍要观察繁忙进程状态，避免高频循环抓取。</p>
+<p>先按线程状态做粗略统计：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rg <span class="string">&#x27;java.lang.Thread.State&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span> | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c</span><br></pre></td></tr></table></figure>
+
+<p>结果中 <code>BLOCKED</code> 数量持续增加。继续搜索 JVM 的死锁结论：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rg -n <span class="string">&#x27;deadlock|waiting to lock|locked &lt;&#x27;</span> /tmp/thread-1919-1.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>文件末尾出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Found one Java-level deadlock:</span><br><span class="line">=============================</span><br><span class="line">&quot;transfer-worker-7&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000001</span><br><span class="line">  which is held by &quot;transfer-worker-12&quot;</span><br><span class="line"></span><br><span class="line">&quot;transfer-worker-12&quot;:</span><br><span class="line">  waiting to lock monitor 0x000000002</span><br><span class="line">  which is held by &quot;transfer-worker-7&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这已经不是“可能死锁”，而是 JVM 给出的闭环证据。</p>
+<h2 id="第二步：还原两条锁链"><a href="#第二步：还原两条锁链" class="headerlink" title="第二步：还原两条锁链"></a>第二步：还原两条锁链</h2><p>线程 7 的关键栈：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;transfer-worker-7&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000b&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000a&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
+
+<p>线程 12：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;transfer-worker-12&quot; BLOCKED</span><br><span class="line">at com.example.stock.StockTransferService.transfer(StockTransferService.java:84)</span><br><span class="line">- waiting to lock &lt;0x00000000a&gt; (a java.lang.Object)</span><br><span class="line">- locked &lt;0x00000000b&gt; (a java.lang.Object)</span><br></pre></td></tr></table></figure>
+
+<p>画成等待图：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">worker-7  持有仓库 A 锁 -&gt; 等待仓库 B 锁</span><br><span class="line">worker-12 持有仓库 B 锁 -&gt; 等待仓库 A 锁</span><br><span class="line">                         ^              |</span><br><span class="line">                         +--------------+</span><br></pre></td></tr></table></figure>
+
+<p>两个线程都不会主动释放已持有锁，因此相关任务永久等待。随着更多请求等待这两个仓库，工作线程也逐渐被占满。</p>
+<h2 id="第三步：对应到代码"><a href="#第三步：对应到代码" class="headerlink" title="第三步：对应到代码"></a>第三步：对应到代码</h2><p>简化后的旧实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="type">Object</span> <span class="variable">sourceLock</span> <span class="operator">=</span> lockRegistry.get(sourceWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">targetLock</span> <span class="operator">=</span> lockRegistry.get(targetWarehouseId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (sourceLock) &#123;</span><br><span class="line">        checkAndDecrease(sourceWarehouseId, productId, quantity);</span><br><span class="line">        <span class="keyword">synchronized</span> (targetLock) &#123;</span><br><span class="line">            increase(targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请求 <code>A -&gt; B</code> 先锁 A 后锁 B；另一个请求 <code>B -&gt; A</code> 先锁 B 后锁 A。代码单独看没有语法问题，并发组合后形成循环等待。</p>
+<p>还要确认 <code>lockRegistry</code> 对同一个仓库 ID 是否始终返回同一个对象。如果每次 <code>new Object()</code>，锁根本无法提供互斥；如果 registry 无界增长，又会产生内存问题。</p>
+<h2 id="临时恢复"><a href="#临时恢复" class="headerlink" title="临时恢复"></a>临时恢复</h2><p>死锁中的线程无法通过业务超时自动恢复。我们先停止批量任务入口，保存三份 dump 和相关任务号，再摘除异常实例并正常重启。</p>
+<p>重启会打断当前任务，执行前确认：</p>
+<ul>
+<li>调拨操作是否有事务。</li>
+<li>已执行步骤能否幂等重试。</li>
+<li>消息是否会重新投递。</li>
+<li>是否存在需要人工核对的中间状态。</li>
+</ul>
+<p>不能只看接口恢复就重新打开批量入口，否则同一组相反方向任务会再次触发。</p>
+<h2 id="修复一：所有调用使用稳定锁顺序"><a href="#修复一：所有调用使用稳定锁顺序" class="headerlink" title="修复一：所有调用使用稳定锁顺序"></a>修复一：所有调用使用稳定锁顺序</h2><p>按仓库 ID 从小到大获取锁，与调拨方向无关：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long sourceWarehouseId,</span></span><br><span class="line"><span class="params">                     Long targetWarehouseId,</span></span><br><span class="line"><span class="params">                     Long productId,</span></span><br><span class="line"><span class="params">                     <span class="type">int</span> quantity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (sourceWarehouseId.equals(targetWarehouseId)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;SAME_WAREHOUSE_TRANSFER&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Long</span> <span class="variable">firstId</span> <span class="operator">=</span> Math.min(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Long</span> <span class="variable">secondId</span> <span class="operator">=</span> Math.max(sourceWarehouseId, targetWarehouseId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">firstLock</span> <span class="operator">=</span> lockRegistry.get(firstId);</span><br><span class="line">    <span class="type">Object</span> <span class="variable">secondLock</span> <span class="operator">=</span> lockRegistry.get(secondId);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">synchronized</span> (firstLock) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (secondLock) &#123;</span><br><span class="line">            <span class="comment">// 获取顺序固定后，再按真实业务方向更新</span></span><br><span class="line">            doTransfer(sourceWarehouseId, targetWarehouseId, productId, quantity);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>A -&gt; B</code> 和 <code>B -&gt; A</code> 都先获取编号较小的锁，不再形成环。</p>
+<p>锁内只保留必要计算和本地数据更新，不执行远程调用、文件 IO 或不受控重试。持锁时间越长，吞吐越低，故障影响也越大。</p>
+<h2 id="修复二：增加有限等待和可观察性"><a href="#修复二：增加有限等待和可观察性" class="headerlink" title="修复二：增加有限等待和可观察性"></a>修复二：增加有限等待和可观察性</h2><p>一致顺序解决当前死锁，但线程仍可能因其他缺陷长时间等待。对于需要超时能力的场景，可以使用 <code>ReentrantLock.tryLock</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">boolean</span> <span class="variable">firstAcquired</span> <span class="operator">=</span> firstLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line"><span class="keyword">if</span> (!firstAcquired) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">secondAcquired</span> <span class="operator">=</span> secondLock.tryLock(<span class="number">200</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">    <span class="keyword">if</span> (!secondAcquired) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;TRANSFER_BUSY&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        doTransfer(sourceId, targetId, productId, quantity);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        secondLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    firstLock.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获取失败要返回可处理的业务结果或进入重试队列，不能无限紧循环重试。所有成功获取都必须在 <code>finally</code> 中释放。</p>
+<p>实际项目将锁等待次数、等待耗时和失败仓库编号做成指标，日志只记录脱敏业务 ID，不输出完整请求对象。</p>
+<h2 id="单元测试要主动制造相反顺序"><a href="#单元测试要主动制造相反顺序" class="headerlink" title="单元测试要主动制造相反顺序"></a>单元测试要主动制造相反顺序</h2><p>普通串行测试永远不会触发。我们使用两个线程同时执行 <code>A -&gt; B</code> 和 <code>B -&gt; A</code>，并设置测试超时：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test(timeout = 3000)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">oppositeTransfersShouldCompleteWithoutDeadlock</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">    <span class="type">CountDownLatch</span> <span class="variable">start</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CountDownLatch</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    Future&lt;?&gt; first = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">1L</span>, <span class="number">2L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    Future&lt;?&gt; second = executor.submit(() -&gt; &#123;</span><br><span class="line">        await(start);</span><br><span class="line">        service.transfer(<span class="number">2L</span>, <span class="number">1L</span>, <span class="number">100L</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    start.countDown();</span><br><span class="line">    first.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">    second.get(<span class="number">2</span>, TimeUnit.SECONDS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个测试证明当前实现不会永久等待，但并发测试仍可能受调度影响。还需要代码 Review 检查锁顺序，并在压测中重复运行更多随机组合。</p>
+<h2 id="JVM-锁解决不了多实例一致性"><a href="#JVM-锁解决不了多实例一致性" class="headerlink" title="JVM 锁解决不了多实例一致性"></a>JVM 锁解决不了多实例一致性</h2><p>服务部署多个实例后，实例 A 的 <code>synchronized</code> 无法阻止实例 B 同时修改相同库存。真实库存一致性最终要依赖数据库条件更新、事务、版本号或经过设计的分布式协调。</p>
+<p>例如扣减可以让数据库原子判断：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> warehouse_stock</span><br><span class="line"><span class="keyword">SET</span> available <span class="operator">=</span> available <span class="operator">-</span> :quantity,</span><br><span class="line">    version <span class="operator">=</span> version <span class="operator">+</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">WHERE</span> warehouse_id <span class="operator">=</span> :warehouseId</span><br><span class="line">  <span class="keyword">AND</span> product_id <span class="operator">=</span> :productId</span><br><span class="line">  <span class="keyword">AND</span> available <span class="operator">&gt;=</span> :quantity</span><br><span class="line">  <span class="keyword">AND</span> version <span class="operator">=</span> :version;</span><br></pre></td></tr></table></figure>
+
+<p>受影响行数为 0 时重新读取并按业务决定重试或失败。不要因为修复了单 JVM 死锁，就误以为分布式并发也已解决。</p>
+<h2 id="取证报告的最终结论"><a href="#取证报告的最终结论" class="headerlink" title="取证报告的最终结论"></a>取证报告的最终结论</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">直接证据：JVM 报告 Java-level deadlock</span><br><span class="line">线程闭环：worker-7 持 A 等 B，worker-12 持 B 等 A</span><br><span class="line">代码原因：锁顺序跟随业务参数方向</span><br><span class="line">触发条件：两个仓库同时发生相反方向调拨</span><br><span class="line">短期恢复：停止入口、保存现场、摘流重启</span><br><span class="line">长期修复：按仓库 ID 固定加锁顺序，增加有限等待与并发测试</span><br><span class="line">额外风险：JVM 锁不覆盖多实例</span><br></pre></td></tr></table></figure>
+
+<p>这次定位过程并不依赖猜测。线程状态、对象地址、持有关系和源码行号组成了完整证据链。遇到“CPU 不高但请求不动”时，先保留线程现场，往往比反复重启更接近答案。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +403,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -489,7 +639,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -639,7 +789,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -863,7 +1013,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1076,7 +1226,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1287,7 +1437,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1470,7 +1620,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1676,7 +1826,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1817,7 +1967,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 17:46:28" itemprop="dateModified" datetime="2026-10-15T17:46:28+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1970,209 +2120,6 @@
 <h2 id="每季度做一次组合盘点"><a href="#每季度做一次组合盘点" class="headerlink" title="每季度做一次组合盘点"></a>每季度做一次组合盘点</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 删除已经下线或失效的债务项</span><br><span class="line">[ ] 更新发生频率和实际损失</span><br><span class="line">[ ] 标出安全、数据和稳定性红线</span><br><span class="line">[ ] 找到与未来需求重合的处理窗口</span><br><span class="line">[ ] 检查临时兼容层和功能开关是否到期</span><br><span class="line">[ ] 复核已治理项目是否真的降低指标</span><br><span class="line">[ ] 明确本季度接受不处理的项目</span><br></pre></td></tr></table></figure>
 
 <p>技术债永远不会归零，因为系统和业务都在变化。成熟的治理不是发起一次大扫除，而是持续知道债务在哪里、正在支付多少利息，以及下一笔工程投入为什么值得。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/11/15/2020-11-15-%E5%BC%80%E5%8F%91%E4%B8%8E%E6%B5%8B%E8%AF%95%E5%8D%8F%E4%BD%9C%E7%BB%8F%E9%AA%8C/" class="post-title-link" itemprop="url">开发与测试协作经验</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-11-15 16:37:20" itemprop="dateCreated datePublished" datetime="2020-11-15T16:37:20+08:00">2020-11-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 16:49:15" itemprop="dateModified" datetime="2026-10-15T16:49:15+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/" itemprop="url" rel="index"><span itemprop="name">项目协作</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/dev-test-collaboration-cover.svg" alt="开发与测试协作经验封面图"></p>
-<p>有一次测试提了一个缺陷：“优惠券使用失败。”开发看完回复：“我这里正常，无法复现。”两句话都是真的，但没有推动问题前进一步。测试看到的是某组环境和数据下的失败，开发验证的是另一组条件下的成功。</p>
-<p>后来回看，这不是谁描述得不认真，而是双方没有共享同一套上下文。开发与测试的协作，核心不是把缺陷在系统里来回指派，而是共同缩小“预期”和“实际”之间的差异。</p>
-<h2 id="同一个问题的两个视角"><a href="#同一个问题的两个视角" class="headerlink" title="同一个问题的两个视角"></a>同一个问题的两个视角</h2><p>测试首先关心：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户做了什么</span><br><span class="line">预期看到什么</span><br><span class="line">实际发生什么</span><br><span class="line">哪些条件下稳定复现</span><br><span class="line">还可能影响哪些场景</span><br></pre></td></tr></table></figure>
-
-<p>开发首先关心：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">请求进入哪个版本和实例</span><br><span class="line">参数、身份和数据状态是什么</span><br><span class="line">代码走到哪个分支</span><br><span class="line">日志、异常和下游返回是什么</span><br><span class="line">最小改动会影响哪些调用方</span><br></pre></td></tr></table></figure>
-
-<p>两边并不冲突。测试提供可观察行为，开发补充内部证据，合在一起才是一份可定位的问题。</p>
-<h2 id="把“优惠券失败”补完整"><a href="#把“优惠券失败”补完整" class="headerlink" title="把“优惠券失败”补完整"></a>把“优惠券失败”补完整</h2><p>一份可以直接开始排查的缺陷记录应该像这样：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">标题：新用户券在商品金额等于门槛时提示不可用</span><br><span class="line">环境：test，order-service 1.11.3</span><br><span class="line">账号：测试账号 U10027</span><br><span class="line">前置数据：</span><br><span class="line">- 优惠券满 100 减 20，未使用，未过期</span><br><span class="line">- 商品原价 100，无其他优惠</span><br><span class="line"></span><br><span class="line">步骤：</span><br><span class="line">1. 加入商品并进入结算页</span><br><span class="line">2. 选择该优惠券</span><br><span class="line">3. 提交订单</span><br><span class="line"></span><br><span class="line">预期：应抵扣 20，实付 80</span><br><span class="line">实际：返回 COUPON_THRESHOLD_NOT_REACHED</span><br><span class="line">时间：2020-11-15 14:32:18</span><br><span class="line">traceId：b3f1078a92</span><br><span class="line">频率：重复 5 次均出现</span><br><span class="line">对照：商品金额 101 时可以使用</span><br></pre></td></tr></table></figure>
-
-<p>“100 失败、101 成功”比一张错误截图更接近根因。开发沿 traceId 查到门槛判断使用了 <code>amount &gt; threshold</code>，而需求是大于等于。</p>
-<p>截图可以保留界面现象，但文本字段必须可搜索、可复制。密码、Token 和真实用户信息不能作为附件上传。</p>
-<h2 id="测试开始前，开发交付什么"><a href="#测试开始前，开发交付什么" class="headerlink" title="测试开始前，开发交付什么"></a>测试开始前，开发交付什么</h2><p>提测不能只有一个分支名。开发至少说明：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">改动目的和范围</span><br><span class="line">明确未实现的内容</span><br><span class="line">接口、数据库、配置变化</span><br><span class="line">主流程与异常流程</span><br><span class="line">自测结果</span><br><span class="line">已知风险</span><br><span class="line">日志和监控入口</span><br><span class="line">回退方式</span><br></pre></td></tr></table></figure>
-
-<p>对于优惠券需求，开发自测不只验证“能用”：</p>
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>用例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>金额</td>
-<td>99.99、100、100.01</td>
-</tr>
-<tr>
-<td>时间</td>
-<td>生效前、有效期内、刚过期</td>
-</tr>
-<tr>
-<td>状态</td>
-<td>未使用、已锁定、已核销</td>
-</tr>
-<tr>
-<td>并发</td>
-<td>重复提交、超时重试</td>
-</tr>
-<tr>
-<td>组合</td>
-<td>与会员价、满减是否互斥</td>
-</tr>
-<tr>
-<td>权限</td>
-<td>是否属于当前用户</td>
-</tr>
-</tbody></table>
-<p>边界表能让双方在提测前对齐重点，也减少低成本问题进入测试队列。</p>
-<h2 id="测试不是最后一站"><a href="#测试不是最后一站" class="headerlink" title="测试不是最后一站"></a>测试不是最后一站</h2><p>协作应该从需求评审开始。测试在评审阶段提出“金额等于门槛怎么算”“支付失败后券是否释放”，通常比代码完成后发现便宜得多。</p>
-<p>我习惯把工作拆成四个交接点：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需求评审：共同补边界和验收标准</span><br><span class="line">方案评审：测试了解状态、依赖和风险</span><br><span class="line">开发阶段：关键用例先自动化，环境提前准备</span><br><span class="line">提测之后：按证据定位、验证修复并补回归</span><br></pre></td></tr></table></figure>
-
-<p>测试也不必理解所有代码，但知道数据状态和系统边界后，能够设计出比页面点击更有效的场景。</p>
-<h2 id="发现缺陷后先做分诊"><a href="#发现缺陷后先做分诊" class="headerlink" title="发现缺陷后先做分诊"></a>发现缺陷后先做分诊</h2><p>不是每个失败都立刻归为代码 Bug。先判断属于哪类：</p>
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>证据</th>
-<th>下一步</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>需求歧义</td>
-<td>验收标准没有定义边界</td>
-<td>产品确认并更新需求</td>
-</tr>
-<tr>
-<td>代码缺陷</td>
-<td>行为与已确认规则不符</td>
-<td>开发修复并补测试</td>
-</tr>
-<tr>
-<td>环境问题</td>
-<td>版本、配置或依赖异常</td>
-<td>恢复环境并记录差异</td>
-</tr>
-<tr>
-<td>数据问题</td>
-<td>测试前置状态不成立</td>
-<td>修复数据构造方式</td>
-</tr>
-<tr>
-<td>自动化问题</td>
-<td>用例假设过期或不稳定</td>
-<td>更新脚本并定位波动</td>
-</tr>
-</tbody></table>
-<p>分诊不是推卸，而是找到真正应该改变的地方。把配置错误改成一段业务兼容代码，短期能过测试，长期会让问题更隐蔽。</p>
-<p>优先级也要基于影响：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">阻塞：核心流程不可用，无替代方案</span><br><span class="line">高：重要功能错误、数据或安全风险</span><br><span class="line">中：局部功能错误，有明确绕行方式</span><br><span class="line">低：展示、文案或低频体验问题</span><br></pre></td></tr></table></figure>
-
-<p>“我提的 Bug 必须最高”会让优先级失去意义。由产品影响、用户范围、恢复成本和上线时间共同决定。</p>
-<h2 id="开发收到缺陷后的回复方式"><a href="#开发收到缺陷后的回复方式" class="headerlink" title="开发收到缺陷后的回复方式"></a>开发收到缺陷后的回复方式</h2><p>有效回复不是“不是我的问题”，而是给出当前判断和下一步：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">已在 test 1.11.3 复现。</span><br><span class="line">定位到 CouponRule 第 48 行使用了严格大于判断。</span><br><span class="line">需求确认门槛应包含等于场景。</span><br><span class="line">计划补充 99.99、100、100.01 三个单元测试后修复。</span><br><span class="line">预计 17:00 提供版本，影响所有满额券计算。</span><br></pre></td></tr></table></figure>
-
-<p>暂时无法复现时也可以明确缺什么：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当前使用相同账号和版本执行 3 次未出现。</span><br><span class="line">请补充失败时间或 traceId，以确认请求实例和当时配置。</span><br><span class="line">我会同时检查 14:30 前后的券锁定日志。</span><br></pre></td></tr></table></figure>
-
-<p>这样问题仍在向前推进。</p>
-<h2 id="修复不能只让原步骤通过"><a href="#修复不能只让原步骤通过" class="headerlink" title="修复不能只让原步骤通过"></a>修复不能只让原步骤通过</h2><p>修复完成后至少做三层验证：</p>
-<ol>
-<li>原失败步骤已经恢复。</li>
-<li>相邻边界没有被破坏。</li>
-<li>相同规则的其他入口保持一致。</li>
-</ol>
-<p>优惠券可能在下单、购物车试算和运营后台预览中分别计算。如果只改下单接口，用户会在页面看到“可用”，提交时又失败，或者相反。</p>
-<p>开发应补自动测试锁定规则；测试根据影响范围回归。两者不是重复工作：自动测试保护以后每次构建，探索性测试继续寻找未被想到的组合。</p>
-<h2 id="对环境争议建立统一答案"><a href="#对环境争议建立统一答案" class="headerlink" title="对环境争议建立统一答案"></a>对环境争议建立统一答案</h2><p>“我本地正常”通常说明环境缺少可比性。团队应让每次测试都能确认：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">前端与后端版本</span><br><span class="line">Git 提交或构建号</span><br><span class="line">数据库迁移版本</span><br><span class="line">关键配置版本</span><br><span class="line">依赖服务状态</span><br><span class="line">测试数据创建方式</span><br></pre></td></tr></table></figure>
-
-<p>服务提供版本接口，部署系统展示变更历史，测试数据使用脚本创建。这样环境问题不再依赖逐个人询问。</p>
-<h2 id="一次缺陷的关闭标准"><a href="#一次缺陷的关闭标准" class="headerlink" title="一次缺陷的关闭标准"></a>一次缺陷的关闭标准</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 根因和影响范围已记录</span><br><span class="line">[ ] 修复提交与部署版本可追溯</span><br><span class="line">[ ] 原用例和相邻边界验证通过</span><br><span class="line">[ ] 必要自动测试已补充</span><br><span class="line">[ ] 临时数据、开关和调试日志已清理</span><br><span class="line">[ ] 需求或接口文档同步更新</span><br><span class="line">[ ] 线上观察项与负责人明确</span><br></pre></td></tr></table></figure>
-
-<p>开发和测试并不是前后两个工位。一个更关注系统如何实现，一个更关注系统如何失败，这两种视角本来就应该互相补充。当双方用版本、数据、traceId 和边界条件说话时，讨论会从“在我这里是否正常”变成“在哪个条件下不符合共同确认的规则”。</p>
 
       
     </div>
