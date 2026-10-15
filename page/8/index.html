@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">221</span>
+        <span class="site-state-item-count">222</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,123 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/01/12/2019-01-12-Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%85%A5%E9%97%A8/" class="post-title-link" itemprop="url">Git版本控制入门</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-12 21:18:43" itemprop="dateCreated datePublished" datetime="2019-01-12T21:18:43+08:00">2019-01-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">开发工具</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>从手动复制代码到使用 Git 管理版本，是我在 2019 年开始项目实践时迈出的第一步。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-01 前后学习和实践 <strong>Git版本控制入门</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>不知道 add、commit、push 分别做了什么</li>
+<li>误把 target 和 .class 文件提交到了仓库</li>
+<li>合并代码时出现冲突，不敢随便改</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>Git 本质上是在本地维护一个对象数据库，工作区、暂存区、本地仓库、远程仓库是四个不同层次。理解这几层之后，很多命令就不再是死记硬背。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初始化仓库</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看状态</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加到暂存区</span></span><br><span class="line">git add src/main/java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提交到本地仓库</span></span><br><span class="line">git commit -m <span class="string">&quot;feat: add user module&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关联远程仓库并推送</span></span><br><span class="line">git remote add origin https://github.com/example/demo.git</span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">target/</span><br><span class="line">*.class</span><br><span class="line">*.log</span><br><span class="line">.idea/</span><br><span class="line">*.iml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 解决冲突后的常见流程</span></span><br><span class="line">git pull origin master</span><br><span class="line"><span class="comment"># 手动编辑冲突文件</span></span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;fix: resolve merge conflict&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 Git版本控制入门 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +370,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -400,7 +517,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -613,7 +730,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -851,7 +968,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1095,7 +1212,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1311,7 +1428,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1560,7 +1677,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1784,7 +1901,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1915,7 +2032,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2107,236 +2224,6 @@
 <li>类型转换要小心精度丢失</li>
 </ul>
 <p>以后写代码时，我会尽量先想清楚变量的范围和用途，再决定使用哪种类型。对于金额这种对精度要求很高的数据，一开始就应该使用 <code>BigDecimal</code>，不要等出问题后再改。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/02/25/2018-02-25-%E7%AC%AC%E4%B8%80%E4%B8%AAHello-World%E7%A8%8B%E5%BA%8F%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">第一个Hello World程序详解</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-02-25 15:22:08" itemprop="dateCreated datePublished" datetime="2018-02-25T15:22:08+08:00">2018-02-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>今天把 JDK 和开发工具都装好以后，终于开始写第一个 Java 程序了。虽然只是最简单的 <code>Hello World</code>，但是实际动手以后发现，这里面并不是只有一行输出语句那么简单。</p>
-<p>我之前学 C 语言的时候，也是从 <code>Hello World</code> 开始的。当时大概知道写完 <code>.c</code> 文件以后，用编译器编译，再运行生成的可执行文件就可以了。所以刚开始学 Java 的时候，我也下意识以为流程差不多：写代码、编译、运行。</p>
-<p>但是 Java 这里多了一个 <code>.class</code> 文件，还要用 <code>javac</code> 和 <code>java</code> 两个命令分别处理，一开始确实有点懵。于是我想把 Java 程序从编写到运行的完整过程搞清楚，至少以后再遇到编译错误、运行错误时，知道问题大概出在哪里。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>第一次写 Java 的 <code>Hello World</code>，我主要遇到了下面几个问题。</p>
-<h2 id="文件名和类名不一致导致编译报错"><a href="#文件名和类名不一致导致编译报错" class="headerlink" title="文件名和类名不一致导致编译报错"></a>文件名和类名不一致导致编译报错</h2><p>我一开始把文件保存成了 <code>hello.java</code>，里面写的是：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac hello.java</span><br></pre></td></tr></table></figure>
-
-<p>结果编译器报错，大概意思是公共类 <code>HelloWorld</code> 应该放在 <code>HelloWorld.java</code> 文件中。这个错误很典型，因为 Java 对 <code>public class</code> 的类名和文件名要求非常严格。</p>
-<h2 id="缺少main方法不知道程序入口在哪"><a href="#缺少main方法不知道程序入口在哪" class="headerlink" title="缺少main方法不知道程序入口在哪"></a>缺少main方法不知道程序入口在哪</h2><p>我还尝试过只写一个普通方法：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sayHello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段代码能编译通过，但是运行时会提示找不到 <code>main</code> 方法。也就是说，Java 程序不是只要有类就能直接运行，JVM 需要知道从哪里开始执行。</p>
-<h2 id="不理解为什么javac编译后生成-class文件"><a href="#不理解为什么javac编译后生成-class文件" class="headerlink" title="不理解为什么javac编译后生成.class文件"></a>不理解为什么javac编译后生成.class文件</h2><p>执行 <code>javac HelloWorld.java</code> 后，目录里生成了 <code>HelloWorld.class</code>。我一开始以为编译后应该生成类似 Windows 下的 <code>.exe</code> 文件，但是 Java 生成的是字节码文件，这和 C 语言直接编译成机器码不同。</p>
-<h2 id="中文输出乱码问题"><a href="#中文输出乱码问题" class="headerlink" title="中文输出乱码问题"></a>中文输出乱码问题</h2><p>我在程序里输出中文时，也遇到过乱码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;你好，Java&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<p>有时编译没问题，但是运行后控制台显示的中文不正常。后来才知道，这和源文件编码、命令行窗口编码、<code>javac</code> 读取源码时使用的编码都有关系。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="public类的类名必须和文件名完全一致"><a href="#public类的类名必须和文件名完全一致" class="headerlink" title="public类的类名必须和文件名完全一致"></a>public类的类名必须和文件名完全一致</h2><p>Java 要求一个 <code>.java</code> 文件中，如果存在 <code>public</code> 修饰的类，那么这个 <code>public</code> 类的类名必须和文件名完全一致，包括大小写。</p>
-<p>例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>文件名就必须是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>不能写成 <code>helloworld.java</code>、<code>hello.java</code> 或 <code>Hello.java</code>。虽然 Windows 文件名大小写不敏感，但 Java 编译器对类名是区分大小写的，初学的时候最好严格保持一致。</p>
-<h2 id="JVM执行时寻找main方法作为程序入口"><a href="#JVM执行时寻找main方法作为程序入口" class="headerlink" title="JVM执行时寻找main方法作为程序入口"></a>JVM执行时寻找main方法作为程序入口</h2><p>Java 程序运行时，JVM 会寻找固定格式的 <code>main</code> 方法作为入口：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
-
-<p>这里的几个关键点是：</p>
-<ul>
-<li><code>public</code>：表示 JVM 可以从类外部访问这个方法</li>
-<li><code>static</code>：表示不需要创建对象，就可以直接调用这个方法</li>
-<li><code>void</code>：表示这个方法没有返回值</li>
-<li><code>main</code>：固定的方法名，是程序入口</li>
-<li><code>String[] args</code>：命令行参数，运行程序时可以从外部传入字符串数组</li>
-</ul>
-<p>如果少写了 <code>static</code>，或者把 <code>main</code> 写成 <code>Main</code>，都可能导致 JVM 找不到程序入口。</p>
-<h2 id="Java先编译成字节码再由JVM执行"><a href="#Java先编译成字节码再由JVM执行" class="headerlink" title="Java先编译成字节码再由JVM执行"></a>Java先编译成字节码再由JVM执行</h2><p>Java 的执行流程大致是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.java  --javac编译--&gt;  HelloWorld.class  --JVM执行--&gt;  程序输出结果</span><br></pre></td></tr></table></figure>
-
-<p>这里的 <code>.class</code> 文件不是普通文本文件，而是 Java 字节码文件。JVM 可以读取字节码，然后在不同操作系统上解释执行或即时编译执行。</p>
-<p>这也是 Java 经常说的“一次编译，到处运行”的基础：只要目标机器安装了合适的 JVM，同一份 <code>.class</code> 字节码理论上就可以在不同平台运行。</p>
-<h2 id="Windows默认GBK编码可能导致中文乱码"><a href="#Windows默认GBK编码可能导致中文乱码" class="headerlink" title="Windows默认GBK编码可能导致中文乱码"></a>Windows默认GBK编码可能导致中文乱码</h2><p>我现在主要在 Windows 环境下学习 Java。Windows 命令行默认编码经常是 GBK，而很多编辑器保存源码时默认是 UTF-8。</p>
-<p>如果源文件实际是 UTF-8，但 <code>javac</code> 按系统默认编码去读取，或者控制台用另一种编码显示，就可能出现中文乱码。最稳妥的方式是明确告诉 <code>javac</code> 源文件编码：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>这样至少编译阶段不会因为编码识别错误导致中文出问题。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="完整的HelloWorld-java代码及逐行解释"><a href="#完整的HelloWorld-java代码及逐行解释" class="headerlink" title="完整的HelloWorld.java代码及逐行解释"></a>完整的HelloWorld.java代码及逐行解释</h2><p>下面是我整理后的第一个 Java 程序，文件名必须保存为 <code>HelloWorld.java</code>。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义一个公共类，类名必须和文件名 HelloWorld.java 完全一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// Java程序入口，JVM运行程序时会从这个方法开始执行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 向控制台输出一行文本，输出结束后自动换行</span></span><br><span class="line">        System.out.println(<span class="string">&quot;你好，Java&quot;</span>); <span class="comment">// 输出中文内容，用来测试当前编码是否正常</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>逐行理解：</p>
-<ol>
-<li><code>public class HelloWorld</code>：声明一个公共类，类名是 <code>HelloWorld</code>。</li>
-<li><code>&#123;</code> 和 <code>&#125;</code>：表示代码块的开始和结束，类和方法都需要用大括号包起来。</li>
-<li><code>public static void main(String[] args)</code>：固定格式的主方法，是 Java 程序入口。</li>
-<li><code>System.out.println(&quot;Hello World&quot;)</code>：在控制台打印 <code>Hello World</code>。</li>
-<li>每条语句末尾的分号不能省略，这是 Java 的语法要求。</li>
-</ol>
-<h2 id="javac编译和java运行的完整命令"><a href="#javac编译和java运行的完整命令" class="headerlink" title="javac编译和java运行的完整命令"></a>javac编译和java运行的完整命令</h2><p>假设当前目录下有 <code>HelloWorld.java</code> 文件，先打开命令行进入这个目录。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> D:\java-study</span><br></pre></td></tr></table></figure>
-
-<p>编译 Java 源文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>如果编译成功，命令行通常不会输出任何内容，但是目录里会多出一个文件：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld.class</span><br></pre></td></tr></table></figure>
-
-<p>然后运行程序：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>注意这里运行时写的是类名 <code>HelloWorld</code>，不要写成 <code>HelloWorld.class</code>，也不要写成 <code>HelloWorld.java</code>。</p>
-<p>正常输出如下：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
-
-<p>如果担心中文编码问题，可以这样编译：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>对应输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br><span class="line">你好，Java</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="带命令行参数的版本"><a href="#带命令行参数的版本" class="headerlink" title="带命令行参数的版本"></a>带命令行参数的版本</h2><p><code>main</code> 方法里的 <code>String[] args</code> 可以接收命令行参数。为了理解它，我又写了一个版本：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// 定义HelloWorld类，文件名仍然必须是HelloWorld.java</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// args用于接收运行程序时传入的命令行参数</span></span><br><span class="line">        <span class="keyword">if</span> (args.length == <span class="number">0</span>) &#123; <span class="comment">// 判断是否没有传入任何参数，避免直接访问数组导致异常</span></span><br><span class="line">            System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 没有参数时输出默认内容</span></span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">// 提前结束main方法，让后面的参数输出逻辑不再执行</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;收到的第一个参数是：&quot;</span> + args[<span class="number">0</span>]); <span class="comment">// 输出命令行传入的第一个参数</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>编译：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>不带参数运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello World</span><br></pre></td></tr></table></figure>
-
-<p>带参数运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld Java入门</span><br></pre></td></tr></table></figure>
-
-<p>输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">收到的第一个参数是：Java入门</span><br></pre></td></tr></table></figure>
-
-<p>如果传入多个参数，<code>args[0]</code> 是第一个，<code>args[1]</code> 是第二个。这个地方让我想到 C 语言里的 <code>argc</code> 和 <code>argv</code>，只是 Java 把参数封装成了字符串数组。</p>
-<h2 id="使用Eclipse创建Java项目的步骤"><a href="#使用Eclipse创建Java项目的步骤" class="headerlink" title="使用Eclipse创建Java项目的步骤"></a>使用Eclipse创建Java项目的步骤</h2><p>手动编译运行理解清楚以后，也可以用 Eclipse 创建项目。Eclipse 会自动帮我们调用编译器，很多目录结构和 classpath 细节也会帮忙处理。</p>
-<p>大致步骤如下：</p>
-<ol>
-<li>打开 Eclipse。</li>
-<li>选择 <code>File</code> -&gt; <code>New</code> -&gt; <code>Java Project</code>。</li>
-<li>在 <code>Project name</code> 中输入项目名，例如 <code>HelloWorldDemo</code>。</li>
-<li>选择已经安装好的 JDK，初学阶段默认配置即可。</li>
-<li>点击 <code>Finish</code> 创建项目。</li>
-<li>在 <code>src</code> 目录上右键，选择 <code>New</code> -&gt; <code>Class</code>。</li>
-<li>在 <code>Name</code> 中输入 <code>HelloWorld</code>。</li>
-<li>勾选 <code>public static void main(String[] args)</code>，让 Eclipse 自动生成主方法。</li>
-<li>在 <code>main</code> 方法中写入输出语句。</li>
-<li>右键代码区域，选择 <code>Run As</code> -&gt; <code>Java Application</code> 运行程序。</li>
-</ol>
-<p>Eclipse 里生成的代码大概是：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HelloWorld</span> &#123; <span class="comment">// Eclipse创建的公共类，类名和文件名保持一致</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123; <span class="comment">// 勾选主方法选项后，Eclipse会自动生成程序入口</span></span><br><span class="line">        System.out.println(<span class="string">&quot;Hello World&quot;</span>); <span class="comment">// 在控制台输出Hello World</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h2 id="classpath的概念"><a href="#classpath的概念" class="headerlink" title="classpath的概念"></a>classpath的概念</h2><p><code>classpath</code> 可以简单理解为 JVM 查找 <code>.class</code> 文件的路径。</p>
-<p>我们执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>JVM 会根据 classpath 去找 <code>HelloWorld.class</code>。如果当前目录不在 classpath 中，就可能出现找不到类的错误。</p>
-<p>在简单练习时，可以在 <code>.class</code> 文件所在目录执行命令，或者显式指定 classpath：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -classpath . HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>这里的 <code>.</code> 表示当前目录。也可以写成简写形式：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> . HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>如果 class 文件放在 <code>bin</code> 目录下，可以这样运行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -<span class="built_in">cp</span> bin HelloWorld</span><br></pre></td></tr></table></figure>
-
-<p>初学阶段我觉得没必要一开始就背很多 classpath 的复杂规则，但至少要知道：运行 Java 程序时，JVM 必须能在 classpath 指定的位置找到对应的 <code>.class</code> 文件。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天这个 <code>Hello World</code> 程序虽然很小，但实际把 Java 的几个基础概念都串起来了。</p>
-<p>首先，Java 的编译运行机制和 C 语言有本质区别。C 语言通常直接编译成本机平台的机器码，而 Java 是先通过 <code>javac</code> 编译成 <code>.class</code> 字节码，再交给 JVM 运行。</p>
-<p>其次，写 Java 程序时要注意文件名、类名、编码的一致性。尤其是 <code>public class HelloWorld</code> 必须放在 <code>HelloWorld.java</code> 中，中文源码最好统一使用 UTF-8，并在命令行编译时加上：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">javac -encoding UTF-8 HelloWorld.java</span><br></pre></td></tr></table></figure>
-
-<p>再次，<code>main</code> 方法是 Java 程序入口，签名最好先按固定格式记住：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span></span><br></pre></td></tr></table></figure>
-
-<p>最后，我对“一次编译，到处运行”有了更具体的理解。它不是说 Java 源文件可以直接在任何地方运行，而是说 Java 源文件编译成字节码后，可以交给不同平台上的 JVM 执行。</p>
-<p>IDE 确实能帮我们屏蔽很多细节，比如自动编译、自动设置 classpath、自动生成 main 方法。但是我觉得初学者还是应该先用命令行手动编译运行几次。这样以后 Eclipse 或其他工具报错时，不至于完全不知道底层发生了什么。</p>
 
       
     </div>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="700" viewBox="0 0 1280 700">
+  <rect width="1280" height="700" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">MYSQL / COMPOSITE INDEX</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">联合索引 idx(a, b, c) 的最左前缀</text>
+
+  <!-- 索引结构 -->
+  <g font-family="Menlo,Consolas,monospace">
+    <rect x="72" y="176" width="1136" height="86" rx="10" fill="#101a29" stroke="#22d3ee" stroke-width="2"/>
+    <text x="104" y="210" fill="#22d3ee" font-size="17">INDEX</text>
+    <rect x="104" y="222" width="120" height="30" rx="6" fill="#0b1522" stroke="#22d3ee"/>
+    <text x="146" y="243" fill="#e7f8fb" font-size="17">a</text>
+    <rect x="240" y="222" width="120" height="30" rx="6" fill="#0b1522" stroke="#22d3ee"/>
+    <text x="282" y="243" fill="#e7f8fb" font-size="17">b</text>
+    <rect x="376" y="222" width="120" height="30" rx="6" fill="#0b1522" stroke="#22d3ee"/>
+    <text x="418" y="243" fill="#e7f8fb" font-size="17">c</text>
+    <text x="520" y="243" fill="#6f8497" font-size="15">← 按此顺序存储</text>
+  </g>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">
+    <!-- 能命中 -->
+    <rect x="72" y="292" width="552" height="330" rx="12" fill="#0f2b22" stroke="#34d399"/>
+    <text x="104" y="330" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="17">CAN USE INDEX</text>
+
+    <text x="104" y="372" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE a = ?</text>
+    <text x="104" y="408" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE a = ? AND b = ?</text>
+    <text x="104" y="444" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE a = ? AND b = ? AND c = ?</text>
+    <text x="104" y="480" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE a = ? AND c = ?</text>
+    <text x="400" y="480" fill="#9eb0c2" font-size="15">a 走索引，c 只过滤</text>
+    <text x="104" y="516" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE a &gt; ? AND b = ?</text>
+    <text x="400" y="516" fill="#9eb0c2" font-size="15">范围后 b 用不上</text>
+    <text x="104" y="556" fill="#9eb0c2" font-size="16">按索引顺序 a → b → c 逐列匹配</text>
+    <text x="104" y="586" fill="#6f8497" font-size="15">范围查询会截断它后面的列</text>
+
+    <!-- 不能命中 -->
+    <rect x="656" y="292" width="552" height="330" rx="12" fill="#2b1418" stroke="#fb7185"/>
+    <text x="688" y="330" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="17">CANNOT USE INDEX</text>
+
+    <text x="688" y="372" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE b = ?</text>
+    <text x="688" y="408" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE b = ? AND c = ?</text>
+    <text x="688" y="444" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE c = ?</text>
+    <text x="688" y="480" fill="#f2f7fb" font-family="Menlo,Consolas,monospace" font-size="16">WHERE c = ? AND a = ?</text>
+
+    <text x="688" y="530" fill="#9eb0c2" font-size="16">跳过最左列 a，无法定位索引起点</text>
+    <text x="688" y="560" fill="#9eb0c2" font-size="16">→ 退化为全表扫描或全索引扫描</text>
+    <text x="688" y="596" fill="#6f8497" font-size="15">优化器可能改用其他索引或直接扫表</text>
+  </g>
+</svg>

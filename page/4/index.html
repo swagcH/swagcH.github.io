@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">221</span>
+        <span class="site-state-item-count">222</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,209 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/12/26/2021-12-26-%E5%B9%B4%E5%BA%A6%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">年度故障案例总结</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-26 23:41:09" itemprop="dateCreated datePublished" datetime="2021-12-26T23:41:09+08:00">2021-12-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2021/incident-review-2021-cover.svg" alt="年度故障案例总结技术图"></p>
+<p>2021 年写了不少故障记录。单篇看，原因分散在慢 SQL、缓存、磁盘、线程池和消息队列；放到一整年再看，会发现多数事故都不是某个技术点突然失效，而是容量边界没有被看见、失败结果没有出口、变更缺少验证。</p>
+<p>这篇不再复述每条命令，只做一次稳定性账本。</p>
+<h2 id="全年故障画像"><a href="#全年故障画像" class="headerlink" title="全年故障画像"></a>全年故障画像</h2><p>团队登记的有效生产事件按主因分类：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th align="right">数量</th>
+<th>典型表现</th>
+<th>主要缺口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库</td>
+<td align="right">3</td>
+<td>慢 SQL、连接等待</td>
+<td>查询基线和索引评审</td>
+</tr>
+<tr>
+<td>缓存</td>
+<td align="right">2</td>
+<td>回源突增、命中率下降</td>
+<td>容量保护和演练</td>
+</tr>
+<tr>
+<td>应用并发</td>
+<td align="right">2</td>
+<td>线程排队、死锁</td>
+<td>有界资源与线程取证</td>
+</tr>
+<tr>
+<td>部署配置</td>
+<td align="right">2</td>
+<td>路由错误、环境差异</td>
+<td>自动校验和灰度</td>
+</tr>
+<tr>
+<td>消息</td>
+<td align="right">1</td>
+<td>业务状态不一致</td>
+<td>端到端轨迹和幂等</td>
+</tr>
+<tr>
+<td>系统资源</td>
+<td align="right">1</td>
+<td>磁盘写满</td>
+<td>趋势告警和滚动策略</td>
+</tr>
+</tbody></table>
+<p>数量不用于比较谁出了更多问题，而是决定下一笔稳定性投入放在哪里。</p>
+<p>有两个指标变化比较明显：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">告警到确认影响范围：平均 18 分钟 -&gt; 7 分钟</span><br><span class="line">确认故障到恢复业务：平均 42 分钟 -&gt; 24 分钟</span><br></pre></td></tr></table></figure>
+
+<p>恢复变快，不是因为大家更会猜，而是日志开始有 traceId，服务有版本和健康接口，值班手册也明确了先看什么。</p>
+<h2 id="重复出现的模式一：系统没有主动说“满了”"><a href="#重复出现的模式一：系统没有主动说“满了”" class="headerlink" title="重复出现的模式一：系统没有主动说“满了”"></a>重复出现的模式一：系统没有主动说“满了”</h2><p>线程池队列一万、HTTP 连接池单路由两条、数据库连接等待、磁盘 100%，这些问题表面不同，本质上都是资源有边界，但系统没有在接近边界时给出可行动信号。</p>
+<p>年初我们常看的指标是 CPU 和内存。年底的基础看板增加了：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HTTP 客户端 leased / pending</span><br><span class="line">数据库连接 active / pending</span><br><span class="line">线程池 active / queue / rejected</span><br><span class="line">RabbitMQ ready / unacked / dead letter</span><br><span class="line">缓存命中率 / 回源 QPS</span><br><span class="line">磁盘增长速度 / inode</span><br></pre></td></tr></table></figure>
+
+<p>指标不是越多越好。每个告警都要对应一个负责人、一条判断路径和一个处置动作。连续几个月无人处理的告警，应调整阈值或删除，而不是继续制造噪声。</p>
+<h2 id="重复出现的模式二：成功日志出现得太早"><a href="#重复出现的模式二：成功日志出现得太早" class="headerlink" title="重复出现的模式二：成功日志出现得太早"></a>重复出现的模式二：成功日志出现得太早</h2><p>“消息已发送”只代表调用了客户端方法；“任务已提交”只代表进入线程池；“发布完成”有时只代表进程启动。很多误判来自成功定义停在了中间步骤。</p>
+<p>今年重新定义了几个完成条件：</p>
+<table>
+<thead>
+<tr>
+<th>动作</th>
+<th>过去</th>
+<th>现在</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>发消息</td>
+<td>Producer 方法返回</td>
+<td>Broker confirm，消费结果可追踪</td>
+</tr>
+<tr>
+<td>异步任务</td>
+<td>放入内存队列</td>
+<td>持久化状态，可拒绝、可补偿</td>
+</tr>
+<tr>
+<td>上线</td>
+<td>实例启动</td>
+<td>冒烟、指标和版本核对通过</td>
+</tr>
+<tr>
+<td>SQL 优化</td>
+<td>单次查询变快</td>
+<td>扫描量下降，写入与复制正常</td>
+</tr>
+</tbody></table>
+<p>稳定性很多时候是语义问题。只要团队对“成功”理解不同，监控和沟通就会产生空白。</p>
+<h2 id="重复出现的模式三：恢复了，但没有降低复发概率"><a href="#重复出现的模式三：恢复了，但没有降低复发概率" class="headerlink" title="重复出现的模式三：恢复了，但没有降低复发概率"></a>重复出现的模式三：恢复了，但没有降低复发概率</h2><p>重启确实解决过连接池耗尽、死锁和文件句柄占用。如果复盘只写“重启恢复”，下一次仍会按相同方式出现。</p>
+<p>现在复盘至少分三层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">直接原因：哪个资源或代码路径失败</span><br><span class="line">触发条件：为什么在这个时间暴露</span><br><span class="line">系统缺口：为什么没有提前发现、隔离或阻止</span><br></pre></td></tr></table></figure>
+
+<p>对应行动也分层：</p>
+<ul>
+<li>恢复动作：让业务尽快可用。</li>
+<li>修复动作：消除当前缺陷。</li>
+<li>预防动作：测试、监控、流程或架构改进。</li>
+</ul>
+<p>每项行动必须有负责人、截止时间和验收证据。“加强意识”“持续关注”无法关闭。</p>
+<h2 id="今年真正落地的变化"><a href="#今年真正落地的变化" class="headerlink" title="今年真正落地的变化"></a>今年真正落地的变化</h2><p><strong>调用链可追踪。</strong> 网关、服务和消息开始传递 traceId 与 messageId。跨系统耗时可以对齐，不再只凭单侧日志判断下游慢。</p>
+<p><strong>资源显式有界。</strong> 新线程池使用有界队列和明确拒绝策略；客户端连接池配置单路由上限与获取超时；批处理有并发预算。</p>
+<p><strong>变更逐步放量。</strong> 发布先单实例灰度，检查错误率、P99、连接池和业务结果后再扩展。数据库和配置也进入发布单。</p>
+<p><strong>故障先留现场。</strong> 对 CPU、内存、死锁和磁盘问题，Runbook 写清了重启前最小证据集。现场不再完全依赖某一位熟悉系统的人。</p>
+<p><strong>可靠性进入代码。</strong> 消息使用 Confirm、Return、Outbox 和消费幂等；缓存回源有 TTL 抖动、限流和降级，而不是只靠人工盯盘。</p>
+<p>这些改变没有让故障消失，但让影响更小、原因更容易确认。</p>
+<h2 id="仍然欠缺的部分"><a href="#仍然欠缺的部分" class="headerlink" title="仍然欠缺的部分"></a>仍然欠缺的部分</h2><p>第一，容量数据仍然零散。很多参数来自一次压测，没有持续根据真实峰值和任务耗时更新。系统扩容后，单实例和下游预算也没有自动重新计算。</p>
+<p>第二，演练覆盖不足。Redis 故障做过演练，但数据库只读、消息积压、配置中心不可用等场景仍停留在文档。</p>
+<p>第三，业务降级不够明确。技术上可以返回缓存旧值或关闭推荐，业务上是否可接受，需要产品、研发和测试共同确认。</p>
+<p>第四，复盘行动偶尔延期。写出行动项不等于完成，需要在迭代和季度盘点中持续追踪。</p>
+<h2 id="明年的稳定性目标"><a href="#明年的稳定性目标" class="headerlink" title="明年的稳定性目标"></a>明年的稳定性目标</h2><p>我给下一年保留四个可验证目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 核心接口有延迟、错误率和容量基线</span><br><span class="line">2. 高风险依赖每季度至少完成一次故障演练</span><br><span class="line">3. 生产事件都能在 10 分钟内确定影响范围</span><br><span class="line">4. 复盘行动按期完成率达到 90%</span><br></pre></td></tr></table></figure>
+
+<p>技术指标之外，还要追踪重复故障率。如果相同原因连续发生，说明复盘没有进入系统。</p>
+<p>这一年的排查经验可以压缩成一句话：先建立证据，再缩小范围；先保护系统边界，再追求单点性能；恢复业务以后，还要把现场经验变成下一次自动生效的保护。</p>
+<p>稳定性并不是某个季度的专项，它更像每天写代码、配参数、做 Review 和发布时不断累积的结果。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +456,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -421,7 +624,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -571,7 +774,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -807,7 +1010,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -957,7 +1160,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1181,7 +1384,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1394,7 +1597,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1605,7 +1808,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1788,7 +1991,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1932,147 +2135,6 @@
 <h2 id="这条调用链最后留下的图"><a href="#这条调用链最后留下的图" class="headerlink" title="这条调用链最后留下的图"></a>这条调用链最后留下的图</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">网关 5s</span><br><span class="line">  -&gt; 参数与认证 15ms</span><br><span class="line">  -&gt; 价格计算 35ms</span><br><span class="line">  -&gt; 数据库写入 40ms</span><br><span class="line">  -&gt; HTTP 连接池排队 0~200ms</span><br><span class="line">  -&gt; 库存处理 P99 420ms</span><br><span class="line">  -&gt; 状态落库 30ms</span><br><span class="line">  -&gt; 预留异常处理时间</span><br></pre></td></tr></table></figure>
 
 <p>这次排查让我意识到，“某个下游调用耗时 6 秒”仍然是一个过粗的结论。客户端排队、DNS、建连、网络传输和服务端处理必须继续拆开。只有把不同系统的时钟、traceId、线程状态和连接池指标放在一起，消失的那 6 秒才真正有了位置。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">工作第一年总结</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-12-27 23:26:18" itemprop="dateCreated datePublished" datetime="2020-12-27T23:26:18+08:00">2020-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/first-year-review-cover.svg" alt="工作第一年总结封面图"></p>
-<p>写下这篇总结时，我工作的第一年快结束了。回头看年初的自己，最明显的特点是着急：着急听懂会议里的每个词，着急把需求做完，着急证明自己能独立解决问题。</p>
-<p>一年后，我会的框架确实多了一些，但更重要的变化是开始接受一件事：工程能力不只是写代码的速度，它还包括理解问题、确认边界、留下证据，以及让别人能够接着自己的工作继续走。</p>
-<h2 id="刚开始，所有问题看起来都像代码问题"><a href="#刚开始，所有问题看起来都像代码问题" class="headerlink" title="刚开始，所有问题看起来都像代码问题"></a>刚开始，所有问题看起来都像代码问题</h2><p>第一次接需求时，我拿到一句“增加订单筛选”，立即打开 Controller。写到一半才发现，筛选时间按创建时间还是支付时间没有确认，导出和页面是否共用条件也没有结论。</p>
-<p>那次需求反复改了几轮。代码并不难，真正浪费时间的是我把模糊内容当成了确定输入。</p>
-<p>后来每次开始前，我会先写几行：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户要解决什么问题</span><br><span class="line">正常流程是什么</span><br><span class="line">边界和异常是什么</span><br><span class="line">本次不做什么</span><br><span class="line">怎样算完成</span><br></pre></td></tr></table></figure>
-
-<p>这些问题没有让开发变慢，反而减少了返工。程序员不是接收一句话就输出代码的转换器，澄清本身就是工作的一部分。</p>
-<h2 id="第一次独立上线，让我认识“完成”的含义"><a href="#第一次独立上线，让我认识“完成”的含义" class="headerlink" title="第一次独立上线，让我认识“完成”的含义"></a>第一次独立上线，让我认识“完成”的含义</h2><p>在本地看到接口返回成功时，我曾经觉得任务已经完成。真正上线后才知道，一个改动还需要回答很多问题：</p>
-<ul>
-<li>测试环境和生产配置是否一致。</li>
-<li>数据库变更能否兼容旧版本。</li>
-<li>日志能不能定位一笔失败请求。</li>
-<li>监控是否能发现错误率上升。</li>
-<li>如果回退，新增数据怎么办。</li>
-</ul>
-<p>第一次参与发布时，我大部分时间都在等别人确认。不是因为没有权限，而是我说不清变更影响和验证方式。</p>
-<p>从那以后，我开始在提测和发布前准备清单。最初只是怕遗漏，后来才意识到，清单更大的价值是把脑中的隐性判断交给团队。别人不必相信“我都测过了”，可以直接看到测了什么、结果是什么。</p>
-<h2 id="一次线上故障，比十篇教程更具体"><a href="#一次线上故障，比十篇教程更具体" class="headerlink" title="一次线上故障，比十篇教程更具体"></a>一次线上故障，比十篇教程更具体</h2><p>今年遇到过连接池耗尽的问题。告警响起时，我第一反应是最近发布的代码肯定有 Bug，随后又怀疑数据库。真正开始排查后，团队先看影响范围，再保存日志和线程现场，最后才定位到导出任务把远程调用放进长事务。</p>
-<p>那次经历让我记住了几个顺序：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事实在猜测之前</span><br><span class="line">恢复和取证同时安排</span><br><span class="line">直接原因不等于根本原因</span><br><span class="line">修复代码不等于完成复盘</span><br></pre></td></tr></table></figure>
-
-<p>过去遇到错误，我习惯立刻搜索异常文本；现在我会先问系统发生了什么变化、影响哪些请求、哪一层指标出现异常。搜索能力仍然重要，但没有正确问题，搜到的答案很容易只是相似而不是适用。</p>
-<h2 id="Code-Review-也改变了"><a href="#Code-Review-也改变了" class="headerlink" title="Code Review 也改变了"></a>Code Review 也改变了</h2><p>年初 Review 别人的代码，我主要看格式、空指针和命名。别人 Review 我的代码时，我也常把评论理解成对个人能力的评价。</p>
-<p>合作久了以后，我逐渐看到 Review 的真正价值：作者最熟悉实现，Reviewer 更容易发现被作者默认的前提。一次有效讨论应该围绕：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">业务规则是否完整</span><br><span class="line">失败后数据停在哪里</span><br><span class="line">并发和重复请求会怎样</span><br><span class="line">日志是否保留必要上下文</span><br><span class="line">测试能否证明关键行为</span><br></pre></td></tr></table></figure>
-
-<p>我也学会让评论更具体。与其写“这里不太好”，不如说明“外部调用放在事务中会延长连接占用，建议先提交本地状态，再通过任务重试通知”。</p>
-<p>评论对代码，不对人；结论最好有风险和替代方案。这件事说起来普通，真正做到以后，协作成本低了很多。</p>
-<h2 id="从“问答案”到“带着排查结果提问”"><a href="#从“问答案”到“带着排查结果提问”" class="headerlink" title="从“问答案”到“带着排查结果提问”"></a>从“问答案”到“带着排查结果提问”</h2><p>刚入职时我害怕问得太多，有时又会在卡住后直接把错误截图发给同事。两种方式都不理想：前者浪费时间，后者把全部定位工作转给了对方。</p>
-<p>现在我会先准备：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">我想完成什么</span><br><span class="line">执行了什么</span><br><span class="line">预期和实际分别是什么</span><br><span class="line">查过哪些日志、代码和文档</span><br><span class="line">目前有哪两个判断</span><br><span class="line">希望对方确认哪个关键点</span><br></pre></td></tr></table></figure>
-
-<p>这样的提问通常更快得到答案，也方便对方指出我在哪一步理解错了。能够求助不是能力不足，关键是让求助成为协作，而不是任务转移。</p>
-<h2 id="今年真正掌握的是一组小习惯"><a href="#今年真正掌握的是一组小习惯" class="headerlink" title="今年真正掌握的是一组小习惯"></a>今年真正掌握的是一组小习惯</h2><p>如果只列技术名词，这一年可以写 Spring Boot、MySQL、Redis、Git、Linux。但让我日常工作发生变化的，是更细小的习惯：</p>
-<ol>
-<li>修改前先复现，保存基线。</li>
-<li>提交前完整阅读自己的 diff。</li>
-<li>复杂逻辑先写一张状态表。</li>
-<li>日志带业务编号和 traceId，不打印敏感信息。</li>
-<li>大改动拆成可以验证的小提交。</li>
-<li>故障恢复后补行动项，并确认负责人。</li>
-<li>解决一次问题后留下文档或自动测试。</li>
-</ol>
-<p>这些动作单独看都不难，坚持下来却能降低很多重复成本。</p>
-<h2 id="也有一些没有做好的地方"><a href="#也有一些没有做好的地方" class="headerlink" title="也有一些没有做好的地方"></a>也有一些没有做好的地方</h2><p>今年仍然有几个明显不足。</p>
-<p>首先是业务理解还不够主动。有时只关注当前接口，没有继续追问这个字段最终影响报表、结算还是客户操作。</p>
-<p>其次是对底层原理的学习容易断续。遇到问题时会集中看资料，问题过去后又缺少系统整理，知识之间没有形成连接。</p>
-<p>还有一个问题是估时偏乐观。我常按“编码完成”估算，漏掉联调、数据准备、回归和发布观察。后来开始把任务拆成可见步骤，估时才逐渐接近真实。</p>
-<p>这些不足不会靠一份年度计划自动消失，需要放进下一年的日常动作。</p>
-<h2 id="给第二年的三个目标"><a href="#给第二年的三个目标" class="headerlink" title="给第二年的三个目标"></a>给第二年的三个目标</h2><p>我不打算列一长串框架，先保留三个方向。</p>
-<p><strong>把一个领域理解深。</strong> 不只知道接口和表，还能说明核心流程、状态变化、异常补偿和业务指标。</p>
-<p><strong>把排查过程系统化。</strong> 继续练习从现象到系统、进程、线程和代码的证据链，减少依靠经验猜测。</p>
-<p><strong>做能被团队复用的产出。</strong> 可能是一套测试、一份 Runbook、一个脚本，也可能只是把一次故障写清楚。</p>
-<p>第一年结束时，我没有一种“已经入门完成”的感觉，反而更清楚系统里有多少自己不知道的东西。但这并不让人沮丧。与年初相比，我至少知道遇到陌生问题时该从哪里开始，知道怎样把不确定性一点点变成事实。</p>
-<p>成长可能就是这样：写代码依旧重要，但不再把代码当成全部答案。</p>
 
       
     </div>

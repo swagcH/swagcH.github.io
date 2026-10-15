@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">221</span>
+        <span class="site-state-item-count">222</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,315 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">MySQL 慢查询优化：从执行计划到索引设计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-17 09:00:00" itemprop="dateCreated datePublished" datetime="2026-10-17T09:00:00+08:00">2026-10-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" itemprop="url" rel="index"><span itemprop="name">性能优化</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>“加个索引”是解决慢查询最常见也最容易用错的建议。加错索引不但不解决问题，还会拖慢写入、占额外空间，甚至让优化器选错执行路径。</p>
+<p>这篇文章按实际排查顺序组织：<strong>怎么定位慢查询 → 怎么读执行计划 → 怎么设计索引 → 哪些写法会让索引失效</strong>。最后给一份可以照着走的检查清单。</p>
+<h2 id="第一步：先定位，不要猜"><a href="#第一步：先定位，不要猜" class="headerlink" title="第一步：先定位，不要猜"></a>第一步：先定位，不要猜</h2><p>优化最容易犯的错是”凭感觉猜哪个 SQL 慢”。先把慢的找出来。</p>
+<h3 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h3><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># my.cnf</span></span><br><span class="line"><span class="attr">slow_query_log</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">slow_query_log_file</span> = /var/log/mysql/slow.log</span><br><span class="line"><span class="attr">long_query_time</span> = <span class="number">1</span>          <span class="comment"># 超过 1 秒记录</span></span><br><span class="line"><span class="attr">log_queries_not_using_indexes</span> = <span class="number">1</span>   <span class="comment"># 未走索引的也记录（谨慎开启，日志量大）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意 <code>long_query_time</code> 的单位是秒</strong>，可以设小数（比如 <code>0.5</code>）。很多线上问题的 SQL 执行时间是几百毫秒，按默认 10 秒根本抓不到。</p>
+<p>用 <code>mysqldumpslow</code> 或 <code>pt-query-digest</code> 聚合分析，<strong>按总耗时排序</strong>而不是单次耗时——一条 50ms 但每秒执行 1000 次的 SQL，比一条 2 秒但每小时执行一次的 SQL 危害大得多。</p>
+<h3 id="performance-schema"><a href="#performance-schema" class="headerlink" title="performance_schema"></a>performance_schema</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 按总延迟排序，找出最消耗资源的 SQL</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    DIGEST_TEXT,</span><br><span class="line">    COUNT_STAR <span class="keyword">AS</span> exec_count,</span><br><span class="line">    ROUND(SUM_TIMER_WAIT <span class="operator">/</span> <span class="number">1000000000000</span>, <span class="number">2</span>) <span class="keyword">AS</span> total_sec,</span><br><span class="line">    ROUND(AVG_TIMER_WAIT <span class="operator">/</span> <span class="number">1000000000</span>, <span class="number">2</span>) <span class="keyword">AS</span> avg_ms,</span><br><span class="line">    SUM_ROWS_EXAMINED <span class="keyword">AS</span> rows_examined,</span><br><span class="line">    SUM_ROWS_SENT <span class="keyword">AS</span> rows_sent</span><br><span class="line"><span class="keyword">FROM</span> performance_schema.events_statements_summary_by_digest</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_TIMER_WAIT <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键看 <code>rows_examined</code> 和 <code>rows_sent</code> 的比例</strong>。如果扫描了几十万行只返回 10 行，说明索引没用好。</p>
+<h2 id="第二步：读懂-EXPLAIN"><a href="#第二步：读懂-EXPLAIN" class="headerlink" title="第二步：读懂 EXPLAIN"></a>第二步：读懂 EXPLAIN</h2><p><code>EXPLAIN</code> 是排查的核心工具。重点看这四列：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10086</span> <span class="keyword">AND</span> status <span class="operator">=</span> <span class="number">1</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> create_time <span class="keyword">DESC</span> LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="type：访问类型（最重要的列）"><a href="#type：访问类型（最重要的列）" class="headerlink" title="type：访问类型（最重要的列）"></a>type：访问类型（最重要的列）</h3><p>从好到坏：</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>含义</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>system</code></td>
+<td>表只有一行</td>
+<td>极少见</td>
+</tr>
+<tr>
+<td><code>const</code></td>
+<td>主键或唯一索引等值查询</td>
+<td>最优</td>
+</tr>
+<tr>
+<td><code>eq_ref</code></td>
+<td>联表时用主键&#x2F;唯一索引</td>
+<td>联表场景最优</td>
+</tr>
+<tr>
+<td><code>ref</code></td>
+<td>非唯一索引等值查询</td>
+<td><strong>常规业务的目标</strong></td>
+</tr>
+<tr>
+<td><code>range</code></td>
+<td>索引范围扫描</td>
+<td>可接受（<code>BETWEEN</code>、<code>&gt;</code>、<code>IN</code>）</td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>扫全索引树</td>
+<td>比 ALL 好一点，仍需警惕</td>
+</tr>
+<tr>
+<td><code>ALL</code></td>
+<td>全表扫描</td>
+<td><strong>必须处理</strong></td>
+</tr>
+</tbody></table>
+<p><strong>判断标准</strong>：核心业务 SQL 至少要达到 <code>ref</code> 或 <code>range</code>。出现 <code>ALL</code> 或 <code>index</code> 就要具体分析。</p>
+<p><img src="/images/posts/2026/mysql-explain-type.svg" alt="EXPLAIN type 访问类型从优到劣"></p>
+<h3 id="key-与-key-len"><a href="#key-与-key-len" class="headerlink" title="key 与 key_len"></a>key 与 key_len</h3><ul>
+<li><code>key</code>：实际使用的索引。<strong>如果 <code>possible_keys</code> 有值但 <code>key</code> 是 NULL，说明优化器认为走索引不划算</strong>（通常是索引选择性太差）</li>
+<li><code>key_len</code>：使用到的索引长度（字节）。<strong>可以用来判断联合索引用到了几列</strong></li>
+</ul>
+<p><code>key_len</code> 的计算（以 InnoDB、utf8mb4 为例）：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>INT</code></td>
+<td>4 字节（允许 NULL 则 +1）</td>
+</tr>
+<tr>
+<td><code>BIGINT</code></td>
+<td>8 字节</td>
+</tr>
+<tr>
+<td><code>VARCHAR(n)</code></td>
+<td><code>4n + 2</code>（utf8mb4 每字符最多 4 字节，+2 存长度）</td>
+</tr>
+<tr>
+<td><code>CHAR(n)</code></td>
+<td><code>4n</code></td>
+</tr>
+<tr>
+<td>索引列允许 NULL</td>
+<td>额外 +1</td>
+</tr>
+</tbody></table>
+<p>举例：联合索引 <code>idx(user_id, status, create_time)</code>，其中 <code>user_id BIGINT NOT NULL</code>、<code>status TINYINT NOT NULL</code>。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- key_len = 8（只用到 user_id）</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10086</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- key_len = 9（用到 user_id + status）</span></span><br><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10086</span> <span class="keyword">AND</span> status <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这是验证”联合索引到底用了几列”最直接的方法</strong>，比猜靠谱。</p>
+<h3 id="rows-与-filtered"><a href="#rows-与-filtered" class="headerlink" title="rows 与 filtered"></a>rows 与 filtered</h3><ul>
+<li><code>rows</code>：预估需要扫描的行数。<strong>这是优化器基于统计信息的估算，不一定准</strong>，但数量级有参考价值</li>
+<li><code>filtered</code>：扫描后满足条件的行占比（百分比）。**<code>rows × filtered%</code> 才是真正参与后续操作的行数**</li>
+</ul>
+<p>如果 <code>rows</code> 是 100 万但 <code>filtered</code> 是 0.01%，说明索引只起到了部分过滤作用，剩下大量行是在 Server 层过滤掉的。</p>
+<h3 id="Extra：一定要看的提示"><a href="#Extra：一定要看的提示" class="headerlink" title="Extra：一定要看的提示"></a>Extra：一定要看的提示</h3><table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>含义</th>
+<th>处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Using index</code></td>
+<td><strong>覆盖索引</strong>，不需要回表</td>
+<td>✅ 好</td>
+</tr>
+<tr>
+<td><code>Using where</code></td>
+<td>Server 层还要过滤</td>
+<td>结合 filtered 判断</td>
+</tr>
+<tr>
+<td><code>Using filesort</code></td>
+<td><strong>需要额外排序</strong>，无法用索引顺序</td>
+<td>⚠️ 大结果集时是问题</td>
+</tr>
+<tr>
+<td><code>Using temporary</code></td>
+<td><strong>用了临时表</strong>（常见于 GROUP BY &#x2F; DISTINCT）</td>
+<td>⚠️ 尽量消除</td>
+</tr>
+<tr>
+<td><code>Using index condition</code></td>
+<td>索引下推（ICP）生效</td>
+<td>✅ 好</td>
+</tr>
+</tbody></table>
+<p><strong><code>Using filesort</code> 是最常见的性能杀手</strong>。它不一定走磁盘，但需要在内存里排序，结果集大时会占用大量内存甚至落盘。</p>
+<h2 id="第三步：索引设计"><a href="#第三步：索引设计" class="headerlink" title="第三步：索引设计"></a>第三步：索引设计</h2><h3 id="原则一：最左前缀"><a href="#原则一：最左前缀" class="headerlink" title="原则一：最左前缀"></a>原则一：最左前缀</h3><p>联合索引 <code>idx(a, b, c)</code> 能支持的查询：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">✅ WHERE a = ?</span><br><span class="line">✅ WHERE a = ? AND b = ?</span><br><span class="line">✅ WHERE a = ? AND b = ? AND c = ?</span><br><span class="line">✅ WHERE a = ? AND c = ?        （a 用到索引，c 只能过滤）</span><br><span class="line">✅ WHERE a &gt; ? AND b = ?        （范围查询后面的列用不上索引）</span><br><span class="line">❌ WHERE b = ?                  （跳过 a）</span><br><span class="line">❌ WHERE b = ? AND c = ?</span><br><span class="line">❌ WHERE c = ?</span><br></pre></td></tr></table></figure>
+
+<p><strong>记住一条：范围查询（<code>&gt;</code>、<code>&lt;</code>、<code>BETWEEN</code>、<code>LIKE</code>）会让它后面的列无法使用索引。</strong></p>
+<p><img src="/images/posts/2026/mysql-leftmost-prefix.svg" alt="联合索引最左前缀：哪些查询能命中"></p>
+<h3 id="原则二：把选择性高的列放前面"><a href="#原则二：把选择性高的列放前面" class="headerlink" title="原则二：把选择性高的列放前面"></a>原则二：把选择性高的列放前面</h3><p><strong>选择性 &#x3D; 不重复值数量 &#x2F; 总行数</strong>。越接近 1 越好。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 算一下各列的选择性</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> user_id) <span class="operator">/</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> sel_user_id,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> status) <span class="operator">/</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> sel_status,</span><br><span class="line">    <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> <span class="type">DATE</span>(create_time)) <span class="operator">/</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> sel_date</span><br><span class="line"><span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<p><code>status</code> 只有几个值，选择性极低，<strong>单独建索引基本没用</strong>（优化器会直接放弃）。但放在联合索引里作为第二列是可以的——它能在 <code>user_id</code> 筛选后进一步缩小范围。</p>
+<p><strong>例外</strong>：如果某个低选择性列是<strong>高频等值查询条件</strong>，且能和其他列组成联合索引，仍然有价值。</p>
+<h3 id="原则三：覆盖索引"><a href="#原则三：覆盖索引" class="headerlink" title="原则三：覆盖索引"></a>原则三：覆盖索引</h3><p>如果查询需要的列都在索引里，就不需要回表（<code>Using index</code>）。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 索引 idx(user_id, status, create_time)</span></span><br><span class="line"><span class="comment">-- 这个查询可以完全走索引，不回表：</span></span><br><span class="line"><span class="keyword">SELECT</span> user_id, status, create_time <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10086</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这是最有效的优化手段之一</strong>，尤其对高频查询。代价是索引变宽、占用更多空间、写入稍慢。</p>
+<p><strong>注意</strong>：<code>SELECT *</code> 几乎不可能被覆盖，这也是”不要用 <code>SELECT *</code>“的实际原因之一。</p>
+<h3 id="原则四：索引下推（ICP）"><a href="#原则四：索引下推（ICP）" class="headerlink" title="原则四：索引下推（ICP）"></a>原则四：索引下推（ICP）</h3><p>MySQL 5.6+ 默认开启。作用是把 <code>WHERE</code> 中能用索引判断的条件下推到存储引擎层，<strong>减少回表次数</strong>。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 索引 idx(user_id, name)</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">10086</span> <span class="keyword">AND</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>没有 ICP 时：先用 <code>user_id</code> 找到主键 → 回表 → 再判断 <code>name</code>。<br>有 ICP 时：在索引上就判断 <code>name</code>，只有满足的才回表。</p>
+<p><strong>表现是 Extra 里出现 <code>Using index condition</code>。</strong></p>
+<h2 id="第四步：这些写法会让索引失效"><a href="#第四步：这些写法会让索引失效" class="headerlink" title="第四步：这些写法会让索引失效"></a>第四步：这些写法会让索引失效</h2><p>即使建了索引，下面这些写法仍会导致全表扫描：</p>
+<p><strong>1. 在索引列上做运算或函数</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ 索引失效</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> <span class="keyword">YEAR</span>(create_time) <span class="operator">=</span> <span class="number">2026</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> id <span class="operator">+</span> <span class="number">1</span> <span class="operator">=</span> <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 改成范围查询</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> create_time <span class="operator">&gt;=</span> <span class="string">&#x27;2026-01-01&#x27;</span> <span class="keyword">AND</span> create_time <span class="operator">&lt;</span> <span class="string">&#x27;2027-01-01&#x27;</span>;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="number">99</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2. 隐式类型转换</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- phone 是 VARCHAR，传了数字 → 全表扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> phone <span class="operator">=</span> <span class="number">13800138000</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 传字符串</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> phone <span class="operator">=</span> <span class="string">&#x27;13800138000&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这个坑很隐蔽</strong>：<code>WHERE varchar_col = 123</code> 会触发隐式转换，MySQL 把字符串转成数字比较，索引失效。<strong>反过来的情况（数字列传字符串）通常不会失效</strong>，因为数字列会优先转成数字。</p>
+<p><strong>3. 前导模糊匹配</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ 无法使用索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;%张&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 可以使用索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">&#x27;张%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4. <code>OR</code> 连接不同列</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ 可能全表扫描</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">1</span> <span class="keyword">OR</span> status <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 改成 UNION，各自走索引</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>5. <code>!=</code> &#x2F; <code>NOT IN</code> &#x2F; <code>NOT EXISTS</code></strong></p>
+<p>这类”否定条件”通常无法有效利用索引（因为要扫描的范围太大）。<strong>但要注意：这不绝对</strong> —— 如果 <code>!=</code> 能排除掉绝大部分数据，优化器可能仍会走索引。<strong>用 <code>EXPLAIN</code> 验证，不要背结论。</strong></p>
+<p><strong>6. 字符集&#x2F;排序规则不一致的联表</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- a.charset = utf8mb4, b.charset = utf8 → 联表时索引可能失效</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> a <span class="keyword">JOIN</span> b <span class="keyword">ON</span> a.name <span class="operator">=</span> b.name;</span><br></pre></td></tr></table></figure>
+
+<p>统一字符集（现在推荐全部 <code>utf8mb4</code>）。</p>
+<h2 id="几个典型场景"><a href="#几个典型场景" class="headerlink" title="几个典型场景"></a>几个典型场景</h2><h3 id="深分页"><a href="#深分页" class="headerlink" title="深分页"></a>深分页</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- ❌ 越翻越慢：扫描 100 万行只返回 20 行</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">ORDER</span> <span class="keyword">BY</span> id LIMIT <span class="number">1000000</span>, <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 方案一：记住上次的位置（游标分页）</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> id <span class="operator">&gt;</span> <span class="number">1000000</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> id LIMIT <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ✅ 方案二：延迟关联，先用索引拿主键再回表</span></span><br><span class="line"><span class="keyword">SELECT</span> o.<span class="operator">*</span> <span class="keyword">FROM</span> orders o</span><br><span class="line"><span class="keyword">JOIN</span> (<span class="keyword">SELECT</span> id <span class="keyword">FROM</span> orders <span class="keyword">ORDER</span> <span class="keyword">BY</span> id LIMIT <span class="number">1000000</span>, <span class="number">20</span>) t <span class="keyword">ON</span> o.id <span class="operator">=</span> t.id;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方案二能生效的前提是子查询能走覆盖索引</strong>（只取 <code>id</code>）。</p>
+<h3 id="大表加索引-改表结构"><a href="#大表加索引-改表结构" class="headerlink" title="大表加索引 &#x2F; 改表结构"></a>大表加索引 &#x2F; 改表结构</h3><p><strong>MySQL 5.6+ 的 <code>ALGORITHM=INPLACE</code> 支持在线加索引</strong>（不阻塞 DML），但仍需注意：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 先检查是否支持 INPLACE</span></span><br><span class="line"><span class="keyword">ALTER TABLE</span> orders <span class="keyword">ADD</span> INDEX idx_user_status (user_id, status), ALGORITHM<span class="operator">=</span>INPLACE, LOCK<span class="operator">=</span><span class="keyword">NONE</span>;</span><br></pre></td></tr></table></figure>
+
+<p>**生产环境建议用 <code>gh-ost</code> 或 <code>pt-online-schema-change</code>**，它们通过建影子表 + 增量同步的方式，把风险控制得更小，且可暂停&#x2F;回滚。</p>
+<h3 id="COUNT-很慢"><a href="#COUNT-很慢" class="headerlink" title="COUNT(*) 很慢"></a><code>COUNT(*)</code> 很慢</h3><p>InnoDB 不保存精确行数（因为 MVCC），<code>COUNT(*)</code> 需要扫描。优化方向：</p>
+<ul>
+<li>用覆盖索引扫描（选最小的索引）</li>
+<li>业务上接受近似值（用 <code>EXPLAIN</code> 的 <code>rows</code> 估算）</li>
+<li>维护计数表（用触发器或应用层增量更新）</li>
+</ul>
+<h3 id="子查询-vs-JOIN"><a href="#子查询-vs-JOIN" class="headerlink" title="子查询 vs JOIN"></a>子查询 vs JOIN</h3><p><strong>MySQL 5.6 之前子查询性能很差</strong>（相关子查询会逐行执行）。5.6+ 优化器会把很多子查询改写成 JOIN，但<strong>不是所有都能优化</strong>。</p>
+<p><strong>建议</strong>：能用 JOIN 就用 JOIN，尤其是 <code>IN (SELECT ...)</code> 这种写法。用 <code>EXPLAIN</code> 确认执行计划符合预期。</p>
+<h2 id="优化检查清单"><a href="#优化检查清单" class="headerlink" title="优化检查清单"></a>优化检查清单</h2><ul>
+<li><input disabled="" type="checkbox"> 慢查询日志已开启，<code>long_query_time</code> 设到合理值（不要用默认 10 秒）</li>
+<li><input disabled="" type="checkbox"> 用 <code>pt-query-digest</code> 按<strong>总耗时</strong>排序找 TOP SQL，而不是按单次耗时</li>
+<li><input disabled="" type="checkbox"> 检查 <code>rows_examined</code> 与 <code>rows_sent</code> 的比例（比例过大说明索引没用好）</li>
+<li><input disabled="" type="checkbox"> 核心 SQL 的 <code>type</code> 达到 <code>ref</code> &#x2F; <code>range</code>，没有 <code>ALL</code></li>
+<li><input disabled="" type="checkbox"> <code>Extra</code> 里没有大结果集的 <code>Using filesort</code> &#x2F; <code>Using temporary</code></li>
+<li><input disabled="" type="checkbox"> 联合索引符合最左前缀，且<strong>高选择性列在前</strong></li>
+<li><input disabled="" type="checkbox"> 高频查询考虑覆盖索引（<code>Using index</code>），避免 <code>SELECT *</code></li>
+<li><input disabled="" type="checkbox"> 确认没有在索引列上做函数运算、隐式类型转换、前导模糊</li>
+<li><input disabled="" type="checkbox"> 联表的字符集一致</li>
+<li><input disabled="" type="checkbox"> 深分页已改为游标分页或延迟关联</li>
+<li><input disabled="" type="checkbox"> 大表 DDL 走 <code>gh-ost</code> &#x2F; <code>pt-osc</code>，不在业务高峰执行</li>
+<li><input disabled="" type="checkbox"> 索引不是越多越好：定期用 <code>sys.schema_unused_indexes</code> 清理无用索引</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>慢查询优化有一条稳定的顺序：</p>
+<p><strong>先量出来（慢日志 + performance_schema）→ 再看执行计划（EXPLAIN）→ 再改索引或 SQL → 最后验证效果</strong>。</p>
+<p>跳过前两步直接”加索引”，很容易加出无用甚至有害的索引。</p>
+<p>另外两点经验：</p>
+<ol>
+<li><strong>索引不是越多越好</strong>。每个索引都要在写入时维护，也会占用缓冲池空间。定期清理无用索引</li>
+<li><strong><code>EXPLAIN</code> 是唯一的裁判</strong>。上面列的那些”索引失效规则”都有例外，最终要看执行计划，不要背结论</li>
+</ol>
+<hr>
+<p><em>相关文章：</em></p>
+<ul>
+<li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
+<li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
+<li><a href="#">RabbitMQ 在微服务解耦中的正确用法</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +562,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -457,7 +766,7 @@
 <p><em>相关文章：</em></p>
 <ul>
 <li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
-<li><a href="#">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
 <li><a href="#">RabbitMQ 在微服务解耦中的正确用法</a></li>
 </ul>
 
@@ -516,7 +825,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：18:01:40" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：18:07:43" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -695,7 +1004,7 @@
 <p><em>相关文章：</em></p>
 <ul>
 <li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
-<li><a href="#">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
 <li><a href="#">RabbitMQ 在微服务解耦中的正确用法</a></li>
 </ul>
 
@@ -1344,101 +1653,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/05/18/2025-05-18-Vibe-Coding%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E4%B8%8D%E7%9C%8B%E4%BB%A3%E7%A0%81/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/" class="post-title-link" itemprop="url">第一次用AI完成一个真实需求：从需求澄清到上线</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-04-06 21:15:00" itemprop="dateCreated datePublished" datetime="2025-04-06T21:15:00+08:00">2025-04-06</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/AI%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">AI实践</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/ai-feature-log-cover.png" alt="AI 需求开发日志封面图"></p>
-<p>这是我第一次有意识地让 AI 参与一个完整需求，而不是只让它解释报错或补一个工具方法。</p>
-<p>需求不大：在工单列表增加“最近跟进时间”筛选，并让导出接口使用相同条件。真正做下来，AI 最有价值的部分不是写代码，而是帮助我快速梳理分散的调用链；最危险的部分也不是语法错误，而是它会非常自然地替需求补上一个没有确认过的定义。</p>
-<p>下面按当天的开发时间线还原整个过程。项目和数据均做了简化，重点是我与 AI 怎样分工，以及哪些地方发生了返工。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/04/06/2025-04-06-%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%A8AI%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E9%9C%80%E6%B1%82/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

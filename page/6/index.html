@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">221</span>
+        <span class="site-state-item-count">222</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,195 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/05/10/2020-05-10-%E9%9C%80%E6%B1%82%E8%AF%84%E5%AE%A1%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/05/10/2020-05-10-%E9%9C%80%E6%B1%82%E8%AF%84%E5%AE%A1%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">需求评审中的常见问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-05-10 15:28:41" itemprop="dateCreated datePublished" datetime="2020-05-10T15:28:41+08:00">2020-05-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%8D%8F%E4%BD%9C/" itemprop="url" rel="index"><span itemprop="name">项目协作</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>很多“开发延期”和“测试漏测”，根因在代码开始前就已经出现：目标不清、边界没讨论、异常流程无人负责。需求评审不是听产品讲一遍页面，而是把模糊描述转换成可以实现和验收的共同结论。</p>
+</blockquote>
+<h2 id="一个典型评审现场"><a href="#一个典型评审现场" class="headerlink" title="一个典型评审现场"></a>一个典型评审现场</h2><p>需求只有一句：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户可以取消未发货订单，退款原路返回。</span><br></pre></td></tr></table></figure>
+
+<p>听起来很简单，继续问才发现至少有这些分支：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">已支付但库存未出库</span><br><span class="line">部分商品已出库</span><br><span class="line">优惠券是否退回</span><br><span class="line">积分是否回滚</span><br><span class="line">支付渠道退款失败</span><br><span class="line">重复点击取消</span><br><span class="line">客服和用户同时操作</span><br><span class="line">订单正在状态迁移</span><br></pre></td></tr></table></figure>
+
+<p>如果这些问题留到开发或测试阶段才发现，接口、表结构和排期都可能重新调整。</p>
+<h2 id="1-先问“为什么做”"><a href="#1-先问“为什么做”" class="headerlink" title="1. 先问“为什么做”"></a>1. 先问“为什么做”</h2><p>评审前先确认目标：</p>
+<ul>
+<li>当前用户痛点是什么。</li>
+<li>成功以后用什么指标判断有效。</li>
+<li>为什么必须在这个版本完成。</li>
+<li>是否有更小范围的方案。</li>
+</ul>
+<p>“增加取消按钮”是功能描述，“降低未发货订单的客服取消量”才是目标。知道目标后，才能判断是否需要自动退款、取消原因和运营后台。</p>
+<h2 id="2-把正常流程写成状态变化"><a href="#2-把正常流程写成状态变化" class="headerlink" title="2. 把正常流程写成状态变化"></a>2. 把正常流程写成状态变化</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">PAID</span><br><span class="line">  -&gt; CANCEL_REQUESTED</span><br><span class="line">  -&gt; REFUNDING</span><br><span class="line">  -&gt; CANCELLED</span><br></pre></td></tr></table></figure>
+
+<p>每个箭头回答：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">谁触发</span><br><span class="line">需要什么权限</span><br><span class="line">前置状态</span><br><span class="line">写哪些数据</span><br><span class="line">调用哪些外部系统</span><br><span class="line">失败后停在哪个状态</span><br><span class="line">能否重试</span><br></pre></td></tr></table></figure>
+
+<p>页面流程可能只有三步，服务端状态通常更多。状态没有定义清楚时，不要急着估时。</p>
+<h2 id="3-用边界表发现遗漏"><a href="#3-用边界表发现遗漏" class="headerlink" title="3. 用边界表发现遗漏"></a>3. 用边界表发现遗漏</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>需要确认的问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户</td>
+<td>普通用户、客服、管理员权限是否不同</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>发货前、支付后多久允许取消</td>
+</tr>
+<tr>
+<td>状态</td>
+<td>哪些状态允许，处理中如何展示</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>历史订单是否支持，是否需要迁移</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>重复点击、多人同时操作如何处理</td>
+</tr>
+<tr>
+<td>外部依赖</td>
+<td>支付、库存、优惠券失败怎么办</td>
+</tr>
+<tr>
+<td>通知</td>
+<td>用户、商家和客服是否收到消息</td>
+</tr>
+<tr>
+<td>审计</td>
+<td>谁在什么时候因为什么取消</td>
+</tr>
+</tbody></table>
+<p>边界表不是为了把需求无限做大，而是让产品明确哪些在本期、哪些不支持。</p>
+<h2 id="4-权限要具体到数据范围"><a href="#4-权限要具体到数据范围" class="headerlink" title="4. 权限要具体到数据范围"></a>4. 权限要具体到数据范围</h2><p>“登录用户可以取消订单”不够，需要说明：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户只能取消自己的订单</span><br><span class="line">客服需要 order:cancel 权限</span><br><span class="line">客服跨租户不可操作</span><br><span class="line">管理员强制取消必须填写原因</span><br><span class="line">敏感操作记录操作人和来源</span><br></pre></td></tr></table></figure>
+
+<p>权限遗漏常常不会在正常测试中暴露，却可能造成严重数据越权。</p>
+<h2 id="5-异常不是统一提示“失败”"><a href="#5-异常不是统一提示“失败”" class="headerlink" title="5. 异常不是统一提示“失败”"></a>5. 异常不是统一提示“失败”</h2><p>支付渠道超时有多种可能：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">请求未到达渠道</span><br><span class="line">渠道已受理但响应丢失</span><br><span class="line">渠道明确拒绝</span><br><span class="line">渠道退款成功但本地更新失败</span><br></pre></td></tr></table></figure>
+
+<p>调用超时不能直接把订单恢复原状态，因为渠道可能已经退款。需求中要定义查询、补偿和人工处理入口。</p>
+<p>对用户展示的文案、后台状态和告警负责人也要明确，不能全部留给开发“看着处理”。</p>
+<h2 id="6-数据变化提前说清楚"><a href="#6-数据变化提前说清楚" class="headerlink" title="6. 数据变化提前说清楚"></a>6. 数据变化提前说清楚</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">是否新增表或字段</span><br><span class="line">历史数据如何初始化</span><br><span class="line">报表口径是否变化</span><br><span class="line">搜索索引是否重建</span><br><span class="line">是否产生新的个人信息</span><br><span class="line">数据保留多久</span><br></pre></td></tr></table></figure>
+
+<p>数据迁移和回滚常常比接口开发耗时更长。评审只估页面和接口，会得到虚假的排期。</p>
+<h2 id="7-验收标准要能测试"><a href="#7-验收标准要能测试" class="headerlink" title="7. 验收标准要能测试"></a>7. 验收标准要能测试</h2><p>不清晰：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">取消过程要友好，退款尽快完成。</span><br></pre></td></tr></table></figure>
+
+<p>可测试：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">未发货且已支付订单允许申请取消</span><br><span class="line">重复提交同一订单只创建一笔退款</span><br><span class="line">渠道明确成功后订单进入 CANCELLED</span><br><span class="line">渠道超时后订单保持 REFUNDING，并可由任务查询</span><br><span class="line">用户能看到取消进度和失败原因分类</span><br></pre></td></tr></table></figure>
+
+<p>性能、权限、兼容和失败恢复也属于验收，不只是按钮能点击。</p>
+<h2 id="8-估时不要只报编码天数"><a href="#8-估时不要只报编码天数" class="headerlink" title="8. 估时不要只报编码天数"></a>8. 估时不要只报编码天数</h2><p>拆分为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">方案设计</span><br><span class="line">接口和数据变更</span><br><span class="line">外部依赖联调</span><br><span class="line">自动化测试</span><br><span class="line">历史数据处理</span><br><span class="line">灰度和监控</span><br><span class="line">上线验证</span><br><span class="line">风险缓冲</span><br></pre></td></tr></table></figure>
+
+<p>存在未确认项时，给区间和前提：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">支付渠道支持退款查询：预计 5 天</span><br><span class="line">若不支持查询，需要增加人工对账：另评估 2 至 3 天</span><br></pre></td></tr></table></figure>
+
+<p>这比给一个精确但没有依据的日期更负责。</p>
+<h2 id="9-会议结论怎么记录"><a href="#9-会议结论怎么记录" class="headerlink" title="9. 会议结论怎么记录"></a>9. 会议结论怎么记录</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">目标：降低未发货订单客服取消量</span><br><span class="line">本期范围：已支付、未出库的普通订单</span><br><span class="line">不在范围：部分出库、组合订单、跨境订单</span><br><span class="line">已确认：状态机、权限、退款查询方式</span><br><span class="line">待确认：优惠券退回时效，负责人产品 A，截止周二</span><br><span class="line">技术风险：渠道超时后的最终状态</span><br><span class="line">数据变更：新增退款请求表和取消原因</span><br><span class="line">验收：12 条主流程和异常用例</span><br></pre></td></tr></table></figure>
+
+<p>结论应进入需求单或共享文档，不能只留在会议录音和聊天记录中。</p>
+<h2 id="10-需求变更如何处理"><a href="#10-需求变更如何处理" class="headerlink" title="10. 需求变更如何处理"></a>10. 需求变更如何处理</h2><p>变更发生时记录：</p>
+<ul>
+<li>改了什么，为什么。</li>
+<li>影响接口、数据、测试和排期哪些部分。</li>
+<li>谁确认接受新的时间或范围。</li>
+<li>已开发内容如何处理。</li>
+</ul>
+<p>小改动积累起来同样会改变交付风险。变更记录不是为了追责，而是避免不同角色持有不同版本的需求。</p>
+<h2 id="我会带进评审的十个问题"><a href="#我会带进评审的十个问题" class="headerlink" title="我会带进评审的十个问题"></a>我会带进评审的十个问题</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. 用户问题和成功指标是什么？</span><br><span class="line">2. 本期明确不做什么？</span><br><span class="line">3. 状态如何变化？</span><br><span class="line">4. 异常和超时后停在哪里？</span><br><span class="line">5. 权限和数据范围是什么？</span><br><span class="line">6. 重复和并发操作怎么处理？</span><br><span class="line">7. 外部依赖有什么不确定性？</span><br><span class="line">8. 历史数据和兼容怎么处理？</span><br><span class="line">9. 如何测试并验收？</span><br><span class="line">10. 上线后看什么指标，失败怎么回退？</span><br></pre></td></tr></table></figure>
+
+<p>好的需求评审不会消灭所有变化，但会让重要的不确定性提前出现。开发的价值也不是在会上不断说“做不了”，而是说明风险、提出更小方案，并把模糊目标转成可以交付的边界。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +442,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -440,7 +629,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -594,7 +783,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -750,7 +939,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -950,7 +1139,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1066,7 +1255,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1182,7 +1371,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1298,7 +1487,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1414,7 +1603,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-15 18:07:43" itemprop="dateModified" datetime="2026-10-15T18:07:43+08:00">2026-10-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1459,121 +1648,6 @@
 <p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
 <p>对 Postman接口调试记录 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/09/08/2019-09-08-RESTful%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/09/08/2019-09-08-RESTful%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" class="post-title-link" itemprop="url">RESTful接口设计</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-09-08 17:26:40" itemprop="dateCreated datePublished" datetime="2019-09-08T17:26:40+08:00">2019-09-08</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:01:40" itemprop="dateModified" datetime="2026-10-15T18:01:40+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">接口设计</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>写接口不只是能返回 JSON，还要考虑 URL、方法、状态码和语义。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-09 前后学习和实践 <strong>RESTful接口设计</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>URL 里到底该不该出现动词</li>
-<li>状态码是否统一返回 200 很纠结</li>
-<li>接口返回结构不统一</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>RESTful 更强调资源语义，URL 表示资源，HTTP 方法表示动作，状态码表达结果。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GET    /api/users        查询用户列表</span><br><span class="line">GET    /api/users/&#123;id&#125;   查询用户详情</span><br><span class="line">POST   /api/users        新增用户</span><br><span class="line">PUT    /api/users/&#123;id&#125;   修改用户</span><br><span class="line">DELETE /api/users/&#123;id&#125;   删除用户</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;code&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;success&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;data&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;username&quot;</span><span class="punctuation">:</span> <span class="string">&quot;tom&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 RESTful接口设计 的理解，我最后沉淀成几条经验：</p>
 <ul>
 <li>先理解它解决什么问题，再记具体用法；</li>
 <li>先跑通最小 Demo，再接入完整项目；</li>

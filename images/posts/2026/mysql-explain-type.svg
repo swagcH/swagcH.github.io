@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">MYSQL / EXPLAIN · TYPE</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">访问类型：从最优到最差</text>
+
+  <g font-family="Menlo,Consolas,monospace" font-size="19">
+    <rect x="72" y="180" width="170" height="50" rx="8" fill="#0f2b22" stroke="#34d399" stroke-width="2"/>
+    <text x="98" y="212" fill="#34d399">const</text>
+    <rect x="72" y="246" width="170" height="50" rx="8" fill="#0f2b22" stroke="#34d399" stroke-width="2"/>
+    <text x="98" y="278" fill="#34d399">eq_ref</text>
+    <rect x="72" y="312" width="170" height="50" rx="8" fill="#0f2b22" stroke="#22d3ee" stroke-width="2"/>
+    <text x="98" y="344" fill="#22d3ee">ref</text>
+    <rect x="72" y="378" width="170" height="50" rx="8" fill="#0f2b22" stroke="#22d3ee" stroke-width="2"/>
+    <text x="98" y="410" fill="#22d3ee">range</text>
+    <rect x="72" y="444" width="170" height="50" rx="8" fill="#2b2410" stroke="#fbbf24" stroke-width="2"/>
+    <text x="98" y="476" fill="#fbbf24">index</text>
+    <rect x="72" y="510" width="170" height="50" rx="8" fill="#2b1418" stroke="#fb7185" stroke-width="2"/>
+    <text x="98" y="542" fill="#fb7185">ALL</text>
+
+    <path d="M157 230V246M157 296V312M157 362V378M157 428V444M157 494V510" stroke="#3d5164" stroke-width="2" stroke-dasharray="4 4"/>
+  </g>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="18">
+    <text x="276" y="212" fill="#c9d6e2">主键 / 唯一索引等值查询</text>
+    <text x="276" y="278" fill="#c9d6e2">联表时用主键 / 唯一索引</text>
+    <text x="276" y="344" fill="#c9d6e2">非唯一索引等值查询</text>
+    <text x="276" y="410" fill="#c9d6e2">索引范围扫描</text>
+    <text x="276" y="476" fill="#c9d6e2">扫全索引树，仍需警惕</text>
+    <text x="276" y="542" fill="#fb7185" font-weight="700">全表扫描 —— 必须处理</text>
+
+    <rect x="520" y="322" width="150" height="30" rx="15" fill="#0f2b22" stroke="#22d3ee"/>
+    <text x="540" y="343" fill="#22d3ee" font-size="15">常规业务目标</text>
+
+    <rect x="520" y="522" width="150" height="30" rx="15" fill="#2b1418" stroke="#fb7185"/>
+    <text x="548" y="543" fill="#fb7185" font-size="15">性能瓶颈</text>
+  </g>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <rect x="720" y="180" width="488" height="204" rx="10" fill="#101a29" stroke="#294158"/>
+    <text x="748" y="214" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">KEY / KEY_LEN</text>
+    <text x="748" y="250" fill="#f2f7fb" font-size="17">possible_keys 有值但 key 为 NULL</text>
+    <text x="748" y="276" fill="#9eb0c2" font-size="15">→ 优化器认为走索引不划算</text>
+    <text x="748" y="316" fill="#f2f7fb" font-size="17">key_len 可判断索引用了几列</text>
+    <text x="748" y="342" fill="#9eb0c2" font-size="15">→ 验证索引命中最直接的方法</text>
+    <text x="748" y="370" fill="#6f8497" font-size="14" font-family="Menlo,Consolas,monospace">BIGINT NOT NULL = 8　TINYINT = 1</text>
+
+    <rect x="720" y="404" width="488" height="176" rx="10" fill="#101a29" stroke="#fb7185"/>
+    <text x="748" y="438" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">EXTRA · 必须看的提示</text>
+    <text x="748" y="472" fill="#34d399" font-size="16" font-family="Menlo,Consolas,monospace">Using index → 覆盖索引 ✅</text>
+    <text x="748" y="504" fill="#fb7185" font-size="16" font-family="Menlo,Consolas,monospace">Using filesort → 额外排序 ⚠️</text>
+    <text x="748" y="536" fill="#fb7185" font-size="16" font-family="Menlo,Consolas,monospace">Using temporary → 临时表 ⚠️</text>
+    <text x="748" y="566" fill="#9eb0c2" font-size="14">大结果集出现后两者时要处理</text>
+
+    <rect x="72" y="600" width="1136" height="72" rx="10" fill="#0b1522" stroke="#294158"/>
+    <text x="104" y="634" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="17">rows × filtered% = 真正参与后续操作的行数</text>
+    <text x="104" y="660" fill="#6f8497" font-size="15">rows 是优化器的估算值，数量级有参考价值，不必纠结精确数字</text>
+  </g>
+</svg>
