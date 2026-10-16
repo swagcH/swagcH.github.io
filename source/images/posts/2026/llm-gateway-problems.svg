@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">LLM GATEWAY / WHY</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">不建网关，会遇到的四类问题</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <!-- 问题区 -->
+    <rect x="72" y="180" width="552" height="106" rx="10" fill="#2b1418" stroke="#fb7185"/>
+    <text x="100" y="214" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">PROBLEM 1</text>
+    <text x="100" y="246" fill="#f2f7fb" font-size="19">重复适配</text>
+    <text x="100" y="272" fill="#9eb0c2" font-size="15">每家鉴权方式、请求格式、错误码都不同，业务代码写 N 套</text>
+
+    <rect x="656" y="180" width="552" height="106" rx="10" fill="#2b1418" stroke="#fb7185"/>
+    <text x="684" y="214" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">PROBLEM 2</text>
+    <text x="684" y="246" fill="#f2f7fb" font-size="19">无容错</text>
+    <text x="684" y="272" fill="#9eb0c2" font-size="15">A 家限流或抖动，业务直接失败，不能自动切到 B 家</text>
+
+    <rect x="72" y="306" width="552" height="106" rx="10" fill="#2b1418" stroke="#fb7185"/>
+    <text x="100" y="340" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">PROBLEM 3</text>
+    <text x="100" y="372" fill="#f2f7fb" font-size="19">无法观测</text>
+    <text x="100" y="398" fill="#9eb0c2" font-size="15">不知道哪家慢、哪家贵、用量多少、失败率多高</text>
+
+    <rect x="656" y="306" width="552" height="106" rx="10" fill="#2b1418" stroke="#fb7185"/>
+    <text x="684" y="340" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">PROBLEM 4</text>
+    <text x="684" y="372" fill="#f2f7fb" font-size="19">变更成本高</text>
+    <text x="684" y="398" fill="#9eb0c2" font-size="15">换模型要改代码 + 重新发布，无法快速试新模型</text>
+
+    <!-- 中间箭头 -->
+    <path d="M640 450V494" stroke="#70869b" stroke-width="3"/>
+    <path d="M631 482L640 494L649 482" fill="none" stroke="#70869b" stroke-width="3"/>
+
+    <!-- 解决方案 -->
+    <rect x="72" y="494" width="1136" height="112" rx="12" fill="#0f2b22" stroke="#34d399" stroke-width="2"/>
+    <text x="104" y="530" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="17">GATEWAY 收敛为一件事</text>
+    <text x="104" y="566" fill="#f2f7fb" font-size="22" font-weight="700">把「N 家供应商」收敛成「一个统一接口」</text>
+    <text x="104" y="594" fill="#9eb0c2" font-size="15">对外只暴露 OpenAI 兼容协议 → 业务方零适配成本，只改 base_url 与 api_key</text>
+  </g>
+</svg>
