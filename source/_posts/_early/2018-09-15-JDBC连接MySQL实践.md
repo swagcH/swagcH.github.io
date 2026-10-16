@@ -1,4 +1,5 @@
 ---
+published: false
 title: JDBC连接MySQL实践
 date: 2018-09-15 10:27:44
 tags: [Java, JDBC, MySQL, 数据库连接, CRUD]

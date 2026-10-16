@@ -1,35 +1,36 @@
 ---
-title: Maven项目管理实践
-date: 2019-02-17 16:36:21
-tags: [Maven, Java, 依赖管理, 项目构建]
-categories: 项目实践
-keywords: Maven项目管理, pom.xml配置, Maven依赖管理, Java项目构建, Maven生命周期
-cover: /images/posts/2019/maven-practice-cover.svg
+published: false
+title: Spring MVC请求流程理解
+date: 2019-06-29 18:42:33
+tags: [Spring MVC, DispatcherServlet, Controller, 请求流程]
+categories: Spring
+keywords: Spring MVC请求流程, DispatcherServlet, HandlerMapping, Controller, Spring MVC原理
+cover: /images/posts/2019/spring-mvc-flow-cover.svg
 ---
 
 
 # 背景
 
-Maven 让我第一次感受到 Java 项目不只是写代码，还包括依赖、构建和目录约定。
+在能写 Controller 之后，我开始追问一个问题：请求到底是怎么一步步进入方法里的。
 
 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。
 
-这篇文章记录的是我在 2019-02 前后学习和实践 **Maven项目管理实践** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
+这篇文章记录的是我在 2019-06 前后学习和实践 **Spring MVC请求流程理解** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
 
 
 # 问题
 
 刚开始实践时，我主要卡在下面几个点：
 
-1. jar 包版本冲突导致项目启动失败
-2. pom.xml 里 dependency 和 plugin 分不清
-3. 不知道 clean、package、install 的区别
+1. Controller 方法为什么能接到参数
+2. DispatcherServlet 到底做了什么
+3. 视图解析器和 JSON 返回分不清
 
 这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。
 
 # 分析
 
-Maven 的核心价值不是下载 jar 包，而是用约定统一项目结构、依赖关系和构建流程。pom.xml 是项目构建说明书。
+Spring MVC 是围绕 DispatcherServlet 展开的请求分发体系，它负责协调映射、适配、调用和响应。
 
 我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：
 
@@ -44,29 +45,27 @@ Maven 的核心价值不是下载 jar 包，而是用约定统一项目结构、
 
 我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。
 
-```xml
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.demo</groupId>
-  <artifactId>student-system</artifactId>
-  <version>1.0.0</version>
-
-  <dependencies>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.47</version>
-    </dependency>
-  </dependencies>
-</project>
+```java
+@Controller
+@RequestMapping("/users")
+public class UserController {
+    @GetMapping("/{id}")
+    @ResponseBody
+    public UserVO detail(@PathVariable Long id) {
+        return userService.findById(id);
+    }
+}
 ```
 
-```bash
-mvn clean
-mvn compile
-mvn test
-mvn package
-mvn install
+```xml
+<servlet>
+  <servlet-name>dispatcher</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+  <servlet-name>dispatcher</servlet-name>
+  <url-pattern>/</url-pattern>
+</servlet-mapping>
 ```
 
 实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。
@@ -75,7 +74,7 @@ mvn install
 
 这次学习给我的最大感受是：**项目实践里的知识点，真正难的不是单个语法，而是上下文。**
 
-对 Maven项目管理实践 的理解，我最后沉淀成几条经验：
+对 Spring MVC请求流程理解 的理解，我最后沉淀成几条经验：
 
 - 先理解它解决什么问题，再记具体用法；
 - 先跑通最小 Demo，再接入完整项目；

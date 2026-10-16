@@ -1,35 +1,37 @@
 ---
-title: Git版本控制入门
-date: 2019-01-12 21:18:43
-tags: [Git, 版本控制, GitHub, 项目实践]
-categories: 开发工具
-keywords: Git版本控制, Git常用命令, GitHub入门, 分支管理, 代码提交规范
-cover: /images/posts/2019/git-intro-cover.svg
+published: false
+title: Spring IOC理解
+date: 2019-06-08 21:05:49
+tags: [Spring, IOC, DI, Bean]
+categories: Spring
+keywords: Spring IOC理解, 依赖注入, Bean生命周期, Spring容器, Java后端框架
+cover: /images/posts/2019/spring-ioc-cover.svg
 ---
 
+![Spring IOC理解封面图](/images/posts/2019/spring-ioc-cover.svg)
 
 # 背景
 
-从手动复制代码到使用 Git 管理版本，是我在 2019 年开始项目实践时迈出的第一步。
+学习 Spring 的第一道坎就是 IOC，刚开始觉得抽象，后来才明白它是在帮我们管理对象。
 
 2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。
 
-这篇文章记录的是我在 2019-01 前后学习和实践 **Git版本控制入门** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
+这篇文章记录的是我在 2019-06 前后学习和实践 **Spring IOC理解** 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。
 
 
 # 问题
 
 刚开始实践时，我主要卡在下面几个点：
 
-1. 不知道 add、commit、push 分别做了什么
-2. 误把 target 和 .class 文件提交到了仓库
-3. 合并代码时出现冲突，不敢随便改
+1. 为什么对象不自己 new 了
+2. XML 配置 Bean 很容易写错
+3. 依赖注入和控制反转概念抽象
 
 这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。
 
 # 分析
 
-Git 本质上是在本地维护一个对象数据库，工作区、暂存区、本地仓库、远程仓库是四个不同层次。理解这几层之后，很多命令就不再是死记硬背。
+IOC 的重点是对象创建权从业务代码转移到了 Spring 容器，DI 是容器把依赖关系装配进去的过程。
 
 我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：
 
@@ -44,38 +46,21 @@ Git 本质上是在本地维护一个对象数据库，工作区、暂存区、�
 
 我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。
 
-```bash
-# 初始化仓库
-git init
-
-# 查看状态
-git status
-
-# 添加到暂存区
-git add src/main/java
-
-# 提交到本地仓库
-git commit -m "feat: add user module"
-
-# 关联远程仓库并推送
-git remote add origin https://github.com/example/demo.git
-git push -u origin master
+```xml
+<bean id="userRepository" class="com.demo.repository.UserRepository" />
+<bean id="userService" class="com.demo.service.UserService">
+  <property name="userRepository" ref="userRepository" />
+</bean>
 ```
 
-```gitignore
-target/
-*.class
-*.log
-.idea/
-*.iml
-```
+```java
+public class UserService {
+    private UserRepository userRepository;
 
-```bash
-# 解决冲突后的常见流程
-git pull origin master
-# 手动编辑冲突文件
-git add .
-git commit -m "fix: resolve merge conflict"
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
 ```
 
 实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。
@@ -84,7 +69,7 @@ git commit -m "fix: resolve merge conflict"
 
 这次学习给我的最大感受是：**项目实践里的知识点，真正难的不是单个语法，而是上下文。**
 
-对 Git版本控制入门 的理解，我最后沉淀成几条经验：
+对 Spring IOC理解 的理解，我最后沉淀成几条经验：
 
 - 先理解它解决什么问题，再记具体用法；
 - 先跑通最小 Demo，再接入完整项目；
