@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">84</span>
+          <span class="site-state-item-count">85</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">31</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">224</span>
+        <span class="site-state-item-count">227</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,199 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/08/23/2020-08-23-%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2020/08/23/2020-08-23-%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">日志设计实践</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-08-23 21:33:18" itemprop="dateCreated datePublished" datetime="2020-08-23T21:33:18+08:00">2020-08-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">工程实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2020/logging-practice-cover.svg" alt="日志设计实践封面图"></p>
+<p>我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。</p>
+<p>从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。</p>
+<h2 id="反例一：只写一句“操作失败”"><a href="#反例一：只写一句“操作失败”" class="headerlink" title="反例一：只写一句“操作失败”"></a>反例一：只写一句“操作失败”</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(request);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;创建订单失败&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段日志有三个问题：</p>
+<ol>
+<li>没有业务标识，无法找到受影响订单。</li>
+<li>没有异常对象，丢失类型和调用栈。</li>
+<li>捕获后没有继续抛出，调用方可能收到成功结果。</li>
+</ol>
+<p>改造时先明确异常策略，再记录必要上下文：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    orderService.create(request);</span><br><span class="line">&#125; <span class="keyword">catch</span> (BusinessException exception) &#123;</span><br><span class="line">    log.warn(<span class="string">&quot;order_create_rejected userId=&#123;&#125; reasonCode=&#123;&#125;&quot;</span>,</span><br><span class="line">            request.getUserId(), exception.getCode());</span><br><span class="line">    <span class="keyword">throw</span> exception;</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception exception) &#123;</span><br><span class="line">    log.error(<span class="string">&quot;order_create_failed userId=&#123;&#125; requestId=&#123;&#125;&quot;</span>,</span><br><span class="line">            request.getUserId(), request.getRequestId(), exception);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">SystemException</span>(<span class="string">&quot;ORDER_CREATE_FAILED&quot;</span>, exception);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>业务拒绝是可预期结果，使用 <code>WARN</code> 并记录原因码；未知异常使用 <code>ERROR</code> 和完整堆栈。不要在每一层重复打印同一个异常，通常由最了解业务上下文的一层记录一次，再由统一异常处理转换响应。</p>
+<h2 id="反例二：把对象整体序列化"><a href="#反例二：把对象整体序列化" class="headerlink" title="反例二：把对象整体序列化"></a>反例二：把对象整体序列化</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;login request=&#123;&#125;&quot;</span>, json.toJson(loginRequest));</span><br></pre></td></tr></table></figure>
+
+<p>看起来省事，实际上可能把密码、手机号、Token 和大段请求体写入日志。对象增加字段后，日志风险还会悄悄扩大。</p>
+<p>更稳妥的方式是使用字段白名单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">log.info(<span class="string">&quot;login_attempt accountType=&#123;&#125; tenantId=&#123;&#125; clientIp=&#123;&#125;&quot;</span>,</span><br><span class="line">        request.getAccountType(),</span><br><span class="line">        request.getTenantId(),</span><br><span class="line">        maskIp(clientIp));</span><br></pre></td></tr></table></figure>
+
+<p>默认不记录这些内容：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">密码、验证码、Cookie、Authorization</span><br><span class="line">身份证号、银行卡号、完整手机号和邮箱</span><br><span class="line">数据库连接密码、密钥、签名原文</span><br><span class="line">文件正文、二进制内容、超长 SQL 参数</span><br></pre></td></tr></table></figure>
+
+<p>确需定位单个对象时，可以记录不可逆摘要或内部业务编号，不要用敏感原文换取短期便利。</p>
+<h2 id="先定义一条业务事件"><a href="#先定义一条业务事件" class="headerlink" title="先定义一条业务事件"></a>先定义一条业务事件</h2><p>自由文本很适合阅读，但不利于检索和统计。我会让关键日志具备相对稳定的字段：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">timestamp   level   service   env</span><br><span class="line">event       traceId requestId</span><br><span class="line">userId      orderId</span><br><span class="line">result      reasonCode</span><br><span class="line">costMs      exception</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">event=order_submit</span><br><span class="line">traceId=7f94c892a0d1</span><br><span class="line">orderId=O202008230018</span><br><span class="line">userId=10027</span><br><span class="line">result=SUCCESS</span><br><span class="line">costMs=84</span><br></pre></td></tr></table></figure>
+
+<p><code>event</code> 表示稳定事件名，<code>result</code> 表示结果，<code>reasonCode</code> 表示可分类原因。人可以读懂，日志平台也能按成功率和耗时聚合。</p>
+<p>字段命名要统一。一个服务写 <code>orderNo</code>，另一个写 <code>order_id</code>，第三个放进一段中文消息，跨服务查询会非常痛苦。</p>
+<h2 id="级别是一种处置约定"><a href="#级别是一种处置约定" class="headerlink" title="级别是一种处置约定"></a>级别是一种处置约定</h2><p>我用“谁需要行动”来判断级别：</p>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>含义</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ERROR</code></td>
+<td>当前请求失败，通常需要排查或告警</td>
+<td>数据库不可用、未知异常</td>
+</tr>
+<tr>
+<td><code>WARN</code></td>
+<td>可恢复或可预期异常，需要观察趋势</td>
+<td>限流、降级、业务拒绝</td>
+</tr>
+<tr>
+<td><code>INFO</code></td>
+<td>关键生命周期和业务结果</td>
+<td>服务启动、订单创建完成</td>
+</tr>
+<tr>
+<td><code>DEBUG</code></td>
+<td>开发排查细节，生产默认关闭</td>
+<td>分支判断、中间结果</td>
+</tr>
+<tr>
+<td><code>TRACE</code></td>
+<td>高频且极细粒度信息</td>
+<td>循环内部或协议细节</td>
+</tr>
+</tbody></table>
+<p>用户密码错误不应每次都打 <code>ERROR</code>；数据库连接失败也不该只打 <code>INFO</code>。级别混乱会让告警失真，最终大家只能忽略日志。</p>
+<h2 id="在入口建立-traceId"><a href="#在入口建立-traceId" class="headerlink" title="在入口建立 traceId"></a>在入口建立 traceId</h2><p>一条请求经过多个类甚至多个服务时，需要一个共同标识。Spring Boot 项目可以在过滤器中放入 MDC：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TraceIdFilter</span> <span class="keyword">extends</span> <span class="title class_">OncePerRequestFilter</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">TRACE_ID</span> <span class="operator">=</span> <span class="string">&quot;traceId&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doFilterInternal</span><span class="params">(HttpServletRequest request,</span></span><br><span class="line"><span class="params">                                    HttpServletResponse response,</span></span><br><span class="line"><span class="params">                                    FilterChain filterChain)</span></span><br><span class="line">            <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">traceId</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;X-Trace-Id&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (traceId == <span class="literal">null</span> || traceId.trim().isEmpty()) &#123;</span><br><span class="line">            traceId = UUID.randomUUID().toString().replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 放入 MDC 后，日志格式可以自动输出 traceId</span></span><br><span class="line">            MDC.put(TRACE_ID, traceId);</span><br><span class="line">            response.setHeader(<span class="string">&quot;X-Trace-Id&quot;</span>, traceId);</span><br><span class="line">            filterChain.doFilter(request, response);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 线程会被容器复用，必须清理，避免串到下一次请求</span></span><br><span class="line">            MDC.remove(TRACE_ID);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>日志格式中加入 <code>%X&#123;traceId&#125;</code> 后，同一请求的日志就能串起来。调用下游服务、发送消息时还要显式传递这个标识；仅在当前线程生成，并不能自动穿过 HTTP、MQ 和异步线程池。</p>
+<h2 id="异步任务容易丢上下文"><a href="#异步任务容易丢上下文" class="headerlink" title="异步任务容易丢上下文"></a>异步任务容易丢上下文</h2><p>MDC 基于线程上下文，提交到线程池后通常不会自动复制。可以在任务包装器中保存和恢复：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Runnable <span class="title function_">withMdc</span><span class="params">(Runnable task)</span> &#123;</span><br><span class="line">    Map&lt;String, String&gt; context = MDC.getCopyOfContextMap();</span><br><span class="line">    <span class="keyword">return</span> () -&gt; &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (context != <span class="literal">null</span>) &#123;</span><br><span class="line">                MDC.setContextMap(context);</span><br><span class="line">            &#125;</span><br><span class="line">            task.run();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            MDC.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段写法兼容 JDK 8。实际项目中可以放进统一的 <code>TaskDecorator</code> 或线程池封装，避免每个业务方法自行复制。</p>
+<h2 id="记录入口和出口，但控制粒度"><a href="#记录入口和出口，但控制粒度" class="headerlink" title="记录入口和出口，但控制粒度"></a>记录入口和出口，但控制粒度</h2><p>不是每个方法都需要“开始、结束”两条日志。适合记录的边界包括：</p>
+<ul>
+<li>外部 HTTP 请求进入和完成。</li>
+<li>消息生产、投递确认、消费和确认。</li>
+<li>定时任务开始、处理数量和结束。</li>
+<li>重要状态迁移。</li>
+<li>外部依赖调用的结果与耗时。</li>
+</ul>
+<p>一个请求结束日志可以同时承担访问审计和性能观察：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">event=http_request_completed</span><br><span class="line">method=POST</span><br><span class="line">path=/api/orders</span><br><span class="line">status=201</span><br><span class="line">costMs=126</span><br><span class="line">traceId=7f94c892a0d1</span><br></pre></td></tr></table></figure>
+
+<p>路径应使用模板 <code>/api/orders/&#123;id&#125;</code>，而不是把每个具体 ID 当成新维度，否则统计维度会无限增长。</p>
+<h2 id="异常日志保留最有用的上下文"><a href="#异常日志保留最有用的上下文" class="headerlink" title="异常日志保留最有用的上下文"></a>异常日志保留最有用的上下文</h2><p>异常堆栈说明“代码在哪里失败”，业务字段说明“谁失败”。两者缺一不可，但上下文要有限：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">log.error(</span><br><span class="line">        <span class="string">&quot;payment_callback_failed paymentNo=&#123;&#125; orderId=&#123;&#125; callbackType=&#123;&#125;&quot;</span>,</span><br><span class="line">        paymentNo,</span><br><span class="line">        orderId,</span><br><span class="line">        callbackType,</span><br><span class="line">        exception</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>不要通过字符串拼接输出异常：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：通常只得到 exception.toString()，没有完整调用栈</span></span><br><span class="line">log.error(<span class="string">&quot;callback failed: &quot;</span> + exception);</span><br></pre></td></tr></table></figure>
+
+<p>也不要既在 Repository、Service、Controller 各打一遍相同堆栈，又让全局异常处理再打一遍。重复日志会放大存储量，还会让一次故障看起来像四次。</p>
+<h2 id="日志本身也有成本"><a href="#日志本身也有成本" class="headerlink" title="日志本身也有成本"></a>日志本身也有成本</h2><p>高并发接口每次打印大对象，会消耗序列化 CPU、磁盘 IO 和网络带宽。需要关注：</p>
+<ol>
+<li>热路径是否有高频 <code>INFO</code>。</li>
+<li>参数构造是否在日志关闭时仍会执行。</li>
+<li>单行是否过大，多行堆栈是否失控。</li>
+<li>日志文件是否按大小和日期滚动。</li>
+<li>保留周期是否符合排障与合规要求。</li>
+</ol>
+<p>对高频成功事件，可以用指标统计总量，仅对失败和采样请求保留详细日志。日志、指标和链路追踪各有职责，不应让日志承担全部可观测性。</p>
+<h2 id="用反例驱动一次日志-Review"><a href="#用反例驱动一次日志-Review" class="headerlink" title="用反例驱动一次日志 Review"></a>用反例驱动一次日志 Review</h2><p>每次评审我会抽查下面几项：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 关键事件能否按 traceId 和业务编号检索</span><br><span class="line">[ ] 事件名、字段名和结果码是否稳定</span><br><span class="line">[ ] 异常是否只在合适层级记录一次</span><br><span class="line">[ ] ERROR 是否真的需要行动</span><br><span class="line">[ ] 是否泄露敏感字段或完整请求体</span><br><span class="line">[ ] 异步和跨服务场景是否传递上下文</span><br><span class="line">[ ] 高频日志是否影响性能和存储</span><br><span class="line">[ ] 滚动、保留和告警规则是否匹配</span><br></pre></td></tr></table></figure>
+
+<p>一条好日志应该像交接给值班同事的一句完整说明：哪件事失败、影响谁、证据在哪里。只有真正出问题时还能用得上的日志，才值得在正常运行的每一分钟里被写入。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +446,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -470,7 +663,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -677,7 +870,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -866,7 +1059,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1053,7 +1246,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1207,7 +1400,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1363,7 +1556,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1563,7 +1756,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1679,7 +1872,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1725,122 +1918,6 @@
 <p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
 <p>对 项目上线前检查清单 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/" class="post-title-link" itemprop="url">权限管理模块设计</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-11-16 21:44:52" itemprop="dateCreated datePublished" datetime="2019-11-16T21:44:52+08:00">2019-11-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">项目实践</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2019/permission-design-cover.svg" alt="权限管理模块设计封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>权限管理是第一个让我明显感受到“业务建模”重要性的模块。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-11 前后学习和实践 <strong>权限管理模块设计</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>用户、角色、权限三者关系不清楚</li>
-<li>菜单权限和按钮权限混在一起</li>
-<li>SQL 查询权限列表效率不高</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>RBAC 把权限直接分配给角色，再把角色分配给用户，可以降低用户和权限之间的复杂度。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create table</span> sys_user(id <span class="type">bigint</span> <span class="keyword">primary key</span>, username <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_role(id <span class="type">bigint</span> <span class="keyword">primary key</span>, role_name <span class="type">varchar</span>(<span class="number">64</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_permission(id <span class="type">bigint</span> <span class="keyword">primary key</span>, permission_code <span class="type">varchar</span>(<span class="number">128</span>));</span><br><span class="line"><span class="keyword">create table</span> sys_user_role(user_id <span class="type">bigint</span>, role_id <span class="type">bigint</span>);</span><br><span class="line"><span class="keyword">create table</span> sys_role_permission(role_id <span class="type">bigint</span>, permission_id <span class="type">bigint</span>);</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> p.permission_code</span><br><span class="line"><span class="keyword">from</span> sys_user u</span><br><span class="line"><span class="keyword">join</span> sys_user_role ur <span class="keyword">on</span> u.id <span class="operator">=</span> ur.user_id</span><br><span class="line"><span class="keyword">join</span> sys_role_permission rp <span class="keyword">on</span> ur.role_id <span class="operator">=</span> rp.role_id</span><br><span class="line"><span class="keyword">join</span> sys_permission p <span class="keyword">on</span> rp.permission_id <span class="operator">=</span> p.id</span><br><span class="line"><span class="keyword">where</span> u.id <span class="operator">=</span> ?;</span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 权限管理模块设计 的理解，我最后沉淀成几条经验：</p>
 <ul>
 <li>先理解它解决什么问题，再记具体用法；</li>
 <li>先跑通最小 Demo，再接入完整项目；</li>

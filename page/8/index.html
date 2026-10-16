@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">84</span>
+          <span class="site-state-item-count">85</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">31</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">224</span>
+        <span class="site-state-item-count">227</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,124 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/03/27/2019-03-27-HTTP%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%93%8D%E5%BA%94%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/03/27/2019-03-27-HTTP%E8%AF%B7%E6%B1%82%E4%B8%8E%E5%93%8D%E5%BA%94%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">HTTP请求与响应学习笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-03-27 22:11:37" itemprop="dateCreated datePublished" datetime="2019-03-27T22:11:37+08:00">2019-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java-Web/" itemprop="url" rel="index"><span itemprop="name">Java Web</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/http-notes-cover.svg" alt="HTTP请求与响应学习笔记封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>真正写接口之前，我发现自己必须先补上 HTTP 请求与响应这门基础课。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-03 前后学习和实践 <strong>HTTP请求与响应学习笔记</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>GET 和 POST 只会从表面区分</li>
+<li>状态码只认识 404 和 500</li>
+<li>请求头、响应头看不懂</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>HTTP 是浏览器和服务器之间的文本协议，方法、URL、Header、Body、状态码共同描述了一次完整交互。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/users/1</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>localhost:8080</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>application/json</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">HTTP/1.1</span> <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/json;charset=UTF-8</span><br><span class="line"></span><br><span class="line"><span class="language-json"><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Tom&quot;</span><span class="punctuation">&#125;</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST http://localhost:8080/users   -H <span class="string">&quot;Content-Type: application/json&quot;</span>   -d <span class="string">&#x27;&#123;&quot;name&quot;:&quot;Tom&quot;,&quot;age&quot;:18&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 HTTP请求与响应学习笔记 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +371,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -369,7 +487,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -484,7 +602,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -601,7 +719,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -748,7 +866,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -961,7 +1079,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1199,7 +1317,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1443,7 +1561,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1659,7 +1777,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1846,230 +1964,6 @@
 <li>自定义对象作为 key 时，重写 <code>equals</code> 必须重写 <code>hashCode</code>。</li>
 </ol>
 <p>学完这些内容后，我再看 <code>HashMap</code> 就不只是一个“键值对容器”了，而是能联想到数组、链表、红黑树、哈希冲突和并发安全等知识点。理解底层原理，才能真正把这个常用工具用好。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2018/06/10/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2018/06/10/2018-06-10-ArrayList%E4%B8%8ELinkedList%E5%8C%BA%E5%88%AB/" class="post-title-link" itemprop="url">ArrayList与LinkedList区别</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2018-06-10 16:42:55" itemprop="dateCreated datePublished" datetime="2018-06-10T16:42:55+08:00">2018-06-10</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E9%9B%86%E5%90%88/" itemprop="url" rel="index"><span itemprop="name">Java集合</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>学完 Java 面向对象之后，终于进入了集合框架这一章。说实话，刚接触 <code>List</code> 接口的时候我是懵的——<code>ArrayList</code> 和 <code>LinkedList</code> 都实现了 <code>List</code>，方法几乎一模一样，那到底该用哪个？</p>
-<p>当时做课程作业，随手就 <code>new ArrayList&lt;&gt;()</code>，也没多想。直到有一次写一个模拟队列的功能，频繁在头部插入元素，程序跑得巨慢，我才意识到：<strong>选错 List 实现，性能差距可以差到几十倍</strong>。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>踩坑过程中，我遇到了三个核心问题：</p>
-<p><strong>1. 随机访问和头插性能差异巨大</strong></p>
-<p>同样的 10 万次操作，<code>ArrayList</code> 随机访问几乎瞬间完成，但头部插入慢到怀疑人生；而 <code>LinkedList</code> 头部插入飞快，随机访问却慢得离谱。我当时完全不理解为什么。</p>
-<p><strong>2. 不知道什么场景该用哪个</strong></p>
-<p>网上文章都说“随机访问多用 ArrayList，增删多用 LinkedList”，但这个“增删”到底指哪个位置的增删？尾部增删两者差不多啊！这种笼统的说法反而让我更困惑。</p>
-<p><strong>3. 遍历删除元素时 ConcurrentModificationException</strong></p>
-<p>这是最坑的。我想遍历 <code>List</code> 删除符合条件的元素，写了下面这种代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (String item : list) &#123;</span><br><span class="line">    <span class="keyword">if</span> (item.equals(<span class="string">&quot;deleteMe&quot;</span>)) &#123;</span><br><span class="line">        list.remove(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>结果直接抛了 <code>ConcurrentModificationException</code>，当时完全不知道为什么，也不知道怎么改。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>要真正搞懂这两个类的区别，必须从底层源码入手。</p>
-<h2 id="ArrayList：底层是数组"><a href="#ArrayList：底层是数组" class="headerlink" title="ArrayList：底层是数组"></a>ArrayList：底层是数组</h2><p>翻开 <code>ArrayList</code> 的 JDK 源码，核心就是一个数组：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">transient</span> Object[] elementData;</span><br><span class="line"><span class="keyword">private</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
-
-<p><strong>随机访问为什么是 O(1)？</strong></p>
-<p>因为数组在内存中是连续存储的，通过下标可以直接定位：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> E <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    rangeCheck(index);</span><br><span class="line">    <span class="keyword">return</span> elementData(index);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">E <span class="title function_">elementData</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (E) elementData[index];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这段源码说明，<code>get(index)</code> 的核心操作就是 <code>elementData[index]</code>，所以随机访问时间复杂度是 O(1)。</p>
-<p><strong>头部插入为什么是 O(n)？</strong></p>
-<p>因为要在头部插入元素，需要把后面所有元素都往后挪一位：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> index, E element)</span> &#123;</span><br><span class="line">    rangeCheckForAdd(index);</span><br><span class="line">    ensureCapacityInternal(size + <span class="number">1</span>);</span><br><span class="line">    System.arraycopy(elementData, index, elementData, index + <span class="number">1</span>, size - index);</span><br><span class="line">    elementData[index] = element;</span><br><span class="line">    size++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>关键就在 <code>System.arraycopy</code>。如果在索引 0 的位置插入，原来所有元素都要向后移动，元素越多越慢，所以头插是 O(n)。</p>
-<p><strong>扩容机制也会带来额外成本</strong></p>
-<p><code>ArrayList</code> 默认初始容量是 10，容量不够时会扩容为原来的 1.5 倍：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">grow</span><span class="params">(<span class="type">int</span> minCapacity)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCapacity</span> <span class="operator">=</span> elementData.length;</span><br><span class="line">    <span class="type">int</span> <span class="variable">newCapacity</span> <span class="operator">=</span> oldCapacity + (oldCapacity &gt;&gt; <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (newCapacity - minCapacity &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        newCapacity = minCapacity;</span><br><span class="line">    &#125;</span><br><span class="line">    elementData = Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>扩容时会复制旧数组，因此如果一开始就知道大概容量，最好使用 <code>new ArrayList&lt;&gt;(capacity)</code>，避免多次扩容。</p>
-<h2 id="LinkedList：底层是双向链表"><a href="#LinkedList：底层是双向链表" class="headerlink" title="LinkedList：底层是双向链表"></a>LinkedList：底层是双向链表</h2><p><code>LinkedList</code> 的核心是 <code>Node</code> 节点，每个节点保存当前元素、前驱节点和后继节点：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span>&lt;E&gt; &#123;</span><br><span class="line">    E item;</span><br><span class="line">    Node&lt;E&gt; next;</span><br><span class="line">    Node&lt;E&gt; prev;</span><br><span class="line"></span><br><span class="line">    Node(Node&lt;E&gt; prev, E element, Node&lt;E&gt; next) &#123;</span><br><span class="line">        <span class="built_in">this</span>.item = element;</span><br><span class="line">        <span class="built_in">this</span>.next = next;</span><br><span class="line">        <span class="built_in">this</span>.prev = prev;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>头部插入为什么是 O(1)？</strong></p>
-<p>因为链表头插只需要修改几个引用，不需要移动已有元素：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addFirst</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    linkFirst(e);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">linkFirst</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> Node&lt;E&gt; f = first;</span><br><span class="line">    <span class="keyword">final</span> Node&lt;E&gt; newNode = <span class="keyword">new</span> <span class="title class_">Node</span>&lt;&gt;(<span class="literal">null</span>, e, f);</span><br><span class="line">    first = newNode;</span><br><span class="line">    <span class="keyword">if</span> (f == <span class="literal">null</span>) &#123;</span><br><span class="line">        last = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        f.prev = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    size++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个过程只调整 <code>first</code>、<code>prev</code> 等引用，和集合大小没有直接关系，所以是 O(1)。</p>
-<p><strong>随机访问为什么是 O(n)？</strong></p>
-<p>链表不像数组那样可以通过下标直接定位。即使知道 index，也必须从头或从尾一步一步走过去：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> E <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    checkElementIndex(index);</span><br><span class="line">    <span class="keyword">return</span> node(index).item;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node&lt;E&gt; <span class="title function_">node</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (index &lt; (size &gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">        Node&lt;E&gt; x = first;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; index; i++) &#123;</span><br><span class="line">            x = x.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;E&gt; x = last;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> size - <span class="number">1</span>; i &gt; index; i--) &#123;</span><br><span class="line">            x = x.prev;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>JDK 做了一个优化：如果 index 在前半部分，就从头开始找；如果在后半部分，就从尾开始找。但本质仍然是遍历，复杂度还是 O(n)。</p>
-<h2 id="fail-fast-机制与-ConcurrentModificationException"><a href="#fail-fast-机制与-ConcurrentModificationException" class="headerlink" title="fail-fast 机制与 ConcurrentModificationException"></a>fail-fast 机制与 ConcurrentModificationException</h2><p>这个问题和 <code>ArrayList</code>、<code>LinkedList</code> 都有关，因为它们都使用了 <code>AbstractList</code> 中的 <code>modCount</code>：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">transient</span> <span class="type">int</span> <span class="variable">modCount</span> <span class="operator">=</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-
-<p>每次对集合做结构性修改，比如 <code>add</code>、<code>remove</code>，<code>modCount</code> 都会变化。迭代器创建时会记录一个 <code>expectedModCount</code>，遍历过程中会检查两者是否一致：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">checkForComodification</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ConcurrentModificationException</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>所以用 for-each 遍历时调用 <code>list.remove()</code>，集合自己的 <code>modCount</code> 变了，但迭代器里的 <code>expectedModCount</code> 没有同步更新，就会触发 fail-fast 机制，抛出 <code>ConcurrentModificationException</code>。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><h2 id="完整对比表格"><a href="#完整对比表格" class="headerlink" title="完整对比表格"></a>完整对比表格</h2><table>
-<thead>
-<tr>
-<th>对比项</th>
-<th>ArrayList</th>
-<th>LinkedList</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>底层数据结构</td>
-<td>Object[] 数组</td>
-<td>双向链表</td>
-</tr>
-<tr>
-<td>随机访问 get(i)</td>
-<td><strong>O(1)</strong></td>
-<td>O(n)</td>
-</tr>
-<tr>
-<td>头部插入 add(0, e)</td>
-<td>O(n)</td>
-<td><strong>O(1)</strong></td>
-</tr>
-<tr>
-<td>尾部插入 add(e)</td>
-<td>均摊 O(1)</td>
-<td>O(1)</td>
-</tr>
-<tr>
-<td>中间插入 add(i, e)</td>
-<td>O(n)</td>
-<td>O(n)</td>
-</tr>
-<tr>
-<td>删除 remove(i)</td>
-<td>O(n)</td>
-<td>O(n)</td>
-</tr>
-<tr>
-<td>内存占用</td>
-<td>比较紧凑，但可能有预留空间</td>
-<td>每个节点额外保存 prev、next 引用</td>
-</tr>
-<tr>
-<td>是否支持 RandomAccess</td>
-<td>支持</td>
-<td>不支持</td>
-</tr>
-<tr>
-<td>额外能力</td>
-<td>主要作为 List 使用</td>
-<td>同时可作为 Deque、Queue 使用</td>
-</tr>
-<tr>
-<td>适用场景</td>
-<td>读多写少、随机访问多、尾部追加多</td>
-<td>频繁头部插入删除、队列或双端队列场景</td>
-</tr>
-</tbody></table>
-<p>注意：<code>LinkedList</code> 的中间插入和删除，修改节点引用本身是 O(1)，但定位到目标节点需要 O(n)，所以整体仍然是 O(n)。</p>
-<h2 id="ArrayList-LinkedList-基本操作"><a href="#ArrayList-LinkedList-基本操作" class="headerlink" title="ArrayList&#x2F;LinkedList 基本操作"></a>ArrayList&#x2F;LinkedList 基本操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ListBasicDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; arrayList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        arrayList.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        arrayList.add(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        arrayList.add(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line">        arrayList.add(<span class="number">1</span>, <span class="string">&quot;Go&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;ArrayList: &quot;</span> + arrayList);</span><br><span class="line">        System.out.println(<span class="string">&quot;获取索引2: &quot;</span> + arrayList.get(<span class="number">2</span>));</span><br><span class="line">        arrayList.remove(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;删除C++后: &quot;</span> + arrayList);</span><br><span class="line"></span><br><span class="line">        LinkedList&lt;String&gt; linkedList = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">        linkedList.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        linkedList.addFirst(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line">        linkedList.addLast(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;LinkedList: &quot;</span> + linkedList);</span><br><span class="line">        System.out.println(<span class="string">&quot;第一个: &quot;</span> + linkedList.getFirst());</span><br><span class="line">        System.out.println(<span class="string">&quot;最后一个: &quot;</span> + linkedList.getLast());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="性能对比测试代码"><a href="#性能对比测试代码" class="headerlink" title="性能对比测试代码"></a>性能对比测试代码</h2><p>这是我当时写的测试代码，能够比较直观地感受到两者差距：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ListPerformanceTest</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">COUNT</span> <span class="operator">=</span> <span class="number">100000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        testHeadInsert();</span><br><span class="line">        testRandomAccess();</span><br><span class="line">        testTailInsert();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">testHeadInsert</span><span class="params">()</span> &#123;</span><br><span class="line">        List&lt;String&gt; arrayList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        LinkedList&lt;String&gt; linkedList = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            arrayList.add(<span class="number">0</span>, <span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">long</span> <span class="variable">end</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;ArrayList 头部插入 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line"></span><br><span class="line">        start = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            linkedList.addFirst(<span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line">        end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;LinkedList 头部插入 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">testRandomAccess</span><span class="params">()</span> &#123;</span><br><span class="line">        List&lt;String&gt; arrayList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        List&lt;String&gt; linkedList = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            arrayList.add(<span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">            linkedList.add(<span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            arrayList.get(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">long</span> <span class="variable">end</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;ArrayList 随机访问 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line"></span><br><span class="line">        start = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            linkedList.get(i);</span><br><span class="line">        &#125;</span><br><span class="line">        end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;LinkedList 随机访问 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">testTailInsert</span><span class="params">()</span> &#123;</span><br><span class="line">        List&lt;String&gt; arrayList = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        List&lt;String&gt; linkedList = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="type">long</span> <span class="variable">start</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            arrayList.add(<span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">long</span> <span class="variable">end</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;ArrayList 尾部插入 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line"></span><br><span class="line">        start = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; COUNT; i++) &#123;</span><br><span class="line">            linkedList.add(<span class="string">&quot;item&quot;</span> + i);</span><br><span class="line">        &#125;</span><br><span class="line">        end = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">&quot;LinkedList 尾部插入 &quot;</span> + COUNT + <span class="string">&quot; 次: &quot;</span> + (end - start) + <span class="string">&quot;ms&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>我本机跑出来的结果大致如下，不同机器会有差异：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ArrayList 头部插入 100000 次: 2835ms</span><br><span class="line">LinkedList 头部插入 100000 次: 8ms</span><br><span class="line">ArrayList 随机访问 100000 次: 3ms</span><br><span class="line">LinkedList 随机访问 100000 次: 5421ms</span><br><span class="line">ArrayList 尾部插入 100000 次: 5ms</span><br><span class="line">LinkedList 尾部插入 100000 次: 9ms</span><br></pre></td></tr></table></figure>
-
-<p>从结果看，头部插入 <code>ArrayList</code> 明显慢，随机访问则是 <code>LinkedList</code> 明显慢，尾部插入两者差距不大。</p>
-<h2 id="正确遍历删除的方式"><a href="#正确遍历删除的方式" class="headerlink" title="正确遍历删除的方式"></a>正确遍历删除的方式</h2><p><strong>方式一：使用 Iterator.remove()，推荐这种写法</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IteratorRemoveDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        list.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line"></span><br><span class="line">        Iterator&lt;String&gt; iterator = list.iterator();</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">item</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">&quot;deleteMe&quot;</span>.equals(item)) &#123;</span><br><span class="line">                iterator.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;删除后: &quot;</span> + list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>Iterator.remove()</code> 安全的原因是：它删除元素后会同步更新迭代器内部的 <code>expectedModCount</code>，因此不会触发 fail-fast。</p>
-<p><strong>方式二：倒序遍历删除，适合 ArrayList</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReverseRemoveDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        list.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> list.size() - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">&quot;deleteMe&quot;</span>.equals(list.get(i))) &#123;</span><br><span class="line">                list.remove(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;删除后: &quot;</span> + list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>倒序删除不会影响还没有遍历到的索引，所以也能避免漏删问题。不过如果已经使用迭代器遍历，还是优先使用 <code>Iterator.remove()</code>。</p>
-<p><strong>方式三：JDK 8 的 removeIf，最简洁</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RemoveIfDemo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        list.add(<span class="string">&quot;Java&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;Python&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;deleteMe&quot;</span>);</span><br><span class="line">        list.add(<span class="string">&quot;C++&quot;</span>);</span><br><span class="line"></span><br><span class="line">        list.removeIf(<span class="string">&quot;deleteMe&quot;</span>::equals);</span><br><span class="line">        System.out.println(<span class="string">&quot;删除后: &quot;</span> + list);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经过这次踩坑，我总结出三条实用原则：</p>
-<p><strong>1. 90% 的场景用 ArrayList 就对了</strong></p>
-<p>日常开发里，大部分场景都是读多写少、随机访问、尾部追加。<code>ArrayList</code> 底层数组内存连续，访问速度快，CPU 缓存命中率也更友好，所以它应该作为默认选择。</p>
-<p><strong>2. 频繁头插再考虑 LinkedList</strong></p>
-<p>如果确实需要频繁在头部插入或删除，比如实现队列、双端队列，<code>LinkedList</code> 的 O(1) 头部操作才有优势。但如果还需要大量随机访问，就不要选它。</p>
-<p><strong>3. 遍历删除用 Iterator</strong></p>
-<p>遍历过程中不要直接 <code>list.remove()</code>，否则很容易遇到 <code>ConcurrentModificationException</code>。稳妥做法是使用 <code>Iterator.remove()</code>，JDK 8 以后也可以使用 <code>removeIf</code>。</p>
-<p>最后的感受是：不要只背“ArrayList 查询快，LinkedList 增删快”这种结论。真正重要的是理解数组和链表的底层结构：数组访问快但插入可能搬移元素，链表头插快但定位元素慢。理解了这些，再遇到 List 选择问题就不会慌了。<br>EOF; __tr_native_ec&#x3D;$?; pwd -P &gt;| ‘&#x2F;var&#x2F;folders&#x2F;sb&#x2F;zyyfx17n2q13ky7hfwtl_8dc0000gn&#x2F;T&#x2F;agent-toolhost&#x2F;jobs&#x2F;job-9de6a9094cdf4f9787cdf8a27b5814ac&#x2F;cwd.txt’; exit “$__tr_native_ec”</p>
 
       
     </div>

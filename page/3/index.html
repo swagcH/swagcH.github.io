@@ -175,18 +175,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">84</span>
+          <span class="site-state-item-count">85</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-count">31</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">224</span>
+        <span class="site-state-item-count">227</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,303 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/" class="post-title-link" itemprop="url">服务器内存不足与OOM排查</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-10 16:40:00" itemprop="dateCreated datePublished" datetime="2023-09-10T16:40:00+08:00">2023-09-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-11 21:25:00" itemprop="dateModified" datetime="2023-09-11T21:25:00+08:00">2023-09-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：服务器内存“看起来快满了”和真正发生 OOM 不是一回事。Linux 会使用空闲内存做页缓存，<code>free</code> 很低不一定危险；反过来，容器被 OOM Kill 时，宿主机可能还有大量空闲内存。</p>
+</blockquote>
+<p>这篇按一份内存取证报告展开。案例中容器限制为 4GiB，JVM <code>-Xmx3g</code>，退出码 137。监控显示堆只用了约 2.1GiB，因此最初“堆泄漏”的判断并不成立。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">现象：order-service Pod 重启，退出码 137</span><br><span class="line">容器限制：4GiB</span><br><span class="line">JVM：JDK 8，-Xms3g -Xmx3g</span><br><span class="line">退出前 Heap used：约 2.1GiB</span><br><span class="line">退出前 RSS：约 3.95GiB</span><br><span class="line">宿主机 available：约 18GiB</span><br><span class="line">Java 日志：没有 java.lang.OutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+<p>这组事实更像容器边界触发的 OOM Kill，而不是 JVM 主动抛出堆 OOM。</p>
+<h2 id="第一步：先确认是谁判定-OOM"><a href="#第一步：先确认是谁判定-OOM" class="headerlink" title="第一步：先确认是谁判定 OOM"></a>第一步：先确认是谁判定 OOM</h2><p>不同错误对应不同边界：</p>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>决策者</th>
+<th>典型方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Java heap space</code></td>
+<td>JVM</td>
+<td>堆对象过多或堆不足</td>
+</tr>
+<tr>
+<td><code>GC overhead limit exceeded</code></td>
+<td>JVM</td>
+<td>GC 高耗但回收很少</td>
+</tr>
+<tr>
+<td><code>Metaspace</code></td>
+<td>JVM</td>
+<td>类元数据或类加载器</td>
+</tr>
+<tr>
+<td><code>Direct buffer memory</code></td>
+<td>JVM&#x2F;NIO</td>
+<td>直接内存</td>
+</tr>
+<tr>
+<td><code>unable to create new native thread</code></td>
+<td>JVM&#x2F;OS</td>
+<td>线程、地址空间、系统限制</td>
+</tr>
+<tr>
+<td>退出码 137 &#x2F; OOMKilled</td>
+<td>cgroup 或内核</td>
+<td>进程总内存超过边界</td>
+</tr>
+<tr>
+<td>宿主机多个进程被杀</td>
+<td>Linux OOM Killer</td>
+<td>整机内存压力</td>
+</tr>
+</tbody></table>
+<p>容器平台先看事件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;</span><br><span class="line">kubectl get pod &lt;pod-name&gt; -n &lt;namespace&gt; -o yaml</span><br></pre></td></tr></table></figure>
+
+<p>节点侧根据权限检查内核记录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">journalctl -k --since <span class="string">&#x27;2023-09-10 16:00:00&#x27;</span></span><br><span class="line">dmesg -T | rg -i <span class="string">&#x27;out of memory|killed process|oom&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>内核日志可能包含进程和主机信息，只由有权限的人员读取。部分集群不会向应用账号开放节点日志，此时以 Pod 事件和监控平台为准。</p>
+<p>cgroup v2 可以查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.current</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.max</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.events</span><br></pre></td></tr></table></figure>
+
+<p>路径会随运行时和 cgroup 版本变化。当前案例 <code>oom_kill</code> 计数增加，确认是容器超限。</p>
+<h2 id="第二步：整机、容器、进程、JVM-四层不要混看"><a href="#第二步：整机、容器、进程、JVM-四层不要混看" class="headerlink" title="第二步：整机、容器、进程、JVM 四层不要混看"></a>第二步：整机、容器、进程、JVM 四层不要混看</h2><h3 id="整机"><a href="#整机" class="headerlink" title="整机"></a>整机</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">free -h</span><br><span class="line">vmstat 1 5</span><br><span class="line">ps -eo pid,user,%mem,rss,vsz,etime,cmd --<span class="built_in">sort</span>=-rss | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p><code>free -h</code> 优先看 <code>available</code>，不要只看 <code>free</code>。<code>vmstat</code> 关注 <code>si/so</code>，持续交换通常意味着真实压力。</p>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>看工作集、RSS、Cache、limit 和 OOM 事件。宿主机有空闲，不能阻止单个容器越过自己的 4GiB 限制。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/status</span><br><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/smaps_rollup</span><br></pre></td></tr></table></figure>
+
+<p>重点包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VmRSS：当前驻留物理内存</span><br><span class="line">VmSize：虚拟地址空间，不等于实际占用</span><br><span class="line">RssAnon：匿名页，常包含 JVM 堆和本地内存</span><br><span class="line">RssFile：文件映射</span><br><span class="line">Threads：线程数量</span><br></pre></td></tr></table></figure>
+
+<h3 id="JVM"><a href="#JVM" class="headerlink" title="JVM"></a>JVM</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jstat -gcutil &lt;pid&gt; 1000 10</span><br><span class="line">jcmd &lt;pid&gt; GC.heap_info</span><br><span class="line">jcmd &lt;pid&gt; VM.flags</span><br></pre></td></tr></table></figure>
+
+<p>JVM 堆只是进程内存的一部分。容器限制针对进程总量，而不是只看 <code>-Xmx</code>。</p>
+<h2 id="第三步：画一张-JVM-内存预算"><a href="#第三步：画一张-JVM-内存预算" class="headerlink" title="第三步：画一张 JVM 内存预算"></a>第三步：画一张 JVM 内存预算</h2><p>Java 进程常见组成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Metaspace 与 Compressed Class Space</span><br><span class="line">Code Cache</span><br><span class="line">Direct Buffer</span><br><span class="line">线程栈</span><br><span class="line">GC 与 JVM 内部结构</span><br><span class="line">JNI / 本地库</span><br><span class="line">内存映射文件</span><br><span class="line">页缓存与容器统计差异</span><br></pre></td></tr></table></figure>
+
+<p>本次退出前的估算：</p>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th align="right">观察或预算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Heap used</td>
+<td align="right">2.1GiB</td>
+</tr>
+<tr>
+<td>Heap committed</td>
+<td align="right">3.0GiB</td>
+</tr>
+<tr>
+<td>Metaspace + Class</td>
+<td align="right">230MiB</td>
+</tr>
+<tr>
+<td>Code Cache</td>
+<td align="right">110MiB</td>
+</tr>
+<tr>
+<td>Direct Buffer</td>
+<td align="right">430MiB</td>
+</tr>
+<tr>
+<td>线程约 620 个</td>
+<td align="right">栈上限约 620MiB</td>
+</tr>
+<tr>
+<td>JVM&#x2F;GC&#x2F;本地库</td>
+<td align="right">约 180MiB</td>
+</tr>
+</tbody></table>
+<p>这些数字不能简单相加当精确 RSS：堆 committed 不一定全部驻留，线程栈也会按需提交。但它足以说明 <code>-Xmx3g</code> 放进 4GiB 容器几乎没有安全余量。</p>
+<p>配置预算至少要满足：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">容器 limit</span><br><span class="line">  &gt; Xmx</span><br><span class="line">  + 可预期的 Metaspace 和 Code Cache</span><br><span class="line">  + Direct Memory 上界</span><br><span class="line">  + 最大线程数 × 栈预算</span><br><span class="line">  + JVM 与本地库</span><br><span class="line">  + 安全余量</span><br></pre></td></tr></table></figure>
+
+<p>不能使用“容器 4G，所以 Xmx 也配 4G”的方式。</p>
+<h2 id="第四步：用-NMT-观察堆外组成"><a href="#第四步：用-NMT-观察堆外组成" class="headerlink" title="第四步：用 NMT 观察堆外组成"></a>第四步：用 NMT 观察堆外组成</h2><p>JDK 8 可在启动时启用 Native Memory Tracking：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NativeMemoryTracking=summary</span><br></pre></td></tr></table></figure>
+
+<p>运行时查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcmd &lt;pid&gt; VM.native_memory summary scale=MB</span><br></pre></td></tr></table></figure>
+
+<p>NMT 必须在 JVM 启动时开启，不能在事故发生后临时补开。它能分类 JVM 自身原生内存，但不保证覆盖所有第三方本地库和内核页缓存，也有一定性能开销，需要在压测后启用。</p>
+<p>输出重点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Class</span><br><span class="line">Thread</span><br><span class="line">Code</span><br><span class="line">GC</span><br><span class="line">Compiler</span><br><span class="line">Internal</span><br><span class="line">Arena Chunk</span><br></pre></td></tr></table></figure>
+
+<p>NIO 直接缓冲还可以通过应用指标、BufferPoolMXBean 或 <code>jcmd VM.native_memory</code> 辅助判断。只看 NMT 一项仍不足以解释进程全部 RSS。</p>
+<h2 id="第五步：为什么线程数突然到-620"><a href="#第五步：为什么线程数突然到-620" class="headerlink" title="第五步：为什么线程数突然到 620"></a>第五步：为什么线程数突然到 620</h2><p>故障前下游库存接口延迟从 100ms 上升到 4s。应用中有一个无边界伸缩的异步池：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span></span><br><span class="line">        Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
+
+<p><code>newCachedThreadPool</code> 在任务堆积时可以持续创建线程。下游变慢后，旧任务没有完成，新任务继续创建线程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">正常线程数：约 180</span><br><span class="line">故障前 1 分钟：320</span><br><span class="line">故障前 20 秒：510</span><br><span class="line">退出前：620</span><br></pre></td></tr></table></figure>
+
+<p>同时 HTTP 客户端使用直接缓冲，等待请求增加后 Direct Memory 也上涨。堆使用率并没有明显异常，但进程 RSS 触碰容器限制。</p>
+<p>这次根因可以分成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">触发条件：下游响应显著变慢</span><br><span class="line">放大机制：无界线程池持续创建线程</span><br><span class="line">容量缺口：Xmx 占容器限制 75%，堆外余量不足</span><br><span class="line">观测缺口：只告警 Heap，没有线程、RSS 和 cgroup 指标</span><br></pre></td></tr></table></figure>
+
+<h2 id="第六步：如果真的是-Java-Heap-Space"><a href="#第六步：如果真的是-Java-Heap-Space" class="headerlink" title="第六步：如果真的是 Java Heap Space"></a>第六步：如果真的是 Java Heap Space</h2><p>堆 OOM 的取证路径不同。建议提前配置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">-XX:HeapDumpPath=/var/lib/order/dumps</span><br><span class="line">-XX:+ExitOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+<p><code>ExitOnOutOfMemoryError</code> 是否使用要结合 JDK 版本和服务恢复策略评估。Dump 目录必须有足够独立空间、正确权限和保留策略；否则 OOM 时可能因为磁盘不足再次失败。</p>
+<p>临时主动导出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jcmd &lt;pid&gt; GC.heap_dump /secure/path/order-heap.hprof</span><br></pre></td></tr></table></figure>
+
+<p>Heap Dump 可能触发停顿、产生接近堆大小的文件并包含敏感业务数据。生产执行前必须评估磁盘、停顿和数据安全，由负责人授权。已经严重抖动的进程不一定承受得住主动 Dump。</p>
+<p>分析时先看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">对象数量和浅堆大小</span><br><span class="line">Retained Heap</span><br><span class="line">Dominator Tree</span><br><span class="line">从大对象到 GC Root 的引用链</span><br><span class="line">类加载器数量</span><br><span class="line">集合和缓存是否无界</span><br></pre></td></tr></table></figure>
+
+<p>“某个 DTO 数量最多”不等于 DTO 泄漏。要找谁长期持有它，以及这些对象是否超过业务合理数量。</p>
+<h2 id="常见-OOM-分支"><a href="#常见-OOM-分支" class="headerlink" title="常见 OOM 分支"></a>常见 OOM 分支</h2><h3 id="Java-heap-space"><a href="#Java-heap-space" class="headerlink" title="Java heap space"></a>Java heap space</h3><p>可能是无界缓存、一次加载大结果集、消息积压对象化或真实容量不足。对照 GC 后 Old 区是否下降、对象增长曲线和引用链。</p>
+<h3 id="GC-overhead-limit-exceeded"><a href="#GC-overhead-limit-exceeded" class="headerlink" title="GC overhead limit exceeded"></a>GC overhead limit exceeded</h3><p>JVM 花大量时间 GC，却只回收很少内存。通常已经接近堆耗尽，不能只关闭这个保护开关。继续查长期存活对象和分配速率。</p>
+<h3 id="Metaspace"><a href="#Metaspace" class="headerlink" title="Metaspace"></a>Metaspace</h3><p>检查动态代理、脚本引擎、热部署和重复创建类加载器。若类数量持续上涨，单纯增加 <code>MaxMetaspaceSize</code> 只会延迟暴露。</p>
+<h3 id="Direct-buffer-memory"><a href="#Direct-buffer-memory" class="headerlink" title="Direct buffer memory"></a>Direct buffer memory</h3><p>关注 Netty&#x2F;NIO、文件传输、HTTP 客户端和未及时释放的直接缓冲。可以设置 <code>MaxDirectMemorySize</code> 形成边界，但值过小也会影响正常 IO。</p>
+<h3 id="Unable-to-create-new-native-thread"><a href="#Unable-to-create-new-native-thread" class="headerlink" title="Unable to create new native thread"></a>Unable to create new native thread</h3><p>同时看线程数、<code>ulimit -u</code>、地址空间、容器 PID limit 和剩余内存。线程池无界、阻塞调用和线程泄漏是常见原因。</p>
+<h3 id="Linux-或-cgroup-OOM-Kill"><a href="#Linux-或-cgroup-OOM-Kill" class="headerlink" title="Linux 或 cgroup OOM Kill"></a>Linux 或 cgroup OOM Kill</h3><p>可能没有 Java 异常和 Heap Dump，因为 JVM 没有机会处理。证据主要来自容器事件、内核日志、RSS、cgroup 和退出前指标。</p>
+<h2 id="本次修复"><a href="#本次修复" class="headerlink" title="本次修复"></a>本次修复</h2><h3 id="1-重新划分内存预算"><a href="#1-重新划分内存预算" class="headerlink" title="1. 重新划分内存预算"></a>1. 重新划分内存预算</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">容器 limit：4GiB -&gt; 5GiB</span><br><span class="line">Xms/Xmx：3GiB -&gt; 2.5GiB</span><br><span class="line">MaxDirectMemorySize：512MiB</span><br><span class="line">Xss：在测试后从 1MiB 调整为 512KiB</span><br><span class="line">安全余量：至少保留约 25%</span><br></pre></td></tr></table></figure>
+
+<p>调整 <code>Xss</code> 可能让深调用更早 <code>StackOverflowError</code>，必须通过测试验证，不能为了省内存盲目减小。容器扩容和下调 Xmx 同时执行，是为了先恢复余量，再根据堆真实峰值逐步优化。</p>
+<h3 id="2-无界线程池改为有界"><a href="#2-无界线程池改为有界" class="headerlink" title="2. 无界线程池改为有界"></a>2. 无界线程池改为有界</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ThreadPoolExecutor</span> <span class="variable">executor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">        <span class="number">32</span>,</span><br><span class="line">        <span class="number">64</span>,</span><br><span class="line">        <span class="number">60</span>,</span><br><span class="line">        TimeUnit.SECONDS,</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">200</span>),</span><br><span class="line">        namedThreadFactory(<span class="string">&quot;inventory-call&quot;</span>),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.AbortPolicy()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>线程数还要受下游并发和连接池约束。拒绝后进入可追踪补偿，不静默丢弃。</p>
+<h3 id="3-下游调用快速失败"><a href="#3-下游调用快速失败" class="headerlink" title="3. 下游调用快速失败"></a>3. 下游调用快速失败</h3><p>设置连接池获取、建连和读取超时，取消叠加重试；当下游变慢时对入口限流，避免请求在内存中无限累积。</p>
+<h3 id="4-补齐四层指标"><a href="#4-补齐四层指标" class="headerlink" title="4. 补齐四层指标"></a>4. 补齐四层指标</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">主机 available / swap / OOM</span><br><span class="line">容器 working set / RSS / limit / oom_kill</span><br><span class="line">进程 RSS / thread count / open files</span><br><span class="line">JVM heap / metaspace / direct buffer / GC</span><br></pre></td></tr></table></figure>
+
+<p>任何一层达到 80% 都不直接等于故障，但趋势和剩余时间应触发提前调查。</p>
+<h2 id="复现与容量验证"><a href="#复现与容量验证" class="headerlink" title="复现与容量验证"></a>复现与容量验证</h2><p>修复后在隔离环境注入 4 秒下游延迟：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">修复前</th>
+<th align="right">修复后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最大线程数</td>
+<td align="right">620+</td>
+<td align="right">248</td>
+</tr>
+<tr>
+<td>进程 RSS</td>
+<td align="right">3.95GiB 后被杀</td>
+<td align="right">峰值 3.42GiB</td>
+</tr>
+<tr>
+<td>Heap used</td>
+<td align="right">2.1GiB</td>
+<td align="right">2.0GiB</td>
+</tr>
+<tr>
+<td>Direct Buffer</td>
+<td align="right">430MiB</td>
+<td align="right">280MiB</td>
+</tr>
+<tr>
+<td>拒绝&#x2F;补偿</td>
+<td align="right">无边界堆积</td>
+<td align="right">有明确计数</td>
+</tr>
+<tr>
+<td>OOM Kill</td>
+<td align="right">发生</td>
+<td align="right">未发生</td>
+</tr>
+</tbody></table>
+<p>还需要确认业务结果：超载请求是否得到明确响应，补偿任务能否追赶，下游恢复后内存和线程是否回落。</p>
+<h2 id="取证清单"><a href="#取证清单" class="headerlink" title="取证清单"></a>取证清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[ ] 判断 JVM OOM、容器 OOM 还是整机 OOM</span><br><span class="line">[ ] 保存退出时间、版本、事件和内核记录</span><br><span class="line">[ ] 对齐主机、容器、进程、JVM 四层指标</span><br><span class="line">[ ] 比较 Heap used 与进程 RSS</span><br><span class="line">[ ] 检查线程数、Direct Buffer、Metaspace 和本地库</span><br><span class="line">[ ] Heap Dump 前评估停顿、磁盘和数据安全</span><br><span class="line">[ ] 用引用链证明泄漏，不只看对象数量</span><br><span class="line">[ ] 建立 Xmx 之外的完整内存预算</span><br><span class="line">[ ] 在下游变慢和任务积压场景重新压测</span><br><span class="line">[ ] 验证恢复后 RSS、线程和业务积压都会回落</span><br></pre></td></tr></table></figure>
+
+<p>内存问题最关键的第一问不是“哪个对象最大”，而是“哪一层的边界被突破”。只有先分清整机、容器、进程和 JVM，Heap Dump、NMT、线程数和 cgroup 指标才会落到正确的位置。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1003,7 +1300,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1175,7 +1472,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1349,7 +1646,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1512,7 +1809,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1692,7 +1989,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1899,7 +2196,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
+      <time title="修改时间：2026-10-16 14:57:51" itemprop="dateModified" datetime="2026-10-16T14:57:51+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2000,180 +2297,6 @@
 <p>演练只能在隔离环境或得到授权的窗口执行，不能为了验证可靠性直接终止生产 Broker。</p>
 <h2 id="复盘结论"><a href="#复盘结论" class="headerlink" title="复盘结论"></a>复盘结论</h2><p>消息可靠性不是“绝不重复、绝不丢失”的一句承诺，而是一条可验证的证据链：生产端有 Outbox 和 Confirm，Broker 有持久化与监控，消费端有事务、幂等、有限重试和死信，业务侧还有对账。</p>
 <p>系统允许重复投递，但不能允许重复产生业务结果；系统允许短暂延迟，但不能让失败消息永远不可见。做到这两点，消息队列才真正承担了异步解耦，而不是把故障藏到了另一个进程里。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/03/27/2022-03-27-Nacos,Gateway,OpenFeign%E5%AE%9E%E6%93%8D/" class="post-title-link" itemprop="url">Nacos,Gateway,OpenFeign实操</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-03-27 20:46:18" itemprop="dateCreated datePublished" datetime="2022-03-27T20:46:18+08:00">2022-03-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>这一篇直接做一个最小链路：外部请求先进入 Gateway，再由订单服务通过 OpenFeign 查询库存服务。目标不是堆出完整项目，而是让注册、路由和远程调用每一步都有明确的验证结果。</p>
-</blockquote>
-<p>本文示例默认 JDK 8、Spring Boot 2.x、Spring Cloud 2021.x。Spring Cloud Alibaba 的版本必须根据官方兼容表选择，不能把不同博客里的版本随意拼在一起。</p>
-<h2 id="1-实验结构"><a href="#1-实验结构" class="headerlink" title="1. 实验结构"></a>1. 实验结构</h2><p>准备三个应用和一个 Nacos：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Nacos             127.0.0.1:8848</span><br><span class="line">gateway-service   127.0.0.1:8080</span><br><span class="line">order-service     127.0.0.1:8081</span><br><span class="line">stock-service     127.0.0.1:8082</span><br></pre></td></tr></table></figure>
-
-<p>请求链路：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl /api/order/preview?skuId=1001</span><br><span class="line">  -&gt; gateway-service</span><br><span class="line">  -&gt; lb://order-service/order/preview</span><br><span class="line">  -&gt; OpenFeign: stock-service/stock/1001</span><br></pre></td></tr></table></figure>
-
-<p>建议先启动 Nacos，再启动库存、订单，最后启动网关。每启动一个服务就验证一次，不要等全部启动后再看一堆混在一起的日志。</p>
-<h2 id="2-依赖准备"><a href="#2-依赖准备" class="headerlink" title="2. 依赖准备"></a>2. 依赖准备</h2><p>三个应用都通过 BOM 管理版本。订单和库存是 Servlet 应用，使用 <code>spring-boot-starter-web</code>；网关基于 WebFlux，不应该再引入 <code>spring-boot-starter-web</code>，否则可能出现 Web 应用类型冲突。</p>
-<p>订单服务核心依赖：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-loadbalancer<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>网关服务核心依赖：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-loadbalancer<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>部分版本会通过其他 starter 间接引入 LoadBalancer，但显式写出更容易理解 <code>lb://</code> 依赖什么。实际项目以 Maven 依赖树和当前版本文档为准：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn dependency:tree</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-先完成-stock-service"><a href="#3-先完成-stock-service" class="headerlink" title="3. 先完成 stock-service"></a>3. 先完成 stock-service</h2><p>配置服务名和端口：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8082</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">stock-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br></pre></td></tr></table></figure>
-
-<p>如果使用 namespace，配置值通常应填写 Nacos 的 namespace ID，而不是控制台展示名称。示例省略 namespace，表示使用默认 public 环境。</p>
-<p>提供一个最小查询接口：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StockController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> StockView <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span> &#123;</span><br><span class="line">        <span class="comment">// 示例固定返回，先验证治理链路，不引入数据库变量</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">StockView</span>(skuId, <span class="number">20</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StockView</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Long skuId;</span><br><span class="line">    <span class="keyword">private</span> Integer available;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">StockView</span><span class="params">(Long skuId, Integer available)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.skuId = skuId;</span><br><span class="line">        <span class="built_in">this</span>.available = available;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Long <span class="title function_">getSkuId</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> skuId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Integer <span class="title function_">getAvailable</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> available;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>启动后做两次验证：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://127.0.0.1:8082/stock/1001</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;skuId&quot;</span><span class="punctuation">:</span><span class="number">1001</span><span class="punctuation">,</span><span class="attr">&quot;available&quot;</span><span class="punctuation">:</span><span class="number">20</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<p>然后登录 Nacos 控制台，确认 <code>stock-service</code> 有一个健康实例，并检查实例 IP 和端口是否真能从订单服务所在网络访问。</p>
-<h2 id="4-order-service-接入-OpenFeign"><a href="#4-order-service-接入-OpenFeign" class="headerlink" title="4. order-service 接入 OpenFeign"></a>4. order-service 接入 OpenFeign</h2><p>配置：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8081</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line"></span><br><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">stock-service:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">1000</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">2000</span></span><br><span class="line">        <span class="attr">loggerLevel:</span> <span class="string">basic</span></span><br></pre></td></tr></table></figure>
-
-<p>启动类开启 Feign 扫描：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableFeignClients</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderApplication</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(OrderApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>声明库存客户端：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;, path = &quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockFeignClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    StockView <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>较旧的 Spring MVC&#x2F;Feign 组合对参数名推断不一致，<code>@PathVariable(&quot;skuId&quot;)</code> 和 <code>@RequestParam(&quot;skuId&quot;)</code> 最好显式写名称，不依赖编译参数。</p>
-<p>订单接口只做组合展示：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/order&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OrderController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> StockFeignClient stockFeignClient;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">OrderController</span><span class="params">(StockFeignClient stockFeignClient)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.stockFeignClient = stockFeignClient;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/preview&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> StockView <span class="title function_">preview</span><span class="params">(<span class="meta">@RequestParam(&quot;skuId&quot;)</span> Long skuId)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> stockFeignClient.getStock(skuId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>暂时绕过网关验证：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">&#x27;http://127.0.0.1:8081/order/preview?skuId=1001&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>如果这一步不通，问题在订单、服务发现或库存，不要提前修改网关。</p>
-<h2 id="5-gateway-service-配置路由"><a href="#5-gateway-service-配置路由" class="headerlink" title="5. gateway-service 配置路由"></a>5. gateway-service 配置路由</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">gateway-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
-
-<p>路径变化如下：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">外部路径：/api/order/preview</span><br><span class="line">StripPrefix=1</span><br><span class="line">转发路径：/order/preview</span><br><span class="line">Controller：@RequestMapping(&quot;/order&quot;) + @GetMapping(&quot;/preview&quot;)</span><br></pre></td></tr></table></figure>
-
-<p>最终验证：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="string">&#x27;http://127.0.0.1:8080/api/order/preview?skuId=1001&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>能得到库存 JSON，说明网关路由、订单注册、Feign 调用三段都已打通。</p>
-<h2 id="6-扩容库存服务验证负载均衡"><a href="#6-扩容库存服务验证负载均衡" class="headerlink" title="6. 扩容库存服务验证负载均衡"></a>6. 扩容库存服务验证负载均衡</h2><p>再启动一个库存实例：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar stock-service.jar --server.port=8083</span><br></pre></td></tr></table></figure>
-
-<p>为了观察实例，可以临时在返回值增加端口信息，或者从日志记录当前端口。连续请求订单接口，确认两个实例都收到流量：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> 1 2 3 4 5 6; <span class="keyword">do</span></span><br><span class="line">  curl -s <span class="string">&#x27;http://127.0.0.1:8080/api/order/preview?skuId=1001&#x27;</span></span><br><span class="line">  <span class="built_in">printf</span> <span class="string">&#x27;\n&#x27;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
-
-<p>不要把“请求一定严格轮流”当作测试标准。负载均衡策略、实例缓存和连接行为都会影响结果，重点是两个健康实例都能被发现和调用。</p>
-<h2 id="7-五类高频问题"><a href="#7-五类高频问题" class="headerlink" title="7. 五类高频问题"></a>7. 五类高频问题</h2><h3 id="7-1-Nacos-看不到服务"><a href="#7-1-Nacos-看不到服务" class="headerlink" title="7.1 Nacos 看不到服务"></a>7.1 Nacos 看不到服务</h3><p>按下面顺序检查：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">应用是否启动成功</span><br><span class="line">server-addr 是否可达</span><br><span class="line">namespace 和 group 是否一致</span><br><span class="line">服务名是否为空或被配置覆盖</span><br><span class="line">Nacos 是否开启认证</span><br><span class="line">客户端和服务端版本是否兼容</span><br></pre></td></tr></table></figure>
-
-<p>不要只看最后一行启动日志，向上搜索 Nacos 客户端连接异常。</p>
-<h3 id="7-2-网关返回-503"><a href="#7-2-网关返回-503" class="headerlink" title="7.2 网关返回 503"></a>7.2 网关返回 503</h3><p><code>lb://order-service</code> 找不到健康实例时，通常返回 503。先看 Nacos 实例，再确认网关与订单服务是否使用同一个 namespace。注册了容器内部 IP 时，还要从网关容器内实际测试连通性。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl http://order-service-ip:8081/actuator/health</span><br></pre></td></tr></table></figure>
-
-<h3 id="7-3-网关返回-404"><a href="#7-3-网关返回-404" class="headerlink" title="7.3 网关返回 404"></a>7.3 网关返回 404</h3><p>记录四个值：请求原路径、Path 谓词、过滤后路径、Controller 映射。临时打开 Gateway 路由日志可以辅助判断，但调试日志量较大，用完应恢复。</p>
-<h3 id="7-4-Feign-报-404-或参数缺失"><a href="#7-4-Feign-报-404-或参数缺失" class="headerlink" title="7.4 Feign 报 404 或参数缺失"></a>7.4 Feign 报 404 或参数缺失</h3><p>对比 Feign 声明和服务端 Controller：HTTP 方法、路径、参数位置、参数名、Content-Type 必须一致。接口改动后只更新服务端，没有同步客户端契约，也会造成运行时错误。</p>
-<h3 id="7-5-Feign-超时"><a href="#7-5-Feign-超时" class="headerlink" title="7.5 Feign 超时"></a>7.5 Feign 超时</h3><p>先直接请求库存接口，再通过订单服务请求。如果直连也慢，问题在库存服务；直连正常而 Feign 慢，再检查服务发现地址、连接池、DNS、负载均衡和超时配置。</p>
-<p>写操作不要默认重试。调用方超时不代表服务端没有成功，重试可能重复扣库存，必须先设计业务幂等键。</p>
-<h2 id="8-最小可观测性"><a href="#8-最小可观测性" class="headerlink" title="8. 最小可观测性"></a>8. 最小可观测性</h2><p>即使是实验项目，也建议为三段链路记录相同的 traceId：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gateway request path, routeId, target, cost</span><br><span class="line">order feign target service, path, status, cost</span><br><span class="line">stock request skuId, result, cost</span><br></pre></td></tr></table></figure>
-
-<p>可以开放最小 Actuator 端点用于检查，但不能直接暴露到公网：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">health,info</span></span><br></pre></td></tr></table></figure>
-
-<p>生产环境还要配合认证、网络隔离和访问控制。</p>
-<h2 id="9-完成实验后的检查表"><a href="#9-完成实验后的检查表" class="headerlink" title="9. 完成实验后的检查表"></a>9. 完成实验后的检查表</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 三个服务使用兼容的 BOM</span><br><span class="line">[ ] Nacos 中服务名、namespace、group 一致</span><br><span class="line">[ ] 注册 IP 和端口从调用方网络可达</span><br><span class="line">[ ] Feign 契约与 Controller 完全一致</span><br><span class="line">[ ] Gateway 路由前后路径可以写清楚</span><br><span class="line">[ ] 连接和读取超时已经配置</span><br><span class="line">[ ] 写接口重试前具备幂等能力</span><br><span class="line">[ ] 日志能串起 Gateway、Order、Stock 三段</span><br></pre></td></tr></table></figure>
-
-<p>这组三个组件真正难的不是启动，而是保持服务名、环境、路径和超时语义一致。最有效的实践方式仍然是分段验证：先直连服务，再走 Feign，最后加 Gateway。链路每次只增加一个变量，故障范围自然就小了。</p>
 
       
     </div>
