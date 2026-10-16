@@ -21,26 +21,26 @@
     <meta name="description" content="“缓存穿透、击穿、雪崩”这三个词几乎每份面经都会出现，但实际项目里出问题的往往不是概念本身，而是方案选型时的取舍没想清楚：加布隆过滤器要不要考虑误判？互斥锁会不会把可用性问题变成响应时间问题？先删缓存还是先更数据库？ 这篇文章按”现象 → 方案 → 代价”的方式整理一遍，最后给出我在项目里的实际做法。 先把三个概念分清三者经常被混着说，但触发条件完全不同：    问题 触发条件 直接后果    穿">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis 缓存设计：穿透、击穿、雪崩的实际处理">
-<meta property="og:url" content="https://swagch.github.io/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
+<meta property="og:url" content="https://swagch.github.io/2026/05/24/2026-05-24-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
 <meta property="og:site_name" content="杰尼龟的笔记">
 <meta property="og:description" content="“缓存穿透、击穿、雪崩”这三个词几乎每份面经都会出现，但实际项目里出问题的往往不是概念本身，而是方案选型时的取舍没想清楚：加布隆过滤器要不要考虑误判？互斥锁会不会把可用性问题变成响应时间问题？先删缓存还是先更数据库？ 这篇文章按”现象 → 方案 → 代价”的方式整理一遍，最后给出我在项目里的实际做法。 先把三个概念分清三者经常被混着说，但触发条件完全不同：    问题 触发条件 直接后果    穿">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2026/redis-three-problems.svg">
-<meta property="article:published_time" content="2026-10-16T01:00:00.000Z">
-<meta property="article:modified_time" content="2026-10-16T01:51:59.101Z">
+<meta property="article:published_time" content="2026-05-24T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-16T02:10:13.407Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Redis">
-<meta property="article:tag" content="性能优化">
 <meta property="article:tag" content="缓存">
 <meta property="article:tag" content="高并发">
+<meta property="article:tag" content="性能优化">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://swagch.github.io/images/posts/2026/redis-three-problems.svg">
 
 
-<link rel="canonical" href="https://swagch.github.io/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
+<link rel="canonical" href="https://swagch.github.io/2026/05/24/2026-05-24-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/","path":"2026/10/16/2026-10-16-Redis缓存设计/","title":"Redis 缓存设计：穿透、击穿、雪崩的实际处理"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://swagch.github.io/2026/05/24/2026-05-24-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/","path":"2026/05/24/2026-05-24-Redis缓存设计/","title":"Redis 缓存设计：穿透、击穿、雪崩的实际处理"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Redis 缓存设计：穿透、击穿、雪崩的实际处理 | 杰尼龟的笔记</title>
@@ -221,7 +221,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/05/24/2026-05-24-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -249,9 +249,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2026-10-16 09:00:00 / 修改时间：09:51:59" itemprop="dateCreated datePublished" datetime="2026-10-16T09:00:00+08:00">2026-10-16</time>
+      <time title="创建时间：2026-05-24 09:00:00" itemprop="dateCreated datePublished" datetime="2026-05-24T09:00:00+08:00">2026-05-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 10:10:13" itemprop="dateModified" datetime="2026-10-16T10:10:13+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -460,10 +466,10 @@
 <hr>
 <p><em>相关文章：</em></p>
 <ul>
-<li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
-<li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
-<li><a href="/2026/10/18/2026-10-18-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
-<li><a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
+<li><a href="/2026/04/12/2026-04-12-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
+<li><a href="/2026/07/08/2026-07-08-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/06/15/2026-06-15-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+<li><a href="/2026/09/20/2026-09-20-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
 </ul>
 
     </div>
@@ -475,22 +481,22 @@
     <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Redis/" rel="tag"># Redis</a>
-              <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="tag"># 性能优化</a>
               <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"># 缓存</a>
               <a href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/" rel="tag"># 高并发</a>
+              <a href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="tag"># 性能优化</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/" rel="prev" title="ShardingSphere 分库分表实践：从选型到踩坑">
+                <a href="/2026/04/12/2026-04-12-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/" rel="prev" title="ShardingSphere 分库分表实践：从选型到踩坑">
                   <i class="fa fa-angle-left"></i> ShardingSphere 分库分表实践：从选型到踩坑
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="next" title="MySQL 慢查询优化：从执行计划到索引设计">
-                  MySQL 慢查询优化：从执行计划到索引设计 <i class="fa fa-angle-right"></i>
+                <a href="/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/" rel="next" title="博客重新出发">
+                  博客重新出发 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
