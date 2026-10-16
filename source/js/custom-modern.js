@@ -477,7 +477,7 @@
 
     var overview = createElement('section', 'series-overview');
     overview.appendChild(createElement('p', 'series-overview-kicker', 'CURATED LEARNING PATHS'));
-    overview.appendChild(createElement('h2', '', '三条路径，呈现完整的工程能力'));
+    overview.appendChild(createElement('h2', '', series.length + ' 条路径，呈现完整的工程能力'));
     overview.appendChild(createElement('p', '', '每条专题都从基础认知走向真实案例与复盘，适合招聘方快速了解技术判断，也适合开发者按顺序系统阅读。'));
     page.appendChild(overview);
 
