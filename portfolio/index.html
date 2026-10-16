@@ -26,7 +26,7 @@
 <meta property="og:description" content="作品集          五个项目，两条能力线：生产系统交付 · 稳定性治理与 AI 工程化                  生产系统交付                                            深圳能源大屏           后端技术负责人                  2024.05 - 2026.03">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-10-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-10-16T06:57:51.873Z">
+<meta property="article:modified_time" content="2026-10-16T13:11:49.627Z">
 <meta property="article:author" content="无敌杰尼龟">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="Spring Boot">
@@ -273,17 +273,20 @@
         <time>2022.03 - 2024.04</time>
       </div>
       <p class="project-desc">
-        管理医院出入人员并联动门禁闸机的系统，支持读取、保存、分析通行记录，提供实时访客记录、门禁管理与授权管理。已被十余家医院采购并投入使用。
+        面向医院出入人员管理并与门禁闸机联动的系统，支持通行记录采集与分析、实时访客管理、门禁授权管理。采用 5 模块微服务架构，已被十余家医院采购并投入使用。
       </p>
       <dl class="project-meta">
         <dt>技术栈</dt>
-        <dd>SpringCloud · RabbitMQ · ShardingSphere · ElasticSearch · Redis · Nginx · MySQL</dd>
+        <dd>SpringCloud · RabbitMQ · ShardingSphere · ElasticSearch · Redis · MQTT（设备通信）· HL7（医疗数据交换）· MySQL · Oracle · Nginx</dd>
         <dt>我的职责</dt>
-        <dd>核心需求分析评审与项目进度把控；独立负责出入记录、门禁管理等核心模块的设计、开发与维护；对接微信公众号与阿里云短信实现业务预警；协调前后端联调并推进落地</dd>
+        <dd>独立负责出入记录、门禁管理、访客管理等核心模块的设计与开发；主导设备侧对接，基于 MQTT 实现人员服务与门禁闸机的异步解耦，支持多厂商设备接入；对接医院信息系统，基于 HL7 协议接收患者信息实现院内数据打通；主导数据库优化并推进项目整体落地</dd>
         <dt>技术难点</dt>
-        <dd>通行记录是典型的高频写入 + 按时间范围检索场景，单表很快到达瓶颈，使用 ShardingSphere 自动分库分表；人员服务与设备模块原先强耦合，引入 RabbitMQ 解耦以提升响应速度；登录信息与字典数据用 Redis 缓存降低数据库压力</dd>
+        <dd><strong>多厂商设备接入</strong>：不同门禁设备的通信协议不一致。通过 MQTT 统一设备通信层，新增厂商只需实现对应适配，不改业务代码<br>
+        <strong>与医院既有系统集成</strong>：医院侧使用 HL7 医疗数据交换标准，基于 HAPI 实现消息解析与转换，把标准协议数据映射到本系统数据模型<br>
+        <strong>高频写入瓶颈</strong>：通行记录是高频写入 + 按时间范围检索场景，单表迅速到达瓶颈，采用 ShardingSphere 分库分表，分片键兼顾"按人查"与"按时间查"两类主要查询<br>
+        <strong>服务耦合</strong>：人员服务与设备模块原先强耦合，一方异常影响另一方，引入 RabbitMQ 异步解耦</dd>
         <dt>量化规模</dt>
-        <dd>十余家医院在用 · 门禁设备联动 · 高频通行记录写入</dd>
+        <dd>1067 个 Java 文件 · 5 个微服务模块 · 36 个 Controller · 约 389 个 REST 接口 · 265 个数据实体 · 十余家医院在用</dd>
       </dl>
     </article>
     <article class="project-card">
@@ -295,15 +298,19 @@
         <time>2022.03 - 2024.04</time>
       </div>
       <p class="project-desc">
-        基于电子签名技术实现无纸化归档的电子病案管理系统，提供数据采集、归档、打印、借阅、封存等功能，整合各临床信息系统数据形成完整电子病案卷宗，使数据可脱离原系统独立展示与查阅。
+        基于电子签名技术实现无纸化归档的电子病案管理系统。整合各临床信息系统的数据形成完整电子病案卷宗，使病案可脱离原系统独立展示与查阅。功能覆盖数据采集、归档、打印、借阅、封存、质控、召回等完整生命周期。
       </p>
       <dl class="project-meta">
         <dt>技术栈</dt>
-        <dd>SpringBoot · MySQL · Redis · MinIO</dd>
+        <dd>SpringBoot · MySQL · Redis · MinIO · 电子签名</dd>
         <dt>我的职责</dt>
-        <dd>核心需求分析与进度把控；独立负责病案借阅、封存模块的设计开发与维护；对接微信公众号、阿里云短信实现业务消息推送与预警</dd>
+        <dd>核心需求分析与项目进度把控；独立负责病案借阅、封存解封模块的设计、开发与维护；使用 MinIO 承担病案文档的对象存储；基于 Redis 对用户下载次数做监控；对接微信公众号、阿里云短信实现消息推送与预警</dd>
         <dt>技术难点</dt>
-        <dd>病案文件体积大、数量多，使用 MinIO 对象存储提升上传下载速度与并发能力；借阅场景存在恶意重复下载风险，基于 Redis 对用户下载次数做监控与限制</dd>
+        <dd><strong>多来源文档整合</strong>：一份完整病案由住院病案首页、入院记录、手术知情同意书、护理记录单、各类检查报告等十余种文档构成，来源系统各异。需要把分散在各临床信息系统的数据汇聚成可独立展示的完整卷宗<br>
+        <strong>大文件存储与并发</strong>：病案文档体积大、数量多，本地文件系统在并发上传下载时表现不佳。改用 MinIO 对象存储，把文件读写从应用服务器剥离<br>
+        <strong>数据安全与合规</strong>：病案属敏感数据，借阅场景存在恶意重复下载风险。基于 Redis 记录并限制用户下载次数，同时保证正常业务不受影响</dd>
+        <dt>量化规模</dt>
+        <dd>覆盖借阅 / 封存解封 / 打印召回 / 查询 / 质控 等完整模块 · 整合十余类临床文档 · 十余家医院在用</dd>
       </dl>
     </article>
   </section>
