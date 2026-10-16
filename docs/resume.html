@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>陈子鑫 - Java 开发工程师</title>
+<style>
+  @page { size: A4; margin: 10mm 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 9.6pt; line-height: 1.42; color: #1a1a1a;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  a { color: #1a1a1a; text-decoration: none; }
+  .name { font-size: 17pt; font-weight: 700; letter-spacing: 1px; }
+  .title { font-size: 10.5pt; color: #555; margin-top: 2px; }
+  .contact { font-size: 9.4pt; color: #333; margin-top: 6px; line-height: 1.7; }
+  .contact a { border-bottom: 1px solid #bbb; }
+  header { border-bottom: 2px solid #222; padding-bottom: 6px; margin-bottom: 9px; }
+
+  h2 {
+    font-size: 10.8pt; font-weight: 700; color: #111;
+    margin: 10px 0 5px; padding-bottom: 2px;
+    border-bottom: 1px solid #ccc;
+    letter-spacing: .5px;
+  }
+  h2::before { content: ""; display: inline-block; width: 3px; height: 12px;
+    background: #2c5aa0; margin-right: 7px; vertical-align: -1px; }
+
+  h3 { font-size: 10.4pt; font-weight: 700; margin-bottom: 2px; }
+  .meta { font-size: 9.2pt; color: #666; }
+  .item { margin-bottom: 6px; page-break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+  .item-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .item-head time { font-size: 9.2pt; color: #666; white-space: nowrap; }
+
+  ul { list-style: none; padding-left: 0; }
+  ul li { position: relative; padding-left: 11px; margin-bottom: 1px; }
+  ul li::before { content: "·"; position: absolute; left: 3px; color: #2c5aa0; font-weight: 700; }
+
+  .skills { display: grid; grid-template-columns: 76px 1fr; gap: 3px 10px; }
+  .skills dt { font-weight: 700; color: #2c5aa0; font-size: 9.6pt; }
+  .skills dd { font-size: 9.8pt; }
+
+  .proj-desc { font-size: 9.2pt; color: #333; margin: 2px 0 3px; }
+  .tech { font-size: 9.3pt; color: #444; margin-bottom: 4px; }
+  .tech b { color: #2c5aa0; }
+  .hl { background: #f0f4fa; padding: 1px 4px; border-radius: 2px; font-weight: 600; }
+  .kw { font-weight: 600; color: #111; }
+  .metrics { font-size: 9.3pt; color: #555; margin-top: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="name">陈子鑫</div>
+  <div class="title">Java 后端开发工程师 · 6 年经验 · 微服务架构 / 系统稳定性 / AI 工程化</div>
+  <div class="contact">
+    15932859833 &nbsp;|&nbsp; 983252494@qq.com &nbsp;|&nbsp; 本科<br>
+    <b>作品集</b>：<a href="https://swagcH.github.io/portfolio/">swagcH.github.io/portfolio</a>
+    &nbsp;|&nbsp; <b>技术博客</b>：<a href="https://swagcH.github.io/">swagcH.github.io</a>
+  </div>
+</header>
+
+<h2>专业技能</h2>
+<dl class="skills">
+  <dt>后端核心</dt>
+  <dd>Java（并发编程 / 集合 / IO / JVM 调优）· 线程池与锁机制 · 面向对象设计</dd>
+  <dt>开发框架</dt>
+  <dd>Spring · Spring Boot · SpringCloud · MyBatis-Plus · QueryDSL-JPA</dd>
+  <dt>数据与中间件</dt>
+  <dd>MySQL（分库分表 / 慢查询优化 / 索引设计）· Redis（缓存设计 / 持久化 / 哨兵）· RabbitMQ · ElasticSearch · MinIO · Oracle</dd>
+  <dt>行业协议</dt>
+  <dd>MQTT（IoT 设备通信）· HL7（医疗数据交换标准，基于 HAPI）</dd>
+  <dt>工程与运维</dt>
+  <dd>Linux · Docker · Nginx 负载均衡 · 日志与指标分析 · 故障排查 · 部署与回滚</dd>
+  <dt>AI 工程化</dt>
+  <dd>统一 LLM 网关 · 降级与兜底 · Agent 工作流 · Prompt 工程 · 调用成本控制</dd>
+</dl>
+
+<h2>工作经历</h2>
+
+<div class="item">
+  <div class="item-head">
+    <h3>深圳市潮向科技有限公司 ｜ Java 开发工程师（后端技术负责人）</h3>
+    <time>2024.05 - 2026.03</time>
+  </div>
+  <ul>
+    <li>主导集团级数据大屏后端技术选型与架构设计，采用 SpringCloud 构建微服务并按业务域拆分服务边界</li>
+    <li>负责与大数据平台、SIS 等 <b>9 个异构系统</b>的数据集成，统一 <b>580 个指标</b>口径对外提供</li>
+    <li>配置维护 <b>4 台服务器</b>，部署 Nginx 实现负载均衡保障高可用</li>
+    <li>引入 <b>ShardingSphere</b> 解决单表数据量增长后的查询瓶颈；引入 <b>MinIO</b> 对象存储</li>
+    <li>主导性能优化与稳定性建设，负责复杂问题排查与技术攻关</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>深圳小信科技有限公司 ｜ Java 开发工程师（研发部）</h3>
+    <time>2022.03 - 2024.04</time>
+  </div>
+  <ul>
+    <li>担任医院电子通行证系统（<span class="hl">5 模块微服务 / 1067 个 Java 文件 / 约 389 个 REST 接口</span>）、病案无纸化系统的<b>后端主程</b></li>
+    <li>主导设备侧对接：基于 <b>MQTT</b> 实现人员服务与门禁闸机异步解耦，支持多厂商设备接入</li>
+    <li>对接医院信息系统：基于 <b>HL7</b>（HAPI）接收患者信息，实现院内数据打通</li>
+    <li>主导性能优化：ShardingSphere 分库分表、RabbitMQ 解耦、Redis 缓存登录态与字典</li>
+    <li>参与技术选型与代码评审，指导初级开发人员</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>珠海析码数据技术有限公司 ｜ Java 开发工程师</h3>
+    <time>2020.07 - 2022.02</time>
+  </div>
+  <ul>
+    <li>参与业务系统后端开发与维护，完成接口开发、数据库设计与业务逻辑实现</li>
+    <li>使用 MySQL、Redis 进行数据存储与缓存处理；参与代码评审与技术文档编写</li>
+  </ul>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>主动学习期 · 独立项目实践</h3>
+    <time>2026.03 - 至今</time>
+  </div>
+  <ul>
+    <li><b>全栈项目实践</b>：独立完成从设计、开发、测试到部署上线的完整项目（详见作品集）</li>
+    <li><b>AI 工程化落地</b>：搭建统一模型网关（聚合 4 家供应商、40+ 模型、35 条降级链）与运维自动化体系</li>
+    <li>持续输出技术文章，记录设计取舍与踩坑过程</li>
+  </ul>
+</div>
+
+<h2>项目经验</h2>
+
+<div class="item">
+  <div class="item-head">
+    <h3>深圳能源大屏 ｜ 后端技术负责人</h3>
+    <time>2024.05 - 2026.03</time>
+  </div>
+  <div class="proj-desc">
+    围绕集团概况、产业布局、低碳电力、生态环保等 7 大主题建设的集团级数据大屏，共 36 个业务板块，接入 167 家生产企业，与大数据平台、SIS 等 9 个系统实现数据集成，接入 580 个指标，展示 6000 余项数据及各厂监控画面。
+  </div>
+  <div class="tech"><b>技术栈</b>：SpringCloud · ShardingSphere · MinIO · Redis · Nginx · MySQL</div>
+  <ul>
+    <li><b>异构数据源统一</b>：9 个来源系统的数据模型、更新频率、接口协议各不相同。设计统一接入层把不同来源归一为一致的指标模型，避免每个板块重复对接</li>
+    <li><b>单表瓶颈</b>：数据量增长后查询变慢，采用 ShardingSphere 分片，分片键按查询模式选择，尽量保证常用查询能路由到单片</li>
+    <li><b>多系统一致性</b>：跨系统取数存在时序差异，通过缓存与更新策略降低对上游的实时依赖</li>
+  </ul>
+  <div class="metrics"><b>量化规模</b>：36 个业务板块 · 167 家生产企业 · 9 个系统集成 · 580 个指标 · 4 台服务器</div>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>医院电子通行证系统 ｜ 后端主程</h3>
+    <time>2022.03 - 2024.04</time>
+  </div>
+  <div class="proj-desc">
+    面向医院出入人员管理并与门禁闸机联动的系统，支持通行记录采集与分析、实时访客管理、门禁授权管理。采用 5 模块微服务架构，已被十余家医院采购并投入使用。
+  </div>
+  <div class="tech"><b>技术栈</b>：SpringCloud · RabbitMQ · ShardingSphere · ElasticSearch · Redis · MQTT · HL7 · MySQL · Oracle · Nginx</div>
+  <ul>
+    <li><b>多厂商设备接入</b>：不同门禁设备通信协议不一致。通过 MQTT 统一设备通信层，新增厂商只需实现对应适配，不改业务代码</li>
+    <li><b>与医院既有系统集成</b>：医院侧使用 HL7 医疗数据交换标准。基于 HAPI 实现消息解析与转换，把标准协议数据映射到本系统数据模型</li>
+    <li><b>高频写入瓶颈</b>：通行记录是高频写入 + 按时间范围检索场景，采用 ShardingSphere 分库分表，分片键兼顾"按人查"与"按时间查"两类查询</li>
+    <li><b>服务耦合</b>：人员服务与设备模块原先强耦合，引入 RabbitMQ 异步解耦，提升整体可用性</li>
+  </ul>
+  <div class="metrics"><b>量化规模</b>：1067 个 Java 文件 · 5 个微服务模块 · 36 个 Controller · 约 389 个 REST 接口 · 265 个数据实体 · 十余家医院在用</div>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>病案无纸化管理系统 ｜ 后端主程</h3>
+    <time>2022.03 - 2024.04</time>
+  </div>
+  <div class="proj-desc">
+    基于电子签名技术实现无纸化归档的电子病案管理系统。整合各临床信息系统数据形成完整电子病案卷宗，使病案可脱离原系统独立展示与查阅。功能覆盖数据采集、归档、打印、借阅、封存、质控、召回的完整生命周期。
+  </div>
+  <div class="tech"><b>技术栈</b>：SpringBoot · MySQL · Redis · MinIO · 电子签名</div>
+  <ul>
+    <li><b>多来源文档整合</b>：一份完整病案由住院病案首页、入院记录、手术知情同意书、护理记录单、各类检查报告等十余种文档构成，来源系统各异。需要把分散在多个临床信息系统的数据汇聚成可独立展示的完整卷宗</li>
+    <li><b>大文件存储与并发</b>：病案文档体积大、数量多，本地文件系统并发上传下载表现不佳。改用 MinIO 对象存储，把文件读写从应用服务器剥离</li>
+    <li><b>数据安全与合规</b>：病案属敏感数据，借阅场景存在恶意重复下载风险。基于 Redis 记录并限制下载次数，同时保证正常业务不受影响</li>
+  </ul>
+  <div class="metrics"><b>量化规模</b>：覆盖借阅 / 封存解封 / 打印召回 / 查询 / 质控 6 个功能模块 · 整合十余类临床文档 · 十余家医院在用</div>
+</div>
+
+<div class="item">
+  <div class="item-head">
+    <h3>自建 AI 基础设施与运维自动化 ｜ 独立设计与实现</h3>
+    <time>2025 - 至今</time>
+  </div>
+  <div class="proj-desc">
+    为多个项目统一接入大模型能力，并把部署、监控、故障恢复做成自动化流程，减少人工介入。
+  </div>
+  <ul>
+    <li><b>统一 LLM 网关</b>：聚合 4 家供应商、40+ 模型条目，配置 35 条 fallback 降级链与默认兜底模型，把不同平台的鉴权方式、接口协议、限流策略统一为一种调用方式</li>
+    <li><b>容错设计</b>：区分可重试与不可重试错误，上游限流/超时自动降级；理解并处理各供应商差异（UA 拦截、baseURL 规范、配额限制）</li>
+    <li><b>运维自动化</b>：定时任务（模型清单扫描、服务健康检查、内容抓取）+ 异常推送告警；实现公网 IP 漂移的自动识别与放行闭环</li>
+  </ul>
+  <div class="metrics"><b>量化规模</b>：4 家模型供应商 · 40+ 模型条目 · 35 条降级链 · 6 个对外域名 · 7 个定时任务</div>
+</div>
+
+<h2>技术输出</h2>
+<div class="proj-desc">
+在个人博客持续输出工程实践文章（累计约 2 万字），代表文章：《ShardingSphere 分库分表实践：从选型到踩坑》《Redis 缓存设计：穿透、击穿、雪崩的实际处理》《MySQL 慢查询优化：从执行计划到索引设计》《RabbitMQ 在微服务解耦中的正确用法》《SpringCloud 微服务拆分：一次真实的架构演进》《自建 LLM 网关：统一 4 家供应商的架构设计》
+</div>
+
+</body>
+</html>
