@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="740" viewBox="0 0 1280 740">
+  <rect width="1280" height="740" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">SPRINGCLOUD / SERVICE BOUNDARY</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="42" font-weight="700">按什么拆？四个依据的优先级</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <!-- 四个依据 -->
+    <rect x="72" y="170" width="266" height="150" rx="10" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+    <text x="100" y="206" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="15">优先级 1</text>
+    <text x="100" y="238" fill="#f2f7fb" font-size="20" font-weight="700">变化频率</text>
+    <text x="100" y="268" fill="#9eb0c2" font-size="15">变化快的独立出来</text>
+    <text x="100" y="292" fill="#9eb0c2" font-size="15">避免小改动全量发布</text>
+
+    <rect x="362" y="170" width="266" height="150" rx="10" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+    <text x="390" y="206" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="15">优先级 2</text>
+    <text x="390" y="238" fill="#f2f7fb" font-size="20" font-weight="700">数据源</text>
+    <text x="390" y="268" fill="#9eb0c2" font-size="15">不同来源分开隔离</text>
+    <text x="390" y="292" fill="#9eb0c2" font-size="15">防上游拖垮整个服务</text>
+
+    <rect x="652" y="170" width="266" height="150" rx="10" fill="#101a29" stroke="#22d3ee" stroke-width="2"/>
+    <text x="680" y="206" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="15">优先级 3</text>
+    <text x="680" y="238" fill="#f2f7fb" font-size="20" font-weight="700">性能特征</text>
+    <text x="680" y="268" fill="#9eb0c2" font-size="15">读多/写多分开</text>
+    <text x="680" y="292" fill="#9eb0c2" font-size="15">实时/离线分开扩容</text>
+
+    <rect x="942" y="170" width="266" height="150" rx="10" fill="#101a29" stroke="#294158"/>
+    <text x="970" y="206" fill="#6f8497" font-family="Menlo,Consolas,monospace" font-size="15">优先级 4</text>
+    <text x="970" y="238" fill="#c9d6e2" font-size="20" font-weight="700">团队边界</text>
+    <text x="970" y="268" fill="#9eb0c2" font-size="15">康威定律，有明确团队</text>
+    <text x="970" y="292" fill="#9eb0c2" font-size="15">边界时优先</text>
+
+    <!-- 两个极端 -->
+    <rect x="72" y="348" width="552" height="106" rx="10" fill="#2b1418" stroke="#fb7185"/>
+    <text x="100" y="382" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="16">❌ 拆太细</text>
+    <text x="100" y="412" fill="#f2f7fb" font-size="17">一个页面调 6 个服务，日志分散无法串联</text>
+    <text x="100" y="438" fill="#9eb0c2" font-size="15">排查问题要开一堆日志窗口，故障定位困难</text>
+
+    <rect x="656" y="348" width="552" height="106" rx="10" fill="#2b2410" stroke="#fbbf24"/>
+    <text x="684" y="382" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="16">❌ 拆太粗</text>
+    <text x="684" y="412" fill="#f2f7fb" font-size="17">只有"前端服务"和"后台服务"，等于没拆</text>
+    <text x="684" y="438" fill="#9eb0c2" font-size="15">无法按模块扩容，一处改动仍需全量发布</text>
+
+    <!-- 最终结果 -->
+    <text x="72" y="506" fill="#f2f7fb" font-size="22" font-weight="700">最终：6 个服务</text>
+    <text x="280" y="506" fill="#6f8497" font-size="15">↑ 每个都能说清"为什么独立"</text>
+
+    <g font-family="Menlo,Consolas,monospace" font-size="14">
+      <rect x="72" y="522" width="180" height="66" rx="8" fill="#101a29" stroke="#22d3ee"/>
+      <text x="94" y="550" fill="#22d3ee">gateway</text>
+      <text x="94" y="574" fill="#9eb0c2" font-size="13">基础设施</text>
+
+      <rect x="266" y="522" width="180" height="66" rx="8" fill="#101a29" stroke="#294158"/>
+      <text x="288" y="550" fill="#c9d6e2">auth-service</text>
+      <text x="288" y="574" fill="#9eb0c2" font-size="13">变化频率低</text>
+
+      <rect x="460" y="522" width="180" height="66" rx="8" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+      <text x="482" y="550" fill="#34d399">metric-service</text>
+      <text x="482" y="574" fill="#9eb0c2" font-size="13">数据源最多最复杂</text>
+
+      <rect x="654" y="522" width="180" height="66" rx="8" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+      <text x="676" y="550" fill="#34d399">board-service</text>
+      <text x="676" y="574" fill="#9eb0c2" font-size="13">读多写少·变化频繁</text>
+
+      <rect x="848" y="522" width="170" height="66" rx="8" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+      <text x="870" y="550" fill="#34d399">screen-service</text>
+      <text x="870" y="574" fill="#9eb0c2" font-size="13">性能特征不同</text>
+
+      <rect x="1032" y="522" width="176" height="66" rx="8" fill="#101a29" stroke="#294158"/>
+      <text x="1054" y="550" fill="#c9d6e2">system-service</text>
+      <text x="1054" y="574" fill="#9eb0c2" font-size="13">通用能力</text>
+    </g>
+
+    <rect x="72" y="616" width="1136" height="70" rx="10" fill="#0b1522" stroke="#294158"/>
+    <text x="104" y="648" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="16">关键：metric-service 单独拆出 —— 隔离「上游 9 个系统不稳定」这个最大风险源</text>
+    <text x="104" y="672" fill="#6f8497" font-size="14">它的迭代节奏与其他服务完全不同，塞在一起会互相牵制</text>
+  </g>
+</svg>

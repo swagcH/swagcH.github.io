@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">222</span>
+        <span class="site-state-item-count">224</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,189 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">MySQL慢查询分析</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-21 16:48:05" itemprop="dateCreated datePublished" datetime="2021-02-21T16:48:05+08:00">2021-02-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
+<p>这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。</p>
+<p>测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。</p>
+<h2 id="实验对象"><a href="#实验对象" class="headerlink" title="实验对象"></a>实验对象</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>表上原有索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">KEY idx_tenant (tenant_id),</span><br><span class="line">KEY idx_status (status),</span><br><span class="line">KEY idx_created_at (created_at)</span><br></pre></td></tr></table></figure>
+
+<p>三个查询字段分别有索引，很容易产生“应该不会慢”的判断。但 MySQL 通常不会把三个单列索引自动组合成最符合过滤和排序的访问路径。</p>
+<h2 id="先固定实验方法"><a href="#先固定实验方法" class="headerlink" title="先固定实验方法"></a>先固定实验方法</h2><p>为了让结果可比较，我约定：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">数据库版本：MySQL 5.7</span><br><span class="line">数据快照：同一份脱敏数据</span><br><span class="line">结果数量：固定 50</span><br><span class="line">每个方案：预热 2 次，记录后续 5 次</span><br><span class="line">同时记录：耗时、Rows_examined、执行计划、CPU</span><br><span class="line">每轮之间：不修改其他参数</span><br></pre></td></tr></table></figure>
+
+<p>缓存冷暖会显著影响耗时，所以不能拿第一次查询和第十次查询直接比较。生产问题还要从慢查询日志确认真实频率：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Query_time: 2.846  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 50  Rows_examined: 1184297</span><br></pre></td></tr></table></figure>
+
+<p>只返回 50 行却扫描 118 万行，是比单次 2.8 秒更稳定的信号。</p>
+<p>慢查询日志的全局开关会影响数据库行为，应由数据库管理员按规范操作。排查人员优先读取现有平台和日志，不在生产随意执行 <code>SET GLOBAL</code>。</p>
+<h2 id="基线：执行计划在做什么"><a href="#基线：执行计划在做什么" class="headerlink" title="基线：执行计划在做什么"></a>基线：执行计划在做什么</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>精简后的结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">possible_keys: idx_tenant,idx_status,idx_created_at</span><br><span class="line">key: idx_status</span><br><span class="line">rows: 1120000</span><br><span class="line">Extra: Using index condition; Using where; Using filesort</span><br></pre></td></tr></table></figure>
+
+<p>这里重点看四项：</p>
+<ol>
+<li><code>key</code>：实际选择了哪个索引。</li>
+<li><code>rows</code>：优化器估算要检查多少行。</li>
+<li><code>Using where</code>：取出索引记录后仍需过滤。</li>
+<li><code>Using filesort</code>：结果顺序无法直接由当前索引满足。</li>
+</ol>
+<p><code>type=range</code> 不代表一定高效。状态 <code>PAID</code> 在全表中占比很高，先按状态扫描仍会读取大量不属于租户 1001 的记录。</p>
+<h2 id="假设-A：只强制使用租户索引"><a href="#假设-A：只强制使用租户索引" class="headerlink" title="假设 A：只强制使用租户索引"></a>假设 A：只强制使用租户索引</h2><p>为了验证选择性，我在隔离环境使用 <code>FORCE INDEX</code> 做对照：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>扫描从约 112 万行下降到 31 万行，平均耗时从 2.8 秒下降到 0.9 秒，但仍需要过滤和排序。</p>
+<p>这个实验说明 <code>tenant_id</code> 比 <code>status</code> 更有选择性，不说明应该把 <code>FORCE INDEX</code> 写进业务 SQL。数据分布变化后，强制策略可能比优化器更差。</p>
+<h2 id="假设-B：建立符合查询顺序的联合索引"><a href="#假设-B：建立符合查询顺序的联合索引" class="headerlink" title="假设 B：建立符合查询顺序的联合索引"></a>假设 B：建立符合查询顺序的联合索引</h2><p>查询模式是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tenant_id：等值</span><br><span class="line">status：等值</span><br><span class="line">created_at：范围 + 倒序</span><br></pre></td></tr></table></figure>
+
+<p>因此实验索引为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
+
+<p>在生产执行该 DDL 前，必须确认数据库版本、在线 DDL 能力、表大小、额外磁盘、锁等待和复制延迟，并准备中止与回退方案。</p>
+<p>新执行计划：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">key: idx_tenant_status_created</span><br><span class="line">rows: 41862</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
+
+<p><code>Using filesort</code> 消失。因为前两列是等值条件，MySQL 可以沿 <code>created_at</code> 的索引顺序取最近记录，并在满足 <code>LIMIT 50</code> 后尽早停止。</p>
+<p>五次记录：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th align="right">平均耗时</th>
+<th align="right">P95</th>
+<th align="right">Rows_examined</th>
+<th>filesort</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原始索引</td>
+<td align="right">2.81s</td>
+<td align="right">3.06s</td>
+<td align="right">1,184,297</td>
+<td>是</td>
+</tr>
+<tr>
+<td>强制租户索引</td>
+<td align="right">0.91s</td>
+<td align="right">1.02s</td>
+<td align="right">312,460</td>
+<td>是</td>
+</tr>
+<tr>
+<td>联合索引</td>
+<td align="right">43ms</td>
+<td align="right">58ms</td>
+<td align="right">50</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>慢查询日志里的实际 <code>Rows_examined</code> 比 <code>EXPLAIN rows</code> 更能反映本次执行。执行计划的 <code>rows</code> 是估算值，两者不应混为一谈。</p>
+<h2 id="假设-C：把所有返回列都塞进索引"><a href="#假设-C：把所有返回列都塞进索引" class="headerlink" title="假设 C：把所有返回列都塞进索引"></a>假设 C：把所有返回列都塞进索引</h2><p>有人提出把 <code>order_no</code> 和 <code>amount</code> 也加到索引，做成覆盖索引。实验中查询确实少了回表，但收益只有几毫秒，索引体积和写入成本却继续增加。</p>
+<p>这个接口只读取 50 行，回表 50 次并不是主要矛盾。最终没有扩大索引。</p>
+<p>覆盖索引适合返回列少、调用频繁、扫描量明显的场景。不能为了让 <code>Extra</code> 出现 <code>Using index</code>，就把大字段和大量业务字段都加入索引。</p>
+<h2 id="假设-D：去掉时间条件会怎样"><a href="#假设-D：去掉时间条件会怎样" class="headerlink" title="假设 D：去掉时间条件会怎样"></a>假设 D：去掉时间条件会怎样</h2><p>另一个接口复用了相同 SQL，但允许用户查询全部历史。去掉 <code>created_at</code> 条件后，联合索引仍能根据租户和状态定位，并按时间取前 50 条，因此首页仍然很快。</p>
+<p>问题出现在深分页：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>数据库必须跳过前 20 万条，耗时重新上升。解决方式不是继续加索引，而是改成游标：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (created_at <span class="operator">&lt;</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span></span><br><span class="line">       <span class="keyword">OR</span> (created_at <span class="operator">=</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span> <span class="keyword">AND</span> id <span class="operator">&lt;</span> <span class="number">2918172</span>))</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
+
+<p>为了让排序稳定，正式方案将 <code>id</code> 放到索引末尾并作为游标的一部分。仅按时间分页时，相同时间的记录可能重复或遗漏。</p>
+<h2 id="索引上线前后分别验证"><a href="#索引上线前后分别验证" class="headerlink" title="索引上线前后分别验证"></a>索引上线前后分别验证</h2><p>上线前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] SQL 来自真实慢日志，不是凭印象优化</span><br><span class="line">[ ] 数据分布和生产相近</span><br><span class="line">[ ] 联合索引顺序匹配过滤与排序</span><br><span class="line">[ ] 检查已有重复索引</span><br><span class="line">[ ] 评估索引大小、写放大和复制延迟</span><br><span class="line">[ ] 准备 DDL 观察与中止方案</span><br></pre></td></tr></table></figure>
+
+<p>上线后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 实际执行计划使用预期索引</span><br><span class="line">[ ] Rows_examined 与耗时下降</span><br><span class="line">[ ] 数据库 CPU 和 IO 没有异常上升</span><br><span class="line">[ ] INSERT、UPDATE 延迟仍在基线内</span><br><span class="line">[ ] 主从延迟正常</span><br><span class="line">[ ] 一周后复核真实查询分布</span><br></pre></td></tr></table></figure>
+
+<p>这次优化最有价值的并不是“加了一个联合索引”，而是验证过程：先用真实慢日志建立基线，再用单列索引实验理解选择性，最后让索引顺序匹配查询模式，并拒绝收益很小的过宽覆盖索引。</p>
+<p>执行计划不是一张及格证。只有扫描量、响应时间、写入成本和真实业务负载一起改善，这次调优才算完成。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +436,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -459,7 +642,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -600,7 +783,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -815,7 +998,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1018,7 +1201,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1185,7 +1368,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1360,7 +1543,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1543,7 +1726,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1703,7 +1886,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1834,223 +2017,6 @@
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 关键事件能否按 traceId 和业务编号检索</span><br><span class="line">[ ] 事件名、字段名和结果码是否稳定</span><br><span class="line">[ ] 异常是否只在合适层级记录一次</span><br><span class="line">[ ] ERROR 是否真的需要行动</span><br><span class="line">[ ] 是否泄露敏感字段或完整请求体</span><br><span class="line">[ ] 异步和跨服务场景是否传递上下文</span><br><span class="line">[ ] 高频日志是否影响性能和存储</span><br><span class="line">[ ] 滚动、保留和告警规则是否匹配</span><br></pre></td></tr></table></figure>
 
 <p>一条好日志应该像交接给值班同事的一句完整说明：哪件事失败、影响谁、证据在哪里。只有真正出问题时还能用得上的日志，才值得在正常运行的每一分钟里被写入。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2020/07/12/2020-07-12-Git%E5%8D%8F%E4%BD%9C%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B/" class="post-title-link" itemprop="url">Git协作开发流程</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-07-12 18:20:53" itemprop="dateCreated datePublished" datetime="2020-07-12T18:20:53+08:00">2020-07-12</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%B7%A5%E7%A8%8B%E8%A7%84%E8%8C%83/" itemprop="url" rel="index"><span itemprop="name">工程规范</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2020/git-collaboration-cover.svg" alt="Git协作开发流程封面图"></p>
-<p>一个人使用 Git，记住 <code>add</code>、<code>commit</code>、<code>push</code> 基本够用；多人协作以后，难点变成了什么时候开分支、如何保持改动足够小、冲突由谁处理，以及线上版本怎样准确追溯。</p>
-<p>下面是我逐步整理出来的一份团队运行手册。它不追求复杂的分支模型，目标只有三个：主分支随时可发布、每次改动可以审查、出现问题能够回退。</p>
-<h2 id="分支只承担清晰职责"><a href="#分支只承担清晰职责" class="headerlink" title="分支只承担清晰职责"></a>分支只承担清晰职责</h2><p>小团队可以从三类分支开始：</p>
-<table>
-<thead>
-<tr>
-<th>分支</th>
-<th>来源</th>
-<th>生命周期</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>main</code></td>
-<td>受保护分支</td>
-<td>长期</td>
-<td>已验证、可发布代码</td>
-</tr>
-<tr>
-<td><code>feature/*</code></td>
-<td><code>main</code></td>
-<td>数小时到数天</td>
-<td>单个需求或技术任务</td>
-</tr>
-<tr>
-<td><code>hotfix/*</code></td>
-<td>线上 Tag</td>
-<td>尽可能短</td>
-<td>生产紧急修复</td>
-</tr>
-</tbody></table>
-<p>如果团队有固定测试窗口，可以增加 <code>release/*</code>；如果没有明确收益，不必照搬完整 Git Flow。分支越多，版本流转和补丁同步成本越高。</p>
-<p>分支名要能直接关联工作：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">feature/order-export</span><br><span class="line">fix/payment-callback-idempotency</span><br><span class="line">hotfix/20200712-login-timeout</span><br></pre></td></tr></table></figure>
-
-<p><code>tmp</code>、<code>new</code>、<code>test2</code> 之类名称会让几周后的清理和追溯变得困难。</p>
-<h2 id="开始任务前"><a href="#开始任务前" class="headerlink" title="开始任务前"></a>开始任务前</h2><p>先确认工作区干净，并从最新主分支创建任务分支：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git fetch origin</span><br><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git switch -c feature/order-export</span><br></pre></td></tr></table></figure>
-
-<p><code>--ff-only</code> 可以阻止 <code>pull</code> 在本地悄悄生成一次合并提交。如果当前 Git 版本不支持 <code>switch</code>，可以使用 <code>checkout</code> 完成相同操作。</p>
-<p>开始编码前还应明确：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">需求或缺陷编号</span><br><span class="line">本次明确包含和不包含的范围</span><br><span class="line">数据库、接口、配置是否变化</span><br><span class="line">验证方式</span><br><span class="line">上线和回退方式</span><br></pre></td></tr></table></figure>
-
-<p>Git 能记录代码变化，却不能替代范围管理。</p>
-<h2 id="一个提交表达一个意图"><a href="#一个提交表达一个意图" class="headerlink" title="一个提交表达一个意图"></a>一个提交表达一个意图</h2><p>好的提交不是“今天写了多少”，而是一个可以独立解释、审查和撤销的变化。例如：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">feat(order): add paid-order export endpoint</span><br><span class="line">fix(payment): ignore duplicated callback</span><br><span class="line">test(order): cover export permission boundary</span><br><span class="line">refactor(order): extract status transition validation</span><br></pre></td></tr></table></figure>
-
-<p>提交前先检查实际内容：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status --short</span><br><span class="line">git diff</span><br><span class="line">git diff --cached</span><br></pre></td></tr></table></figure>
-
-<p>不要习惯性执行 <code>git add .</code>。配置、日志、IDE 文件和临时数据很容易一起进入提交。更稳妥的方式是按文件或按代码块暂存：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add src/main/java/com/example/order/OrderExportService.java</span><br><span class="line">git add -p</span><br><span class="line">git commit -m <span class="string">&quot;feat(order): add paid-order export service&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>如果一次提交同时包含格式化全项目、重命名、业务修改和依赖升级，Review 很难分辨真正变化。应把机械修改和行为修改拆开。</p>
-<h2 id="每天与主分支同步"><a href="#每天与主分支同步" class="headerlink" title="每天与主分支同步"></a>每天与主分支同步</h2><p>短分支能显著降低冲突。功能开发超过一天时，我会定期同步远端：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin</span><br><span class="line">git rebase origin/main</span><br></pre></td></tr></table></figure>
-
-<p>适合使用 <code>rebase</code> 的前提是分支由自己维护，或者团队明确允许重写该分支历史。已经被多人共同使用的分支不要随意 rebase，否则其他人的提交基线会变化。</p>
-<p>不允许重写历史时，使用合并：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/main</span><br></pre></td></tr></table></figure>
-
-<p>团队应统一一种默认方式。混合使用并不可怕，真正麻烦的是没有约定，导致提交图无法解释。</p>
-<h2 id="冲突处理不是选择“我的”或“他的”"><a href="#冲突处理不是选择“我的”或“他的”" class="headerlink" title="冲突处理不是选择“我的”或“他的”"></a>冲突处理不是选择“我的”或“他的”</h2><p>冲突发生时先暂停自动操作，理解两边意图：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br><span class="line">git diff --name-only --diff-filter=U</span><br><span class="line">git <span class="built_in">log</span> --oneline --left-right HEAD...origin/main</span><br></pre></td></tr></table></figure>
-
-<p>处理步骤：</p>
-<ol>
-<li>阅读当前分支和主分支对应提交。</li>
-<li>确认两边修改解决的业务问题。</li>
-<li>手工合成最终行为，而不是直接选择一侧。</li>
-<li>删除冲突标记，重新编译并运行相关测试。</li>
-<li><code>git add</code> 已解决文件，再继续 rebase 或 commit。</li>
-</ol>
-<p>如果方向不对，可以执行 <code>git rebase --abort</code> 或 <code>git merge --abort</code> 回到操作前。中止比带着不确定结果继续提交更可靠。</p>
-<h2 id="提交合并请求前的自检"><a href="#提交合并请求前的自检" class="headerlink" title="提交合并请求前的自检"></a>提交合并请求前的自检</h2><p>合并请求不是把检查工作转交给 Reviewer。提交前至少确认：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[ ] 改动范围与任务一致，没有临时文件</span><br><span class="line">[ ] 编译、自动测试和静态检查通过</span><br><span class="line">[ ] 接口、数据库和配置变化有说明</span><br><span class="line">[ ] 日志不包含密码、Token 或个人敏感信息</span><br><span class="line">[ ] 新增分支和异常路径有测试</span><br><span class="line">[ ] 兼容与回退方式明确</span><br><span class="line">[ ] 分支已同步最新主分支</span><br></pre></td></tr></table></figure>
-
-<p>合并请求描述建议回答四件事：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 为什么改</span></span><br><span class="line">支付回调可能重复投递，积分会重复增加。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么改</span></span><br><span class="line">以支付流水号建立唯一约束，重复请求返回原处理结果。</span><br><span class="line"></span><br><span class="line"><span class="section">## 怎么验证</span></span><br><span class="line">单次、重复、并发回调测试均通过。</span><br><span class="line"></span><br><span class="line"><span class="section">## 风险与回退</span></span><br><span class="line">先上线约束与兼容代码；回退应用不删除约束。</span><br></pre></td></tr></table></figure>
-
-<p>Reviewer 应重点看业务边界、数据一致性、异常处理和测试，格式问题尽量交给自动化工具。</p>
-<h2 id="主分支的合并规则"><a href="#主分支的合并规则" class="headerlink" title="主分支的合并规则"></a>主分支的合并规则</h2><p>主分支至少应有这些保护：</p>
-<ul>
-<li>禁止直接 push。</li>
-<li>必须通过合并请求。</li>
-<li>CI 检查通过后才能合并。</li>
-<li>至少一位非作者 Review。</li>
-<li>禁止提交密钥和生成物。</li>
-<li>合并后自动删除短期分支。</li>
-</ul>
-<p>是否使用 merge commit、squash 或 rebase merge，可以按团队追溯习惯选择：</p>
-<table>
-<thead>
-<tr>
-<th>方式</th>
-<th>优点</th>
-<th>适合场景</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Merge commit</td>
-<td>保留完整分支上下文</td>
-<td>大功能、需要保留阶段提交</td>
-</tr>
-<tr>
-<td>Squash</td>
-<td>主线简洁，一个任务一个提交</td>
-<td>小而频繁的功能分支</td>
-</tr>
-<tr>
-<td>Rebase merge</td>
-<td>线性历史且保留提交</td>
-<td>提交本身已经整理良好</td>
-</tr>
-</tbody></table>
-<p>不要在同一个仓库随意切换策略，否则查找版本和回退时会增加认知成本。</p>
-<h2 id="发布必须能对应到提交"><a href="#发布必须能对应到提交" class="headerlink" title="发布必须能对应到提交"></a>发布必须能对应到提交</h2><p>每次生产发布都创建不可变 Tag：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch main</span><br><span class="line">git pull --ff-only origin main</span><br><span class="line">git tag -a v1.8.0 -m <span class="string">&quot;release v1.8.0&quot;</span></span><br><span class="line">git push origin v1.8.0</span><br></pre></td></tr></table></figure>
-
-<p>发布记录至少包含 Tag、构建编号、数据库变更、配置版本和负责人。只有“周日晚上那一版”无法支持故障定位。</p>
-<p>回退前要先区分代码回退和数据回退。应用可以回到旧 Tag，但已执行的不可逆 DDL、已写入的新状态、已发送的消息不会自动恢复。</p>
-<h2 id="Hotfix-的最短闭环"><a href="#Hotfix-的最短闭环" class="headerlink" title="Hotfix 的最短闭环"></a>Hotfix 的最短闭环</h2><p>线上紧急修复从实际生产 Tag 创建，而不是从开发中的某个分支猜：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git switch -c hotfix/20200712-login-timeout v1.8.0</span><br><span class="line"><span class="comment"># 完成最小修改、测试和 Review</span></span><br><span class="line">git tag -a v1.8.1 -m <span class="string">&quot;hotfix login timeout&quot;</span></span><br><span class="line">git push origin v1.8.1</span><br></pre></td></tr></table></figure>
-
-<p>修复发布后，还要把对应提交合回主开发线，避免下一次发布重新带回缺陷。</p>
-<h2 id="关于强制推送和历史修改"><a href="#关于强制推送和历史修改" class="headerlink" title="关于强制推送和历史修改"></a>关于强制推送和历史修改</h2><p><code>git push --force</code> 可能覆盖远端他人的提交，受保护分支应直接禁止。确需更新自己的未合并分支时，也优先使用：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --force-with-lease</span><br></pre></td></tr></table></figure>
-
-<p><code>--force-with-lease</code> 会在远端已被他人更新时拒绝覆盖，但它仍然是重写历史操作，执行前必须确认分支所有者和影响范围。</p>
-<p>同样，不把 <code>reset --hard</code> 当日常清理命令。未提交文件可能永久丢失；先查看 <code>status</code>、保存必要改动，再决定恢复方式。</p>
-<h2 id="一套流程最后解决的是沟通"><a href="#一套流程最后解决的是沟通" class="headerlink" title="一套流程最后解决的是沟通"></a>一套流程最后解决的是沟通</h2><p>这套手册执行一段时间后，最明显的变化并不是提交图更漂亮，而是问题更容易回答：某行代码为什么改、谁审过、对应哪个版本、怎样验证、能否回退。</p>
-<p>Git 协作的核心不是命令数量，而是把一次改动变成边界清楚、证据完整、可被团队接住的交付单元。</p>
 
       
     </div>

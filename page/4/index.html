@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">222</span>
+        <span class="site-state-item-count">224</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,181 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2022/02/20/2022-02-20-Spring%20Cloud%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Spring Cloud学习笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-02-20 21:07:33" itemprop="dateCreated datePublished" datetime="2022-02-20T21:07:33+08:00">2022-02-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>这篇是一份分层学习笔记。Spring Cloud 不是一个单独框架，而是一组约定和组件。记组件名字很快，真正费时间的是弄清每一层解决什么问题，以及故障时应该先检查哪一层。</p>
+</blockquote>
+<h2 id="1-先建立一张治理地图"><a href="#1-先建立一张治理地图" class="headerlink" title="1. 先建立一张治理地图"></a>1. 先建立一张治理地图</h2><p>我把常见能力分成七层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">流量入口：Gateway</span><br><span class="line">服务位置：Nacos Discovery / Eureka / Consul</span><br><span class="line">远程调用：OpenFeign + LoadBalancer</span><br><span class="line">配置管理：Nacos Config / Config Server</span><br><span class="line">稳定性：CircuitBreaker / Sentinel</span><br><span class="line">可观测性：Micrometer / Prometheus / Trace</span><br><span class="line">交付运行：Docker / CI/CD / Kubernetes</span><br></pre></td></tr></table></figure>
+
+<p>一次请求大概会经过：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Browser</span><br><span class="line">  -&gt; Gateway</span><br><span class="line">  -&gt; order-service</span><br><span class="line">       -&gt; OpenFeign</span><br><span class="line">       -&gt; stock-service</span><br><span class="line"></span><br><span class="line">order-service 和 stock-service</span><br><span class="line">  -&gt; 注册到服务注册中心</span><br><span class="line">  -&gt; 从配置中心读取各自配置</span><br><span class="line">  -&gt; 输出日志、指标和链路信息</span><br></pre></td></tr></table></figure>
+
+<p>这张图最重要的作用不是画架构，而是排查故障。请求没有到订单服务，先看网关；订单服务找不到库存服务，先看注册发现；服务能找到但调用超时，再看网络、线程池和 Feign 超时。</p>
+<h2 id="2-版本兼容比配置更先检查"><a href="#2-版本兼容比配置更先检查" class="headerlink" title="2. 版本兼容比配置更先检查"></a>2. 版本兼容比配置更先检查</h2><p>Spring Cloud 初学时最容易忽略版本。网上复制一段配置，依赖可能来自完全不同的年代：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Spring Boot 2.x：仍可使用 JDK 8，匹配 Spring Cloud 2020/2021 等版本线</span><br><span class="line">Spring Boot 3.x：要求 Java 17，包名迁移到 jakarta.*</span><br><span class="line">Spring Cloud Netflix 旧版本：常见 Ribbon、Hystrix、Zuul</span><br><span class="line">较新版本：更多使用 Spring Cloud LoadBalancer、CircuitBreaker、Gateway</span><br></pre></td></tr></table></figure>
+
+<p>本项目默认 JDK 8，因此示例以 Spring Boot 2.x 和 Spring Cloud 2021.x 的思路为主。具体小版本必须通过官方兼容矩阵确认，尤其是同时使用 Spring Cloud Alibaba 时，不能只让 Maven“没有报错”就认为版本兼容。</p>
+<p>使用 BOM 统一依赖版本：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">spring-cloud.version</span>&gt;</span>2021.0.8<span class="tag">&lt;/<span class="name">spring-cloud.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring-cloud.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Spring Cloud Alibaba 也应该使用对应 BOM，并根据兼容表选择版本。不要在各个子项目单独写组件版本，否则服务之间很快会出现难以解释的差异。</p>
+<h2 id="3-注册中心解决“服务在哪里”"><a href="#3-注册中心解决“服务在哪里”" class="headerlink" title="3. 注册中心解决“服务在哪里”"></a>3. 注册中心解决“服务在哪里”</h2><p>单体应用可以把下游地址写在配置里：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">stock-service:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://10.0.0.15:8082</span></span><br></pre></td></tr></table></figure>
+
+<p>实例扩容、迁移或重启以后，固定地址会变得难以维护。注册发现把实例列表交给注册中心：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">order-service</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8848</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="string">dev</span></span><br></pre></td></tr></table></figure>
+
+<p>服务名是治理体系里的稳定标识。<code>order-service</code> 注册后，调用方通过服务名获取实例列表，再由客户端负载均衡选择一个实例。</p>
+<p>排查注册问题时依次确认：</p>
+<ol>
+<li>应用是否真正启动成功。</li>
+<li><code>spring.application.name</code> 是否符合约定。</li>
+<li>Nacos 地址、namespace、group 和认证是否一致。</li>
+<li>控制台是否能看到实例，实例 IP 和端口是否可达。</li>
+<li>服务是否被标记为不健康。</li>
+</ol>
+<p>控制台“有实例”只代表注册成功，不代表调用方一定能连通。注册进去一个容器内部 IP，也会出现发现成功、调用超时。</p>
+<h2 id="4-配置中心解决“配置怎么管理”"><a href="#4-配置中心解决“配置怎么管理”" class="headerlink" title="4. 配置中心解决“配置怎么管理”"></a>4. 配置中心解决“配置怎么管理”</h2><p>注册中心和配置中心可能由同一个 Nacos 提供，但它们是两条不同链路。注册正常不代表配置一定加载成功。</p>
+<p>配置中心适合管理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">环境相关地址</span><br><span class="line">连接池和超时参数</span><br><span class="line">功能开关</span><br><span class="line">限流阈值</span><br><span class="line">不需要重新构建即可调整的业务参数</span><br></pre></td></tr></table></figure>
+
+<p>不适合把所有配置都动态刷新。数据库连接、线程池大小等参数修改后是否能安全生效，取决于组件实现。核心参数变更仍然需要评审、灰度和回滚记录。</p>
+<p>Spring Boot 2.4 以后配置加载机制发生过变化，部分版本使用 <code>spring.config.import</code>，旧项目常通过 <code>bootstrap.yml</code> 加载。实际项目要先确认 Spring Boot、Spring Cloud 和 Alibaba 版本，再决定配置写法，不能把两套机制混在一起。</p>
+<p>排查配置时记录三件事：</p>
+<ul>
+<li>最终加载的是哪个 Data ID、group 和 namespace。</li>
+<li>本地配置、环境变量和远程配置谁的优先级更高。</li>
+<li>配置变更以后 Bean 是否真的支持刷新。</li>
+</ul>
+<h2 id="5-OpenFeign-解决“服务怎么调用”"><a href="#5-OpenFeign-解决“服务怎么调用”" class="headerlink" title="5. OpenFeign 解决“服务怎么调用”"></a>5. OpenFeign 解决“服务怎么调用”</h2><p>OpenFeign 把 HTTP 契约声明成 Java 接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;stock-service&quot;, path = &quot;/stock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">StockClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/&#123;skuId&#125;&quot;)</span></span><br><span class="line">    Integer <span class="title function_">getStock</span><span class="params">(<span class="meta">@PathVariable(&quot;skuId&quot;)</span> Long skuId)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>它减少了重复的 HTTP 客户端代码，但远程调用的本质没有改变：仍然可能连接失败、超时、返回非预期状态码，也可能被重复调用。</p>
+<p>接口设计要明确：</p>
+<ol>
+<li>URL、HTTP 方法和参数序列化方式。</li>
+<li>连接超时和读取超时。</li>
+<li>错误码如何映射，不能把所有失败都转成 <code>null</code>。</li>
+<li>是否允许重试，写操作是否幂等。</li>
+<li>调用日志是否包含 traceId、目标服务和耗时。</li>
+</ol>
+<p>一段常见超时配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">default:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">1000</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">3000</span></span><br><span class="line">        <span class="attr">loggerLevel:</span> <span class="string">basic</span></span><br></pre></td></tr></table></figure>
+
+<p>不同 Spring Cloud OpenFeign 版本的配置前缀可能变化，升级时需要查看实际版本文档和启动日志。超时不是越大越稳定，应该从整条接口的时间预算倒推。</p>
+<h2 id="6-Gateway-解决“入口怎么收口”"><a href="#6-Gateway-解决“入口怎么收口”" class="headerlink" title="6. Gateway 解决“入口怎么收口”"></a>6. Gateway 解决“入口怎么收口”</h2><p>Gateway 常见职责包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">路由</span><br><span class="line">认证信息透传</span><br><span class="line">跨域处理</span><br><span class="line">限流</span><br><span class="line">灰度标记</span><br><span class="line">统一访问日志</span><br></pre></td></tr></table></figure>
+
+<p>它不适合承载大量业务编排。把订单逻辑写进网关过滤器，会让入口层难以扩容和测试。</p>
+<p>基础路由示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">order-route</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">lb://order-service</span></span><br><span class="line">          <span class="attr">predicates:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">Path=/api/order/**</span></span><br><span class="line">          <span class="attr">filters:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">StripPrefix=1</span></span><br></pre></td></tr></table></figure>
+
+<p>这里外部请求 <code>/api/order/create</code> 去掉一段前缀后，转发为 <code>/order/create</code>。遇到 404 时，必须同时写出“外部路径、过滤后路径、Controller 路径”，只看其中一段很容易绕晕。</p>
+<h2 id="7-稳定性组件不是错误吞掉器"><a href="#7-稳定性组件不是错误吞掉器" class="headerlink" title="7. 稳定性组件不是错误吞掉器"></a>7. 稳定性组件不是错误吞掉器</h2><p>熔断、限流和降级解决的是故障扩散问题，不是让异常消失。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">超时：限制一次调用最长占用资源的时间</span><br><span class="line">限流：限制进入系统的请求速率</span><br><span class="line">熔断：下游持续失败时快速拒绝，给它恢复时间</span><br><span class="line">降级：核心依赖不可用时返回可接受的替代结果</span><br><span class="line">隔离：限制某类调用可以占用的线程或并发量</span><br></pre></td></tr></table></figure>
+
+<p>库存扣减失败不能随便降级成“扣减成功”，商品推荐失败则可以返回空列表。降级策略必须由业务语义决定。</p>
+<h2 id="8-我的学习顺序"><a href="#8-我的学习顺序" class="headerlink" title="8. 我的学习顺序"></a>8. 我的学习顺序</h2><p>相比一次启动十个组件，下面的顺序更容易建立确定性：</p>
+<ol>
+<li>两个普通 Spring Boot 服务分别启动，先用固定 URL 调通。</li>
+<li>接入注册中心，验证服务名调用和实例切换。</li>
+<li>使用 OpenFeign，补齐超时、错误码和调用日志。</li>
+<li>增加 Gateway，逐条验证路由和过滤器。</li>
+<li>接入配置中心，验证配置来源和刷新边界。</li>
+<li>人工制造超时和实例下线，观察客户端行为。</li>
+<li>最后接入指标、日志和链路追踪。</li>
+</ol>
+<p>每一步都保留一个最小测试：健康检查、查询接口、写接口和超时接口。组件增加以后，先重复旧测试，再验证新能力。</p>
+<h2 id="9-一套固定排查顺序"><a href="#9-一套固定排查顺序" class="headerlink" title="9. 一套固定排查顺序"></a>9. 一套固定排查顺序</h2><p>遇到“微服务调用失败”时，我会按下面的顺序缩小范围：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">应用是否启动</span><br><span class="line">  -&gt; 配置是否加载</span><br><span class="line">  -&gt; 实例是否注册且地址可达</span><br><span class="line">  -&gt; 网关路由后的路径是否正确</span><br><span class="line">  -&gt; Feign 是否拿到实例</span><br><span class="line">  -&gt; TCP 连接和超时是否正常</span><br><span class="line">  -&gt; 下游线程池、连接池和业务日志是否异常</span><br></pre></td></tr></table></figure>
+
+<p>不要先怀疑最复杂的组件。很多 404 只是路径前缀错了，很多超时只是注册了不可达 IP，很多配置问题只是 namespace 不一致。</p>
+<h2 id="10-这份笔记最后留下什么"><a href="#10-这份笔记最后留下什么" class="headerlink" title="10. 这份笔记最后留下什么"></a>10. 这份笔记最后留下什么</h2><p>Spring Cloud 的价值不是提供一套固定架构，而是把微服务常见问题抽象成可替换的能力。理解“注册发现、配置、调用、入口、稳定性、可观测性”这些层次以后，即使以后替换 Nacos、Feign 或 Gateway，排查思路仍然有效。</p>
+<p>学习组件时，我更关心三个问题：它解决什么故障，它自己会引入什么故障，以及没有它时有没有更简单的办法。能回答这三个问题，才算真正把组件放进了架构里。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +428,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -450,7 +625,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -653,7 +828,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -821,7 +996,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -971,7 +1146,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1207,7 +1382,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1357,7 +1532,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1581,7 +1756,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1794,7 +1969,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1943,189 +2118,6 @@
 <h2 id="生产落地清单"><a href="#生产落地清单" class="headerlink" title="生产落地清单"></a>生产落地清单</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[ ] 无效参数在入口提前拒绝</span><br><span class="line">[ ] 权限校验不依赖缓存命中与否</span><br><span class="line">[ ] 空值使用独立标记和短 TTL</span><br><span class="line">[ ] 业务新增后主动失效空值缓存</span><br><span class="line">[ ] Bloom 容量、误判率和重建流程明确</span><br><span class="line">[ ] 同步失败有监控和降级路径</span><br><span class="line">[ ] 调用方、接口和批量大小有限流</span><br><span class="line">[ ] 监控缓存命中率、空值率和数据库回源 QPS</span><br></pre></td></tr></table></figure>
 
 <p>缓存穿透没有一个单点“银弹”。真正可靠的是多层减压：明显错误尽早拒绝，重复空结果短期记住，大范围不存在 ID 用概率结构过滤，异常流量在入口限速，而数据库仍保留最后的事实判断。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">MySQL慢查询分析</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-02-21 16:48:05" itemprop="dateCreated datePublished" datetime="2021-02-21T16:48:05+08:00">2021-02-21</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
-<p>这篇记录一次慢查询实验。目标不是看到耗时下降就结束，而是把每次改动的假设、执行计划、扫描行数和副作用放在一起比较。</p>
-<p>测试表约 320 万行，问题接口查询某租户最近的已支付订单。文中的数据来自隔离环境，生产索引变更仍需要单独评估锁、磁盘和主从延迟。</p>
-<h2 id="实验对象"><a href="#实验对象" class="headerlink" title="实验对象"></a>实验对象</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>表上原有索引：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PRIMARY KEY</span> (id),</span><br><span class="line">KEY idx_tenant (tenant_id),</span><br><span class="line">KEY idx_status (status),</span><br><span class="line">KEY idx_created_at (created_at)</span><br></pre></td></tr></table></figure>
-
-<p>三个查询字段分别有索引，很容易产生“应该不会慢”的判断。但 MySQL 通常不会把三个单列索引自动组合成最符合过滤和排序的访问路径。</p>
-<h2 id="先固定实验方法"><a href="#先固定实验方法" class="headerlink" title="先固定实验方法"></a>先固定实验方法</h2><p>为了让结果可比较，我约定：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">数据库版本：MySQL 5.7</span><br><span class="line">数据快照：同一份脱敏数据</span><br><span class="line">结果数量：固定 50</span><br><span class="line">每个方案：预热 2 次，记录后续 5 次</span><br><span class="line">同时记录：耗时、Rows_examined、执行计划、CPU</span><br><span class="line">每轮之间：不修改其他参数</span><br></pre></td></tr></table></figure>
-
-<p>缓存冷暖会显著影响耗时，所以不能拿第一次查询和第十次查询直接比较。生产问题还要从慢查询日志确认真实频率：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Query_time: 2.846  Lock_time: 0.000</span><br><span class="line"># Rows_sent: 50  Rows_examined: 1184297</span><br></pre></td></tr></table></figure>
-
-<p>只返回 50 行却扫描 118 万行，是比单次 2.8 秒更稳定的信号。</p>
-<p>慢查询日志的全局开关会影响数据库行为，应由数据库管理员按规范操作。排查人员优先读取现有平台和日志，不在生产随意执行 <code>SET GLOBAL</code>。</p>
-<h2 id="基线：执行计划在做什么"><a href="#基线：执行计划在做什么" class="headerlink" title="基线：执行计划在做什么"></a>基线：执行计划在做什么</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>精简后的结果：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">possible_keys: idx_tenant,idx_status,idx_created_at</span><br><span class="line">key: idx_status</span><br><span class="line">rows: 1120000</span><br><span class="line">Extra: Using index condition; Using where; Using filesort</span><br></pre></td></tr></table></figure>
-
-<p>这里重点看四项：</p>
-<ol>
-<li><code>key</code>：实际选择了哪个索引。</li>
-<li><code>rows</code>：优化器估算要检查多少行。</li>
-<li><code>Using where</code>：取出索引记录后仍需过滤。</li>
-<li><code>Using filesort</code>：结果顺序无法直接由当前索引满足。</li>
-</ol>
-<p><code>type=range</code> 不代表一定高效。状态 <code>PAID</code> 在全表中占比很高，先按状态扫描仍会读取大量不属于租户 1001 的记录。</p>
-<h2 id="假设-A：只强制使用租户索引"><a href="#假设-A：只强制使用租户索引" class="headerlink" title="假设 A：只强制使用租户索引"></a>假设 A：只强制使用租户索引</h2><p>为了验证选择性，我在隔离环境使用 <code>FORCE INDEX</code> 做对照：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN</span><br><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info FORCE INDEX (idx_tenant)</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> created_at <span class="operator">&gt;=</span> <span class="string">&#x27;2021-01-01 00:00:00&#x27;</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>扫描从约 112 万行下降到 31 万行，平均耗时从 2.8 秒下降到 0.9 秒，但仍需要过滤和排序。</p>
-<p>这个实验说明 <code>tenant_id</code> 比 <code>status</code> 更有选择性，不说明应该把 <code>FORCE INDEX</code> 写进业务 SQL。数据分布变化后，强制策略可能比优化器更差。</p>
-<h2 id="假设-B：建立符合查询顺序的联合索引"><a href="#假设-B：建立符合查询顺序的联合索引" class="headerlink" title="假设 B：建立符合查询顺序的联合索引"></a>假设 B：建立符合查询顺序的联合索引</h2><p>查询模式是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tenant_id：等值</span><br><span class="line">status：等值</span><br><span class="line">created_at：范围 + 倒序</span><br></pre></td></tr></table></figure>
-
-<p>因此实验索引为：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_tenant_status_created</span><br><span class="line"><span class="keyword">ON</span> order_info (tenant_id, status, created_at);</span><br></pre></td></tr></table></figure>
-
-<p>在生产执行该 DDL 前，必须确认数据库版本、在线 DDL 能力、表大小、额外磁盘、锁等待和复制延迟，并准备中止与回退方案。</p>
-<p>新执行计划：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">type: range</span><br><span class="line">key: idx_tenant_status_created</span><br><span class="line">rows: 41862</span><br><span class="line">Extra: Using index condition</span><br></pre></td></tr></table></figure>
-
-<p><code>Using filesort</code> 消失。因为前两列是等值条件，MySQL 可以沿 <code>created_at</code> 的索引顺序取最近记录，并在满足 <code>LIMIT 50</code> 后尽早停止。</p>
-<p>五次记录：</p>
-<table>
-<thead>
-<tr>
-<th>方案</th>
-<th align="right">平均耗时</th>
-<th align="right">P95</th>
-<th align="right">Rows_examined</th>
-<th>filesort</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>原始索引</td>
-<td align="right">2.81s</td>
-<td align="right">3.06s</td>
-<td align="right">1,184,297</td>
-<td>是</td>
-</tr>
-<tr>
-<td>强制租户索引</td>
-<td align="right">0.91s</td>
-<td align="right">1.02s</td>
-<td align="right">312,460</td>
-<td>是</td>
-</tr>
-<tr>
-<td>联合索引</td>
-<td align="right">43ms</td>
-<td align="right">58ms</td>
-<td align="right">50</td>
-<td>否</td>
-</tr>
-</tbody></table>
-<p>慢查询日志里的实际 <code>Rows_examined</code> 比 <code>EXPLAIN rows</code> 更能反映本次执行。执行计划的 <code>rows</code> 是估算值，两者不应混为一谈。</p>
-<h2 id="假设-C：把所有返回列都塞进索引"><a href="#假设-C：把所有返回列都塞进索引" class="headerlink" title="假设 C：把所有返回列都塞进索引"></a>假设 C：把所有返回列都塞进索引</h2><p>有人提出把 <code>order_no</code> 和 <code>amount</code> 也加到索引，做成覆盖索引。实验中查询确实少了回表，但收益只有几毫秒，索引体积和写入成本却继续增加。</p>
-<p>这个接口只读取 50 行，回表 50 次并不是主要矛盾。最终没有扩大索引。</p>
-<p>覆盖索引适合返回列少、调用频繁、扫描量明显的场景。不能为了让 <code>Extra</code> 出现 <code>Using index</code>，就把大字段和大量业务字段都加入索引。</p>
-<h2 id="假设-D：去掉时间条件会怎样"><a href="#假设-D：去掉时间条件会怎样" class="headerlink" title="假设 D：去掉时间条件会怎样"></a>假设 D：去掉时间条件会怎样</h2><p>另一个接口复用了相同 SQL，但允许用户查询全部历史。去掉 <code>created_at</code> 条件后，联合索引仍能根据租户和状态定位，并按时间取前 50 条，因此首页仍然很快。</p>
-<p>问题出现在深分页：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LIMIT <span class="number">200000</span>, <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>数据库必须跳过前 20 万条，耗时重新上升。解决方式不是继续加索引，而是改成游标：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, order_no, amount, created_at</span><br><span class="line"><span class="keyword">FROM</span> order_info</span><br><span class="line"><span class="keyword">WHERE</span> tenant_id <span class="operator">=</span> <span class="number">1001</span></span><br><span class="line">  <span class="keyword">AND</span> status <span class="operator">=</span> <span class="string">&#x27;PAID&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> (created_at <span class="operator">&lt;</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span></span><br><span class="line">       <span class="keyword">OR</span> (created_at <span class="operator">=</span> <span class="string">&#x27;2021-02-20 10:00:00&#x27;</span> <span class="keyword">AND</span> id <span class="operator">&lt;</span> <span class="number">2918172</span>))</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> created_at <span class="keyword">DESC</span>, id <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">50</span>;</span><br></pre></td></tr></table></figure>
-
-<p>为了让排序稳定，正式方案将 <code>id</code> 放到索引末尾并作为游标的一部分。仅按时间分页时，相同时间的记录可能重复或遗漏。</p>
-<h2 id="索引上线前后分别验证"><a href="#索引上线前后分别验证" class="headerlink" title="索引上线前后分别验证"></a>索引上线前后分别验证</h2><p>上线前：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] SQL 来自真实慢日志，不是凭印象优化</span><br><span class="line">[ ] 数据分布和生产相近</span><br><span class="line">[ ] 联合索引顺序匹配过滤与排序</span><br><span class="line">[ ] 检查已有重复索引</span><br><span class="line">[ ] 评估索引大小、写放大和复制延迟</span><br><span class="line">[ ] 准备 DDL 观察与中止方案</span><br></pre></td></tr></table></figure>
-
-<p>上线后：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[ ] 实际执行计划使用预期索引</span><br><span class="line">[ ] Rows_examined 与耗时下降</span><br><span class="line">[ ] 数据库 CPU 和 IO 没有异常上升</span><br><span class="line">[ ] INSERT、UPDATE 延迟仍在基线内</span><br><span class="line">[ ] 主从延迟正常</span><br><span class="line">[ ] 一周后复核真实查询分布</span><br></pre></td></tr></table></figure>
-
-<p>这次优化最有价值的并不是“加了一个联合索引”，而是验证过程：先用真实慢日志建立基线，再用单列索引实验理解选择性，最后让索引顺序匹配查询模式，并拒绝收益很小的过宽覆盖索引。</p>
-<p>执行计划不是一张及格证。只有扫描量、响应时间、写入成本和真实业务负载一起改善，这次调优才算完成。</p>
 
       
     </div>

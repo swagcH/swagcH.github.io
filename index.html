@@ -175,7 +175,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -186,7 +186,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">222</span>
+        <span class="site-state-item-count">224</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -208,6 +208,370 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/" class="post-title-link" itemprop="url">SpringCloud 微服务拆分：一次真实的架构演进</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-19 09:00:00" itemprop="dateCreated datePublished" datetime="2026-10-19T09:00:00+08:00">2026-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>“微服务拆分”经常被当成一个技术动作——把单体拆成几个服务，引入注册中心和网关就算完事。但实际做下来会发现，**拆分的难点从来不在技术组件，而在”边界怎么划”和”拆完之后怎么运维”**。</p>
+<p>这篇文章以我负责的一个集团级数据大屏项目为例，记录从架构选型、服务边界划分、异构系统集成，到部署与运维的完整过程。重点写<strong>判断依据和踩过的坑</strong>，而不是组件清单。</p>
+<h2 id="项目背景"><a href="#项目背景" class="headerlink" title="项目背景"></a>项目背景</h2><p><strong>规模</strong>：围绕 7 大主题（集团概况、产业布局、低碳电力、生态环保、综合燃气、数智服务、专题介绍）建设，共 36 个业务板块，接入 167 家生产企业，展示 6000 余项数据。</p>
+<p><strong>复杂度来源</strong>：需要与大数据平台、SIS（厂级监控信息系统）等 <strong>9 个异构系统</strong>做数据集成，对外提供 <strong>580 个指标</strong>。</p>
+<p><strong>约束</strong>：只有 4 台服务器，且要保证大屏展示的高可用（大屏是给领导看的，宕机影响面大）。</p>
+<p><img src="/images/posts/2026/springcloud-arch-overview.svg" alt="能源大屏微服务架构总览"></p>
+<h2 id="一、架构选型：为什么是-SpringCloud"><a href="#一、架构选型：为什么是-SpringCloud" class="headerlink" title="一、架构选型：为什么是 SpringCloud"></a>一、架构选型：为什么是 SpringCloud</h2><h3 id="候选方案对比"><a href="#候选方案对比" class="headerlink" title="候选方案对比"></a>候选方案对比</h3><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>优势</th>
+<th>代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>单体 + 模块化</strong></td>
+<td>部署简单、无网络开销、事务简单</td>
+<td>一处改动全量发布、无法按模块扩容</td>
+</tr>
+<tr>
+<td><strong>SpringCloud</strong></td>
+<td>生态成熟、团队熟悉、组件可选</td>
+<td>运维复杂度上升（注册中心、网关、配置中心）</td>
+</tr>
+<tr>
+<td><strong>SpringCloud Alibaba</strong></td>
+<td>自带 Nacos&#x2F;Sentinel，国内生态好</td>
+<td>与 SpringCloud 有版本对齐成本</td>
+</tr>
+<tr>
+<td><strong>Dubbo</strong></td>
+<td>RPC 性能好</td>
+<td>偏 RPC 调用，服务治理组件需自行补齐</td>
+</tr>
+</tbody></table>
+<p><strong>最终选 SpringCloud + Nacos</strong>，理由是：</p>
+<ol>
+<li><strong>团队熟悉度优先</strong>。技术选型要考虑团队能不能 hold 住，而不只是”哪个更先进”</li>
+<li><strong>Nacos 一个组件同时解决注册中心和配置中心</strong>，比 Eureka + Config 两套更省运维</li>
+<li><strong>生态和文档成熟</strong>，出问题容易找到资料</li>
+<li>**数据大屏本质是”多数据源聚合 + 展示”**，对 RPC 性能要求不高，Dubbo 的性能优势用不上</li>
+</ol>
+<h3 id="拆几个服务？按什么拆？"><a href="#拆几个服务？按什么拆？" class="headerlink" title="拆几个服务？按什么拆？"></a>拆几个服务？按什么拆？</h3><p><strong>这是最容易做错的决策。</strong> 我见过两种极端：</p>
+<ul>
+<li><strong>拆太细</strong>：一个业务拆七八个服务，一个请求跨五六个服务，排查问题要开一堆日志窗口</li>
+<li><strong>拆太粗</strong>：只有两个服务（”前端服务”和”后台服务”），等于没拆</li>
+</ul>
+<p><strong>我的拆分依据（按优先级）：</strong></p>
+<p><strong>1. 按变化频率拆</strong></p>
+<p>变化快的模块独立出来，避免每次小改动都要全量发布。比如”专题介绍”这类内容型板块，运营经常要调整，独立成服务后可以单独发布。</p>
+<p><strong>2. 按数据源拆</strong></p>
+<p>不同数据来源的模块分开，隔离故障。这个项目里有 9 个外部系统，如果全部塞在一个服务里，任何一个上游慢都会拖垮整个服务。</p>
+<p><strong>3. 按性能特征拆</strong></p>
+<p>读多写少和写多读少分开；实时查询和离线统计分开。大屏的”实时指标”和”历史趋势”承担的负载完全不同，拆开后可以独立扩容。</p>
+<p><strong>4. 按团队边界拆</strong>（如果有多个团队）</p>
+<p>康威定律：系统架构会趋同于组织结构。如果有明确的团队边界，按团队拆能减少协作成本。</p>
+<p><img src="/images/posts/2026/springcloud-split-criteria.svg" alt="服务拆分依据与 6 个服务的职责划分"></p>
+<p><strong>最终拆成了 6 个服务：</strong></p>
+<table>
+<thead>
+<tr>
+<th>服务</th>
+<th>职责</th>
+<th>拆分依据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>gateway</code></td>
+<td>统一入口、路由、鉴权、限流</td>
+<td>基础设施</td>
+</tr>
+<tr>
+<td><code>auth-service</code></td>
+<td>认证授权、菜单权限</td>
+<td>变化频率低但被所有服务依赖</td>
+</tr>
+<tr>
+<td><code>metric-service</code></td>
+<td>指标数据的接入与统一</td>
+<td>数据源最多、最复杂</td>
+</tr>
+<tr>
+<td><code>board-service</code></td>
+<td>大屏各板块的数据组装</td>
+<td>读多写少、变化频繁</td>
+</tr>
+<tr>
+<td><code>screen-service</code></td>
+<td>监控画面相关</td>
+<td>数据源独立、性能特征不同</td>
+</tr>
+<tr>
+<td><code>system-service</code></td>
+<td>系统管理、字典、日志</td>
+<td>通用能力</td>
+</tr>
+</tbody></table>
+<p><strong>注意 <code>metric-service</code> 单独拆出来的原因</strong>：它是整个项目最复杂的部分——要把 9 个来源、格式各异的数据统一成 580 个指标的标准模型。把它独立出来，一方面隔离了”上游系统不稳定”的风险，另一方面它的迭代节奏和其他服务完全不同。</p>
+<h2 id="二、异构系统集成：最花时间的部分"><a href="#二、异构系统集成：最花时间的部分" class="headerlink" title="二、异构系统集成：最花时间的部分"></a>二、异构系统集成：最花时间的部分</h2><p><strong>9 个系统、580 个指标，这部分工作量远超预期。</strong></p>
+<h3 id="难点在哪"><a href="#难点在哪" class="headerlink" title="难点在哪"></a>难点在哪</h3><p><strong>1. 接口协议各不相同</strong></p>
+<p>有的提供 REST API，有的是数据库直连，有的是消息推送（Kafka&#x2F;MQ），还有的只能通过文件交换。<strong>没有统一的接入方式。</strong></p>
+<p><strong>应对</strong>：设计<strong>统一接入层</strong>，每种协议实现一个适配器，向上暴露统一接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">MetricSourceAdapter</span> &#123;</span><br><span class="line">    <span class="comment">/** 该适配器支持的来源类型 */</span></span><br><span class="line">    SourceType <span class="title function_">supportType</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** 拉取指标数据 */</span></span><br><span class="line">    List&lt;MetricData&gt; <span class="title function_">fetch</span><span class="params">(MetricQuery query)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RestApiAdapter</span> <span class="keyword">implements</span> <span class="title class_">MetricSourceAdapter</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DbDirectAdapter</span> <span class="keyword">implements</span> <span class="title class_">MetricSourceAdapter</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MqSubscribeAdapter</span> <span class="keyword">implements</span> <span class="title class_">MetricSourceAdapter</span> &#123; <span class="comment">/* ... */</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>业务代码只依赖 <code>MetricSourceAdapter</code>，不关心具体来源。新增一个来源系统，只需实现一个适配器。</p>
+<p><strong>2. 指标口径不一致</strong></p>
+<p>同一个指标（比如”发电量”）在不同系统里的定义、单位、统计周期可能不同。<strong>这是最容易被低估的坑</strong>——不做统一，大屏上会出现”同一个指标在不同板块数字不一样”。</p>
+<p><strong>应对</strong>：建立<strong>指标字典</strong>，作为唯一数据源。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> metric_dict (</span><br><span class="line">    metric_code    <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">PRIMARY KEY</span>,   <span class="comment">-- 指标编码，全局唯一</span></span><br><span class="line">    metric_name    <span class="type">VARCHAR</span>(<span class="number">128</span>),              <span class="comment">-- 指标名称</span></span><br><span class="line">    unit           <span class="type">VARCHAR</span>(<span class="number">16</span>),               <span class="comment">-- 标准单位</span></span><br><span class="line">    source_type    <span class="type">VARCHAR</span>(<span class="number">32</span>),               <span class="comment">-- 来源类型</span></span><br><span class="line">    source_config  JSON,                      <span class="comment">-- 来源配置（接口地址/表名/字段映射）</span></span><br><span class="line">    transform_expr <span class="type">VARCHAR</span>(<span class="number">512</span>),              <span class="comment">-- 转换表达式（单位换算、口径调整）</span></span><br><span class="line">    update_period  <span class="type">INT</span>,                       <span class="comment">-- 更新周期（秒）</span></span><br><span class="line">    enabled        TINYINT</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><strong>指标编码全局唯一</strong>，所有服务都通过 <code>metric_code</code> 取数，不直接引用上游字段</li>
+<li><strong>转换逻辑配置化</strong>（<code>transform_expr</code>），口径调整不用改代码</li>
+<li><strong>更新周期分开配置</strong>，实时指标和高频统计不用同样的刷新频率</li>
+</ul>
+<p><strong>3. 更新频率差异大</strong></p>
+<p>有的数据秒级更新，有的是天级批量。如果统一按最高频率拉取，会造成大量无效请求。</p>
+<p><strong>应对</strong>：<strong>按指标配置更新周期 + 分层缓存</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">秒级指标 → 直连查询（或短缓存 5s）</span><br><span class="line">分钟级   → Redis 缓存 5min</span><br><span class="line">小时级   → Redis 缓存 1h</span><br><span class="line">天级     → 本地缓存 + 定时刷新</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据一致性"><a href="#数据一致性" class="headerlink" title="数据一致性"></a>数据一致性</h3><p>跨系统取数存在时序差异：A 系统的数据已更新，B 系统还是旧的，聚合结果会不一致。</p>
+<p><strong>应对</strong>：</p>
+<ul>
+<li><strong>单个指标内保证一致</strong>（同一个指标只从一个系统取）</li>
+<li><strong>跨指标聚合时记录数据时间戳</strong>，大屏上展示”数据更新时间”，让使用者知道数据的新鲜度</li>
+<li><strong>不做跨系统的强一致</strong>——这在异构集成的场景下成本过高且收益有限</li>
+</ul>
+<h2 id="三、几个关键技术点"><a href="#三、几个关键技术点" class="headerlink" title="三、几个关键技术点"></a>三、几个关键技术点</h2><h3 id="服务间调用：Feign-超时与熔断"><a href="#服务间调用：Feign-超时与熔断" class="headerlink" title="服务间调用：Feign + 超时与熔断"></a>服务间调用：Feign + 超时与熔断</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient(name = &quot;metric-service&quot;, fallbackFactory = MetricFallbackFactory.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">MetricClient</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/metric/batch&quot;)</span></span><br><span class="line">    List&lt;MetricVO&gt; <span class="title function_">batchQuery</span><span class="params">(<span class="meta">@RequestParam(&quot;codes&quot;)</span> List&lt;String&gt; codes)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>必须配置超时</strong>（默认值往往过长）：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">default:</span></span><br><span class="line">        <span class="attr">connectTimeout:</span> <span class="number">2000</span>      <span class="comment"># 连接超时 2s</span></span><br><span class="line">        <span class="attr">readTimeout:</span> <span class="number">5000</span>         <span class="comment"># 读超时 5s</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>必须配置熔断降级</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MetricFallbackFactory</span> <span class="keyword">implements</span> <span class="title class_">FallbackFactory</span>&lt;MetricClient&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> MetricClient <span class="title function_">create</span><span class="params">(Throwable cause)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> codes -&gt; &#123;</span><br><span class="line">            log.error(<span class="string">&quot;指标服务调用失败: &#123;&#125;&quot;</span>, cause.getMessage());</span><br><span class="line">            <span class="comment">// 降级：返回缓存数据或空值，不要让整个大屏挂掉</span></span><br><span class="line">            <span class="keyword">return</span> Collections.emptyList();</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么大屏项目一定要有降级</strong>：大屏是多个板块拼起来的，如果”综合燃气”板块的服务挂了，不应该导致整个大屏白屏。<strong>局部降级 + 提示</strong>比整体不可用体验好得多。</p>
+<h3 id="配置中心：Nacos"><a href="#配置中心：Nacos" class="headerlink" title="配置中心：Nacos"></a>配置中心：Nacos</h3><p><strong>为什么需要</strong>：服务多起来之后，改一个配置（比如超时时间）要重启所有服务是不可接受的。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="string">$&#123;NACOS_ADDR&#125;</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yaml</span></span><br><span class="line">        <span class="attr">shared-configs:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">data-id:</span> <span class="string">common-config.yaml</span>     <span class="comment"># 公共配置（数据库、Redis）</span></span><br><span class="line">            <span class="attr">refresh:</span> <span class="literal">true</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">data-id:</span> <span class="string">$&#123;spring.application.name&#125;.yaml</span>   <span class="comment"># 服务专属配置</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>实践建议</strong>：</p>
+<ul>
+<li><strong>公共配置和服务配置分开</strong>：数据库、Redis 这类所有服务都要用的放公共配置</li>
+<li><strong>敏感信息用环境变量注入</strong>，不要明文写在配置中心（至少要用加密配置）</li>
+<li><strong>开启 <code>refresh: true</code> 但要注意范围</strong>：不是所有配置都能热更新（比如数据库连接池的核心参数）</li>
+</ul>
+<h3 id="高可用部署：只有-4-台服务器怎么办"><a href="#高可用部署：只有-4-台服务器怎么办" class="headerlink" title="高可用部署：只有 4 台服务器怎么办"></a>高可用部署：只有 4 台服务器怎么办</h3><p><strong>约束</strong>：4 台服务器，要跑 6 个服务 + Nacos + Redis + MySQL + Nginx，还要保证大屏不挂。</p>
+<p><strong>方案</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────┐</span><br><span class="line">│   Nginx     │  负载均衡 + 静态资源（部署在 2 台）</span><br><span class="line">└──────┬──────┘</span><br><span class="line">       │</span><br><span class="line">┌──────▼──────┐  ┌─────────────┐</span><br><span class="line">│  服务实例 A  │  │  服务实例 B  │  关键服务双实例（分布在不同机器）</span><br><span class="line">└──────┬──────┘  └──────┬──────┘</span><br><span class="line">       │                │</span><br><span class="line">┌──────▼────────────────▼──────┐</span><br><span class="line">│  Nacos 集群（2 节点）          │  注册中心必须高可用</span><br><span class="line">└──────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键判断：哪些必须高可用，哪些可以单点？</strong></p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>是否高可用</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Nacos</strong></td>
+<td>✅ 必须</td>
+<td>注册中心挂了，所有服务无法互相发现</td>
+</tr>
+<tr>
+<td><strong>网关</strong></td>
+<td>✅ 必须</td>
+<td>单点挂了整个系统不可访问</td>
+</tr>
+<tr>
+<td><strong>核心业务服务</strong></td>
+<td>✅ 关键服务双实例</td>
+<td>大屏主板块不能挂</td>
+</tr>
+<tr>
+<td><strong>Redis</strong></td>
+<td>⚠️ 主从 + 哨兵</td>
+<td>缓存挂了可以降级到数据库，但不能长时间挂</td>
+</tr>
+<tr>
+<td><strong>MySQL</strong></td>
+<td>⚠️ 主从</td>
+<td>主库挂了只读可用，写入中断</td>
+</tr>
+<tr>
+<td><strong>非核心服务</strong></td>
+<td>❌ 可单点</td>
+<td>系统管理、日志服务挂了不影响大屏展示</td>
+</tr>
+</tbody></table>
+<p><strong>这是资源受限下的务实做法</strong>：不是所有组件都做高可用（成本不允许），而是<strong>按影响面排序</strong>，把资源投在最关键的地方。</p>
+<h3 id="数据库分片"><a href="#数据库分片" class="headerlink" title="数据库分片"></a>数据库分片</h3><p>数据量增长后（指标数据是持续写入的时序数据），单表查询变慢。使用 <strong>ShardingSphere</strong> 按企业维度分片。</p>
+<p><strong>详细的分片设计见</strong>：<a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></p>
+<p><strong>这里补充一点分片在微服务架构下的特殊考虑</strong>：</p>
+<ul>
+<li><strong>分片规则要配置在所有访问该表的服务里</strong>（ShardingSphere-JDBC 模式），服务越多，规则同步越容易出问题</li>
+<li>如果服务数量继续增加，应该考虑改用 <strong>ShardingSphere-Proxy</strong>，把分片规则集中到代理层</li>
+<li><strong>跨服务的分片键必须统一</strong>，否则 A 服务按 <code>tenant_id</code> 分片、B 服务按 <code>device_id</code> 分片，联表查询会变成全路由</li>
+</ul>
+<h2 id="四、踩过的坑"><a href="#四、踩过的坑" class="headerlink" title="四、踩过的坑"></a>四、踩过的坑</h2><h3 id="坑-1：服务拆分过细导致排查困难"><a href="#坑-1：服务拆分过细导致排查困难" class="headerlink" title="坑 1：服务拆分过细导致排查困难"></a>坑 1：服务拆分过细导致排查困难</h3><p><strong>现象</strong>：初期把一个板块拆成了 4 个服务，结果一个页面加载要调 6 个服务，某次线上问题排查花了很久——因为日志分散在多个服务里，无法串起来。</p>
+<p><strong>解决</strong>：</p>
+<ul>
+<li><strong>引入链路追踪</strong>（SkyWalking &#x2F; Sleuth + Zipkin），给每个请求分配 TraceId，日志里带上它</li>
+<li><strong>合并过细的服务</strong>。把”强相关、总是一起变化”的服务合并回去</li>
+<li><strong>教训</strong>：拆分的粒度应该按”变化频率”和”数据边界”，不是按”功能数量”</li>
+</ul>
+<h3 id="坑-2：Nacos-配置的命名空间混用"><a href="#坑-2：Nacos-配置的命名空间混用" class="headerlink" title="坑 2：Nacos 配置的命名空间混用"></a>坑 2：Nacos 配置的命名空间混用</h3><p><strong>现象</strong>：测试环境的服务连到了生产环境的配置，导致测试时改了生产的参数。</p>
+<p><strong>原因</strong>：Nacos 的 <code>namespace</code> &#x2F; <code>group</code> &#x2F; <code>data-id</code> 三层没有规划好，不同环境用同一个 namespace。</p>
+<p><strong>解决</strong>：<strong>按环境划分 namespace</strong>，且用 CI&#x2F;CD 注入，不允许手工配置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">namespace: dev / test / prod</span><br><span class="line">group: DEFAULT_GROUP</span><br><span class="line">data-id: $&#123;app-name&#125;-$&#123;env&#125;.yaml</span><br></pre></td></tr></table></figure>
+
+<h3 id="坑-3：Feign-调用没有传递认证信息"><a href="#坑-3：Feign-调用没有传递认证信息" class="headerlink" title="坑 3：Feign 调用没有传递认证信息"></a>坑 3：Feign 调用没有传递认证信息</h3><p><strong>现象</strong>：网关鉴权通过后，服务内部通过 Feign 调用其他服务时丢了用户上下文，导致下游服务拿不到用户信息。</p>
+<p><strong>解决</strong>：用 <code>RequestInterceptor</code> 把认证信息透传下去。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FeignAuthConfig</span> &#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> RequestInterceptor <span class="title function_">authInterceptor</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> template -&gt; &#123;</span><br><span class="line">            <span class="comment">// 从当前请求上下文取出 token 和用户信息，透传给下游</span></span><br><span class="line">            <span class="type">RequestAttributes</span> <span class="variable">attrs</span> <span class="operator">=</span> RequestContextHolder.getRequestAttributes();</span><br><span class="line">            <span class="keyword">if</span> (attrs <span class="keyword">instanceof</span> ServletRequestAttributes sra) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">token</span> <span class="operator">=</span> sra.getRequest().getHeader(<span class="string">&quot;Authorization&quot;</span>);</span><br><span class="line">                <span class="keyword">if</span> (token != <span class="literal">null</span>) template.header(<span class="string">&quot;Authorization&quot;</span>, token);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：这只是内部调用的上下文透传，<strong>下游服务仍要校验</strong>，不能信任上游传过来的身份（零信任原则）。</p>
+<h3 id="坑-4：大屏接口响应慢，实际是串行调用"><a href="#坑-4：大屏接口响应慢，实际是串行调用" class="headerlink" title="坑 4：大屏接口响应慢，实际是串行调用"></a>坑 4：大屏接口响应慢，实际是串行调用</h3><p><strong>现象</strong>：大屏首页要展示十几个板块，响应时间超过 3 秒。</p>
+<p><strong>原因</strong>：代码里十几个板块的数据是<strong>串行</strong>获取的。</p>
+<p><strong>解决</strong>：改成并行 + 统一超时。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用 CompletableFuture 并行获取多个板块的数据</span></span><br><span class="line">List&lt;CompletableFuture&lt;BoardData&gt;&gt; futures = boardCodes.stream()</span><br><span class="line">    .map(code -&gt; CompletableFuture</span><br><span class="line">        .supplyAsync(() -&gt; loadBoard(code), boardExecutor)</span><br><span class="line">        .orTimeout(<span class="number">2</span>, TimeUnit.SECONDS)              <span class="comment">// 单个板块超时 2s</span></span><br><span class="line">        .exceptionally(ex -&gt; BoardData.empty(code)))  <span class="comment">// 失败降级为空</span></span><br><span class="line">    .toList();</span><br><span class="line"></span><br><span class="line">List&lt;BoardData&gt; results = futures.stream()</span><br><span class="line">    .map(CompletableFuture::join)</span><br><span class="line">    .toList();</span><br></pre></td></tr></table></figure>
+
+<p><strong>两个关键点</strong>：</p>
+<ul>
+<li><strong>单个板块超时后降级为空</strong>，不影响其他板块（大屏部分数据缺失比整个页面加载失败好）</li>
+<li><strong>用独立的线程池</strong>（<code>boardExecutor</code>），不要用默认的 <code>ForkJoinPool.commonPool()</code>——被阻塞的任务会拖垮整个应用的其他并行操作</li>
+</ul>
+<p><strong>优化后响应时间从 3 秒降到 800ms 左右。</strong></p>
+<h2 id="五、架构演进的经验总结"><a href="#五、架构演进的经验总结" class="headerlink" title="五、架构演进的经验总结"></a>五、架构演进的经验总结</h2><h3 id="关于拆分"><a href="#关于拆分" class="headerlink" title="关于拆分"></a>关于拆分</h3><ol>
+<li><strong>先单体，后拆分</strong>。项目初期业务边界不清晰，过早拆分会导致频繁调整。我们的做法是<strong>先按模块化单体开发，明确边界后再拆</strong></li>
+<li><strong>拆分依据按优先级</strong>：变化频率 &gt; 数据源 &gt; 性能特征 &gt; 团队边界</li>
+<li>**拆完要能说清”为什么这么拆”**。如果只能说”按业务拆的”，说明还没想清楚</li>
+</ol>
+<h3 id="关于治理"><a href="#关于治理" class="headerlink" title="关于治理"></a>关于治理</h3><ol>
+<li><strong>超时和熔断必须在第一版就有</strong>。后期补的代价是”已经出过故障”</li>
+<li><strong>链路追踪不是可选项</strong>。服务超过 3 个，没有 TraceId 排查就是大海捞针</li>
+<li><strong>降级方案要有明确的触发条件和预期行为</strong>（比如”指标服务不可用时返回缓存数据，并在大屏上标注数据延迟”）</li>
+</ol>
+<h3 id="关于资源受限的现实"><a href="#关于资源受限的现实" class="headerlink" title="关于资源受限的现实"></a>关于资源受限的现实</h3><p><strong>不是所有组件都要高可用。</strong> 4 台服务器的约束下，正确的做法是：</p>
+<ol>
+<li><strong>列出所有组件</strong></li>
+<li><strong>按”挂了的影响面”排序</strong></li>
+<li><strong>把有限的资源投在前几名</strong></li>
+</ol>
+<p><strong>这个排序本身就是架构能力的体现</strong>——能说清”为什么 Nacos 必须双节点，而日志服务可以单点”，比笼统地说”我们做了高可用”更有说服力。</p>
+<h2 id="落地检查清单"><a href="#落地检查清单" class="headerlink" title="落地检查清单"></a>落地检查清单</h2><ul>
+<li><input disabled="" type="checkbox"> 服务拆分有明确依据（能说清每个服务为什么独立）</li>
+<li><input disabled="" type="checkbox"> 拆分的粒度合理（没有”一个请求跨 5 个服务”的情况）</li>
+<li><input disabled="" type="checkbox"> 有统一入口网关（路由、鉴权、限流）</li>
+<li><input disabled="" type="checkbox"> 注册中心高可用（至少 2 节点）</li>
+<li><input disabled="" type="checkbox"> 配置中心按环境隔离 namespace</li>
+<li><input disabled="" type="checkbox"> 服务间调用配置了超时（不用默认值）</li>
+<li><input disabled="" type="checkbox"> 关键调用有熔断降级，且降级行为明确</li>
+<li><input disabled="" type="checkbox"> 认证信息在服务间正确透传，且下游仍做校验</li>
+<li><input disabled="" type="checkbox"> 引入链路追踪，日志带 TraceId</li>
+<li><input disabled="" type="checkbox"> 异构数据源有统一接入层，新增来源不改业务代码</li>
+<li><input disabled="" type="checkbox"> 指标&#x2F;字段有统一字典，口径问题在字典层解决</li>
+<li><input disabled="" type="checkbox"> 按影响面确定高可用范围，重点资源投在关键组件</li>
+<li><input disabled="" type="checkbox"> 大屏&#x2F;首页类接口做并行聚合 + 单点超时降级</li>
+<li><input disabled="" type="checkbox"> 独立线程池隔离不同业务，不共用默认池</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>微服务架构的价值不是”用了多少组件”，而是<strong>能不能按业务的真实边界把系统切开，并让每个部分独立演进、独立扩缩容、故障隔离</strong>。</p>
+<p>回顾这个项目，我认为最有价值的三个决策是：</p>
+<ol>
+<li><strong>先模块化单体，边界清晰后再拆</strong>——避免了初期反复调整服务划分</li>
+<li><strong>把最复杂的指标接入独立成服务</strong>——隔离了”上游 9 个系统不稳定”这个最大风险源</li>
+<li><strong>按影响面分配高可用资源</strong>——在 4 台服务器的约束下做了务实的取舍</li>
+</ol>
+<p>而最该早点做的是<strong>链路追踪</strong>——服务一多，没有它排查问题会非常痛苦。</p>
+<hr>
+<p><em>相关文章：</em></p>
+<ul>
+<li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
+<li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
+<li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/10/18/2026-10-18-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -253,7 +617,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -505,6 +869,7 @@
 <li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
 <li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
 <li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
 </ul>
 
       
@@ -568,7 +933,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -814,6 +1179,7 @@
 <li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
 <li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
 <li><a href="/2026/10/18/2026-10-18-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+<li><a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
 </ul>
 
       
@@ -869,15 +1235,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
+      
 
-      <time title="创建时间：2026-10-16 09:00:00" itemprop="dateCreated datePublished" datetime="2026-10-16T09:00:00+08:00">2026-10-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-15 18:23:11" itemprop="dateModified" datetime="2026-10-15T18:23:11+08:00">2026-10-15</time>
+      <time title="创建时间：2026-10-16 09:00:00 / 修改时间：09:51:59" itemprop="dateCreated datePublished" datetime="2026-10-16T09:00:00+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1083,6 +1443,7 @@
 <li><a href="/2026/10/15/2026-10-15-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">ShardingSphere 分库分表实践：从选型到踩坑</a></li>
 <li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
 <li><a href="/2026/10/18/2026-10-18-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+<li><a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
 </ul>
 
       
@@ -1138,9 +1499,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2026-10-15 09:00:00 / 修改时间：18:23:11" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+      <time title="创建时间：2026-10-15 09:00:00" itemprop="dateCreated datePublished" datetime="2026-10-15T09:00:00+08:00">2026-10-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-10-16 09:51:59" itemprop="dateModified" datetime="2026-10-16T09:51:59+08:00">2026-10-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1321,6 +1688,7 @@
 <li><a href="/2026/10/16/2026-10-16-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
 <li><a href="/2026/10/17/2026-10-17-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
 <li><a href="/2026/10/18/2026-10-18-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+<li><a href="/2026/10/19/2026-10-19-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
 </ul>
 
       
@@ -1779,101 +2147,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/09/14/2025-09-14-%E6%88%91%E7%9A%84AI%E7%BC%96%E7%A8%8B%E5%B7%A5%E4%BD%9C%E6%B5%81/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/" class="post-title-link" itemprop="url">AI辅助Java重构实战：拆解一个过长Service</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2025-07-20 14:30:00" itemprop="dateCreated datePublished" datetime="2025-07-20T14:30:00+08:00">2025-07-20</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">Java进阶</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2025/java-refactor-cover.png" alt="AI 辅助 Java 重构封面图"></p>
-<p>这次想记录一个更接近存量项目的 AI 使用场景：拆解一个 186 行的 <code>createOrder</code> 方法。</p>
-<p>它同时做参数校验、商品查询、价格计算、库存扣减、订单落库、优惠券核销和通知发送。方法虽然长，却已经稳定运行两年。面对这种代码，最危险的需求不是“帮我重构”，而是“帮我一次重写得更优雅”。</p>
-<p>重构的目标应该是改善内部结构而不改变外部行为。AI 可以加快识别重复和生成小函数的速度，但前提是我们先固定行为，再让每一步差异足够小。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/07/20/2025-07-20-AI%E8%BE%85%E5%8A%A9Java%E9%87%8D%E6%9E%84%E5%AE%9E%E6%88%98/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
