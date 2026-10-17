@@ -215,52 +215,6 @@
       </tags>
   </entry>
   <entry>
-    <title>项目上线前检查清单</title>
-    <url>/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/</url>
-    <content><![CDATA[<p><img src="/images/posts/2019/release-checklist-cover.svg" alt="项目上线前检查清单封面图"></p>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>第一次准备上线项目时，我才发现代码写完并不等于项目完成。</p>
-<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
-<p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>项目上线前检查清单</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
-<ol>
-<li>本地能跑不代表线上能跑</li>
-<li>配置文件里还有本地路径和测试密码</li>
-<li>日志、备份、回滚方案没有提前准备</li>
-</ol>
-<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
-<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>上线是一组工程动作，包括配置检查、构建检查、数据库检查、日志监控、备份和回滚。</p>
-<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
-
-<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
-<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 构建检查</span></span><br><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置检查</span></span><br><span class="line">grep -R <span class="string">&quot;localhost\|127.0.0.1\|root&quot;</span> src/main/resources</span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志检查</span></span><br><span class="line"><span class="built_in">tail</span> -f logs/app.log</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">上线前检查：</span><br><span class="line">1. 数据库脚本是否备份</span><br><span class="line">2. 配置是否切换到生产环境</span><br><span class="line">3. 日志目录是否存在</span><br><span class="line">4. 端口是否开放</span><br><span class="line">5. 是否有回滚包</span><br></pre></td></tr></table></figure>
-
-<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
-<p>对 项目上线前检查清单 的理解，我最后沉淀成几条经验：</p>
-<ul>
-<li>先理解它解决什么问题，再记具体用法；</li>
-<li>先跑通最小 Demo，再接入完整项目；</li>
-<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
-<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
-<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
-</ul>
-<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
-]]></content>
-      <categories>
-        <category>项目实践</category>
-      </categories>
-      <tags>
-        <tag>测试</tag>
-        <tag>项目上线</tag>
-        <tag>部署检查</tag>
-        <tag>运维</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>权限管理模块设计</title>
     <url>/2019/11/16/2019-11-16-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97%E8%AE%BE%E8%AE%A1/</url>
     <content><![CDATA[<p><img src="/images/posts/2019/permission-design-cover.svg" alt="权限管理模块设计封面图"></p>
@@ -304,6 +258,52 @@
         <tag>RBAC</tag>
         <tag>角色权限</tag>
         <tag>系统设计</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>项目上线前检查清单</title>
+    <url>/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/</url>
+    <content><![CDATA[<p><img src="/images/posts/2019/release-checklist-cover.svg" alt="项目上线前检查清单封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>第一次准备上线项目时，我才发现代码写完并不等于项目完成。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>项目上线前检查清单</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>本地能跑不代表线上能跑</li>
+<li>配置文件里还有本地路径和测试密码</li>
+<li>日志、备份、回滚方案没有提前准备</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>上线是一组工程动作，包括配置检查、构建检查、数据库检查、日志监控、备份和回滚。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 构建检查</span></span><br><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置检查</span></span><br><span class="line">grep -R <span class="string">&quot;localhost\|127.0.0.1\|root&quot;</span> src/main/resources</span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志检查</span></span><br><span class="line"><span class="built_in">tail</span> -f logs/app.log</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">上线前检查：</span><br><span class="line">1. 数据库脚本是否备份</span><br><span class="line">2. 配置是否切换到生产环境</span><br><span class="line">3. 日志目录是否存在</span><br><span class="line">4. 端口是否开放</span><br><span class="line">5. 是否有回滚包</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 项目上线前检查清单 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+]]></content>
+      <categories>
+        <category>项目实践</category>
+      </categories>
+      <tags>
+        <tag>测试</tag>
+        <tag>项目上线</tag>
+        <tag>部署检查</tag>
+        <tag>运维</tag>
       </tags>
   </entry>
   <entry>
@@ -1499,103 +1499,6 @@
       </tags>
   </entry>
   <entry>
-    <title>线上问题排查记录</title>
-    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
-<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
-<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
-<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
-
-<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
-<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
-<p>当时群里很快出现了几个猜测：</p>
-<ul>
-<li>刚发布的新版本有问题。</li>
-<li>数据库变慢。</li>
-<li>网络波动。</li>
-<li>线程池满了。</li>
-</ul>
-<p>值班负责人先把内容分成事实和假设：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
-
-<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
-<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
-
-<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
-<p>日志中的共同异常是：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
-
-<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
-<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
-
-<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
-<p>连接池指标显示：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
-
-<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
-<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
-<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
-<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
-<ol>
-<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
-<li>摘除两个异常实例，不再接收新请求。</li>
-<li>等待和终止已确认无业务写入的导出任务。</li>
-<li>逐个重启异常实例并完成健康检查。</li>
-<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
-</ol>
-<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
-<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
-<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
-
-<p>数据库查询改为每批 500 条：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
-<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
-
-<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
-<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
-<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
-<li>导出改为异步分页任务。</li>
-<li>设置导出并发上限和单用户频率限制。</li>
-<li>补充 1 万条数据的集成测试。</li>
-<li>连接池等待数进入告警。</li>
-</ul>
-<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
-<li>建立外部调用统一超时配置。</li>
-<li>Review 清单增加“事务中是否包含远程调用”。</li>
-<li>发布看板增加连接池、线程池和下游耗时。</li>
-<li>为大批量任务建立独立执行资源。</li>
-</ul>
-<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
-<li>导出任务平均和最大处理时间。</li>
-<li>每批数据大小是否需要调整。</li>
-<li>客户批量接口的失败和限流情况。</li>
-</ul>
-<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
-<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
-
-<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
-]]></content>
-      <categories>
-        <category>问题排查</category>
-      </categories>
-      <tags>
-        <tag>线上问题</tag>
-        <tag>故障排查</tag>
-        <tag>日志</tag>
-        <tag>复盘</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>项目部署标准化流程</title>
     <url>/2020/10/18/2020-10-18-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B/</url>
     <content><![CDATA[<p><img src="/images/posts/2020/deploy-standard-cover.svg" alt="项目部署标准化流程封面图"></p>
@@ -1698,6 +1601,103 @@
         <tag>项目部署</tag>
         <tag>标准化流程</tag>
         <tag>发布</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线上问题排查记录</title>
+    <url>/2020/10/31/2020-10-31-%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/prod-debug-cover.svg" alt="线上问题排查记录封面图"></p>
+<p>这是我第一次完整参与线上故障处理。事后看，根因并不复杂：一个导出任务在事务中执行了慢速远程调用，持续占用数据库连接，最终把连接池耗尽。真正让我印象深刻的，是故障现场里“恢复、取证、判断、沟通”必须同时进行。</p>
+<p>下面的时间和业务数据都做了脱敏，保留的是排查过程。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">时间：2020-10-31 20:07 - 20:38</span><br><span class="line">影响：订单查询和创建间歇性失败</span><br><span class="line">峰值错误率：约 18%</span><br><span class="line">直接原因：数据库连接池无可用连接</span><br><span class="line">根本原因：批量导出事务包含逐条远程调用</span><br><span class="line">恢复方式：关闭导出入口，重启异常实例并逐步恢复流量</span><br></pre></td></tr></table></figure>
+
+<p>当晚 19:40 发布了订单导出功能。发布后最初二十分钟指标正常，因此团队完成了常规发布确认。</p>
+<h2 id="20-07，第一条告警"><a href="#20-07，第一条告警" class="headerlink" title="20:07，第一条告警"></a>20:07，第一条告警</h2><p>监控显示订单接口 P99 从 420ms 上升到 8s，随后开始出现 5xx。客服同时反馈用户“偶尔打不开订单列表”。</p>
+<p>当时群里很快出现了几个猜测：</p>
+<ul>
+<li>刚发布的新版本有问题。</li>
+<li>数据库变慢。</li>
+<li>网络波动。</li>
+<li>线程池满了。</li>
+</ul>
+<p>值班负责人先把内容分成事实和假设：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实：</span><br><span class="line">- 只有 order-service 明显异常</span><br><span class="line">- 三个实例中有两个错误率高</span><br><span class="line">- CPU 约 35%，内存无明显上涨</span><br><span class="line">- 数据库整体 CPU 约 42%</span><br><span class="line"></span><br><span class="line">假设：</span><br><span class="line">- 应用连接池耗尽</span><br><span class="line">- 某条 SQL 变慢</span><br><span class="line">- 新功能占用了公共线程或连接</span><br></pre></td></tr></table></figure>
+
+<p>这个动作看起来简单，却避免了团队按各自猜测同时改系统。</p>
+<h2 id="20-10，先确认影响范围"><a href="#20-10，先确认影响范围" class="headerlink" title="20:10，先确认影响范围"></a>20:10，先确认影响范围</h2><p>我们从网关按路径和状态码聚合：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">/api/orders/query      5xx 约 16%</span><br><span class="line">/api/orders/create     5xx 约 11%</span><br><span class="line">/api/products/query    正常</span><br><span class="line">/api/users/profile     正常</span><br></pre></td></tr></table></figure>
+
+<p>订单读写都受影响，说明问题不太像单一查询逻辑。随后按实例查看，发现刚处理过导出请求的两个实例最严重。</p>
+<p>日志中的共同异常是：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">SQLTransientConnectionException:</span><br><span class="line">HikariPool-1 - Connection is not available,</span><br><span class="line">request timed out after 3000ms</span><br></pre></td></tr></table></figure>
+
+<p>至此可以确认直接故障点是连接池，而不是把“数据库可能有问题”当最终结论。</p>
+<h2 id="20-14，保留现场"><a href="#20-14，保留现场" class="headerlink" title="20:14，保留现场"></a>20:14，保留现场</h2><p>在重启前，我们从一个异常实例保存了三类证据：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 记录进程和资源快照</span></span><br><span class="line">ps -eo pid,%cpu,%mem,etime,cmd --<span class="built_in">sort</span>=-%cpu | <span class="built_in">head</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 连续抓取三次线程现场，观察是否一直停在同一位置</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-1.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-2.<span class="built_in">log</span></span><br><span class="line">jstack &lt;pid&gt; &gt; /tmp/order-201031-2014-3.<span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程建立的数据库连接数量</span></span><br><span class="line">lsof -Pan -p &lt;pid&gt; -iTCP | <span class="built_in">head</span></span><br></pre></td></tr></table></figure>
+
+<p>这些命令应由有服务器权限的值班人员执行，导出文件要按生产数据规范保存，不上传到个人网盘或公共聊天。</p>
+<p>连接池指标显示：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">active=30</span><br><span class="line">idle=0</span><br><span class="line">pending=86</span><br><span class="line">max=30</span><br></pre></td></tr></table></figure>
+
+<p>线程 dump 中，大量请求在等待 <code>HikariPool.getConnection</code>；另有 30 个导出线程停在外部客户信息接口。连接数、线程数和连接池上限正好能够对应。</p>
+<h2 id="20-18，找到连接为什么不释放"><a href="#20-18，找到连接为什么不释放" class="headerlink" title="20:18，找到连接为什么不释放"></a>20:18，找到连接为什么不释放</h2><p>沿着导出任务的 traceId 查日志，看到一次导出包含 8,000 多条订单。代码结构可以简化成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> File <span class="title function_">exportOrders</span><span class="params">(OrderExportRequest request)</span> &#123;</span><br><span class="line">    List&lt;Order&gt; orders = orderRepository.findForExport(request);</span><br><span class="line">    <span class="keyword">for</span> (Order order : orders) &#123;</span><br><span class="line">        <span class="type">Customer</span> <span class="variable">customer</span> <span class="operator">=</span> customerClient.query(order.getCustomerId());</span><br><span class="line">        order.fillCustomerName(customer.getName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> excelWriter.write(orders);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@Transactional</code> 覆盖了查询、数千次远程调用和文件生成。查询结束后，事务连接并没有立即归还；当多个导出并发执行时，连接池很快被占满。</p>
+<p>这时还有一个关键判断：是否直接扩大连接池？结论是不扩大。数据库并未达到容量上限，但扩大连接池只会允许更多长事务并发，可能把局部问题推向数据库。</p>
+<h2 id="20-22，先止血"><a href="#20-22，先止血" class="headerlink" title="20:22，先止血"></a>20:22，先止血</h2><p>恢复顺序是：</p>
+<ol>
+<li>在网关临时关闭订单导出入口，只影响新增导出。</li>
+<li>摘除两个异常实例，不再接收新请求。</li>
+<li>等待和终止已确认无业务写入的导出任务。</li>
+<li>逐个重启异常实例并完成健康检查。</li>
+<li>每次只恢复一个实例的流量，观察连接池和错误率。</li>
+</ol>
+<p>终止任务、摘流和重启都可能影响业务，必须由当班负责人授权，并先确认导出操作无写入副作用。不能看到线程多就直接杀进程。</p>
+<p>20:28，订单接口错误率开始下降；20:33，P99 恢复到 500ms 左右；20:38，连续五分钟没有新的连接超时，故障转入观察。</p>
+<h2 id="20-45，修复方案评审"><a href="#20-45，修复方案评审" class="headerlink" title="20:45，修复方案评审"></a>20:45，修复方案评审</h2><p>修复没有只删除 <code>@Transactional</code>，而是重新划分处理阶段：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">阶段一：分页读取订单，只在短事务中访问数据库</span><br><span class="line">阶段二：批量查询客户信息，设置超时和并发上限</span><br><span class="line">阶段三：流式写文件，避免所有结果常驻内存</span><br><span class="line">阶段四：记录任务状态，用户异步下载</span><br></pre></td></tr></table></figure>
+
+<p>数据库查询改为每批 500 条：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">export</span><span class="params">(OrderExportTask task)</span> &#123;</span><br><span class="line">    <span class="type">Long</span> <span class="variable">lastId</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 每批查询独立完成，不让数据库事务跨越远程调用</span></span><br><span class="line">        List&lt;Order&gt; batch = orderQueryService.findNextBatch(</span><br><span class="line">                task.getCondition(), lastId, <span class="number">500</span>);</span><br><span class="line">        <span class="keyword">if</span> (batch.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;Long, Customer&gt; customers =</span><br><span class="line">                customerBatchClient.queryByIds(extractCustomerIds(batch));</span><br><span class="line">        excelWriter.append(enrich(batch, customers));</span><br><span class="line">        lastId = batch.get(batch.size() - <span class="number">1</span>).getId();</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里使用游标分页，避免页数增大后 <code>OFFSET</code> 扫描越来越慢。客户接口改为批量查询，并限制单实例同时执行的导出数量。</p>
+<h2 id="为什么发布检查没有发现"><a href="#为什么发布检查没有发现" class="headerlink" title="为什么发布检查没有发现"></a>为什么发布检查没有发现</h2><p>复盘时没有停在“开发事务写大了”，而是继续追问系统为什么允许这个问题上线：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">为什么连接池耗尽？</span><br><span class="line">因为多个导出任务长时间持有连接。</span><br><span class="line"></span><br><span class="line">为什么长时间持有？</span><br><span class="line">因为事务覆盖远程调用和文件生成。</span><br><span class="line"></span><br><span class="line">为什么测试没有发现？</span><br><span class="line">测试数据只有 50 条，且只执行一次导出。</span><br><span class="line"></span><br><span class="line">为什么灰度没有发现？</span><br><span class="line">冒烟只验证文件能生成，没有观察连接池。</span><br><span class="line"></span><br><span class="line">为什么影响普通接口？</span><br><span class="line">导出和在线请求共享连接池，没有并发隔离。</span><br></pre></td></tr></table></figure>
+
+<p>这说明根因既有代码问题，也有容量测试、灰度指标和资源隔离缺口。</p>
+<h2 id="后续行动"><a href="#后续行动" class="headerlink" title="后续行动"></a>后续行动</h2><p>我们把行动分成三档，避免复盘结束后留下十几条无人处理的建议。</p>
+<h3 id="一周内"><a href="#一周内" class="headerlink" title="一周内"></a>一周内</h3><ul>
+<li>导出改为异步分页任务。</li>
+<li>设置导出并发上限和单用户频率限制。</li>
+<li>补充 1 万条数据的集成测试。</li>
+<li>连接池等待数进入告警。</li>
+</ul>
+<h3 id="一个月内"><a href="#一个月内" class="headerlink" title="一个月内"></a>一个月内</h3><ul>
+<li>建立外部调用统一超时配置。</li>
+<li>Review 清单增加“事务中是否包含远程调用”。</li>
+<li>发布看板增加连接池、线程池和下游耗时。</li>
+<li>为大批量任务建立独立执行资源。</li>
+</ul>
+<h3 id="持续观察"><a href="#持续观察" class="headerlink" title="持续观察"></a>持续观察</h3><ul>
+<li>导出任务平均和最大处理时间。</li>
+<li>每批数据大小是否需要调整。</li>
+<li>客户批量接口的失败和限流情况。</li>
+</ul>
+<p>每项都记录负责人、截止时间和验证标准。“加强监控”“提高意识”没有可验收结果，不算行动项。</p>
+<h2 id="这次事故改变的排查习惯"><a href="#这次事故改变的排查习惯" class="headerlink" title="这次事故改变的排查习惯"></a>这次事故改变的排查习惯</h2><p>第一次线上故障让我形成了一个固定顺序：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">先定影响范围</span><br><span class="line">再区分事实与假设</span><br><span class="line">保存最小现场</span><br><span class="line">用指标缩小到资源</span><br><span class="line">用日志和线程定位代码</span><br><span class="line">按授权执行止血</span><br><span class="line">恢复后再做根因与系统改进</span><br></pre></td></tr></table></figure>
+
+<p>故障现场最容易犯的错，是把第一个合理解释当成根因，或者为了快速恢复先清掉所有证据。真正有效的排查不是谁最先猜中，而是团队能否用同一组事实逐步收敛，并在恢复业务后让相同问题更难再次发生。</p>
+]]></content>
+      <categories>
+        <category>问题排查</category>
+      </categories>
+      <tags>
+        <tag>线上问题</tag>
+        <tag>故障排查</tag>
+        <tag>日志</tag>
+        <tag>复盘</tag>
       </tags>
   </entry>
   <entry>
@@ -1979,77 +1979,6 @@
       </tags>
   </entry>
   <entry>
-    <title>工作第一年总结</title>
-    <url>/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p><img src="/images/posts/2020/first-year-review-cover.svg" alt="工作第一年总结封面图"></p>
-<p>写下这篇总结时，我工作的第一年快结束了。回头看年初的自己，最明显的特点是着急：着急听懂会议里的每个词，着急把需求做完，着急证明自己能独立解决问题。</p>
-<p>一年后，我会的框架确实多了一些，但更重要的变化是开始接受一件事：工程能力不只是写代码的速度，它还包括理解问题、确认边界、留下证据，以及让别人能够接着自己的工作继续走。</p>
-<h2 id="刚开始，所有问题看起来都像代码问题"><a href="#刚开始，所有问题看起来都像代码问题" class="headerlink" title="刚开始，所有问题看起来都像代码问题"></a>刚开始，所有问题看起来都像代码问题</h2><p>第一次接需求时，我拿到一句“增加订单筛选”，立即打开 Controller。写到一半才发现，筛选时间按创建时间还是支付时间没有确认，导出和页面是否共用条件也没有结论。</p>
-<p>那次需求反复改了几轮。代码并不难，真正浪费时间的是我把模糊内容当成了确定输入。</p>
-<p>后来每次开始前，我会先写几行：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">用户要解决什么问题</span><br><span class="line">正常流程是什么</span><br><span class="line">边界和异常是什么</span><br><span class="line">本次不做什么</span><br><span class="line">怎样算完成</span><br></pre></td></tr></table></figure>
-
-<p>这些问题没有让开发变慢，反而减少了返工。程序员不是接收一句话就输出代码的转换器，澄清本身就是工作的一部分。</p>
-<h2 id="第一次独立上线，让我认识“完成”的含义"><a href="#第一次独立上线，让我认识“完成”的含义" class="headerlink" title="第一次独立上线，让我认识“完成”的含义"></a>第一次独立上线，让我认识“完成”的含义</h2><p>在本地看到接口返回成功时，我曾经觉得任务已经完成。真正上线后才知道，一个改动还需要回答很多问题：</p>
-<ul>
-<li>测试环境和生产配置是否一致。</li>
-<li>数据库变更能否兼容旧版本。</li>
-<li>日志能不能定位一笔失败请求。</li>
-<li>监控是否能发现错误率上升。</li>
-<li>如果回退，新增数据怎么办。</li>
-</ul>
-<p>第一次参与发布时，我大部分时间都在等别人确认。不是因为没有权限，而是我说不清变更影响和验证方式。</p>
-<p>从那以后，我开始在提测和发布前准备清单。最初只是怕遗漏，后来才意识到，清单更大的价值是把脑中的隐性判断交给团队。别人不必相信“我都测过了”，可以直接看到测了什么、结果是什么。</p>
-<h2 id="一次线上故障，比十篇教程更具体"><a href="#一次线上故障，比十篇教程更具体" class="headerlink" title="一次线上故障，比十篇教程更具体"></a>一次线上故障，比十篇教程更具体</h2><p>今年遇到过连接池耗尽的问题。告警响起时，我第一反应是最近发布的代码肯定有 Bug，随后又怀疑数据库。真正开始排查后，团队先看影响范围，再保存日志和线程现场，最后才定位到导出任务把远程调用放进长事务。</p>
-<p>那次经历让我记住了几个顺序：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实在猜测之前</span><br><span class="line">恢复和取证同时安排</span><br><span class="line">直接原因不等于根本原因</span><br><span class="line">修复代码不等于完成复盘</span><br></pre></td></tr></table></figure>
-
-<p>过去遇到错误，我习惯立刻搜索异常文本；现在我会先问系统发生了什么变化、影响哪些请求、哪一层指标出现异常。搜索能力仍然重要，但没有正确问题，搜到的答案很容易只是相似而不是适用。</p>
-<h2 id="Code-Review-也改变了"><a href="#Code-Review-也改变了" class="headerlink" title="Code Review 也改变了"></a>Code Review 也改变了</h2><p>年初 Review 别人的代码，我主要看格式、空指针和命名。别人 Review 我的代码时，我也常把评论理解成对个人能力的评价。</p>
-<p>合作久了以后，我逐渐看到 Review 的真正价值：作者最熟悉实现，Reviewer 更容易发现被作者默认的前提。一次有效讨论应该围绕：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">业务规则是否完整</span><br><span class="line">失败后数据停在哪里</span><br><span class="line">并发和重复请求会怎样</span><br><span class="line">日志是否保留必要上下文</span><br><span class="line">测试能否证明关键行为</span><br></pre></td></tr></table></figure>
-
-<p>我也学会让评论更具体。与其写“这里不太好”，不如说明“外部调用放在事务中会延长连接占用，建议先提交本地状态，再通过任务重试通知”。</p>
-<p>评论对代码，不对人；结论最好有风险和替代方案。这件事说起来普通，真正做到以后，协作成本低了很多。</p>
-<h2 id="从“问答案”到“带着排查结果提问”"><a href="#从“问答案”到“带着排查结果提问”" class="headerlink" title="从“问答案”到“带着排查结果提问”"></a>从“问答案”到“带着排查结果提问”</h2><p>刚入职时我害怕问得太多，有时又会在卡住后直接把错误截图发给同事。两种方式都不理想：前者浪费时间，后者把全部定位工作转给了对方。</p>
-<p>现在我会先准备：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">我想完成什么</span><br><span class="line">执行了什么</span><br><span class="line">预期和实际分别是什么</span><br><span class="line">查过哪些日志、代码和文档</span><br><span class="line">目前有哪两个判断</span><br><span class="line">希望对方确认哪个关键点</span><br></pre></td></tr></table></figure>
-
-<p>这样的提问通常更快得到答案，也方便对方指出我在哪一步理解错了。能够求助不是能力不足，关键是让求助成为协作，而不是任务转移。</p>
-<h2 id="今年真正掌握的是一组小习惯"><a href="#今年真正掌握的是一组小习惯" class="headerlink" title="今年真正掌握的是一组小习惯"></a>今年真正掌握的是一组小习惯</h2><p>如果只列技术名词，这一年可以写 Spring Boot、MySQL、Redis、Git、Linux。但让我日常工作发生变化的，是更细小的习惯：</p>
-<ol>
-<li>修改前先复现，保存基线。</li>
-<li>提交前完整阅读自己的 diff。</li>
-<li>复杂逻辑先写一张状态表。</li>
-<li>日志带业务编号和 traceId，不打印敏感信息。</li>
-<li>大改动拆成可以验证的小提交。</li>
-<li>故障恢复后补行动项，并确认负责人。</li>
-<li>解决一次问题后留下文档或自动测试。</li>
-</ol>
-<p>这些动作单独看都不难，坚持下来却能降低很多重复成本。</p>
-<h2 id="也有一些没有做好的地方"><a href="#也有一些没有做好的地方" class="headerlink" title="也有一些没有做好的地方"></a>也有一些没有做好的地方</h2><p>今年仍然有几个明显不足。</p>
-<p>首先是业务理解还不够主动。有时只关注当前接口，没有继续追问这个字段最终影响报表、结算还是客户操作。</p>
-<p>其次是对底层原理的学习容易断续。遇到问题时会集中看资料，问题过去后又缺少系统整理，知识之间没有形成连接。</p>
-<p>还有一个问题是估时偏乐观。我常按“编码完成”估算，漏掉联调、数据准备、回归和发布观察。后来开始把任务拆成可见步骤，估时才逐渐接近真实。</p>
-<p>这些不足不会靠一份年度计划自动消失，需要放进下一年的日常动作。</p>
-<h2 id="给第二年的三个目标"><a href="#给第二年的三个目标" class="headerlink" title="给第二年的三个目标"></a>给第二年的三个目标</h2><p>我不打算列一长串框架，先保留三个方向。</p>
-<p><strong>把一个领域理解深。</strong> 不只知道接口和表，还能说明核心流程、状态变化、异常补偿和业务指标。</p>
-<p><strong>把排查过程系统化。</strong> 继续练习从现象到系统、进程、线程和代码的证据链，减少依靠经验猜测。</p>
-<p><strong>做能被团队复用的产出。</strong> 可能是一套测试、一份 Runbook、一个脚本，也可能只是把一次故障写清楚。</p>
-<p>第一年结束时，我没有一种“已经入门完成”的感觉，反而更清楚系统里有多少自己不知道的东西。但这并不让人沮丧。与年初相比，我至少知道遇到陌生问题时该从哪里开始，知道怎样把不确定性一点点变成事实。</p>
-<p>成长可能就是这样：写代码依旧重要，但不再把代码当成全部答案。</p>
-]]></content>
-      <categories>
-        <category>随笔</category>
-      </categories>
-      <tags>
-        <tag>年度总结</tag>
-        <tag>成长总结</tag>
-        <tag>工作复盘</tag>
-        <tag>工程经验</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>一次接口超时问题排查</title>
     <url>/2021/01/17/2021-01-17-%E4%B8%80%E6%AC%A1%E6%8E%A5%E5%8F%A3%E8%B6%85%E6%97%B6%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/</url>
     <content><![CDATA[<p><img src="/images/posts/2021/api-timeout-cover.svg" alt="一次接口超时问题排查技术图"></p>
@@ -2186,6 +2115,77 @@
       </tags>
   </entry>
   <entry>
+    <title>工作第一年总结</title>
+    <url>/2020/12/27/2020-12-27-%E5%B7%A5%E4%BD%9C%E7%AC%AC%E4%B8%80%E5%B9%B4%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p><img src="/images/posts/2020/first-year-review-cover.svg" alt="工作第一年总结封面图"></p>
+<p>写下这篇总结时，我工作的第一年快结束了。回头看年初的自己，最明显的特点是着急：着急听懂会议里的每个词，着急把需求做完，着急证明自己能独立解决问题。</p>
+<p>一年后，我会的框架确实多了一些，但更重要的变化是开始接受一件事：工程能力不只是写代码的速度，它还包括理解问题、确认边界、留下证据，以及让别人能够接着自己的工作继续走。</p>
+<h2 id="刚开始，所有问题看起来都像代码问题"><a href="#刚开始，所有问题看起来都像代码问题" class="headerlink" title="刚开始，所有问题看起来都像代码问题"></a>刚开始，所有问题看起来都像代码问题</h2><p>第一次接需求时，我拿到一句“增加订单筛选”，立即打开 Controller。写到一半才发现，筛选时间按创建时间还是支付时间没有确认，导出和页面是否共用条件也没有结论。</p>
+<p>那次需求反复改了几轮。代码并不难，真正浪费时间的是我把模糊内容当成了确定输入。</p>
+<p>后来每次开始前，我会先写几行：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">用户要解决什么问题</span><br><span class="line">正常流程是什么</span><br><span class="line">边界和异常是什么</span><br><span class="line">本次不做什么</span><br><span class="line">怎样算完成</span><br></pre></td></tr></table></figure>
+
+<p>这些问题没有让开发变慢，反而减少了返工。程序员不是接收一句话就输出代码的转换器，澄清本身就是工作的一部分。</p>
+<h2 id="第一次独立上线，让我认识“完成”的含义"><a href="#第一次独立上线，让我认识“完成”的含义" class="headerlink" title="第一次独立上线，让我认识“完成”的含义"></a>第一次独立上线，让我认识“完成”的含义</h2><p>在本地看到接口返回成功时，我曾经觉得任务已经完成。真正上线后才知道，一个改动还需要回答很多问题：</p>
+<ul>
+<li>测试环境和生产配置是否一致。</li>
+<li>数据库变更能否兼容旧版本。</li>
+<li>日志能不能定位一笔失败请求。</li>
+<li>监控是否能发现错误率上升。</li>
+<li>如果回退，新增数据怎么办。</li>
+</ul>
+<p>第一次参与发布时，我大部分时间都在等别人确认。不是因为没有权限，而是我说不清变更影响和验证方式。</p>
+<p>从那以后，我开始在提测和发布前准备清单。最初只是怕遗漏，后来才意识到，清单更大的价值是把脑中的隐性判断交给团队。别人不必相信“我都测过了”，可以直接看到测了什么、结果是什么。</p>
+<h2 id="一次线上故障，比十篇教程更具体"><a href="#一次线上故障，比十篇教程更具体" class="headerlink" title="一次线上故障，比十篇教程更具体"></a>一次线上故障，比十篇教程更具体</h2><p>今年遇到过连接池耗尽的问题。告警响起时，我第一反应是最近发布的代码肯定有 Bug，随后又怀疑数据库。真正开始排查后，团队先看影响范围，再保存日志和线程现场，最后才定位到导出任务把远程调用放进长事务。</p>
+<p>那次经历让我记住了几个顺序：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">事实在猜测之前</span><br><span class="line">恢复和取证同时安排</span><br><span class="line">直接原因不等于根本原因</span><br><span class="line">修复代码不等于完成复盘</span><br></pre></td></tr></table></figure>
+
+<p>过去遇到错误，我习惯立刻搜索异常文本；现在我会先问系统发生了什么变化、影响哪些请求、哪一层指标出现异常。搜索能力仍然重要，但没有正确问题，搜到的答案很容易只是相似而不是适用。</p>
+<h2 id="Code-Review-也改变了"><a href="#Code-Review-也改变了" class="headerlink" title="Code Review 也改变了"></a>Code Review 也改变了</h2><p>年初 Review 别人的代码，我主要看格式、空指针和命名。别人 Review 我的代码时，我也常把评论理解成对个人能力的评价。</p>
+<p>合作久了以后，我逐渐看到 Review 的真正价值：作者最熟悉实现，Reviewer 更容易发现被作者默认的前提。一次有效讨论应该围绕：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">业务规则是否完整</span><br><span class="line">失败后数据停在哪里</span><br><span class="line">并发和重复请求会怎样</span><br><span class="line">日志是否保留必要上下文</span><br><span class="line">测试能否证明关键行为</span><br></pre></td></tr></table></figure>
+
+<p>我也学会让评论更具体。与其写“这里不太好”，不如说明“外部调用放在事务中会延长连接占用，建议先提交本地状态，再通过任务重试通知”。</p>
+<p>评论对代码，不对人；结论最好有风险和替代方案。这件事说起来普通，真正做到以后，协作成本低了很多。</p>
+<h2 id="从“问答案”到“带着排查结果提问”"><a href="#从“问答案”到“带着排查结果提问”" class="headerlink" title="从“问答案”到“带着排查结果提问”"></a>从“问答案”到“带着排查结果提问”</h2><p>刚入职时我害怕问得太多，有时又会在卡住后直接把错误截图发给同事。两种方式都不理想：前者浪费时间，后者把全部定位工作转给了对方。</p>
+<p>现在我会先准备：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">我想完成什么</span><br><span class="line">执行了什么</span><br><span class="line">预期和实际分别是什么</span><br><span class="line">查过哪些日志、代码和文档</span><br><span class="line">目前有哪两个判断</span><br><span class="line">希望对方确认哪个关键点</span><br></pre></td></tr></table></figure>
+
+<p>这样的提问通常更快得到答案，也方便对方指出我在哪一步理解错了。能够求助不是能力不足，关键是让求助成为协作，而不是任务转移。</p>
+<h2 id="今年真正掌握的是一组小习惯"><a href="#今年真正掌握的是一组小习惯" class="headerlink" title="今年真正掌握的是一组小习惯"></a>今年真正掌握的是一组小习惯</h2><p>如果只列技术名词，这一年可以写 Spring Boot、MySQL、Redis、Git、Linux。但让我日常工作发生变化的，是更细小的习惯：</p>
+<ol>
+<li>修改前先复现，保存基线。</li>
+<li>提交前完整阅读自己的 diff。</li>
+<li>复杂逻辑先写一张状态表。</li>
+<li>日志带业务编号和 traceId，不打印敏感信息。</li>
+<li>大改动拆成可以验证的小提交。</li>
+<li>故障恢复后补行动项，并确认负责人。</li>
+<li>解决一次问题后留下文档或自动测试。</li>
+</ol>
+<p>这些动作单独看都不难，坚持下来却能降低很多重复成本。</p>
+<h2 id="也有一些没有做好的地方"><a href="#也有一些没有做好的地方" class="headerlink" title="也有一些没有做好的地方"></a>也有一些没有做好的地方</h2><p>今年仍然有几个明显不足。</p>
+<p>首先是业务理解还不够主动。有时只关注当前接口，没有继续追问这个字段最终影响报表、结算还是客户操作。</p>
+<p>其次是对底层原理的学习容易断续。遇到问题时会集中看资料，问题过去后又缺少系统整理，知识之间没有形成连接。</p>
+<p>还有一个问题是估时偏乐观。我常按“编码完成”估算，漏掉联调、数据准备、回归和发布观察。后来开始把任务拆成可见步骤，估时才逐渐接近真实。</p>
+<p>这些不足不会靠一份年度计划自动消失，需要放进下一年的日常动作。</p>
+<h2 id="给第二年的三个目标"><a href="#给第二年的三个目标" class="headerlink" title="给第二年的三个目标"></a>给第二年的三个目标</h2><p>我不打算列一长串框架，先保留三个方向。</p>
+<p><strong>把一个领域理解深。</strong> 不只知道接口和表，还能说明核心流程、状态变化、异常补偿和业务指标。</p>
+<p><strong>把排查过程系统化。</strong> 继续练习从现象到系统、进程、线程和代码的证据链，减少依靠经验猜测。</p>
+<p><strong>做能被团队复用的产出。</strong> 可能是一套测试、一份 Runbook、一个脚本，也可能只是把一次故障写清楚。</p>
+<p>第一年结束时，我没有一种“已经入门完成”的感觉，反而更清楚系统里有多少自己不知道的东西。但这并不让人沮丧。与年初相比，我至少知道遇到陌生问题时该从哪里开始，知道怎样把不确定性一点点变成事实。</p>
+<p>成长可能就是这样：写代码依旧重要，但不再把代码当成全部答案。</p>
+]]></content>
+      <categories>
+        <category>随笔</category>
+      </categories>
+      <tags>
+        <tag>年度总结</tag>
+        <tag>成长总结</tag>
+        <tag>工作复盘</tag>
+        <tag>工程经验</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MySQL慢查询分析</title>
     <url>/2021/02/21/2021-02-21-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90/</url>
     <content><![CDATA[<p><img src="/images/posts/2021/mysql-slow-query-cover.svg" alt="MySQL慢查询分析技术图"></p>
@@ -2296,147 +2296,6 @@
         <tag>索引</tag>
         <tag>慢查询</tag>
         <tag>SQL优化</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis缓存穿透解决方案</title>
-    <url>/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
-    <content><![CDATA[<p><img src="/images/posts/2021/redis-penetration-cover.svg" alt="Redis缓存穿透解决方案技术图"></p>
-<p>缓存穿透指查询一个本来就不存在的数据：Redis 每次未命中，请求继续访问数据库，数据库也返回空。只要请求使用不同的无效 ID，普通缓存几乎没有保护作用。</p>
-<p>为了把不同方案的效果看清楚，我在隔离环境做了四轮攻防实验。压测数据均为构造数据，不针对真实线上服务。</p>
-<h2 id="实验规则"><a href="#实验规则" class="headerlink" title="实验规则"></a>实验规则</h2><p>商品查询接口：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">GET /api/products/&#123;productId&#125;</span><br></pre></td></tr></table></figure>
-
-<p>数据规模和请求模型：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">有效商品：100 万</span><br><span class="line">压测流量：2000 req/s</span><br><span class="line">有效 ID：20%</span><br><span class="line">不存在但格式合法的 ID：60%</span><br><span class="line">格式非法 ID：20%</span><br><span class="line">数据库连接池上限：80</span><br></pre></td></tr></table></figure>
-
-<p>基础读取逻辑：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">query</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + productId;</span><br><span class="line">    <span class="type">Product</span> <span class="variable">cached</span> <span class="operator">=</span> redisRepository.get(key);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> cached;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    <span class="keyword">if</span> (product != <span class="literal">null</span>) &#123;</span><br><span class="line">        redisRepository.set(key, product, Duration.ofMinutes(<span class="number">30</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>不存在的数据不进入缓存，因此每次都会查库。</p>
-<h2 id="第一轮：没有额外防护"><a href="#第一轮：没有额外防护" class="headerlink" title="第一轮：没有额外防护"></a>第一轮：没有额外防护</h2><p>结果：</p>
-<table>
-<thead>
-<tr>
-<th>指标</th>
-<th align="right">正常基线</th>
-<th align="right">无效流量进入后</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Redis 命中率</td>
-<td align="right">94%</td>
-<td align="right">19%</td>
-</tr>
-<tr>
-<td>数据库 QPS</td>
-<td align="right">120</td>
-<td align="right">1,640</td>
-</tr>
-<tr>
-<td>接口 P99</td>
-<td align="right">85ms</td>
-<td align="right">1.8s</td>
-</tr>
-<tr>
-<td>数据库连接等待</td>
-<td align="right">0</td>
-<td align="right">47</td>
-</tr>
-</tbody></table>
-<p>数据库 CPU 尚未完全打满，但连接等待已经影响正常商品查询。穿透的危险不只在攻击，爬虫错误、客户端循环重试、过期链接也可能制造相同流量。</p>
-<h2 id="第二轮：在入口拒绝不可能的请求"><a href="#第二轮：在入口拒绝不可能的请求" class="headerlink" title="第二轮：在入口拒绝不可能的请求"></a>第二轮：在入口拒绝不可能的请求</h2><p>第一层防护不需要 Redis。根据业务约束检查：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">ID 是否为正整数</span><br><span class="line">长度是否在合法范围</span><br><span class="line">租户和数据范围是否有效</span><br><span class="line">接口调用频率是否异常</span><br><span class="line">批量查询数量是否超过上限</span><br></pre></td></tr></table></figure>
-
-<p>Controller 层只负责格式校验，用户是否有权访问某商品仍由业务层判断。不能因为引入缓存就绕过权限。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> ProductView <span class="title function_">queryProduct</span><span class="params">(<span class="type">long</span> productId, UserContext user)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (productId &lt;= <span class="number">0</span> || productId &gt; MAX_PRODUCT_ID) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;INVALID_PRODUCT_ID&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    permissionService.checkTenantAccess(user);</span><br><span class="line">    <span class="keyword">return</span> productQueryService.query(productId, user.getTenantId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>格式校验挡住了 20% 请求，数据库 QPS 降到约 1,240，但格式合法的随机 ID 仍然会穿透。</p>
-<p>这里的 <code>MAX_PRODUCT_ID</code> 只能在业务编号确有稳定上界时使用。若 ID 来自分布式算法或外部系统，不应凭当前最大值拒绝未来合法数据。</p>
-<h2 id="第三轮：短时间缓存“确实不存在”"><a href="#第三轮：短时间缓存“确实不存在”" class="headerlink" title="第三轮：短时间缓存“确实不存在”"></a>第三轮：短时间缓存“确实不存在”</h2><p>数据库返回空时写一个特殊标记：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">query</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> buildKey(productId);</span><br><span class="line">    <span class="type">String</span> <span class="variable">cached</span> <span class="operator">=</span> redisRepository.getString(key);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (NULL_VALUE.equals(cached)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> productSerializer.deserialize(cached);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    <span class="keyword">if</span> (product == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 空值只缓存较短时间，避免商品刚创建后长期不可见</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">ttlSeconds</span> <span class="operator">=</span> <span class="number">60</span> + ThreadLocalRandom.current().nextInt(<span class="number">60</span>);</span><br><span class="line">        redisRepository.setString(key, NULL_VALUE, ttlSeconds);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    redisRepository.setString(</span><br><span class="line">            key,</span><br><span class="line">            productSerializer.serialize(product),</span><br><span class="line">            <span class="number">1800</span></span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>空值缓存适合重复查询同一批无效 ID，例如错误链接或客户端重试。本次压测把无效 ID 集合限制在 1 万个，第二遍请求后数据库 QPS 降到 180 左右。</p>
-<p>但如果攻击者每次生成全新 ID，空值缓存仍会不断创建新 key。还要防止 Redis 被大量无效键占满：</p>
-<ul>
-<li>空值 TTL 明显短于正常数据。</li>
-<li>key 使用固定格式，不直接拼接任意长参数。</li>
-<li>监控空值 key 创建速率。</li>
-<li>对调用方和来源做限流。</li>
-</ul>
-<p>商品创建后应主动删除对应空值缓存，否则在 TTL 到期前会得到“商品不存在”。</p>
-<h2 id="第四轮：布隆过滤器挡住大范围不存在-ID"><a href="#第四轮：布隆过滤器挡住大范围不存在-ID" class="headerlink" title="第四轮：布隆过滤器挡住大范围不存在 ID"></a>第四轮：布隆过滤器挡住大范围不存在 ID</h2><p>布隆过滤器能快速回答“这个 ID 一定不存在”或“可能存在”。它允许少量误判存在，但不会把真实存在的 ID 判断为不存在，前提是数据同步正确。</p>
-<p>查询顺序调整为：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">参数与权限校验</span><br><span class="line">  -&gt; Redis 查询</span><br><span class="line">  -&gt; Bloom 判断</span><br><span class="line">       一定不存在：直接返回空</span><br><span class="line">       可能存在：查询数据库</span><br><span class="line">  -&gt; 回填正常值或短期空值</span><br></pre></td></tr></table></figure>
-
-<p>为什么先查 Redis 再查 Bloom？热点数据已经在 Redis 时，直接返回最快；Bloom 主要保护缓存未命中的后续数据库路径。</p>
-<p>示意代码：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">queryWithBloom</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">ProductCacheValue</span> <span class="variable">cacheValue</span> <span class="operator">=</span> cacheRepository.find(productId);</span><br><span class="line">    <span class="keyword">if</span> (cacheValue.isHit()) &#123;</span><br><span class="line">        <span class="keyword">return</span> cacheValue.getProduct();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (cacheValue.isNullMarker()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!productBloomFilter.mightContain(productId)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    cacheRepository.saveResult(productId, product);</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>加入布隆过滤器后：</p>
-<table>
-<thead>
-<tr>
-<th>指标</th>
-<th align="right">无防护</th>
-<th align="right">参数校验</th>
-<th align="right">空值缓存</th>
-<th align="right">多层防护</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>数据库 QPS</td>
-<td align="right">1,640</td>
-<td align="right">1,240</td>
-<td align="right">180</td>
-<td align="right">126</td>
-</tr>
-<tr>
-<td>P99</td>
-<td align="right">1.8s</td>
-<td align="right">1.3s</td>
-<td align="right">120ms</td>
-<td align="right">92ms</td>
-</tr>
-<tr>
-<td>Redis 新增空 key&#x2F;s</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">43</td>
-<td align="right">3</td>
-</tr>
-</tbody></table>
-<p>“多层防护”包含参数校验、调用方限流、Bloom 和空值缓存。数据库 QPS 接近正常基线，但仍保留少量误判和真实数据查询。</p>
-<h2 id="布隆过滤器的维护比接入更难"><a href="#布隆过滤器的维护比接入更难" class="headerlink" title="布隆过滤器的维护比接入更难"></a>布隆过滤器的维护比接入更难</h2><p>实现时必须回答：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">初始数据如何加载</span><br><span class="line">新商品怎样实时加入</span><br><span class="line">删除商品如何处理</span><br><span class="line">过滤器容量和误判率是多少</span><br><span class="line">重建期间怎样切换</span><br><span class="line">同步失败如何告警</span><br></pre></td></tr></table></figure>
-
-<p>普通布隆过滤器不支持可靠删除。商品下线后保留为“可能存在”只会多查一次数据库，可以接受；错误删除一个仍存在的商品则可能直接返回空，不能接受。</p>
-<p>容量估小后误判率会持续上升。重建时可以生成新版本，完成数据校验后原子切换，不要在原过滤器上边清边写。</p>
-<h2 id="限流保护的是最后边界"><a href="#限流保护的是最后边界" class="headerlink" title="限流保护的是最后边界"></a>限流保护的是最后边界</h2><p>即使 Bloom 正常，也要限制异常来源。限流维度可以包括：</p>
-<ul>
-<li>用户或应用凭证。</li>
-<li>租户。</li>
-<li>客户端 IP，作为辅助而非唯一身份。</li>
-<li>接口和资源类型。</li>
-<li>单次批量大小。</li>
-</ul>
-<p>超限时返回明确错误码和重试时间，不要让客户端立即无限重试。对于登录前公开接口，还需要网关防护和行为识别。</p>
-<p>限流阈值根据正常峰值与容量测试确定。过低会伤害真实用户，过高则无法保护数据库。</p>
-<h2 id="别把缓存击穿和雪崩混进来"><a href="#别把缓存击穿和雪崩混进来" class="headerlink" title="别把缓存击穿和雪崩混进来"></a>别把缓存击穿和雪崩混进来</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">穿透：查询不存在的数据，缓存和数据库都没有</span><br><span class="line">击穿：一个热点 key 失效，大量请求同时回源</span><br><span class="line">雪崩：大量 key 同时失效或缓存整体不可用</span><br></pre></td></tr></table></figure>
-
-<p>空值缓存和 Bloom 主要解决穿透；互斥加载或逻辑过期更适合热点击穿；随机 TTL、预热、限流和高可用用于雪崩。先分类，再选择方案。</p>
-<h2 id="生产落地清单"><a href="#生产落地清单" class="headerlink" title="生产落地清单"></a>生产落地清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 无效参数在入口提前拒绝</span><br><span class="line">[ ] 权限校验不依赖缓存命中与否</span><br><span class="line">[ ] 空值使用独立标记和短 TTL</span><br><span class="line">[ ] 业务新增后主动失效空值缓存</span><br><span class="line">[ ] Bloom 容量、误判率和重建流程明确</span><br><span class="line">[ ] 同步失败有监控和降级路径</span><br><span class="line">[ ] 调用方、接口和批量大小有限流</span><br><span class="line">[ ] 监控缓存命中率、空值率和数据库回源 QPS</span><br></pre></td></tr></table></figure>
-
-<p>缓存穿透没有一个单点“银弹”。真正可靠的是多层减压：明显错误尽早拒绝，重复空结果短期记住，大范围不存在 ID 用概率结构过滤，异常流量在入口限速，而数据库仍保留最后的事实判断。</p>
-]]></content>
-      <categories>
-        <category>故障排查</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-        <tag>缓存穿透</tag>
-        <tag>布隆过滤器</tag>
-        <tag>缓存设计</tag>
       </tags>
   </entry>
   <entry>
@@ -2577,9 +2436,9 @@
       </categories>
       <tags>
         <tag>Redis</tag>
-        <tag>缓存设计</tag>
         <tag>缓存雪崩</tag>
         <tag>高可用</tag>
+        <tag>缓存设计</tag>
       </tags>
   </entry>
   <entry>
@@ -2734,6 +2593,147 @@
         <tag>Nginx</tag>
         <tag>反向代理</tag>
         <tag>网关</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis缓存穿透解决方案</title>
+    <url>/2021/03/14/2021-03-14-Redis%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
+    <content><![CDATA[<p><img src="/images/posts/2021/redis-penetration-cover.svg" alt="Redis缓存穿透解决方案技术图"></p>
+<p>缓存穿透指查询一个本来就不存在的数据：Redis 每次未命中，请求继续访问数据库，数据库也返回空。只要请求使用不同的无效 ID，普通缓存几乎没有保护作用。</p>
+<p>为了把不同方案的效果看清楚，我在隔离环境做了四轮攻防实验。压测数据均为构造数据，不针对真实线上服务。</p>
+<h2 id="实验规则"><a href="#实验规则" class="headerlink" title="实验规则"></a>实验规则</h2><p>商品查询接口：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">GET /api/products/&#123;productId&#125;</span><br></pre></td></tr></table></figure>
+
+<p>数据规模和请求模型：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">有效商品：100 万</span><br><span class="line">压测流量：2000 req/s</span><br><span class="line">有效 ID：20%</span><br><span class="line">不存在但格式合法的 ID：60%</span><br><span class="line">格式非法 ID：20%</span><br><span class="line">数据库连接池上限：80</span><br></pre></td></tr></table></figure>
+
+<p>基础读取逻辑：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">query</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> <span class="string">&quot;product:&quot;</span> + productId;</span><br><span class="line">    <span class="type">Product</span> <span class="variable">cached</span> <span class="operator">=</span> redisRepository.get(key);</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> cached;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    <span class="keyword">if</span> (product != <span class="literal">null</span>) &#123;</span><br><span class="line">        redisRepository.set(key, product, Duration.ofMinutes(<span class="number">30</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不存在的数据不进入缓存，因此每次都会查库。</p>
+<h2 id="第一轮：没有额外防护"><a href="#第一轮：没有额外防护" class="headerlink" title="第一轮：没有额外防护"></a>第一轮：没有额外防护</h2><p>结果：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">正常基线</th>
+<th align="right">无效流量进入后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Redis 命中率</td>
+<td align="right">94%</td>
+<td align="right">19%</td>
+</tr>
+<tr>
+<td>数据库 QPS</td>
+<td align="right">120</td>
+<td align="right">1,640</td>
+</tr>
+<tr>
+<td>接口 P99</td>
+<td align="right">85ms</td>
+<td align="right">1.8s</td>
+</tr>
+<tr>
+<td>数据库连接等待</td>
+<td align="right">0</td>
+<td align="right">47</td>
+</tr>
+</tbody></table>
+<p>数据库 CPU 尚未完全打满，但连接等待已经影响正常商品查询。穿透的危险不只在攻击，爬虫错误、客户端循环重试、过期链接也可能制造相同流量。</p>
+<h2 id="第二轮：在入口拒绝不可能的请求"><a href="#第二轮：在入口拒绝不可能的请求" class="headerlink" title="第二轮：在入口拒绝不可能的请求"></a>第二轮：在入口拒绝不可能的请求</h2><p>第一层防护不需要 Redis。根据业务约束检查：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">ID 是否为正整数</span><br><span class="line">长度是否在合法范围</span><br><span class="line">租户和数据范围是否有效</span><br><span class="line">接口调用频率是否异常</span><br><span class="line">批量查询数量是否超过上限</span><br></pre></td></tr></table></figure>
+
+<p>Controller 层只负责格式校验，用户是否有权访问某商品仍由业务层判断。不能因为引入缓存就绕过权限。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> ProductView <span class="title function_">queryProduct</span><span class="params">(<span class="type">long</span> productId, UserContext user)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (productId &lt;= <span class="number">0</span> || productId &gt; MAX_PRODUCT_ID) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;INVALID_PRODUCT_ID&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    permissionService.checkTenantAccess(user);</span><br><span class="line">    <span class="keyword">return</span> productQueryService.query(productId, user.getTenantId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>格式校验挡住了 20% 请求，数据库 QPS 降到约 1,240，但格式合法的随机 ID 仍然会穿透。</p>
+<p>这里的 <code>MAX_PRODUCT_ID</code> 只能在业务编号确有稳定上界时使用。若 ID 来自分布式算法或外部系统，不应凭当前最大值拒绝未来合法数据。</p>
+<h2 id="第三轮：短时间缓存“确实不存在”"><a href="#第三轮：短时间缓存“确实不存在”" class="headerlink" title="第三轮：短时间缓存“确实不存在”"></a>第三轮：短时间缓存“确实不存在”</h2><p>数据库返回空时写一个特殊标记：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">query</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> buildKey(productId);</span><br><span class="line">    <span class="type">String</span> <span class="variable">cached</span> <span class="operator">=</span> redisRepository.getString(key);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (NULL_VALUE.equals(cached)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> productSerializer.deserialize(cached);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    <span class="keyword">if</span> (product == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 空值只缓存较短时间，避免商品刚创建后长期不可见</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">ttlSeconds</span> <span class="operator">=</span> <span class="number">60</span> + ThreadLocalRandom.current().nextInt(<span class="number">60</span>);</span><br><span class="line">        redisRepository.setString(key, NULL_VALUE, ttlSeconds);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    redisRepository.setString(</span><br><span class="line">            key,</span><br><span class="line">            productSerializer.serialize(product),</span><br><span class="line">            <span class="number">1800</span></span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>空值缓存适合重复查询同一批无效 ID，例如错误链接或客户端重试。本次压测把无效 ID 集合限制在 1 万个，第二遍请求后数据库 QPS 降到 180 左右。</p>
+<p>但如果攻击者每次生成全新 ID，空值缓存仍会不断创建新 key。还要防止 Redis 被大量无效键占满：</p>
+<ul>
+<li>空值 TTL 明显短于正常数据。</li>
+<li>key 使用固定格式，不直接拼接任意长参数。</li>
+<li>监控空值 key 创建速率。</li>
+<li>对调用方和来源做限流。</li>
+</ul>
+<p>商品创建后应主动删除对应空值缓存，否则在 TTL 到期前会得到“商品不存在”。</p>
+<h2 id="第四轮：布隆过滤器挡住大范围不存在-ID"><a href="#第四轮：布隆过滤器挡住大范围不存在-ID" class="headerlink" title="第四轮：布隆过滤器挡住大范围不存在 ID"></a>第四轮：布隆过滤器挡住大范围不存在 ID</h2><p>布隆过滤器能快速回答“这个 ID 一定不存在”或“可能存在”。它允许少量误判存在，但不会把真实存在的 ID 判断为不存在，前提是数据同步正确。</p>
+<p>查询顺序调整为：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">参数与权限校验</span><br><span class="line">  -&gt; Redis 查询</span><br><span class="line">  -&gt; Bloom 判断</span><br><span class="line">       一定不存在：直接返回空</span><br><span class="line">       可能存在：查询数据库</span><br><span class="line">  -&gt; 回填正常值或短期空值</span><br></pre></td></tr></table></figure>
+
+<p>为什么先查 Redis 再查 Bloom？热点数据已经在 Redis 时，直接返回最快；Bloom 主要保护缓存未命中的后续数据库路径。</p>
+<p>示意代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> Product <span class="title function_">queryWithBloom</span><span class="params">(Long productId)</span> &#123;</span><br><span class="line">    <span class="type">ProductCacheValue</span> <span class="variable">cacheValue</span> <span class="operator">=</span> cacheRepository.find(productId);</span><br><span class="line">    <span class="keyword">if</span> (cacheValue.isHit()) &#123;</span><br><span class="line">        <span class="keyword">return</span> cacheValue.getProduct();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (cacheValue.isNullMarker()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!productBloomFilter.mightContain(productId)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> productRepository.findById(productId);</span><br><span class="line">    cacheRepository.saveResult(productId, product);</span><br><span class="line">    <span class="keyword">return</span> product;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>加入布隆过滤器后：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">无防护</th>
+<th align="right">参数校验</th>
+<th align="right">空值缓存</th>
+<th align="right">多层防护</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库 QPS</td>
+<td align="right">1,640</td>
+<td align="right">1,240</td>
+<td align="right">180</td>
+<td align="right">126</td>
+</tr>
+<tr>
+<td>P99</td>
+<td align="right">1.8s</td>
+<td align="right">1.3s</td>
+<td align="right">120ms</td>
+<td align="right">92ms</td>
+</tr>
+<tr>
+<td>Redis 新增空 key&#x2F;s</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">43</td>
+<td align="right">3</td>
+</tr>
+</tbody></table>
+<p>“多层防护”包含参数校验、调用方限流、Bloom 和空值缓存。数据库 QPS 接近正常基线，但仍保留少量误判和真实数据查询。</p>
+<h2 id="布隆过滤器的维护比接入更难"><a href="#布隆过滤器的维护比接入更难" class="headerlink" title="布隆过滤器的维护比接入更难"></a>布隆过滤器的维护比接入更难</h2><p>实现时必须回答：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">初始数据如何加载</span><br><span class="line">新商品怎样实时加入</span><br><span class="line">删除商品如何处理</span><br><span class="line">过滤器容量和误判率是多少</span><br><span class="line">重建期间怎样切换</span><br><span class="line">同步失败如何告警</span><br></pre></td></tr></table></figure>
+
+<p>普通布隆过滤器不支持可靠删除。商品下线后保留为“可能存在”只会多查一次数据库，可以接受；错误删除一个仍存在的商品则可能直接返回空，不能接受。</p>
+<p>容量估小后误判率会持续上升。重建时可以生成新版本，完成数据校验后原子切换，不要在原过滤器上边清边写。</p>
+<h2 id="限流保护的是最后边界"><a href="#限流保护的是最后边界" class="headerlink" title="限流保护的是最后边界"></a>限流保护的是最后边界</h2><p>即使 Bloom 正常，也要限制异常来源。限流维度可以包括：</p>
+<ul>
+<li>用户或应用凭证。</li>
+<li>租户。</li>
+<li>客户端 IP，作为辅助而非唯一身份。</li>
+<li>接口和资源类型。</li>
+<li>单次批量大小。</li>
+</ul>
+<p>超限时返回明确错误码和重试时间，不要让客户端立即无限重试。对于登录前公开接口，还需要网关防护和行为识别。</p>
+<p>限流阈值根据正常峰值与容量测试确定。过低会伤害真实用户，过高则无法保护数据库。</p>
+<h2 id="别把缓存击穿和雪崩混进来"><a href="#别把缓存击穿和雪崩混进来" class="headerlink" title="别把缓存击穿和雪崩混进来"></a>别把缓存击穿和雪崩混进来</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">穿透：查询不存在的数据，缓存和数据库都没有</span><br><span class="line">击穿：一个热点 key 失效，大量请求同时回源</span><br><span class="line">雪崩：大量 key 同时失效或缓存整体不可用</span><br></pre></td></tr></table></figure>
+
+<p>空值缓存和 Bloom 主要解决穿透；互斥加载或逻辑过期更适合热点击穿；随机 TTL、预热、限流和高可用用于雪崩。先分类，再选择方案。</p>
+<h2 id="生产落地清单"><a href="#生产落地清单" class="headerlink" title="生产落地清单"></a>生产落地清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 无效参数在入口提前拒绝</span><br><span class="line">[ ] 权限校验不依赖缓存命中与否</span><br><span class="line">[ ] 空值使用独立标记和短 TTL</span><br><span class="line">[ ] 业务新增后主动失效空值缓存</span><br><span class="line">[ ] Bloom 容量、误判率和重建流程明确</span><br><span class="line">[ ] 同步失败有监控和降级路径</span><br><span class="line">[ ] 调用方、接口和批量大小有限流</span><br><span class="line">[ ] 监控缓存命中率、空值率和数据库回源 QPS</span><br></pre></td></tr></table></figure>
+
+<p>缓存穿透没有一个单点“银弹”。真正可靠的是多层减压：明显错误尽早拒绝，重复空结果短期记住，大范围不存在 ID 用概率结构过滤，异常流量在入口限速，而数据库仍保留最后的事实判断。</p>
+]]></content>
+      <categories>
+        <category>故障排查</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+        <tag>缓存设计</tag>
+        <tag>缓存穿透</tag>
+        <tag>布隆过滤器</tag>
       </tags>
   </entry>
   <entry>
@@ -4063,108 +4063,6 @@
       </tags>
   </entry>
   <entry>
-    <title>从单体到微服务总结</title>
-    <url>/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<blockquote>
-<p>2022 年最后一篇不再写组件配置，想回头看一看这一年的技术路线。年初我关心的是“一个系统怎么拆成多个服务”，到年末更关心“团队能不能长期维护拆完以后的复杂度”。这个变化比多会几个框架更重要。</p>
-</blockquote>
-<h2 id="年初的理解：服务越独立越先进"><a href="#年初的理解：服务越独立越先进" class="headerlink" title="年初的理解：服务越独立越先进"></a>年初的理解：服务越独立越先进</h2><p>最开始看到单体应用的问题很直接：工程越来越大，发布越来越慢，模块之间相互影响。微服务看起来给出了一个明确答案：把用户、订单、库存、支付拆开，每个服务独立数据库、独立部署、独立扩容。</p>
-<p>这个方向没有错，但太容易忽略前提。服务从一个进程拆成四个进程以后，原来隐藏的成本全部显性化：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">本地调用变成网络调用</span><br><span class="line">本地事务变成跨服务状态协调</span><br><span class="line">一个配置文件变成多环境配置管理</span><br><span class="line">一份日志变成跨实例检索</span><br><span class="line">一次发布变成多服务版本兼容</span><br></pre></td></tr></table></figure>
-
-<p>系统不是被拆小了，而是把代码复杂度的一部分换成了分布式系统和组织协作复杂度。</p>
-<h2 id="这一年的实际路线"><a href="#这一年的实际路线" class="headerlink" title="这一年的实际路线"></a>这一年的实际路线</h2><p>回看文章顺序，基本就是我对微服务认识逐渐完整的过程：</p>
-<h3 id="一月：先讨论边界"><a href="#一月：先讨论边界" class="headerlink" title="一月：先讨论边界"></a>一月：先讨论边界</h3><p>第一步不是引入注册中心，而是判断用户、订单、库存和支付的数据归属。边界不清楚时，服务拆得越快，后面跨服务修改越多。</p>
-<p>这一阶段最大的收获是“服务按业务能力拆，不按 Controller 或数据库表数量拆”。如果订单服务仍然直接更新库存表，两个仓库并没有形成两个边界。</p>
-<h3 id="二月至三月：补服务治理"><a href="#二月至三月：补服务治理" class="headerlink" title="二月至三月：补服务治理"></a>二月至三月：补服务治理</h3><p>服务数量增加以后，固定 IP 调用很快失效，于是接触 Nacos、Gateway 和 OpenFeign。它们分别解决服务位置、统一入口和声明式调用，但也引入 namespace、路由、超时和版本兼容问题。</p>
-<p>这让我意识到组件只有放在故障链路里才有意义。注册中心不是为了控制台里出现服务名，而是让调用方能在实例变化后继续找到可用地址；网关不是为了统一加一个前缀，而是为了入口治理和流量控制。</p>
-<h3 id="六月至七月：开始面对异步和高可用"><a href="#六月至七月：开始面对异步和高可用" class="headerlink" title="六月至七月：开始面对异步和高可用"></a>六月至七月：开始面对异步和高可用</h3><p>RabbitMQ 把非核心动作从订单主流程拆出去，响应更快了，但消息丢失、重复消费和最终一致性成为新的责任。Redis 主从和 Sentinel 提升了可用性，却仍然存在异步复制窗口、客户端重连和数据库回源风险。</p>
-<p>从这一阶段开始，我不再把“中间件集群已部署”当成完成，而会继续追问：</p>
-<ul>
-<li>数据有没有可能丢。</li>
-<li>故障以后多久恢复。</li>
-<li>重试会不会制造重复结果。</li>
-<li>整个组件不可用时业务怎么降级。</li>
-</ul>
-<h3 id="八月：让环境可以重复"><a href="#八月：让环境可以重复" class="headerlink" title="八月：让环境可以重复"></a>八月：让环境可以重复</h3><p>Docker 和 Compose 解决了本地、测试环境反复安装依赖的问题。镜像把运行环境固化，Compose 把服务关系写成配置。</p>
-<p>但容器化不是把 Jar 放进镜像就结束。数据卷、容器网络、健康检查、日志轮转、资源边界和密钥管理都需要重新设计。环境一致性提高了，部署规范的重要性反而更高了。</p>
-<h3 id="十月至十一月：补上可观测性"><a href="#十月至十一月：补上可观测性" class="headerlink" title="十月至十一月：补上可观测性"></a>十月至十一月：补上可观测性</h3><p>服务拆开以后，排查问题最明显的痛点出现了：不知道请求经过了哪些实例，也不知道系统是在偶发报错还是整体变慢。</p>
-<p>ELK 让分散日志可以通过 traceId 关联，Prometheus 让请求速率、错误率、延迟和资源饱和度形成趋势。直到这一步，我才真正感受到“可观测性应该先于大规模拆分”。没有日志和指标，微服务的故障隔离只是架构图上的描述。</p>
-<h2 id="单体和微服务不是二选一"><a href="#单体和微服务不是二选一" class="headerlink" title="单体和微服务不是二选一"></a>单体和微服务不是二选一</h2><p>现在再比较两者，我不会简单列优缺点，而会看系统正处于什么阶段。</p>
-<table>
-<thead>
-<tr>
-<th>判断维度</th>
-<th>更适合模块化单体</th>
-<th>可以考虑微服务</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>团队</td>
-<td>单一小团队</td>
-<td>多团队需要独立交付</td>
-</tr>
-<tr>
-<td>业务边界</td>
-<td>仍在频繁变化</td>
-<td>能形成稳定业务能力</td>
-</tr>
-<tr>
-<td>发布</td>
-<td>整体发布仍可接受</td>
-<td>不同模块发布相互阻塞</td>
-</tr>
-<tr>
-<td>资源</td>
-<td>各模块负载接近</td>
-<td>部分能力需要独立扩容</td>
-</tr>
-<tr>
-<td>故障</td>
-<td>影响范围可控</td>
-<td>需要明确隔离关键链路</td>
-</tr>
-<tr>
-<td>工程能力</td>
-<td>自动化和监控较弱</td>
-<td>CI&#x2F;CD、监控、治理已具备</td>
-</tr>
-</tbody></table>
-<p>模块化单体不是失败的微服务。模块边界、数据所有权和依赖方向做得好，未来要拆时成本更低；如果业务一直不需要拆，它本身也可以是长期架构。</p>
-<h2 id="这一年踩过的几个认知坑"><a href="#这一年踩过的几个认知坑" class="headerlink" title="这一年踩过的几个认知坑"></a>这一年踩过的几个认知坑</h2><h3 id="1-把“服务数量”当作架构成熟度"><a href="#1-把“服务数量”当作架构成熟度" class="headerlink" title="1. 把“服务数量”当作架构成熟度"></a>1. 把“服务数量”当作架构成熟度</h3><p>服务很多不代表边界合理。拆得过细会增加接口数量、部署单元和跨服务事务。成熟度更应该看发布成功率、恢复时间、故障影响范围和团队交付效率。</p>
-<h3 id="2-先引入组件，再寻找问题"><a href="#2-先引入组件，再寻找问题" class="headerlink" title="2. 先引入组件，再寻找问题"></a>2. 先引入组件，再寻找问题</h3><p>注册中心、消息队列、缓存和监控都有适用场景。为了技术栈完整而引入，会让团队维护一组没有明确收益的基础设施。</p>
-<p>更合理的顺序是：先描述当前痛点和目标，再选择最小能力解决它，并定义如何验证收益。</p>
-<h3 id="3-认为重试可以提升稳定性"><a href="#3-认为重试可以提升稳定性" class="headerlink" title="3. 认为重试可以提升稳定性"></a>3. 认为重试可以提升稳定性</h3><p>没有超时预算、退避和幂等的重试，会把一次失败放大成多次流量。下游已经过载时，上游同时重试只会让恢复更慢。</p>
-<p>重试是一种有成本的恢复手段，不是异常处理的默认模板。</p>
-<h3 id="4-只设计正常流程"><a href="#4-只设计正常流程" class="headerlink" title="4. 只设计正常流程"></a>4. 只设计正常流程</h3><p>架构图通常只画成功箭头，但线上问题都发生在箭头中间：网络超时、部分成功、实例重启、消息重复、配置未刷新。</p>
-<p>现在设计接口时，我会同时写失败状态、幂等键、补偿方式和可观测字段。能解释失败后的状态，比成功时少几毫秒更重要。</p>
-<h3 id="5-低估团队协作成本"><a href="#5-低估团队协作成本" class="headerlink" title="5. 低估团队协作成本"></a>5. 低估团队协作成本</h3><p>服务边界也是团队边界。接口变更、错误码、数据库迁移和发布顺序都需要约定。没有明确负责人时，独立服务很容易变成“所有人都能改，但没人真正维护”。</p>
-<h2 id="我现在理解的演进顺序"><a href="#我现在理解的演进顺序" class="headerlink" title="我现在理解的演进顺序"></a>我现在理解的演进顺序</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">整理单体模块边界</span><br><span class="line">  -&gt; 明确数据所有权和依赖方向</span><br><span class="line">  -&gt; 建立自动化测试、部署和回滚</span><br><span class="line">  -&gt; 补齐日志、指标和接口契约</span><br><span class="line">  -&gt; 拆出边界稳定且收益明确的服务</span><br><span class="line">  -&gt; 对真实故障做限流、降级、幂等和补偿</span><br><span class="line">  -&gt; 根据运行数据继续调整边界</span><br></pre></td></tr></table></figure>
-
-<p>这不是所有项目必须照走的路线，但顺序背后有一个原则：先获得控制复杂度的能力，再增加分布式复杂度。</p>
-<h2 id="还有哪些没有解决"><a href="#还有哪些没有解决" class="headerlink" title="还有哪些没有解决"></a>还有哪些没有解决</h2><p>到 2022 年底，系统能运行不等于治理已经成熟。下一阶段仍然要补：</p>
-<ol>
-<li>接口版本和兼容性管理，避免服务独立发布后相互破坏。</li>
-<li>数据一致性对账，不能只依赖消息“应该会到”。</li>
-<li>容量评估和压测，让限流阈值有数据依据。</li>
-<li>告警分级和 Runbook，让监控真正进入故障处理。</li>
-<li>交付指标，验证微服务是否真的缩短了发布时间。</li>
-<li>定期故障演练，验证文档中的恢复方案是否可执行。</li>
-</ol>
-<h2 id="年末结论"><a href="#年末结论" class="headerlink" title="年末结论"></a>年末结论</h2><p>这一年最大的变化，不是系统从单体变成了微服务，而是看待架构的角度从“用了什么技术”转向“解决了什么约束”。技术组件可以快速学习，边界、数据和失败语义需要在实践中反复调整。</p>
-<p>微服务不是一个终点。它只是当业务、团队和交付方式发展到一定阶段后，用来重新分配复杂度的手段。真正值得追求的仍然是可理解、可交付、可观察、可恢复的系统。只要这四件事在变好，架构就在向正确方向演进。</p>
-]]></content>
-      <categories>
-        <category>架构成长</category>
-      </categories>
-      <tags>
-        <tag>年度总结</tag>
-        <tag>系统设计</tag>
-        <tag>微服务</tag>
-        <tag>架构演进</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Prometheus监控部署</title>
     <url>/2022/11/20/2022-11-20-Prometheus%E7%9B%91%E6%8E%A7%E9%83%A8%E7%BD%B2/</url>
     <content><![CDATA[<blockquote>
@@ -4266,6 +4164,108 @@
         <tag>Prometheus</tag>
         <tag>监控</tag>
         <tag>Grafana</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>从单体到微服务总结</title>
+    <url>/2022/12/25/2022-12-25-%E4%BB%8E%E5%8D%95%E4%BD%93%E5%88%B0%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<blockquote>
+<p>2022 年最后一篇不再写组件配置，想回头看一看这一年的技术路线。年初我关心的是“一个系统怎么拆成多个服务”，到年末更关心“团队能不能长期维护拆完以后的复杂度”。这个变化比多会几个框架更重要。</p>
+</blockquote>
+<h2 id="年初的理解：服务越独立越先进"><a href="#年初的理解：服务越独立越先进" class="headerlink" title="年初的理解：服务越独立越先进"></a>年初的理解：服务越独立越先进</h2><p>最开始看到单体应用的问题很直接：工程越来越大，发布越来越慢，模块之间相互影响。微服务看起来给出了一个明确答案：把用户、订单、库存、支付拆开，每个服务独立数据库、独立部署、独立扩容。</p>
+<p>这个方向没有错，但太容易忽略前提。服务从一个进程拆成四个进程以后，原来隐藏的成本全部显性化：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">本地调用变成网络调用</span><br><span class="line">本地事务变成跨服务状态协调</span><br><span class="line">一个配置文件变成多环境配置管理</span><br><span class="line">一份日志变成跨实例检索</span><br><span class="line">一次发布变成多服务版本兼容</span><br></pre></td></tr></table></figure>
+
+<p>系统不是被拆小了，而是把代码复杂度的一部分换成了分布式系统和组织协作复杂度。</p>
+<h2 id="这一年的实际路线"><a href="#这一年的实际路线" class="headerlink" title="这一年的实际路线"></a>这一年的实际路线</h2><p>回看文章顺序，基本就是我对微服务认识逐渐完整的过程：</p>
+<h3 id="一月：先讨论边界"><a href="#一月：先讨论边界" class="headerlink" title="一月：先讨论边界"></a>一月：先讨论边界</h3><p>第一步不是引入注册中心，而是判断用户、订单、库存和支付的数据归属。边界不清楚时，服务拆得越快，后面跨服务修改越多。</p>
+<p>这一阶段最大的收获是“服务按业务能力拆，不按 Controller 或数据库表数量拆”。如果订单服务仍然直接更新库存表，两个仓库并没有形成两个边界。</p>
+<h3 id="二月至三月：补服务治理"><a href="#二月至三月：补服务治理" class="headerlink" title="二月至三月：补服务治理"></a>二月至三月：补服务治理</h3><p>服务数量增加以后，固定 IP 调用很快失效，于是接触 Nacos、Gateway 和 OpenFeign。它们分别解决服务位置、统一入口和声明式调用，但也引入 namespace、路由、超时和版本兼容问题。</p>
+<p>这让我意识到组件只有放在故障链路里才有意义。注册中心不是为了控制台里出现服务名，而是让调用方能在实例变化后继续找到可用地址；网关不是为了统一加一个前缀，而是为了入口治理和流量控制。</p>
+<h3 id="六月至七月：开始面对异步和高可用"><a href="#六月至七月：开始面对异步和高可用" class="headerlink" title="六月至七月：开始面对异步和高可用"></a>六月至七月：开始面对异步和高可用</h3><p>RabbitMQ 把非核心动作从订单主流程拆出去，响应更快了，但消息丢失、重复消费和最终一致性成为新的责任。Redis 主从和 Sentinel 提升了可用性，却仍然存在异步复制窗口、客户端重连和数据库回源风险。</p>
+<p>从这一阶段开始，我不再把“中间件集群已部署”当成完成，而会继续追问：</p>
+<ul>
+<li>数据有没有可能丢。</li>
+<li>故障以后多久恢复。</li>
+<li>重试会不会制造重复结果。</li>
+<li>整个组件不可用时业务怎么降级。</li>
+</ul>
+<h3 id="八月：让环境可以重复"><a href="#八月：让环境可以重复" class="headerlink" title="八月：让环境可以重复"></a>八月：让环境可以重复</h3><p>Docker 和 Compose 解决了本地、测试环境反复安装依赖的问题。镜像把运行环境固化，Compose 把服务关系写成配置。</p>
+<p>但容器化不是把 Jar 放进镜像就结束。数据卷、容器网络、健康检查、日志轮转、资源边界和密钥管理都需要重新设计。环境一致性提高了，部署规范的重要性反而更高了。</p>
+<h3 id="十月至十一月：补上可观测性"><a href="#十月至十一月：补上可观测性" class="headerlink" title="十月至十一月：补上可观测性"></a>十月至十一月：补上可观测性</h3><p>服务拆开以后，排查问题最明显的痛点出现了：不知道请求经过了哪些实例，也不知道系统是在偶发报错还是整体变慢。</p>
+<p>ELK 让分散日志可以通过 traceId 关联，Prometheus 让请求速率、错误率、延迟和资源饱和度形成趋势。直到这一步，我才真正感受到“可观测性应该先于大规模拆分”。没有日志和指标，微服务的故障隔离只是架构图上的描述。</p>
+<h2 id="单体和微服务不是二选一"><a href="#单体和微服务不是二选一" class="headerlink" title="单体和微服务不是二选一"></a>单体和微服务不是二选一</h2><p>现在再比较两者，我不会简单列优缺点，而会看系统正处于什么阶段。</p>
+<table>
+<thead>
+<tr>
+<th>判断维度</th>
+<th>更适合模块化单体</th>
+<th>可以考虑微服务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>团队</td>
+<td>单一小团队</td>
+<td>多团队需要独立交付</td>
+</tr>
+<tr>
+<td>业务边界</td>
+<td>仍在频繁变化</td>
+<td>能形成稳定业务能力</td>
+</tr>
+<tr>
+<td>发布</td>
+<td>整体发布仍可接受</td>
+<td>不同模块发布相互阻塞</td>
+</tr>
+<tr>
+<td>资源</td>
+<td>各模块负载接近</td>
+<td>部分能力需要独立扩容</td>
+</tr>
+<tr>
+<td>故障</td>
+<td>影响范围可控</td>
+<td>需要明确隔离关键链路</td>
+</tr>
+<tr>
+<td>工程能力</td>
+<td>自动化和监控较弱</td>
+<td>CI&#x2F;CD、监控、治理已具备</td>
+</tr>
+</tbody></table>
+<p>模块化单体不是失败的微服务。模块边界、数据所有权和依赖方向做得好，未来要拆时成本更低；如果业务一直不需要拆，它本身也可以是长期架构。</p>
+<h2 id="这一年踩过的几个认知坑"><a href="#这一年踩过的几个认知坑" class="headerlink" title="这一年踩过的几个认知坑"></a>这一年踩过的几个认知坑</h2><h3 id="1-把“服务数量”当作架构成熟度"><a href="#1-把“服务数量”当作架构成熟度" class="headerlink" title="1. 把“服务数量”当作架构成熟度"></a>1. 把“服务数量”当作架构成熟度</h3><p>服务很多不代表边界合理。拆得过细会增加接口数量、部署单元和跨服务事务。成熟度更应该看发布成功率、恢复时间、故障影响范围和团队交付效率。</p>
+<h3 id="2-先引入组件，再寻找问题"><a href="#2-先引入组件，再寻找问题" class="headerlink" title="2. 先引入组件，再寻找问题"></a>2. 先引入组件，再寻找问题</h3><p>注册中心、消息队列、缓存和监控都有适用场景。为了技术栈完整而引入，会让团队维护一组没有明确收益的基础设施。</p>
+<p>更合理的顺序是：先描述当前痛点和目标，再选择最小能力解决它，并定义如何验证收益。</p>
+<h3 id="3-认为重试可以提升稳定性"><a href="#3-认为重试可以提升稳定性" class="headerlink" title="3. 认为重试可以提升稳定性"></a>3. 认为重试可以提升稳定性</h3><p>没有超时预算、退避和幂等的重试，会把一次失败放大成多次流量。下游已经过载时，上游同时重试只会让恢复更慢。</p>
+<p>重试是一种有成本的恢复手段，不是异常处理的默认模板。</p>
+<h3 id="4-只设计正常流程"><a href="#4-只设计正常流程" class="headerlink" title="4. 只设计正常流程"></a>4. 只设计正常流程</h3><p>架构图通常只画成功箭头，但线上问题都发生在箭头中间：网络超时、部分成功、实例重启、消息重复、配置未刷新。</p>
+<p>现在设计接口时，我会同时写失败状态、幂等键、补偿方式和可观测字段。能解释失败后的状态，比成功时少几毫秒更重要。</p>
+<h3 id="5-低估团队协作成本"><a href="#5-低估团队协作成本" class="headerlink" title="5. 低估团队协作成本"></a>5. 低估团队协作成本</h3><p>服务边界也是团队边界。接口变更、错误码、数据库迁移和发布顺序都需要约定。没有明确负责人时，独立服务很容易变成“所有人都能改，但没人真正维护”。</p>
+<h2 id="我现在理解的演进顺序"><a href="#我现在理解的演进顺序" class="headerlink" title="我现在理解的演进顺序"></a>我现在理解的演进顺序</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">整理单体模块边界</span><br><span class="line">  -&gt; 明确数据所有权和依赖方向</span><br><span class="line">  -&gt; 建立自动化测试、部署和回滚</span><br><span class="line">  -&gt; 补齐日志、指标和接口契约</span><br><span class="line">  -&gt; 拆出边界稳定且收益明确的服务</span><br><span class="line">  -&gt; 对真实故障做限流、降级、幂等和补偿</span><br><span class="line">  -&gt; 根据运行数据继续调整边界</span><br></pre></td></tr></table></figure>
+
+<p>这不是所有项目必须照走的路线，但顺序背后有一个原则：先获得控制复杂度的能力，再增加分布式复杂度。</p>
+<h2 id="还有哪些没有解决"><a href="#还有哪些没有解决" class="headerlink" title="还有哪些没有解决"></a>还有哪些没有解决</h2><p>到 2022 年底，系统能运行不等于治理已经成熟。下一阶段仍然要补：</p>
+<ol>
+<li>接口版本和兼容性管理，避免服务独立发布后相互破坏。</li>
+<li>数据一致性对账，不能只依赖消息“应该会到”。</li>
+<li>容量评估和压测，让限流阈值有数据依据。</li>
+<li>告警分级和 Runbook，让监控真正进入故障处理。</li>
+<li>交付指标，验证微服务是否真的缩短了发布时间。</li>
+<li>定期故障演练，验证文档中的恢复方案是否可执行。</li>
+</ol>
+<h2 id="年末结论"><a href="#年末结论" class="headerlink" title="年末结论"></a>年末结论</h2><p>这一年最大的变化，不是系统从单体变成了微服务，而是看待架构的角度从“用了什么技术”转向“解决了什么约束”。技术组件可以快速学习，边界、数据和失败语义需要在实践中反复调整。</p>
+<p>微服务不是一个终点。它只是当业务、团队和交付方式发展到一定阶段后，用来重新分配复杂度的手段。真正值得追求的仍然是可理解、可交付、可观察、可恢复的系统。只要这四件事在变好，架构就在向正确方向演进。</p>
+]]></content>
+      <categories>
+        <category>架构成长</category>
+      </categories>
+      <tags>
+        <tag>年度总结</tag>
+        <tag>系统设计</tag>
+        <tag>微服务</tag>
+        <tag>架构演进</tag>
       </tags>
   </entry>
   <entry>
@@ -7817,6 +7817,317 @@
       </tags>
   </entry>
   <entry>
+    <title>博客重新出发</title>
+    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
+    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
+<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
+<span id="more"></span>
+
+<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
+<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
+<li>Hexo：静态博客生成器</li>
+<li>NexT：Hexo 主题</li>
+<li>GitHub Pages：静态站点托管</li>
+<li>GitHub Actions：后续可用于自动构建和部署</li>
+</ul>
+<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
+<li>整理 Java 后端开发笔记</li>
+<li>梳理并发编程和 JVM 相关知识</li>
+<li>记录 Linux、Nginx、部署排查经验</li>
+<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
+</ol>
+]]></content>
+      <categories>
+        <category>随笔</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>GitHub Pages</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>无外网安装nginx</title>
+    <url>/2024/05/22/%E6%97%A0%E5%A4%96%E7%BD%91%E5%AE%89%E8%A3%85nginx/</url>
+    <content><![CDATA[<p><img src="/images/posts/2024/offline-nginx-cover.png" alt="无外网安装Nginx封面图"></p>
+<blockquote>
+<p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>
+</blockquote>
+
+
+<h2 id="1-服务器情况："><a href="#1-服务器情况：" class="headerlink" title="1. 服务器情况："></a>1. 服务器情况：</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/version</span><br><span class="line">Linux version 4.19.90-23.8.v2101.ky10.x86_64</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a>2.准备工作</h2><h3 id="2-1-首先判断是否安装了nginx的三个依赖"><a href="#2-1-首先判断是否安装了nginx的三个依赖" class="headerlink" title="2.1.首先判断是否安装了nginx的三个依赖"></a>2.1.首先判断是否安装了nginx的三个依赖</h3><ol>
+<li>gcc</li>
+<li>pcre</li>
+<li>zlib</li>
+</ol>
+<p>可以访问外网的情况下可以直接命令行一键安装</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">yum -y install gcc zlib zlib-devel pcre-devel openssl </span><br></pre></td></tr></tbody></table></figure>
+
+<p>本篇就不涉及有外网了，重点在无外网。</p>
+<p>没外网的情况下，需要先手动下载上面三个依赖包，方便大家我就把整合好的地址放下面，大家有需要就自取</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy">https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy</a><br>提取码：bpmy </p>
+<p>下载好了以后，分别把三个依赖包，和nginx，指定到自己指定的位置<br>我是把依赖包解压到了/usr/local/src下</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">这是解压命令</span><br><span class="line">tar -xvf openssl-3.0.13.tar.gz</span><br><span class="line"></span><br><span class="line">三个包手动替换的名称就好</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>重点！！！</p>
+</blockquote>
+<p>回到nginx的安装目录，执行下面的命令</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx   --with-pcre=/usr/local/src/pcre-7.3 --with-zlib=/usr/local/src/zlib  --with-openssl=/usr/local/src/openssl</span><br><span class="line"></span><br><span class="line">解释</span><br><span class="line">--prefix 是指定nginx的安装路径，后续的我们操作的nginx都会在这里，类似于windows的选择安装路径</span><br><span class="line">--with-xxx 指定依赖的解压路径，用来找到我们刚刚解压缩的那三个依赖。</span><br></pre></td></tr></tbody></table></figure>
+
+<p>没报错的情况下，继续执行</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line">就可以正常安装了</span><br></pre></td></tr></tbody></table></figure>
+
+<p>到这里nginx应该就安装成功了，后续就是一些优化操作</p>
+<ol>
+<li>可以删除nginx压缩包和解压目录<br>2.设置软链，后续就不用在安装nginx的目录下操作nginx</li>
+</ol>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /usr/local/webserver/nginx/sbin/nginx /usr/bin/</span><br><span class="line"></span><br><span class="line">在其他目录使用</span><br><span class="line">nginx -v</span><br><span class="line">查看是否设置成功</span><br></pre></td></tr></tbody></table></figure>
+
+<p>3.nginx常用命令</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 检查配置</span></span><br><span class="line">$ nginx -t（检查nginx.conf配置是否正确）</span><br><span class="line">$ nginx -s reload（重新载入配置文件，通常配合-t使用，在修改了nginx.conf且检查无误之后）</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">$ nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">$ ps -ef | grep nginx</span><br></pre></td></tr></tbody></table></figure>
+
+<blockquote>
+<p>之前部署项目的时候没遇到过国产系统+无内网两种情况叠加，导致踩坑了两天才调通，希望这篇文章能对后面遇到这种情况的兄弟们有所帮助！</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Linux运维</category>
+      </categories>
+      <tags>
+        <tag>运维</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>服务器内存不足与OOM排查</title>
+    <url>/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/</url>
+    <content><![CDATA[<blockquote>
+<p>写在前面：服务器内存“看起来快满了”和真正发生 OOM 不是一回事。Linux 会使用空闲内存做页缓存，<code>free</code> 很低不一定危险；反过来，容器被 OOM Kill 时，宿主机可能还有大量空闲内存。</p>
+</blockquote>
+<p>这篇按一份内存取证报告展开。案例中容器限制为 4GiB，JVM <code>-Xmx3g</code>，退出码 137。监控显示堆只用了约 2.1GiB，因此最初“堆泄漏”的判断并不成立。</p>
+<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现象：order-service Pod 重启，退出码 137</span><br><span class="line">容器限制：4GiB</span><br><span class="line">JVM：JDK 8，-Xms3g -Xmx3g</span><br><span class="line">退出前 Heap used：约 2.1GiB</span><br><span class="line">退出前 RSS：约 3.95GiB</span><br><span class="line">宿主机 available：约 18GiB</span><br><span class="line">Java 日志：没有 java.lang.OutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+<p>这组事实更像容器边界触发的 OOM Kill，而不是 JVM 主动抛出堆 OOM。</p>
+<h2 id="第一步：先确认是谁判定-OOM"><a href="#第一步：先确认是谁判定-OOM" class="headerlink" title="第一步：先确认是谁判定 OOM"></a>第一步：先确认是谁判定 OOM</h2><p>不同错误对应不同边界：</p>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>决策者</th>
+<th>典型方向</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Java heap space</code></td>
+<td>JVM</td>
+<td>堆对象过多或堆不足</td>
+</tr>
+<tr>
+<td><code>GC overhead limit exceeded</code></td>
+<td>JVM</td>
+<td>GC 高耗但回收很少</td>
+</tr>
+<tr>
+<td><code>Metaspace</code></td>
+<td>JVM</td>
+<td>类元数据或类加载器</td>
+</tr>
+<tr>
+<td><code>Direct buffer memory</code></td>
+<td>JVM&#x2F;NIO</td>
+<td>直接内存</td>
+</tr>
+<tr>
+<td><code>unable to create new native thread</code></td>
+<td>JVM&#x2F;OS</td>
+<td>线程、地址空间、系统限制</td>
+</tr>
+<tr>
+<td>退出码 137 &#x2F; OOMKilled</td>
+<td>cgroup 或内核</td>
+<td>进程总内存超过边界</td>
+</tr>
+<tr>
+<td>宿主机多个进程被杀</td>
+<td>Linux OOM Killer</td>
+<td>整机内存压力</td>
+</tr>
+</tbody></table>
+<p>容器平台先看事件：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;</span><br><span class="line">kubectl get pod &lt;pod-name&gt; -n &lt;namespace&gt; -o yaml</span><br></pre></td></tr></table></figure>
+
+<p>节点侧根据权限检查内核记录：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">journalctl -k --since <span class="string">&#x27;2023-09-10 16:00:00&#x27;</span></span><br><span class="line">dmesg -T | rg -i <span class="string">&#x27;out of memory|killed process|oom&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>内核日志可能包含进程和主机信息，只由有权限的人员读取。部分集群不会向应用账号开放节点日志，此时以 Pod 事件和监控平台为准。</p>
+<p>cgroup v2 可以查看：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.current</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.max</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.events</span><br></pre></td></tr></table></figure>
+
+<p>路径会随运行时和 cgroup 版本变化。当前案例 <code>oom_kill</code> 计数增加，确认是容器超限。</p>
+<h2 id="第二步：整机、容器、进程、JVM-四层不要混看"><a href="#第二步：整机、容器、进程、JVM-四层不要混看" class="headerlink" title="第二步：整机、容器、进程、JVM 四层不要混看"></a>第二步：整机、容器、进程、JVM 四层不要混看</h2><h3 id="整机"><a href="#整机" class="headerlink" title="整机"></a>整机</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">free -h</span><br><span class="line">vmstat 1 5</span><br><span class="line">ps -eo pid,user,%mem,rss,vsz,etime,cmd --<span class="built_in">sort</span>=-rss | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
+
+<p><code>free -h</code> 优先看 <code>available</code>，不要只看 <code>free</code>。<code>vmstat</code> 关注 <code>si/so</code>，持续交换通常意味着真实压力。</p>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>看工作集、RSS、Cache、limit 和 OOM 事件。宿主机有空闲，不能阻止单个容器越过自己的 4GiB 限制。</p>
+<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/status</span><br><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/smaps_rollup</span><br></pre></td></tr></table></figure>
+
+<p>重点包括：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">VmRSS：当前驻留物理内存</span><br><span class="line">VmSize：虚拟地址空间，不等于实际占用</span><br><span class="line">RssAnon：匿名页，常包含 JVM 堆和本地内存</span><br><span class="line">RssFile：文件映射</span><br><span class="line">Threads：线程数量</span><br></pre></td></tr></table></figure>
+
+<h3 id="JVM"><a href="#JVM" class="headerlink" title="JVM"></a>JVM</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jstat -gcutil &lt;pid&gt; 1000 10</span><br><span class="line">jcmd &lt;pid&gt; GC.heap_info</span><br><span class="line">jcmd &lt;pid&gt; VM.flags</span><br></pre></td></tr></table></figure>
+
+<p>JVM 堆只是进程内存的一部分。容器限制针对进程总量，而不是只看 <code>-Xmx</code>。</p>
+<h2 id="第三步：画一张-JVM-内存预算"><a href="#第三步：画一张-JVM-内存预算" class="headerlink" title="第三步：画一张 JVM 内存预算"></a>第三步：画一张 JVM 内存预算</h2><p>Java 进程常见组成：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Metaspace 与 Compressed Class Space</span><br><span class="line">Code Cache</span><br><span class="line">Direct Buffer</span><br><span class="line">线程栈</span><br><span class="line">GC 与 JVM 内部结构</span><br><span class="line">JNI / 本地库</span><br><span class="line">内存映射文件</span><br><span class="line">页缓存与容器统计差异</span><br></pre></td></tr></table></figure>
+
+<p>本次退出前的估算：</p>
+<table>
+<thead>
+<tr>
+<th>组成</th>
+<th align="right">观察或预算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Heap used</td>
+<td align="right">2.1GiB</td>
+</tr>
+<tr>
+<td>Heap committed</td>
+<td align="right">3.0GiB</td>
+</tr>
+<tr>
+<td>Metaspace + Class</td>
+<td align="right">230MiB</td>
+</tr>
+<tr>
+<td>Code Cache</td>
+<td align="right">110MiB</td>
+</tr>
+<tr>
+<td>Direct Buffer</td>
+<td align="right">430MiB</td>
+</tr>
+<tr>
+<td>线程约 620 个</td>
+<td align="right">栈上限约 620MiB</td>
+</tr>
+<tr>
+<td>JVM&#x2F;GC&#x2F;本地库</td>
+<td align="right">约 180MiB</td>
+</tr>
+</tbody></table>
+<p>这些数字不能简单相加当精确 RSS：堆 committed 不一定全部驻留，线程栈也会按需提交。但它足以说明 <code>-Xmx3g</code> 放进 4GiB 容器几乎没有安全余量。</p>
+<p>配置预算至少要满足：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">容器 limit</span><br><span class="line">  &gt; Xmx</span><br><span class="line">  + 可预期的 Metaspace 和 Code Cache</span><br><span class="line">  + Direct Memory 上界</span><br><span class="line">  + 最大线程数 × 栈预算</span><br><span class="line">  + JVM 与本地库</span><br><span class="line">  + 安全余量</span><br></pre></td></tr></table></figure>
+
+<p>不能使用“容器 4G，所以 Xmx 也配 4G”的方式。</p>
+<h2 id="第四步：用-NMT-观察堆外组成"><a href="#第四步：用-NMT-观察堆外组成" class="headerlink" title="第四步：用 NMT 观察堆外组成"></a>第四步：用 NMT 观察堆外组成</h2><p>JDK 8 可在启动时启用 Native Memory Tracking：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">-XX:NativeMemoryTracking=summary</span><br></pre></td></tr></table></figure>
+
+<p>运行时查看：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jcmd &lt;pid&gt; VM.native_memory summary scale=MB</span><br></pre></td></tr></table></figure>
+
+<p>NMT 必须在 JVM 启动时开启，不能在事故发生后临时补开。它能分类 JVM 自身原生内存，但不保证覆盖所有第三方本地库和内核页缓存，也有一定性能开销，需要在压测后启用。</p>
+<p>输出重点：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Class</span><br><span class="line">Thread</span><br><span class="line">Code</span><br><span class="line">GC</span><br><span class="line">Compiler</span><br><span class="line">Internal</span><br><span class="line">Arena Chunk</span><br></pre></td></tr></table></figure>
+
+<p>NIO 直接缓冲还可以通过应用指标、BufferPoolMXBean 或 <code>jcmd VM.native_memory</code> 辅助判断。只看 NMT 一项仍不足以解释进程全部 RSS。</p>
+<h2 id="第五步：为什么线程数突然到-620"><a href="#第五步：为什么线程数突然到-620" class="headerlink" title="第五步：为什么线程数突然到 620"></a>第五步：为什么线程数突然到 620</h2><p>故障前下游库存接口延迟从 100ms 上升到 4s。应用中有一个无边界伸缩的异步池：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span></span><br><span class="line">        Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
+
+<p><code>newCachedThreadPool</code> 在任务堆积时可以持续创建线程。下游变慢后，旧任务没有完成，新任务继续创建线程：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">正常线程数：约 180</span><br><span class="line">故障前 1 分钟：320</span><br><span class="line">故障前 20 秒：510</span><br><span class="line">退出前：620</span><br></pre></td></tr></table></figure>
+
+<p>同时 HTTP 客户端使用直接缓冲，等待请求增加后 Direct Memory 也上涨。堆使用率并没有明显异常，但进程 RSS 触碰容器限制。</p>
+<p>这次根因可以分成：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">触发条件：下游响应显著变慢</span><br><span class="line">放大机制：无界线程池持续创建线程</span><br><span class="line">容量缺口：Xmx 占容器限制 75%，堆外余量不足</span><br><span class="line">观测缺口：只告警 Heap，没有线程、RSS 和 cgroup 指标</span><br></pre></td></tr></table></figure>
+
+<h2 id="第六步：如果真的是-Java-Heap-Space"><a href="#第六步：如果真的是-Java-Heap-Space" class="headerlink" title="第六步：如果真的是 Java Heap Space"></a>第六步：如果真的是 Java Heap Space</h2><p>堆 OOM 的取证路径不同。建议提前配置：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">-XX:HeapDumpPath=/var/lib/order/dumps</span><br><span class="line">-XX:+ExitOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
+
+<p><code>ExitOnOutOfMemoryError</code> 是否使用要结合 JDK 版本和服务恢复策略评估。Dump 目录必须有足够独立空间、正确权限和保留策略；否则 OOM 时可能因为磁盘不足再次失败。</p>
+<p>临时主动导出：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jcmd &lt;pid&gt; GC.heap_dump /secure/path/order-heap.hprof</span><br></pre></td></tr></table></figure>
+
+<p>Heap Dump 可能触发停顿、产生接近堆大小的文件并包含敏感业务数据。生产执行前必须评估磁盘、停顿和数据安全，由负责人授权。已经严重抖动的进程不一定承受得住主动 Dump。</p>
+<p>分析时先看：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">对象数量和浅堆大小</span><br><span class="line">Retained Heap</span><br><span class="line">Dominator Tree</span><br><span class="line">从大对象到 GC Root 的引用链</span><br><span class="line">类加载器数量</span><br><span class="line">集合和缓存是否无界</span><br></pre></td></tr></table></figure>
+
+<p>“某个 DTO 数量最多”不等于 DTO 泄漏。要找谁长期持有它，以及这些对象是否超过业务合理数量。</p>
+<h2 id="常见-OOM-分支"><a href="#常见-OOM-分支" class="headerlink" title="常见 OOM 分支"></a>常见 OOM 分支</h2><h3 id="Java-heap-space"><a href="#Java-heap-space" class="headerlink" title="Java heap space"></a>Java heap space</h3><p>可能是无界缓存、一次加载大结果集、消息积压对象化或真实容量不足。对照 GC 后 Old 区是否下降、对象增长曲线和引用链。</p>
+<h3 id="GC-overhead-limit-exceeded"><a href="#GC-overhead-limit-exceeded" class="headerlink" title="GC overhead limit exceeded"></a>GC overhead limit exceeded</h3><p>JVM 花大量时间 GC，却只回收很少内存。通常已经接近堆耗尽，不能只关闭这个保护开关。继续查长期存活对象和分配速率。</p>
+<h3 id="Metaspace"><a href="#Metaspace" class="headerlink" title="Metaspace"></a>Metaspace</h3><p>检查动态代理、脚本引擎、热部署和重复创建类加载器。若类数量持续上涨，单纯增加 <code>MaxMetaspaceSize</code> 只会延迟暴露。</p>
+<h3 id="Direct-buffer-memory"><a href="#Direct-buffer-memory" class="headerlink" title="Direct buffer memory"></a>Direct buffer memory</h3><p>关注 Netty&#x2F;NIO、文件传输、HTTP 客户端和未及时释放的直接缓冲。可以设置 <code>MaxDirectMemorySize</code> 形成边界，但值过小也会影响正常 IO。</p>
+<h3 id="Unable-to-create-new-native-thread"><a href="#Unable-to-create-new-native-thread" class="headerlink" title="Unable to create new native thread"></a>Unable to create new native thread</h3><p>同时看线程数、<code>ulimit -u</code>、地址空间、容器 PID limit 和剩余内存。线程池无界、阻塞调用和线程泄漏是常见原因。</p>
+<h3 id="Linux-或-cgroup-OOM-Kill"><a href="#Linux-或-cgroup-OOM-Kill" class="headerlink" title="Linux 或 cgroup OOM Kill"></a>Linux 或 cgroup OOM Kill</h3><p>可能没有 Java 异常和 Heap Dump，因为 JVM 没有机会处理。证据主要来自容器事件、内核日志、RSS、cgroup 和退出前指标。</p>
+<h2 id="本次修复"><a href="#本次修复" class="headerlink" title="本次修复"></a>本次修复</h2><h3 id="1-重新划分内存预算"><a href="#1-重新划分内存预算" class="headerlink" title="1. 重新划分内存预算"></a>1. 重新划分内存预算</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">容器 limit：4GiB -&gt; 5GiB</span><br><span class="line">Xms/Xmx：3GiB -&gt; 2.5GiB</span><br><span class="line">MaxDirectMemorySize：512MiB</span><br><span class="line">Xss：在测试后从 1MiB 调整为 512KiB</span><br><span class="line">安全余量：至少保留约 25%</span><br></pre></td></tr></table></figure>
+
+<p>调整 <code>Xss</code> 可能让深调用更早 <code>StackOverflowError</code>，必须通过测试验证，不能为了省内存盲目减小。容器扩容和下调 Xmx 同时执行，是为了先恢复余量，再根据堆真实峰值逐步优化。</p>
+<h3 id="2-无界线程池改为有界"><a href="#2-无界线程池改为有界" class="headerlink" title="2. 无界线程池改为有界"></a>2. 无界线程池改为有界</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">ThreadPoolExecutor</span> <span class="variable">executor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">        <span class="number">32</span>,</span><br><span class="line">        <span class="number">64</span>,</span><br><span class="line">        <span class="number">60</span>,</span><br><span class="line">        TimeUnit.SECONDS,</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">200</span>),</span><br><span class="line">        namedThreadFactory(<span class="string">&quot;inventory-call&quot;</span>),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.AbortPolicy()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>线程数还要受下游并发和连接池约束。拒绝后进入可追踪补偿，不静默丢弃。</p>
+<h3 id="3-下游调用快速失败"><a href="#3-下游调用快速失败" class="headerlink" title="3. 下游调用快速失败"></a>3. 下游调用快速失败</h3><p>设置连接池获取、建连和读取超时，取消叠加重试；当下游变慢时对入口限流，避免请求在内存中无限累积。</p>
+<h3 id="4-补齐四层指标"><a href="#4-补齐四层指标" class="headerlink" title="4. 补齐四层指标"></a>4. 补齐四层指标</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">主机 available / swap / OOM</span><br><span class="line">容器 working set / RSS / limit / oom_kill</span><br><span class="line">进程 RSS / thread count / open files</span><br><span class="line">JVM heap / metaspace / direct buffer / GC</span><br></pre></td></tr></table></figure>
+
+<p>任何一层达到 80% 都不直接等于故障，但趋势和剩余时间应触发提前调查。</p>
+<h2 id="复现与容量验证"><a href="#复现与容量验证" class="headerlink" title="复现与容量验证"></a>复现与容量验证</h2><p>修复后在隔离环境注入 4 秒下游延迟：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th align="right">修复前</th>
+<th align="right">修复后</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>最大线程数</td>
+<td align="right">620+</td>
+<td align="right">248</td>
+</tr>
+<tr>
+<td>进程 RSS</td>
+<td align="right">3.95GiB 后被杀</td>
+<td align="right">峰值 3.42GiB</td>
+</tr>
+<tr>
+<td>Heap used</td>
+<td align="right">2.1GiB</td>
+<td align="right">2.0GiB</td>
+</tr>
+<tr>
+<td>Direct Buffer</td>
+<td align="right">430MiB</td>
+<td align="right">280MiB</td>
+</tr>
+<tr>
+<td>拒绝&#x2F;补偿</td>
+<td align="right">无边界堆积</td>
+<td align="right">有明确计数</td>
+</tr>
+<tr>
+<td>OOM Kill</td>
+<td align="right">发生</td>
+<td align="right">未发生</td>
+</tr>
+</tbody></table>
+<p>还需要确认业务结果：超载请求是否得到明确响应，补偿任务能否追赶，下游恢复后内存和线程是否回落。</p>
+<h2 id="取证清单"><a href="#取证清单" class="headerlink" title="取证清单"></a>取证清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 判断 JVM OOM、容器 OOM 还是整机 OOM</span><br><span class="line">[ ] 保存退出时间、版本、事件和内核记录</span><br><span class="line">[ ] 对齐主机、容器、进程、JVM 四层指标</span><br><span class="line">[ ] 比较 Heap used 与进程 RSS</span><br><span class="line">[ ] 检查线程数、Direct Buffer、Metaspace 和本地库</span><br><span class="line">[ ] Heap Dump 前评估停顿、磁盘和数据安全</span><br><span class="line">[ ] 用引用链证明泄漏，不只看对象数量</span><br><span class="line">[ ] 建立 Xmx 之外的完整内存预算</span><br><span class="line">[ ] 在下游变慢和任务积压场景重新压测</span><br><span class="line">[ ] 验证恢复后 RSS、线程和业务积压都会回落</span><br></pre></td></tr></table></figure>
+
+<p>内存问题最关键的第一问不是“哪个对象最大”，而是“哪一层的边界被突破”。只有先分清整机、容器、进程和 JVM，Heap Dump、NMT、线程数和 cgroup 指标才会落到正确的位置。</p>
+]]></content>
+      <categories>
+        <category>故障排查</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>OOM</tag>
+        <tag>JVM</tag>
+        <tag>内存排查</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JUC并发编程知识点梳理</title>
     <url>/2024/05/02/juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E4%B8%80%E4%BA%9B%E7%90%86%E8%A7%A3/</url>
     <content><![CDATA[<p><img src="/images/posts/2024/juc-notes-cover.png" alt="JUC并发编程知识点封面图"></p>
@@ -8235,317 +8546,6 @@
       <tags>
         <tag>Java</tag>
         <tag>并发编程</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>博客重新出发</title>
-    <url>/2026/06/08/%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%87%BA%E5%8F%91/</url>
-    <content><![CDATA[<p><img src="/images/posts/2026/blog-relaunch-cover.png" alt="博客重新出发封面图"></p>
-<p>博客源码重新搭建完成，后续会继续记录技术学习、项目实践和问题排查过程。</p>
-<span id="more"></span>
-
-<h2 id="为什么重新搭建"><a href="#为什么重新搭建" class="headerlink" title="为什么重新搭建"></a>为什么重新搭建</h2><p>之前只保留了静态站点产物，源码目录已经丢失。为了后续能继续维护文章、主题和部署流程，这次重新生成了一个完整的 Hexo 源码项目。</p>
-<h2 id="当前技术栈"><a href="#当前技术栈" class="headerlink" title="当前技术栈"></a>当前技术栈</h2><ul>
-<li>Hexo：静态博客生成器</li>
-<li>NexT：Hexo 主题</li>
-<li>GitHub Pages：静态站点托管</li>
-<li>GitHub Actions：后续可用于自动构建和部署</li>
-</ul>
-<h2 id="后续计划"><a href="#后续计划" class="headerlink" title="后续计划"></a>后续计划</h2><ol>
-<li>整理 Java 后端开发笔记</li>
-<li>梳理并发编程和 JVM 相关知识</li>
-<li>记录 Linux、Nginx、部署排查经验</li>
-<li>逐步完善博客的搜索、订阅和 SEO 配置</li>
-</ol>
-]]></content>
-      <categories>
-        <category>随笔</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-        <tag>GitHub Pages</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>服务器内存不足与OOM排查</title>
-    <url>/2023/09/10/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E4%B8%8EOOM%E6%8E%92%E6%9F%A5/</url>
-    <content><![CDATA[<blockquote>
-<p>写在前面：服务器内存“看起来快满了”和真正发生 OOM 不是一回事。Linux 会使用空闲内存做页缓存，<code>free</code> 很低不一定危险；反过来，容器被 OOM Kill 时，宿主机可能还有大量空闲内存。</p>
-</blockquote>
-<p>这篇按一份内存取证报告展开。案例中容器限制为 4GiB，JVM <code>-Xmx3g</code>，退出码 137。监控显示堆只用了约 2.1GiB，因此最初“堆泄漏”的判断并不成立。</p>
-<h2 id="事故摘要"><a href="#事故摘要" class="headerlink" title="事故摘要"></a>事故摘要</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">现象：order-service Pod 重启，退出码 137</span><br><span class="line">容器限制：4GiB</span><br><span class="line">JVM：JDK 8，-Xms3g -Xmx3g</span><br><span class="line">退出前 Heap used：约 2.1GiB</span><br><span class="line">退出前 RSS：约 3.95GiB</span><br><span class="line">宿主机 available：约 18GiB</span><br><span class="line">Java 日志：没有 java.lang.OutOfMemoryError</span><br></pre></td></tr></table></figure>
-
-<p>这组事实更像容器边界触发的 OOM Kill，而不是 JVM 主动抛出堆 OOM。</p>
-<h2 id="第一步：先确认是谁判定-OOM"><a href="#第一步：先确认是谁判定-OOM" class="headerlink" title="第一步：先确认是谁判定 OOM"></a>第一步：先确认是谁判定 OOM</h2><p>不同错误对应不同边界：</p>
-<table>
-<thead>
-<tr>
-<th>现象</th>
-<th>决策者</th>
-<th>典型方向</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>Java heap space</code></td>
-<td>JVM</td>
-<td>堆对象过多或堆不足</td>
-</tr>
-<tr>
-<td><code>GC overhead limit exceeded</code></td>
-<td>JVM</td>
-<td>GC 高耗但回收很少</td>
-</tr>
-<tr>
-<td><code>Metaspace</code></td>
-<td>JVM</td>
-<td>类元数据或类加载器</td>
-</tr>
-<tr>
-<td><code>Direct buffer memory</code></td>
-<td>JVM&#x2F;NIO</td>
-<td>直接内存</td>
-</tr>
-<tr>
-<td><code>unable to create new native thread</code></td>
-<td>JVM&#x2F;OS</td>
-<td>线程、地址空间、系统限制</td>
-</tr>
-<tr>
-<td>退出码 137 &#x2F; OOMKilled</td>
-<td>cgroup 或内核</td>
-<td>进程总内存超过边界</td>
-</tr>
-<tr>
-<td>宿主机多个进程被杀</td>
-<td>Linux OOM Killer</td>
-<td>整机内存压力</td>
-</tr>
-</tbody></table>
-<p>容器平台先看事件：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;</span><br><span class="line">kubectl get pod &lt;pod-name&gt; -n &lt;namespace&gt; -o yaml</span><br></pre></td></tr></table></figure>
-
-<p>节点侧根据权限检查内核记录：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">journalctl -k --since <span class="string">&#x27;2023-09-10 16:00:00&#x27;</span></span><br><span class="line">dmesg -T | rg -i <span class="string">&#x27;out of memory|killed process|oom&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>内核日志可能包含进程和主机信息，只由有权限的人员读取。部分集群不会向应用账号开放节点日志，此时以 Pod 事件和监控平台为准。</p>
-<p>cgroup v2 可以查看：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.current</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.max</span><br><span class="line"><span class="built_in">cat</span> /sys/fs/cgroup/memory.events</span><br></pre></td></tr></table></figure>
-
-<p>路径会随运行时和 cgroup 版本变化。当前案例 <code>oom_kill</code> 计数增加，确认是容器超限。</p>
-<h2 id="第二步：整机、容器、进程、JVM-四层不要混看"><a href="#第二步：整机、容器、进程、JVM-四层不要混看" class="headerlink" title="第二步：整机、容器、进程、JVM 四层不要混看"></a>第二步：整机、容器、进程、JVM 四层不要混看</h2><h3 id="整机"><a href="#整机" class="headerlink" title="整机"></a>整机</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">free -h</span><br><span class="line">vmstat 1 5</span><br><span class="line">ps -eo pid,user,%mem,rss,vsz,etime,cmd --<span class="built_in">sort</span>=-rss | <span class="built_in">head</span> -20</span><br></pre></td></tr></table></figure>
-
-<p><code>free -h</code> 优先看 <code>available</code>，不要只看 <code>free</code>。<code>vmstat</code> 关注 <code>si/so</code>，持续交换通常意味着真实压力。</p>
-<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p>看工作集、RSS、Cache、limit 和 OOM 事件。宿主机有空闲，不能阻止单个容器越过自己的 4GiB 限制。</p>
-<h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/status</span><br><span class="line"><span class="built_in">cat</span> /proc/&lt;pid&gt;/smaps_rollup</span><br></pre></td></tr></table></figure>
-
-<p>重点包括：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">VmRSS：当前驻留物理内存</span><br><span class="line">VmSize：虚拟地址空间，不等于实际占用</span><br><span class="line">RssAnon：匿名页，常包含 JVM 堆和本地内存</span><br><span class="line">RssFile：文件映射</span><br><span class="line">Threads：线程数量</span><br></pre></td></tr></table></figure>
-
-<h3 id="JVM"><a href="#JVM" class="headerlink" title="JVM"></a>JVM</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jstat -gcutil &lt;pid&gt; 1000 10</span><br><span class="line">jcmd &lt;pid&gt; GC.heap_info</span><br><span class="line">jcmd &lt;pid&gt; VM.flags</span><br></pre></td></tr></table></figure>
-
-<p>JVM 堆只是进程内存的一部分。容器限制针对进程总量，而不是只看 <code>-Xmx</code>。</p>
-<h2 id="第三步：画一张-JVM-内存预算"><a href="#第三步：画一张-JVM-内存预算" class="headerlink" title="第三步：画一张 JVM 内存预算"></a>第三步：画一张 JVM 内存预算</h2><p>Java 进程常见组成：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Metaspace 与 Compressed Class Space</span><br><span class="line">Code Cache</span><br><span class="line">Direct Buffer</span><br><span class="line">线程栈</span><br><span class="line">GC 与 JVM 内部结构</span><br><span class="line">JNI / 本地库</span><br><span class="line">内存映射文件</span><br><span class="line">页缓存与容器统计差异</span><br></pre></td></tr></table></figure>
-
-<p>本次退出前的估算：</p>
-<table>
-<thead>
-<tr>
-<th>组成</th>
-<th align="right">观察或预算</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Heap used</td>
-<td align="right">2.1GiB</td>
-</tr>
-<tr>
-<td>Heap committed</td>
-<td align="right">3.0GiB</td>
-</tr>
-<tr>
-<td>Metaspace + Class</td>
-<td align="right">230MiB</td>
-</tr>
-<tr>
-<td>Code Cache</td>
-<td align="right">110MiB</td>
-</tr>
-<tr>
-<td>Direct Buffer</td>
-<td align="right">430MiB</td>
-</tr>
-<tr>
-<td>线程约 620 个</td>
-<td align="right">栈上限约 620MiB</td>
-</tr>
-<tr>
-<td>JVM&#x2F;GC&#x2F;本地库</td>
-<td align="right">约 180MiB</td>
-</tr>
-</tbody></table>
-<p>这些数字不能简单相加当精确 RSS：堆 committed 不一定全部驻留，线程栈也会按需提交。但它足以说明 <code>-Xmx3g</code> 放进 4GiB 容器几乎没有安全余量。</p>
-<p>配置预算至少要满足：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">容器 limit</span><br><span class="line">  &gt; Xmx</span><br><span class="line">  + 可预期的 Metaspace 和 Code Cache</span><br><span class="line">  + Direct Memory 上界</span><br><span class="line">  + 最大线程数 × 栈预算</span><br><span class="line">  + JVM 与本地库</span><br><span class="line">  + 安全余量</span><br></pre></td></tr></table></figure>
-
-<p>不能使用“容器 4G，所以 Xmx 也配 4G”的方式。</p>
-<h2 id="第四步：用-NMT-观察堆外组成"><a href="#第四步：用-NMT-观察堆外组成" class="headerlink" title="第四步：用 NMT 观察堆外组成"></a>第四步：用 NMT 观察堆外组成</h2><p>JDK 8 可在启动时启用 Native Memory Tracking：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">-XX:NativeMemoryTracking=summary</span><br></pre></td></tr></table></figure>
-
-<p>运行时查看：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jcmd &lt;pid&gt; VM.native_memory summary scale=MB</span><br></pre></td></tr></table></figure>
-
-<p>NMT 必须在 JVM 启动时开启，不能在事故发生后临时补开。它能分类 JVM 自身原生内存，但不保证覆盖所有第三方本地库和内核页缓存，也有一定性能开销，需要在压测后启用。</p>
-<p>输出重点：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">Java Heap</span><br><span class="line">Class</span><br><span class="line">Thread</span><br><span class="line">Code</span><br><span class="line">GC</span><br><span class="line">Compiler</span><br><span class="line">Internal</span><br><span class="line">Arena Chunk</span><br></pre></td></tr></table></figure>
-
-<p>NIO 直接缓冲还可以通过应用指标、BufferPoolMXBean 或 <code>jcmd VM.native_memory</code> 辅助判断。只看 NMT 一项仍不足以解释进程全部 RSS。</p>
-<h2 id="第五步：为什么线程数突然到-620"><a href="#第五步：为什么线程数突然到-620" class="headerlink" title="第五步：为什么线程数突然到 620"></a>第五步：为什么线程数突然到 620</h2><p>故障前下游库存接口延迟从 100ms 上升到 4s。应用中有一个无边界伸缩的异步池：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span></span><br><span class="line">        Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
-
-<p><code>newCachedThreadPool</code> 在任务堆积时可以持续创建线程。下游变慢后，旧任务没有完成，新任务继续创建线程：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">正常线程数：约 180</span><br><span class="line">故障前 1 分钟：320</span><br><span class="line">故障前 20 秒：510</span><br><span class="line">退出前：620</span><br></pre></td></tr></table></figure>
-
-<p>同时 HTTP 客户端使用直接缓冲，等待请求增加后 Direct Memory 也上涨。堆使用率并没有明显异常，但进程 RSS 触碰容器限制。</p>
-<p>这次根因可以分成：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">触发条件：下游响应显著变慢</span><br><span class="line">放大机制：无界线程池持续创建线程</span><br><span class="line">容量缺口：Xmx 占容器限制 75%，堆外余量不足</span><br><span class="line">观测缺口：只告警 Heap，没有线程、RSS 和 cgroup 指标</span><br></pre></td></tr></table></figure>
-
-<h2 id="第六步：如果真的是-Java-Heap-Space"><a href="#第六步：如果真的是-Java-Heap-Space" class="headerlink" title="第六步：如果真的是 Java Heap Space"></a>第六步：如果真的是 Java Heap Space</h2><p>堆 OOM 的取证路径不同。建议提前配置：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">-XX:HeapDumpPath=/var/lib/order/dumps</span><br><span class="line">-XX:+ExitOnOutOfMemoryError</span><br></pre></td></tr></table></figure>
-
-<p><code>ExitOnOutOfMemoryError</code> 是否使用要结合 JDK 版本和服务恢复策略评估。Dump 目录必须有足够独立空间、正确权限和保留策略；否则 OOM 时可能因为磁盘不足再次失败。</p>
-<p>临时主动导出：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jcmd &lt;pid&gt; GC.heap_dump /secure/path/order-heap.hprof</span><br></pre></td></tr></table></figure>
-
-<p>Heap Dump 可能触发停顿、产生接近堆大小的文件并包含敏感业务数据。生产执行前必须评估磁盘、停顿和数据安全，由负责人授权。已经严重抖动的进程不一定承受得住主动 Dump。</p>
-<p>分析时先看：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">对象数量和浅堆大小</span><br><span class="line">Retained Heap</span><br><span class="line">Dominator Tree</span><br><span class="line">从大对象到 GC Root 的引用链</span><br><span class="line">类加载器数量</span><br><span class="line">集合和缓存是否无界</span><br></pre></td></tr></table></figure>
-
-<p>“某个 DTO 数量最多”不等于 DTO 泄漏。要找谁长期持有它，以及这些对象是否超过业务合理数量。</p>
-<h2 id="常见-OOM-分支"><a href="#常见-OOM-分支" class="headerlink" title="常见 OOM 分支"></a>常见 OOM 分支</h2><h3 id="Java-heap-space"><a href="#Java-heap-space" class="headerlink" title="Java heap space"></a>Java heap space</h3><p>可能是无界缓存、一次加载大结果集、消息积压对象化或真实容量不足。对照 GC 后 Old 区是否下降、对象增长曲线和引用链。</p>
-<h3 id="GC-overhead-limit-exceeded"><a href="#GC-overhead-limit-exceeded" class="headerlink" title="GC overhead limit exceeded"></a>GC overhead limit exceeded</h3><p>JVM 花大量时间 GC，却只回收很少内存。通常已经接近堆耗尽，不能只关闭这个保护开关。继续查长期存活对象和分配速率。</p>
-<h3 id="Metaspace"><a href="#Metaspace" class="headerlink" title="Metaspace"></a>Metaspace</h3><p>检查动态代理、脚本引擎、热部署和重复创建类加载器。若类数量持续上涨，单纯增加 <code>MaxMetaspaceSize</code> 只会延迟暴露。</p>
-<h3 id="Direct-buffer-memory"><a href="#Direct-buffer-memory" class="headerlink" title="Direct buffer memory"></a>Direct buffer memory</h3><p>关注 Netty&#x2F;NIO、文件传输、HTTP 客户端和未及时释放的直接缓冲。可以设置 <code>MaxDirectMemorySize</code> 形成边界，但值过小也会影响正常 IO。</p>
-<h3 id="Unable-to-create-new-native-thread"><a href="#Unable-to-create-new-native-thread" class="headerlink" title="Unable to create new native thread"></a>Unable to create new native thread</h3><p>同时看线程数、<code>ulimit -u</code>、地址空间、容器 PID limit 和剩余内存。线程池无界、阻塞调用和线程泄漏是常见原因。</p>
-<h3 id="Linux-或-cgroup-OOM-Kill"><a href="#Linux-或-cgroup-OOM-Kill" class="headerlink" title="Linux 或 cgroup OOM Kill"></a>Linux 或 cgroup OOM Kill</h3><p>可能没有 Java 异常和 Heap Dump，因为 JVM 没有机会处理。证据主要来自容器事件、内核日志、RSS、cgroup 和退出前指标。</p>
-<h2 id="本次修复"><a href="#本次修复" class="headerlink" title="本次修复"></a>本次修复</h2><h3 id="1-重新划分内存预算"><a href="#1-重新划分内存预算" class="headerlink" title="1. 重新划分内存预算"></a>1. 重新划分内存预算</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">容器 limit：4GiB -&gt; 5GiB</span><br><span class="line">Xms/Xmx：3GiB -&gt; 2.5GiB</span><br><span class="line">MaxDirectMemorySize：512MiB</span><br><span class="line">Xss：在测试后从 1MiB 调整为 512KiB</span><br><span class="line">安全余量：至少保留约 25%</span><br></pre></td></tr></table></figure>
-
-<p>调整 <code>Xss</code> 可能让深调用更早 <code>StackOverflowError</code>，必须通过测试验证，不能为了省内存盲目减小。容器扩容和下调 Xmx 同时执行，是为了先恢复余量，再根据堆真实峰值逐步优化。</p>
-<h3 id="2-无界线程池改为有界"><a href="#2-无界线程池改为有界" class="headerlink" title="2. 无界线程池改为有界"></a>2. 无界线程池改为有界</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">ThreadPoolExecutor</span> <span class="variable">executor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">        <span class="number">32</span>,</span><br><span class="line">        <span class="number">64</span>,</span><br><span class="line">        <span class="number">60</span>,</span><br><span class="line">        TimeUnit.SECONDS,</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">200</span>),</span><br><span class="line">        namedThreadFactory(<span class="string">&quot;inventory-call&quot;</span>),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>.AbortPolicy()</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>线程数还要受下游并发和连接池约束。拒绝后进入可追踪补偿，不静默丢弃。</p>
-<h3 id="3-下游调用快速失败"><a href="#3-下游调用快速失败" class="headerlink" title="3. 下游调用快速失败"></a>3. 下游调用快速失败</h3><p>设置连接池获取、建连和读取超时，取消叠加重试；当下游变慢时对入口限流，避免请求在内存中无限累积。</p>
-<h3 id="4-补齐四层指标"><a href="#4-补齐四层指标" class="headerlink" title="4. 补齐四层指标"></a>4. 补齐四层指标</h3><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">主机 available / swap / OOM</span><br><span class="line">容器 working set / RSS / limit / oom_kill</span><br><span class="line">进程 RSS / thread count / open files</span><br><span class="line">JVM heap / metaspace / direct buffer / GC</span><br></pre></td></tr></table></figure>
-
-<p>任何一层达到 80% 都不直接等于故障，但趋势和剩余时间应触发提前调查。</p>
-<h2 id="复现与容量验证"><a href="#复现与容量验证" class="headerlink" title="复现与容量验证"></a>复现与容量验证</h2><p>修复后在隔离环境注入 4 秒下游延迟：</p>
-<table>
-<thead>
-<tr>
-<th>指标</th>
-<th align="right">修复前</th>
-<th align="right">修复后</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>最大线程数</td>
-<td align="right">620+</td>
-<td align="right">248</td>
-</tr>
-<tr>
-<td>进程 RSS</td>
-<td align="right">3.95GiB 后被杀</td>
-<td align="right">峰值 3.42GiB</td>
-</tr>
-<tr>
-<td>Heap used</td>
-<td align="right">2.1GiB</td>
-<td align="right">2.0GiB</td>
-</tr>
-<tr>
-<td>Direct Buffer</td>
-<td align="right">430MiB</td>
-<td align="right">280MiB</td>
-</tr>
-<tr>
-<td>拒绝&#x2F;补偿</td>
-<td align="right">无边界堆积</td>
-<td align="right">有明确计数</td>
-</tr>
-<tr>
-<td>OOM Kill</td>
-<td align="right">发生</td>
-<td align="right">未发生</td>
-</tr>
-</tbody></table>
-<p>还需要确认业务结果：超载请求是否得到明确响应，补偿任务能否追赶，下游恢复后内存和线程是否回落。</p>
-<h2 id="取证清单"><a href="#取证清单" class="headerlink" title="取证清单"></a>取证清单</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">[ ] 判断 JVM OOM、容器 OOM 还是整机 OOM</span><br><span class="line">[ ] 保存退出时间、版本、事件和内核记录</span><br><span class="line">[ ] 对齐主机、容器、进程、JVM 四层指标</span><br><span class="line">[ ] 比较 Heap used 与进程 RSS</span><br><span class="line">[ ] 检查线程数、Direct Buffer、Metaspace 和本地库</span><br><span class="line">[ ] Heap Dump 前评估停顿、磁盘和数据安全</span><br><span class="line">[ ] 用引用链证明泄漏，不只看对象数量</span><br><span class="line">[ ] 建立 Xmx 之外的完整内存预算</span><br><span class="line">[ ] 在下游变慢和任务积压场景重新压测</span><br><span class="line">[ ] 验证恢复后 RSS、线程和业务积压都会回落</span><br></pre></td></tr></table></figure>
-
-<p>内存问题最关键的第一问不是“哪个对象最大”，而是“哪一层的边界被突破”。只有先分清整机、容器、进程和 JVM，Heap Dump、NMT、线程数和 cgroup 指标才会落到正确的位置。</p>
-]]></content>
-      <categories>
-        <category>故障排查</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>OOM</tag>
-        <tag>JVM</tag>
-        <tag>内存排查</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>无外网安装nginx</title>
-    <url>/2024/05/22/%E6%97%A0%E5%A4%96%E7%BD%91%E5%AE%89%E8%A3%85nginx/</url>
-    <content><![CDATA[<p><img src="/images/posts/2024/offline-nginx-cover.png" alt="无外网安装Nginx封面图"></p>
-<blockquote>
-<p>写在前面：客户给的服务器是银河麒麟，然后不给外网权限，要求安装nginx，网上教程基本没有这种情况的。也是踩了很多的坑，所以记录一下方便后面的bro。PS：重点在于如何安装上nginx，比较基础的操作可以同时参考其他教程一起看！！</p>
-</blockquote>
-
-
-<h2 id="1-服务器情况："><a href="#1-服务器情况：" class="headerlink" title="1. 服务器情况："></a>1. 服务器情况：</h2><figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/version</span><br><span class="line">Linux version 4.19.90-23.8.v2101.ky10.x86_64</span><br></pre></td></tr></tbody></table></figure>
-
-<h2 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a>2.准备工作</h2><h3 id="2-1-首先判断是否安装了nginx的三个依赖"><a href="#2-1-首先判断是否安装了nginx的三个依赖" class="headerlink" title="2.1.首先判断是否安装了nginx的三个依赖"></a>2.1.首先判断是否安装了nginx的三个依赖</h3><ol>
-<li>gcc</li>
-<li>pcre</li>
-<li>zlib</li>
-</ol>
-<p>可以访问外网的情况下可以直接命令行一键安装</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">yum -y install gcc zlib zlib-devel pcre-devel openssl </span><br></pre></td></tr></tbody></table></figure>
-
-<p>本篇就不涉及有外网了，重点在无外网。</p>
-<p>没外网的情况下，需要先手动下载上面三个依赖包，方便大家我就把整合好的地址放下面，大家有需要就自取</p>
-<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy">https://pan.baidu.com/s/1r0c0o6ORbOdB9vM8RoWUrA?pwd=bpmy</a><br>提取码：bpmy </p>
-<p>下载好了以后，分别把三个依赖包，和nginx，指定到自己指定的位置<br>我是把依赖包解压到了/usr/local/src下</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">这是解压命令</span><br><span class="line">tar -xvf openssl-3.0.13.tar.gz</span><br><span class="line"></span><br><span class="line">三个包手动替换的名称就好</span><br></pre></td></tr></tbody></table></figure>
-
-<blockquote>
-<p>重点！！！</p>
-</blockquote>
-<p>回到nginx的安装目录，执行下面的命令</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">./configure --prefix=/usr/local/nginx   --with-pcre=/usr/local/src/pcre-7.3 --with-zlib=/usr/local/src/zlib  --with-openssl=/usr/local/src/openssl</span><br><span class="line"></span><br><span class="line">解释</span><br><span class="line">--prefix 是指定nginx的安装路径，后续的我们操作的nginx都会在这里，类似于windows的选择安装路径</span><br><span class="line">--with-xxx 指定依赖的解压路径，用来找到我们刚刚解压缩的那三个依赖。</span><br></pre></td></tr></tbody></table></figure>
-
-<p>没报错的情况下，继续执行</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line">make</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line">就可以正常安装了</span><br></pre></td></tr></tbody></table></figure>
-
-<p>到这里nginx应该就安装成功了，后续就是一些优化操作</p>
-<ol>
-<li>可以删除nginx压缩包和解压目录<br>2.设置软链，后续就不用在安装nginx的目录下操作nginx</li>
-</ol>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /usr/local/webserver/nginx/sbin/nginx /usr/bin/</span><br><span class="line"></span><br><span class="line">在其他目录使用</span><br><span class="line">nginx -v</span><br><span class="line">查看是否设置成功</span><br></pre></td></tr></tbody></table></figure>
-
-<p>3.nginx常用命令</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><span class="line"><span class="comment"># 检查配置</span></span><br><span class="line">$ nginx -t（检查nginx.conf配置是否正确）</span><br><span class="line">$ nginx -s reload（重新载入配置文件，通常配合-t使用，在修改了nginx.conf且检查无误之后）</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动</span></span><br><span class="line">$ nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看进程</span></span><br><span class="line">$ ps -ef | grep nginx</span><br></pre></td></tr></tbody></table></figure>
-
-<blockquote>
-<p>之前部署项目的时候没遇到过国产系统+无内网两种情况叠加，导致踩坑了两天才调通，希望这篇文章能对后面遇到这种情况的兄弟们有所帮助！</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Linux运维</category>
-      </categories>
-      <tags>
-        <tag>运维</tag>
-        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
