@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>面试速查表 - 陈子鑫</title>
+<style>
+  @page { size: A4; margin: 9mm 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", sans-serif; font-size: 8.9pt;
+         line-height: 1.45; color: #1a1a1a; -webkit-print-color-adjust: exact; }
+  h1 { font-size: 16pt; border-bottom: 2px solid #222; padding-bottom: 5px; margin-bottom: 4px; }
+  .sub { font-size: 8.4pt; color: #666; margin-bottom: 10px; }
+  h2 { font-size: 10.4pt; color: #2c5aa0; margin: 9px 0 4px; padding-bottom: 2px;
+       border-bottom: 1px solid #ccd; page-break-after: avoid; }
+  h3 { font-size: 9.6pt; color: #333; margin: 8px 0 3px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 6px; page-break-inside: avoid; }
+  th { background: #eef2f8; text-align: left; font-size: 8.4pt; padding: 3px 5px;
+       border: 1px solid #ccd; color: #2c5aa0; }
+  td { padding: 3px 5px; border: 1px solid #dde; vertical-align: top; font-size: 8.6pt; }
+  td:first-child { width: 30%; font-weight: 600; color: #333; }
+  code { background: #f2f4f7; padding: 0 3px; border-radius: 2px; font-size: 8.2pt;
+         font-family: Menlo, monospace; }
+  pre { background: #f7f8fa; border-left: 3px solid #2c5aa0; padding: 6px 9px;
+        font-size: 8.2pt; line-height: 1.45; margin: 5px 0; font-family: Menlo, monospace;
+        white-space: pre-wrap; page-break-inside: avoid; }
+  ul { padding-left: 16px; margin: 4px 0; }
+  li { margin-bottom: 2px; font-size: 8.6pt; }
+  strong { color: #111; }
+  .box { background: #f0f7f2; border: 1px solid #b8ddc4; border-radius: 4px;
+         padding: 6px 9px; margin: 6px 0; font-size: 8.5pt; page-break-inside: avoid; }
+  .warn { background: #fdf6f0; border-color: #f0cfa8; }
+</style>
+</head>
+<body>
+
+<h1>面试速查表</h1>
+<div class="sub">陈子鑫 · Java 后端工程师 ｜ 基于 6 篇技术文章与 5 个项目整理，数字均来自代码核实</div>
+
+<h2>一、分库分表</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>什么时候该分？</td><td>先排除：加索引改 SQL → 冷热分离 → 读写分离 → 加缓存。<strong>只有"单实例写入撑不住 + 有高基数且查询必带的分片键"才分</strong></td></tr>
+<tr><td>分片键怎么选？</td><td>四原则：①高基数 ②查询必带 ③分布均匀 ④业务不变。通行证选 <code>user_id</code>（查某人历史是高频）；能源大屏选企业维度</td></tr>
+<tr><td>跨分片事务？</td><td>优先<strong>改设计消除</strong>（需一致的数据同分片）→ 柔性事务（本地消息表+补偿）→ 最后才 Seata</td></tr>
+<tr><td>不带分片键的查询？</td><td>会<strong>路由到所有分片再归并，比单表更慢</strong>。应对：建映射表，或让 ES 承载多维度检索</td></tr>
+<tr><td>深分页？</td><td>每分片取前 N 条再内存归并。<strong>游标分页</strong>或延迟关联</td></tr>
+<tr><td>全局 ID？</td><td>雪花算法（有序、对索引友好），注意时钟回拨</td></tr>
+<tr><td>扩容？</td><td>取模扩容要重分布几乎所有数据。应对：<strong>预分片</strong>、一致性哈希、双倍扩容</td></tr>
+</table>
+<div class="box"><strong>关键认知：</strong>分库分表解决的是"单实例处理能力上限"，不是"查询慢"的通用解法。它把问题从"一台机器扛不住"转换成"分布式带来的一致性、查询与运维复杂度"。</div>
+
+<h2>二、Redis 缓存</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>三者怎么区分？</td><td><strong>穿透=数据不存在</strong>（每次绕过缓存打库）；<strong>击穿=单个热点 key 失效</strong>（并发重建）；<strong>雪崩=一大片同时失效或 Redis 挂了</strong></td></tr>
+<tr><td>穿透怎么防？</td><td>①参数校验（最便宜）②缓存空值（<strong>必须短过期</strong>，否则内存被打满）③布隆过滤器（代价：有误判、不支持删除、需预热同步）</td></tr>
+<tr><td>击穿怎么防？</td><td>①互斥锁重建（代价：响应时间变长、有死锁风险）②<strong>逻辑过期</strong>（返回旧值+异步更新，代价：短暂脏数据）</td></tr>
+<tr><td>雪崩怎么防？</td><td>①<strong>过期时间加随机偏移</strong>（成本最低收益最高）②高可用 ③多级缓存 ④熔断降级 ⑤限流</td></tr>
+<tr><td>为什么删缓存不更新缓存？</td><td>更新浪费（写后可能没人读）；并发写时更新顺序可能与库不一致，导致缓存留旧值</td></tr>
+<tr><td>为什么先更库再删缓存？</td><td>反过来时，删除到更新之间若有读请求，会把<strong>旧值</strong>重新加载进缓存且不会自动纠正</td></tr>
+<tr><td>最终兜底？</td><td><strong>短过期时间</strong>——即使中间不一致，最长一个过期周期后自动恢复</td></tr>
+</table>
+<div class="box"><strong>我实际的选择（要能说取舍）：</strong>参数校验 + 缓存空值（短过期），没用布隆过滤器。理由：key 空间可枚举（用户 ID、设备 ID），攻击者能构造的不存在 key 有限；引入布隆过滤器需要额外预热和同步逻辑，收益不匹配。<br>面试官想听的不是"我知道布隆过滤器"，而是"我知道什么时候不用它"。</div>
+
+<h2>三、MySQL 慢查询</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>怎么定位慢 SQL？</td><td>慢日志（<code>long_query_time</code> <strong>单位是秒</strong>，要设小数）；<code>pt-query-digest</code> <strong>按总耗时排序</strong>；<code>performance_schema</code> 看 <code>rows_examined/rows_sent</code> 比例</td></tr>
+<tr><td>EXPLAIN 看什么？</td><td>①<code>type</code>（核心 SQL 至少 ref/range，不能 ALL）②<code>key_len</code>（<strong>验证联合索引用了几列</strong>）③<code>rows × filtered%</code> ④<code>Extra</code></td></tr>
+<tr><td><code>key_len</code> 怎么算？</td><td>BIGINT=8、TINYINT=1、INT=4，允许 NULL 再 +1；VARCHAR(n) = 4n+2（utf8mb4）</td></tr>
+<tr><td>Extra 哪两个要警惕？</td><td><code>Using filesort</code>（额外排序）、<code>Using temporary</code>（临时表）；<code>Using index</code> 是好的（覆盖索引）</td></tr>
+<tr><td>哪些写法让索引失效？</td><td>①索引列上做函数运算 ②<strong>隐式类型转换</strong>（<code>WHERE varchar_col = 123</code>）③前导模糊 <code>LIKE '%x'</code> ④<code>OR</code> 跨列</td></tr>
+<tr><td><code>!=</code> 会让索引失效吗？</td><td><strong>不绝对</strong>。如果能排除绝大部分数据，优化器可能仍走索引。<strong>用 EXPLAIN 验证，不要背结论</strong></td></tr>
+<tr><td>深分页怎么优化？</td><td>①游标分页 ②延迟关联（先用覆盖索引取主键再回表）</td></tr>
+</table>
+
+<h2>四、RabbitMQ</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>什么时候不该用 MQ？</td><td>需同步返回结果、强一致、逻辑本来就简单、延迟要求极高</td></tr>
+<tr><td>消息丢失的三个环节？</td><td>①生产者→Broker（网络抖动）②Broker 内部（未落盘宕机）③消费者处理（失败/ACK 丢失）</td></tr>
+<tr><td>分别怎么解决？</td><td>①<code>publisher-confirm</code> + <code>publisher-returns</code>（<strong>Confirm 只保证到交换机</strong>，路由失败要用 Returns）②<strong>交换机、队列、消息三者都持久化</strong> ③<strong>手动 ACK</strong> + 区分业务/系统异常</td></tr>
+<tr><td>为什么不能用默认 auto ACK？</td><td>auto 模式下方法返回就 ACK，<strong>抛异常也会 ACK</strong>，消息就丢了</td></tr>
+<tr><td>业务异常和系统异常？</td><td>业务异常（参数错、状态不符）重试多少次都失败 → 记录后 ACK；系统异常（网络、超时）→ <code>basicNack(requeue=true)</code> 重试</td></tr>
+<tr><td>为什么必须做幂等？</td><td>RabbitMQ 只能保证 <strong>at-least-once</strong>。"处理成功"和"ACK"是两个动作不可能原子，所以<strong>同一条消息可能被投递多次</strong></td></tr>
+<tr><td>幂等怎么实现？</td><td>①<strong>唯一 ID + 去重表</strong>（去重记录与业务<strong>必须同事务</strong>）②状态机（<code>UPDATE ... WHERE 旧状态</code>）③Redis 去重（不持久）④业务天然幂等</td></tr>
+</table>
+
+<h2>五、SpringCloud 微服务拆分</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>服务按什么拆？</td><td>优先级：<strong>变化频率 &gt; 数据源 &gt; 性能特征 &gt; 团队边界</strong>（康威定律）</td></tr>
+<tr><td>拆太细/太粗的问题？</td><td>太细：一个页面调 6 个服务，日志分散无法串联；太粗：等于没拆，无法按模块扩容</td></tr>
+<tr><td>为什么单独拆 metric-service？</td><td>隔离"<strong>上游 9 个系统不稳定</strong>"这个最大风险源，且它的迭代节奏与其他服务完全不同</td></tr>
+<tr><td>异构系统怎么集成？</td><td><strong>适配器模式</strong>统一接入层（REST/DB直连/MQ订阅各实现一个 adapter），业务只依赖接口</td></tr>
+<tr><td>指标口径不一致？</td><td>建<strong>指标字典</strong>：全局唯一 <code>metric_code</code> + 配置化转换表达式 + 分层更新周期（秒/分钟/小时/天级）</td></tr>
+<tr><td>4 台服务器做高可用？</td><td><strong>按影响面排序</strong>：Nacos/网关必须双节点（挂了全系统不可用）；Redis/MySQL 主从；非核心服务可单点。<strong>不是所有组件都冗余</strong></td></tr>
+<tr><td>大屏响应慢怎么优化？</td><td>原<strong>串行</strong>获取十几个板块（3 秒）→ <code>CompletableFuture</code> 并行 + <strong>单板块超时降级</strong>（2s）+ <strong>独立线程池</strong>（不用 commonPool）→ <strong>800ms</strong></td></tr>
+</table>
+
+<h2>六、LLM 网关（差异化亮点）</h2>
+<table>
+<tr><th>面试官会问</th><th>我要答的</th></tr>
+<tr><td>为什么要建网关？</td><td>四类问题：重复适配、无容错、无法观测、变更成本高。网关把"N 家供应商"<strong>收敛成一个统一接口</strong></td></tr>
+<tr><td>核心设计？</td><td>对外只暴露 <strong>OpenAI 兼容协议</strong>——不用为每家写适配，切换成本为零（业务方只改 <code>base_url</code> 和 <code>api_key</code>）</td></tr>
+<tr><td>模型命名？</td><td><strong>双轨制</strong>：前缀（<code>ark-</code>/<code>r4-</code>/<code>cc-</code>）指定供应商用于调试对比；通用别名用于生产走降级链</td></tr>
+<tr><td>降级链的关键？</td><td><strong>理解哪些错误才触发降级</strong>：429/5xx/超时/连接失败会；400/401/内容审核不会。<br>参数错误若也降级，会在 4 家白跑一圈，延迟翻 4 倍还是同一个错</td></tr>
+<tr><td>最容易忽略的坑？</td><td><strong>超时端到端对齐</strong>（客户端 ≥ 网关 240s ≥ 上游）。踩过：客户端 12s 但真实需要 20s，客户端先超时、网关还在处理但结果没人接收 → <strong>功能形同虚设，看日志还一切正常</strong></td></tr>
+<tr><td>上游差异怎么处理？</td><td>挡在网关内：CommandCode 被 CF 拦需伪装 UA、数智魔方 baseURL 必须带 <code>/v1</code>、<code>reasoning_content</code> 字段归一化</td></tr>
+<tr><td>怎么监控？</td><td>调用量/失败率/延迟/<strong>降级次数</strong>。<strong>降级次数是核心健康指标</strong>，比失败率更早暴露问题</td></tr>
+</table>
+
+<h2>七、项目追问速记</h2>
+<table>
+<tr><th>项目</th><th>必答要点</th></tr>
+<tr><td>深圳能源大屏<br><span style="font-weight:400;color:#666">后端技术负责人</span></td><td>7 大主题 / 36 板块 / 167 家企业 / 9 个异构系统 / 580 指标 / 4 台服务器<br>①服务怎么拆（变化频率优先）②9 个系统怎么集成（适配器+指标字典）③4 台机器高可用（按影响面排序）④大屏慢怎么优化（并行+降级，<strong>3s→800ms</strong>）</td></tr>
+<tr><td>医院电子通行证<br><span style="font-weight:400;color:#666">后端主程</span></td><td>5 模块微服务 / <strong>1067 个 Java 文件</strong> / 36 Controller / <strong>约 389 个 REST 接口</strong> / 265 实体<br>①多厂商门禁设备接入（<strong>MQTT</strong> 统一通信层）②与医院系统集成（<strong>HL7 + HAPI</strong>，山西省二院）③高频通行记录（ShardingSphere）④为何用 RabbitMQ 解耦</td></tr>
+<tr><td>病案无纸化<br><span style="font-weight:400;color:#666">后端主程</span></td><td>6 个功能模块 / 整合十余类临床文档<br>①多来源文档整合成完整卷宗 ②大文件存储为何用 MinIO ③借阅场景恶意下载怎么防（Redis 记录次数）</td></tr>
+<tr><td>AI 基础设施<br><span style="font-weight:400;color:#666">独立设计与实现</span></td><td>4 家供应商 / 40+ 模型 / 35 条降级链 / 6 个域名 / 7 个定时任务<br>①为何建网关 ②降级链怎么设计 ③超时怎么对齐 ④故障自愈（健康检查+自动重启+飞书告警）</td></tr>
+</table>
+
+<h2>八、通用问题</h2>
+<table>
+<tr><th>问题</th><th>我的答案方向</th></tr>
+<tr><td>为什么离职 / 空档期？</td><td>2026.03 至今是主动学习期：补强工程能力（独立完成全栈项目）+ 把 AI 从"能用"推进到"可用于生产"。<strong>有实物证据</strong>：LLM 网关、运维自动化、6 篇技术文章（约 1.9 万字）</td></tr>
+<tr><td>怎么看 AI 对后端的影响？</td><td>AI 降低了写代码的成本，但<strong>判断什么值得写、什么可以相信</strong>变得更重要。实践记录在博客 AI 编程系列</td></tr>
+<tr><td>你的技术优势？</td><td>6 年 Java 后端（微服务/分库分表/高并发）+ 近 1 年 AI 工程化落地（网关/降级/成本控制）+ <strong>医疗行业协议（HL7）与 IoT 设备通信（MQTT）</strong></td></tr>
+</table>
+
+<h2>九、面试前 30 分钟检查</h2>
+<ul>
+<li>□ 简历 PDF 准备好（<code>~/Desktop/陈子鑫-Java开发工程师.pdf</code>）</li>
+<li>□ 作品集链接能打开（swagcH.github.io/portfolio）</li>
+<li>□ 本文第二到六节的检查清单过一遍</li>
+<li>□ 每个项目的<strong>量化规模数字记住</strong>（问细节时能立刻报出）</li>
+<li>□ 准备 2-3 个"最有成就感的技术问题"故事（推荐：<strong>RustDesk 跨层排障</strong>、<strong>大屏串行优化 3s→800ms</strong>）</li>
+</ul>
+
+</body>
+</html>
