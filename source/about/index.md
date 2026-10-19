@@ -143,15 +143,23 @@ type: about
     <div class="experience-list">
       <article>
         <time>2018 - 2019</time>
-        <div><h3>建立 Java 与 Web 开发基础</h3><p>从语言、集合、异常和 JDBC，逐步进入 Servlet、Spring、MyBatis 与完整项目实践。</p></div>
+        <div><h3>建立 Java 与 Web 开发基础</h3><p>从语言、集合、异常与 JDBC 起步，逐步进入 Servlet、Spring、MyBatis，并完成第一个端到端的完整项目。这个阶段解决的问题是"能写出来"。</p></div>
       </article>
       <article>
-        <time>2020 - 2023</time>
-        <div><h3>从功能开发走向工程与稳定性</h3><p>持续整理代码质量、部署、监控、SQL 调优和线上问题定位，建立可复用的交付与排障方法。</p></div>
+        <time>2020 - 2022</time>
+        <div><h3>从功能开发走向独立交付</h3><p>在企业项目中独立承担模块的设计与落地，开始系统整理代码规范、数据库设计、接口文档与部署流程。关注点从"功能能跑"转向"别人能不能接手"。</p></div>
+      </article>
+      <article>
+        <time>2022 - 2024</time>
+        <div><h3>深入复杂业务与生产稳定性</h3><p>作为后端主程负责医疗行业系统：多厂商门禁设备的统一接入（MQTT）、与医院既有信息系统的 HL7 数据交换、通行记录的高频写入瓶颈（分库分表）。把线上问题的排查过程沉淀为可复用的证据链方法。</p></div>
+      </article>
+      <article>
+        <time>2024 - 2026</time>
+        <div><h3>从模块负责人到技术负责人</h3><p>主导集团级数据大屏的后端架构：微服务边界划分、9 个异构系统的数据集成与 580 个指标口径统一、4 台服务器约束下的高可用取舍，并推动对象存储与并行聚合等改造落地。开始为技术决策的代价负责。</p></div>
       </article>
       <article>
         <time>2025 - 至今</time>
-        <div><h3>探索 AI 进入真实开发流程</h3><p>围绕上下文工程、Vibe Coding、Java 重构和个人工作流，验证 AI 的效率收益与责任边界；并把验证结果沉淀为可复用的基础设施与工程方法。</p></div>
+        <div><h3>把 AI 纳入真实开发流程</h3><p>与技术负责人阶段并行推进：围绕上下文工程、Vibe Coding、Java 重构与个人工作流，验证 AI 的效率收益与责任边界，并把结论沉淀为自建模型网关、运维自动化等可复用基础设施。</p></div>
       </article>
     </div>
   </section>
@@ -164,8 +172,8 @@ type: about
     <p class="contact-intro">你可以通过 GitHub 了解我的公开内容，也可以从专题和归档快速判断关注方向是否与你的团队或问题匹配。</p>
     <div class="contact-links">
       <a href="https://github.com/swagcH" rel="noopener" target="_blank"><i class="fab fa-github"></i><span>GitHub<strong>@swagcH</strong></span></a>
-      <a href="/portfolio/"><i class="fa fa-layer-group"></i><span>作品集<strong>六个项目的完整拆解</strong></span></a>
-      <a href="/series/"><i class="fa fa-layer-group"></i><span>代表专题<strong>浏览三条能力路径</strong></span></a>
+      <a href="/portfolio/"><i class="fa fa-layer-group"></i><span>作品集<strong>五个项目的完整拆解</strong></span></a>
+      <a href="/series/"><i class="fa fa-layer-group"></i><span>代表专题<strong>浏览五条能力路径</strong></span></a>
       <a href="/atom.xml"><i class="fa fa-rss"></i><span>RSS<strong>订阅文章更新</strong></span></a>
       <a href="/archives/"><i class="fa fa-book-open"></i><span>文章归档<strong>浏览全部笔记</strong></span></a>
     </div>
