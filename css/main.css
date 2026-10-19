@@ -1269,7 +1269,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #6effc9;
+    background: #ede461;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -5971,4 +5971,13 @@ mark.search-keyword {
     font-size: 14px;
     line-height: 1.8;
   }
+}
+/* ------------------------------------------------------------------
+ * 固定侧栏社交链接圆点颜色
+ * 主题 (_common/outline/sidebar/index.styl) 用 random-color() 生成 ::before 背景色,
+ * 每次构建都会变,导致 css/main.css 每次部署产生无意义差异。
+ * 主题在 node_modules 中,直接改会被 npm ci 覆盖,故在此覆盖为站点强调色。
+ * ------------------------------------------------------------------ */
+.links-of-author a::before {
+  background: #713cff;
 }
