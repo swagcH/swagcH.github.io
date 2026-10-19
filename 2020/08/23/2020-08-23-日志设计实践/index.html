@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 6.3.0">
+<meta name="theme-color" content="#111111"><meta name="generator" content="Hexo 8.1.2">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
@@ -16,23 +16,23 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"swagch.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":280,"display":"always","padding":24,"offset":24},"hljswrap":true,"codeblock":{"theme":{"light":"stackoverflow-light","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#8b949e","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。 从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。 反例一：只写一句“操作失败”12345try &amp;#123;    orderService.create(r">
+    <meta name="description" content="我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。 从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。 反例一：只写一句“操作失败”12345try &#123;    orderService.create(r">
 <meta property="og:type" content="article">
 <meta property="og:title" content="日志设计实践">
 <meta property="og:url" content="https://swagch.github.io/2020/08/23/2020-08-23-%E6%97%A5%E5%BF%97%E8%AE%BE%E8%AE%A1%E5%AE%9E%E8%B7%B5/">
 <meta property="og:site_name" content="杰尼龟的笔记">
-<meta property="og:description" content="我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。 从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。 反例一：只写一句“操作失败”12345try &amp;#123;    orderService.create(r">
+<meta property="og:description" content="我曾经排查过一个支付回调问题，日志里有几千行“处理失败”，却没有订单号、阶段和异常堆栈。日志数量不少，但没有一行能够把请求和业务结果连起来。 从那以后，我判断一条日志是否有价值，不再看它写了多少内容，而是看它能不能回答：发生了什么、影响哪个对象、进行到哪一步、结果是什么、下一步去哪里查。 反例一：只写一句“操作失败”12345try &#123;    orderService.create(r">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://swagch.github.io/images/posts/2020/logging-practice-cover.svg">
 <meta property="article:published_time" content="2020-08-23T13:33:18.000Z">
-<meta property="article:modified_time" content="2026-10-17T01:44:03.064Z">
+<meta property="article:modified_time" content="2020-08-23T13:33:18.000Z">
 <meta property="article:author" content="无敌杰尼龟">
-<meta property="article:tag" content="日志设计">
-<meta property="article:tag" content="排查问题">
-<meta property="article:tag" content="可观测性">
 <meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="可观测性">
+<meta property="article:tag" content="排查问题">
+<meta property="article:tag" content="日志设计">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://swagch.github.io/images/posts/2020/logging-practice-cover.svg">
 
@@ -54,7 +54,6 @@
 
 
   
-  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
   <script src="/js/local-search-engine.js" defer></script>
@@ -254,13 +253,6 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2026-10-17 09:44:03" itemprop="dateModified" datetime="2026-10-17T09:44:03+08:00">2026-10-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -357,7 +349,7 @@
 <h2 id="在入口建立-traceId"><a href="#在入口建立-traceId" class="headerlink" title="在入口建立 traceId"></a>在入口建立 traceId</h2><p>一条请求经过多个类甚至多个服务时，需要一个共同标识。Spring Boot 项目可以在过滤器中放入 MDC：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TraceIdFilter</span> <span class="keyword">extends</span> <span class="title class_">OncePerRequestFilter</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">TRACE_ID</span> <span class="operator">=</span> <span class="string">&quot;traceId&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doFilterInternal</span><span class="params">(HttpServletRequest request,</span></span><br><span class="line"><span class="params">                                    HttpServletResponse response,</span></span><br><span class="line"><span class="params">                                    FilterChain filterChain)</span></span><br><span class="line">            <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">traceId</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;X-Trace-Id&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (traceId == <span class="literal">null</span> || traceId.trim().isEmpty()) &#123;</span><br><span class="line">            traceId = UUID.randomUUID().toString().replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 放入 MDC 后，日志格式可以自动输出 traceId</span></span><br><span class="line">            MDC.put(TRACE_ID, traceId);</span><br><span class="line">            response.setHeader(<span class="string">&quot;X-Trace-Id&quot;</span>, traceId);</span><br><span class="line">            filterChain.doFilter(request, response);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 线程会被容器复用，必须清理，避免串到下一次请求</span></span><br><span class="line">            MDC.remove(TRACE_ID);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>日志格式中加入 <code>%X&#123;traceId&#125;</code> 后，同一请求的日志就能串起来。调用下游服务、发送消息时还要显式传递这个标识；仅在当前线程生成，并不能自动穿过 HTTP、MQ 和异步线程池。</p>
+<p>日志格式中加入 <code>%X{traceId}</code> 后，同一请求的日志就能串起来。调用下游服务、发送消息时还要显式传递这个标识；仅在当前线程生成，并不能自动穿过 HTTP、MQ 和异步线程池。</p>
 <h2 id="异步任务容易丢上下文"><a href="#异步任务容易丢上下文" class="headerlink" title="异步任务容易丢上下文"></a>异步任务容易丢上下文</h2><p>MDC 基于线程上下文，提交到线程池后通常不会自动复制。可以在任务包装器中保存和恢复：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Runnable <span class="title function_">withMdc</span><span class="params">(Runnable task)</span> &#123;</span><br><span class="line">    Map&lt;String, String&gt; context = MDC.getCopyOfContextMap();</span><br><span class="line">    <span class="keyword">return</span> () -&gt; &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (context != <span class="literal">null</span>) &#123;</span><br><span class="line">                MDC.setContextMap(context);</span><br><span class="line">            &#125;</span><br><span class="line">            task.run();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            MDC.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -373,7 +365,7 @@
 <p>一个请求结束日志可以同时承担访问审计和性能观察：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">event=http_request_completed</span><br><span class="line">method=POST</span><br><span class="line">path=/api/orders</span><br><span class="line">status=201</span><br><span class="line">costMs=126</span><br><span class="line">traceId=7f94c892a0d1</span><br></pre></td></tr></table></figure>
 
-<p>路径应使用模板 <code>/api/orders/&#123;id&#125;</code>，而不是把每个具体 ID 当成新维度，否则统计维度会无限增长。</p>
+<p>路径应使用模板 <code>/api/orders/{id}</code>，而不是把每个具体 ID 当成新维度，否则统计维度会无限增长。</p>
 <h2 id="异常日志保留最有用的上下文"><a href="#异常日志保留最有用的上下文" class="headerlink" title="异常日志保留最有用的上下文"></a>异常日志保留最有用的上下文</h2><p>异常堆栈说明“代码在哪里失败”，业务字段说明“谁失败”。两者缺一不可，但上下文要有限：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">log.error(</span><br><span class="line">        <span class="string">&quot;payment_callback_failed paymentNo=&#123;&#125; orderId=&#123;&#125; callbackType=&#123;&#125;&quot;</span>,</span><br><span class="line">        paymentNo,</span><br><span class="line">        orderId,</span><br><span class="line">        callbackType,</span><br><span class="line">        exception</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
