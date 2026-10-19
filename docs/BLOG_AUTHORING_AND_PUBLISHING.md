@@ -22,7 +22,7 @@
 建议安装：
 
 - Git
-- Node.js 20 LTS
+- Node.js 22（与自动构建环境一致）
 - GitHub CLI，可选但推荐
 - 任意 Markdown 编辑器或 IntelliJ IDEA
 
@@ -143,7 +143,7 @@ cover: /images/posts/2026/article-cover.png
 
 - `title`：文章标题；加入专题时必须与 `brand.yml` 中的标题完全一致。
 - `date`：首次发布时间。
-- `updated`：最近一次实质性修改时间。
+- `updated`：最近一次实质性修改时间；未填写时使用 `date`，不会随电脑文件时间或重新部署改变。仅在正文有实质性修改时更新此字段。
 - `verified`：最近一次验证文章结论的日期。
 - `environment`：实际验证过的技术版本，不确定时不要编造。
 - `tags`：具体技术关键词。
@@ -284,20 +284,18 @@ git restore --staged db.json
 
 ## 8. 发布到线上
 
-当前仓库没有配置从 `source` 自动构建的 GitHub Actions。因此，推送 `source` 后还必须在本地生成并发布 `main`。
+仓库已配置 `.github/workflows/deploy.yml`。推送 `source` 后，`Deploy Hexo` 会自动安装依赖、构建站点并将 `public/` 发布到 `main`，随后由 GitHub Pages 更新线上站点。日常发布只需推送源码：
 
 ```bash
-npm run clean
-npm run build
-npm run deploy
+git push origin source
 ```
 
-`npm run deploy` 会根据 `_config.yml` 中的配置，将 `public/` 发布到远端 `main` 分支。
+无需手动执行 `npm run deploy`。该命令会直接写入 `main`，可能与自动构建互相覆盖。自动部署失败时，应先查看日志并修复源码；需要重新发布同一版本时，可在 Actions 中手动运行 `Deploy Hexo`。
 
 发布后检查：
 
 1. 打开 <https://github.com/swagcH/swagcH.github.io/actions>。
-2. 等待 `pages build and deployment` 显示成功。
+2. 先确认对应源码提交的 `Deploy Hexo` 成功，再等待 `pages build and deployment` 成功。
 3. 打开 <https://swagch.github.io/>。
 4. 检查首页、文章链接、封面图和手机端布局。
 
@@ -323,18 +321,14 @@ git status
 git commit -m "docs: describe this change"
 git push origin source
 
-npm run clean
-npm run build
-npm run deploy
+# 在 GitHub Actions 确认 Deploy Hexo 和 Pages 部署成功
 ```
 
 ## 10. 常见错误
 
 ### 只推送了 `source`，线上没有变化
 
-原因：当前没有自动部署工作流。
-
-处理：执行 `npm run clean`、`npm run build` 和 `npm run deploy`。
+先检查 GitHub Actions 中是否存在对应提交的 `Deploy Hexo` 运行记录。若失败，按失败步骤检查依赖安装、构建日志或仓库 Actions 写权限；若成功，继续检查 Pages 部署是否完成。确认推送的是 `source`，而不是其他分支。
 
 ### 直接修改了 `main` 或 `public/`
 
@@ -348,8 +342,8 @@ npm run deploy
 
 依次检查：
 
-1. 是否重新执行了 `npm run clean` 和 `npm run build`。
-2. 是否执行了 `npm run deploy`。
+1. 修改是否已提交并推送到 `source`。
+2. 对应提交的 `Deploy Hexo` 是否构建成功并更新了 `main`。
 3. 修改 JavaScript 后是否更新了 `body-end.njk` 中的版本参数。
 4. GitHub Pages 部署任务是否成功。
 5. 浏览器是否仍在使用缓存。

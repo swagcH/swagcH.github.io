@@ -21,11 +21,11 @@ jobs:
         with:
           ref: source
 
-      # 安装 Node.js，并启用 npm 依赖缓存加速构建
+      # 与 .nvmrc 保持一致，确保本地与自动部署使用同一 Node.js 主版本
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: '.nvmrc'
           cache: npm
 
       # 严格按照 package-lock.json 安装，保证各设备构建环境一致

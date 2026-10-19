@@ -2,7 +2,7 @@
 
 > 6 年 Java 后端开发经验 · 微服务架构 · 分库分表与性能优化 · 近期专注 AI 工程化落地
 
-**电话**：15932859833　|　**邮箱**：983252494@qq.com　|　**学历**：本科
+**邮箱**：983252494@qq.com　|　**学历**：本科
 **作品集**：https://swagcH.github.io/portfolio/　|　**GitHub**：https://github.com/swagcH
 
 ---
