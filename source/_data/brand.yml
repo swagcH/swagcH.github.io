@@ -3,8 +3,8 @@ profile:
   title: 杰尼龟的笔记
   description: Java 后端工程师的实践笔记，聚焦可维护代码、系统稳定性与 AI 编程工作流，用真实案例说明问题如何定位、方案如何验证。
   primary_action:
-    label: 查看代表专题
-    url: /series/
+    label: 查看代表项目
+    url: /portfolio/
   secondary_action:
     label: 了解我与职业方向
     url: /about/
@@ -165,12 +165,16 @@ series:
   tone: purple
   eyebrow: AI INFRASTRUCTURE
   title: AI 基础设施与工程化
-  description: 把大模型从「能调通」推进到「能用于生产」：统一网关、降级兜底、成本与可观测性。
-  outcome: 理解 LLM 应用在生产环境中的稳定性设计
+  description: 把大模型从"能调通"推进到"能用于生产"：知识边界、流量特征、统一网关与降级兜底。
+  outcome: 理解 LLM 应用在生产环境中的边界与稳定性设计
   posts:
   - 自建 LLM 网关：统一 4 家供应商的架构设计
+  - AI 不知道昨天发生了什么：模型知识的三条来源与代价
+  - AI 在给互联网做压力测试：从 10 亿用户说起
 featured:
 - ShardingSphere 分库分表实践：从选型到踩坑
 - 自建 LLM 网关：统一 4 家供应商的架构设计
 - SpringCloud 微服务拆分：一次真实的架构演进
 - Redis 缓存设计：穿透、击穿、雪崩的实际处理
+- MySQL 慢查询优化：从执行计划到索引设计
+- AI辅助Java重构实战：拆解一个过长Service
