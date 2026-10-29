@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="700" viewBox="0 0 1280 700">
+  <rect width="1280" height="700" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">INFRA / TRAFFIC SHAPE</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="40" font-weight="700">流量的形状变了</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <!-- 左:传统 -->
+    <rect x="72" y="170" width="500" height="196" rx="12" fill="#101a29" stroke="#294158"/>
+    <text x="100" y="204" fill="#6f8497" font-family="Menlo,Consolas,monospace" font-size="16">传统应用</text>
+    <text x="100" y="238" fill="#c9d6e2" font-size="16">请求体　　几 KB</text>
+    <text x="100" y="266" fill="#c9d6e2" font-size="16">响应体　　几十 KB</text>
+    <text x="100" y="294" fill="#c9d6e2" font-size="16">耗时　　　几十毫秒</text>
+    <text x="100" y="322" fill="#c9d6e2" font-size="16">调用链　　1 次请求 = 1 次响应</text>
+    <text x="100" y="350" fill="#6f8497" font-size="14">按「日活 × 人均请求数」就能估出容量</text>
+
+    <!-- 右:AI -->
+    <rect x="604" y="170" width="604" height="196" rx="12" fill="#101a29" stroke="#22d3ee" stroke-width="2"/>
+    <text x="632" y="204" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">AI 应用</text>
+    <text x="632" y="238" fill="#f2f7fb" font-size="16">请求体　　几万～几十万 token（带上下文）</text>
+    <text x="632" y="266" fill="#f2f7fb" font-size="16">响应　　　流式，持续吐 token 十几秒到几分钟</text>
+    <text x="632" y="294" fill="#f2f7fb" font-size="16">调用链　　1 次交互 = 十几次工具调用（串行）</text>
+    <text x="632" y="322" fill="#fb7185" font-size="16">重试　　　昂贵的：已生成的 token 全额再算一次</text>
+    <text x="632" y="350" fill="#9eb0c2" font-size="14">传统 QPS 估算会严重低估负载</text>
+
+    <!-- 四个差异 -->
+    <text x="72" y="424" fill="#f2f7fb" font-size="20" font-weight="700">四处不同，各打到系统的不同位置</text>
+
+    <rect x="72" y="448" width="266" height="130" rx="10" fill="#101a29" stroke="#fbbf24"/>
+    <text x="96" y="480" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="15">① 抓取流量</text>
+    <text x="96" y="510" fill="#c9d6e2" font-size="14">AI 爬虫可能比真实</text>
+    <text x="96" y="532" fill="#c9d6e2" font-size="14">用户还多，且混在</text>
+    <text x="96" y="554" fill="#c9d6e2" font-size="14">监控里看不出来</text>
+
+    <rect x="362" y="448" width="266" height="130" rx="10" fill="#101a29" stroke="#fbbf24"/>
+    <text x="386" y="480" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="15">② 长连接</text>
+    <text x="386" y="510" fill="#c9d6e2" font-size="14">流式 + 慢响应，</text>
+    <text x="386" y="532" fill="#c9d6e2" font-size="14">连接长时间不释放</text>
+    <text x="386" y="554" fill="#c9d6e2" font-size="14">→ 连接池先打满</text>
+
+    <rect x="652" y="448" width="266" height="130" rx="10" fill="#101a29" stroke="#fb7185"/>
+    <text x="676" y="480" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="15">③ 调用链变深</text>
+    <text x="676" y="510" fill="#c9d6e2" font-size="14">单次成功率 99%，</text>
+    <text x="676" y="532" fill="#c9d6e2" font-size="14">20 次串行后只剩 82%</text>
+    <text x="676" y="554" fill="#c9d6e2" font-size="14">→ 重试放大风暴</text>
+
+    <rect x="942" y="448" width="266" height="130" rx="10" fill="#101a29" stroke="#fb7185"/>
+    <text x="966" y="480" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="15">④ 存储放大</text>
+    <text x="966" y="510" fill="#c9d6e2" font-size="14">对话历史/快照/附件</text>
+    <text x="966" y="532" fill="#c9d6e2" font-size="14">体积大、价值密度低</text>
+    <text x="966" y="554" fill="#c9d6e2" font-size="14">→ 主库先崩</text>
+  </g>
+
+  <rect x="72" y="608" width="1136" height="64" rx="10" fill="#0b1522" stroke="#294158"/>
+  <text x="104" y="638" fill="#a9bac9" font-family="Menlo,Consolas,monospace" font-size="16">超时要分层并放大　·　内部调用别绕公网　·　限流按并发或 token 算，不按 QPS</text>
+  <text x="104" y="660" fill="#6f8497" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="14">AI 没有让工程变得不重要，反而让基本功变得更值钱</text>
+</svg>

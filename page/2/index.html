@@ -174,18 +174,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">170</span>
+        <span class="site-state-item-count">178</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,6 +207,339 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2026/04/12/2026-04-12-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/04/12/2026-04-12-ShardingSphere%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E5%AE%9E%E8%B7%B5/" class="post-title-link" itemprop="url">ShardingSphere 分库分表实践：从选型到踩坑</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-04-12 09:00:00" itemprop="dateCreated datePublished" datetime="2026-04-12T09:00:00+08:00">2026-04-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>分库分表最容易被当成一个”数据量大了就上”的开关，但它实际上会改变事务边界、查询方式和运维复杂度。我在两个项目里用过 ShardingSphere（医院通行证系统、能源大屏），这篇文章记录选型依据、分片键的设计过程，以及分片之后被迫重新考虑的那些事。</p>
+<h2 id="先说结论：什么时候不该分"><a href="#先说结论：什么时候不该分" class="headerlink" title="先说结论：什么时候不该分"></a>先说结论：什么时候不该分</h2><p>很多团队把分库分表当成性能问题的第一选择，但它的代价经常被低估。先排除掉不该分的场景，能省掉大量返工。</p>
+<p><strong>优先做这些，而不是分片：</strong></p>
+<ul>
+<li>加索引、改写慢 SQL。很多”数据量大导致的慢查询”，实际是全表扫描或缺索引</li>
+<li>冷热分离。历史数据归档到独立的归档表或冷存储，热表自然瘦身</li>
+<li>读写分离。读多写少的场景，加从库比拆分简单得多</li>
+<li>加缓存。字典、配置、热点数据放 Redis，减少落到数据库的查询</li>
+<li>升级硬件或调参数。在单表千万级以内，这通常够用</li>
+</ul>
+<p><strong>真正需要分片的信号：</strong></p>
+<ul>
+<li>单表数据量到了<strong>千万级以上</strong>，且索引优化后写入或查询仍然明显变慢</li>
+<li>写入量已经超过单实例的处理能力（不只是慢，是撑不住）</li>
+<li>数据有明确的、稳定的拆分维度（比如按时间、按租户、按用户 ID）</li>
+<li>业务能接受分片带来的限制（下面会讲这些限制是什么）</li>
+</ul>
+<p>最后一条最关键。<strong>如果找不到一个高基数、且几乎所有查询都会带上的分片键，分片会带来比收益更大的麻烦。</strong></p>
+<p><img src="/images/posts/2026/sharding-decision.svg" alt="分库分表决策路径：先排除更简单的方案，再考虑分片"></p>
+<h2 id="选型：为什么用-ShardingSphere"><a href="#选型：为什么用-ShardingSphere" class="headerlink" title="选型：为什么用 ShardingSphere"></a>选型：为什么用 ShardingSphere</h2><p>当时对比了几个方向：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>特点</th>
+<th>适合的场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ShardingSphere-JDBC</strong></td>
+<td>以 jar 包形式嵌入应用，走 JDBC 层，无额外部署</td>
+<td>Java 应用，希望零额外运维成本</td>
+</tr>
+<tr>
+<td><strong>ShardingSphere-Proxy</strong></td>
+<td>独立进程，对应用透明（像连一个 MySQL）</td>
+<td>多语言技术栈，或希望不改应用代码</td>
+</tr>
+<tr>
+<td><strong>MyCat</strong></td>
+<td>独立代理，社区活跃度下降</td>
+<td>存量系统</td>
+</tr>
+<tr>
+<td><strong>自己写路由</strong></td>
+<td>完全可控</td>
+<td>分片逻辑极简单且团队有能力维护</td>
+</tr>
+<tr>
+<td><strong>云厂商中间件</strong></td>
+<td>托管，省运维</td>
+<td>已绑定云生态</td>
+</tr>
+</tbody></table>
+<p>我们选 <strong>ShardingSphere-JDBC</strong>，理由很直接：</p>
+<ol>
+<li>技术栈是纯 Java，没有跨语言代理的需求</li>
+<li>不想为分片额外部署和运维一个中间件进程</li>
+<li>JDBC 层接入对业务代码侵入小，SQL 写法基本不用改</li>
+</ol>
+<p>代价是：<strong>分片规则在应用侧，每个需要访问分片表的服务都要引入依赖并配置规则</strong>。如果服务很多，规则同步会成为一个维护点。这种情况 Proxy 更合适。</p>
+<p><img src="/images/posts/2026/sharding-arch.svg" alt="ShardingSphere-JDBC 的接入位置与物理分片结构"></p>
+<h2 id="分片键怎么选"><a href="#分片键怎么选" class="headerlink" title="分片键怎么选"></a>分片键怎么选</h2><p>这是整个分片方案里最重要、也最容易做错的一步。分片键选错，后面所有优化都是在补救。</p>
+<p><strong>选择原则：</strong></p>
+<p><strong>1. 高基数</strong></p>
+<p>分片键的取值要足够分散，否则数据会倾斜到少数分片。用状态字段（只有几个值）做分片键是典型错误。</p>
+<p><strong>2. 查询必带</strong></p>
+<p>理想情况是”绝大多数查询都会带上这个字段”。因为<strong>不带分片键的查询会路由到所有分片</strong>，然后由中间件归并结果——这比单表查询更慢。</p>
+<p><strong>3. 数据分布均匀</strong></p>
+<p>自增 ID 做分片键会有写入热点（新数据总是落在最后一个分片）；用户 ID、租户 ID 这类天然离散的字段更好。</p>
+<p><strong>4. 业务上不会变</strong></p>
+<p>分片键一旦确定，改它的成本极高（等于全量数据重新分布）。</p>
+<p><strong>我们的实际选择：</strong></p>
+<p>医院通行证系统的通行记录有两类主要查询：<strong>按人查历史</strong>、<strong>按时间段查</strong>。</p>
+<ul>
+<li>选 <code>user_id</code> 做分片键 → 按人查能精确定位，但按时间查要扫全部分片</li>
+<li>选 <code>create_time</code> 做分片键 → 按时间查快，但按人查要扫全部</li>
+<li>最终选 <code>user_id</code>，因为”查某个人的通行历史”是高频操作，时间范围查询可以通过额外的查询条件缩小范围</li>
+</ul>
+<p>能源大屏的指标数据则是另一种情况：查询几乎总是带<strong>设备&#x2F;企业维度</strong>，所以分片键选企业维度，保证按企业查询能路由到单片。</p>
+<p><strong>这一步没有标准答案，只能按真实查询模式来定。</strong> 建议先统计线上 SQL 的执行频率，再决定。</p>
+<h2 id="分片之后必须重新考虑的五件事"><a href="#分片之后必须重新考虑的五件事" class="headerlink" title="分片之后必须重新考虑的五件事"></a>分片之后必须重新考虑的五件事</h2><p>分片不是”配置好就完事”。下面每一项都会在分片后变成新问题。</p>
+<h3 id="1-本地事务失效"><a href="#1-本地事务失效" class="headerlink" title="1. 本地事务失效"></a>1. 本地事务失效</h3><p>跨分片的写入无法用本地事务保证。这是最容易出事的地方。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分片前：一个 @Transactional 就够了</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">transfer</span><span class="params">(Long fromUserId, Long toUserId, BigDecimal amount)</span> &#123;</span><br><span class="line">    accountMapper.decrease(fromUserId, amount);</span><br><span class="line">    accountMapper.increase(toUserId, amount);   <span class="comment">// 分片后：可能在不同库</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分片后 <code>fromUserId</code> 和 <code>toUserId</code> 可能落在不同库，本地事务只能保证其中一边。</p>
+<p><strong>应对策略，按推荐顺序：</strong></p>
+<ul>
+<li><strong>优先改设计</strong>：让需要保证一致的数据落在同一个分片。比如把”账户变更”和”流水记录”用同一个分片键，保证同库</li>
+<li><strong>柔性事务</strong>：接受最终一致，用本地消息表 + 定时补偿</li>
+<li><strong>分布式事务框架</strong>：Seata 等。能保证强一致，但性能损耗和运维复杂度都要评估</li>
+</ul>
+<p>我们的选择是<strong>改设计 + 柔性事务</strong>。跨分片的强一致场景尽量在设计阶段就消除掉。</p>
+<h3 id="2-跨片查询与全路由"><a href="#2-跨片查询与全路由" class="headerlink" title="2. 跨片查询与全路由"></a>2. 跨片查询与全路由</h3><p>没有分片键的查询会变成全路由。比如按手机号查通行记录，而分片键是 <code>user_id</code>，就只能查所有分片再归并。</p>
+<p><strong>应对：</strong></p>
+<ul>
+<li>给常用查询建<strong>映射表</strong>（手机号 → user_id），先查映射再路由</li>
+<li>或者用 ElasticSearch 承载多维度检索，数据库只负责按主键取详情（我们在通行证系统里就是这么做的：ES 负责查询，MySQL 负责存储）</li>
+</ul>
+<h3 id="3-深分页"><a href="#3-深分页" class="headerlink" title="3. 深分页"></a>3. 深分页</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 每页 20 条，查第 5000 页</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> record <span class="keyword">ORDER</span> <span class="keyword">BY</span> create_time <span class="keyword">DESC</span> LIMIT <span class="number">100000</span>, <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<p>分片后每个分片都要取出前 100020 条，再在内存里归并排序取最后 20 条。<strong>页数越深，内存和耗时增长越快。</strong></p>
+<p><strong>应对：</strong></p>
+<ul>
+<li><strong>游标分页</strong>（推荐）：用上一页最后一条的 <code>create_time</code> 作为下一页的起点，避免大 offset</li>
+<li><strong>限制最大页数</strong>：产品上接受”最多翻到第 N 页”，深翻走导出或检索</li>
+<li><strong>禁止跨片排序</strong>：如果业务允许，把排序维度也纳入分片键</li>
+</ul>
+<h3 id="4-全局唯一-ID"><a href="#4-全局唯一-ID" class="headerlink" title="4. 全局唯一 ID"></a>4. 全局唯一 ID</h3><p>分片后自增主键不再全局唯一。ShardingSphere 内置了雪花算法：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">shardingsphere:</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="attr">sharding:</span></span><br><span class="line">        <span class="attr">key-generators:</span></span><br><span class="line">          <span class="attr">snowflake:</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">SNOWFLAKE</span></span><br></pre></td></tr></table></figure>
+
+<p>雪花 ID 是有序的，对索引友好，但要注意<strong>时钟回拨</strong>问题（机器时间回退会生成重复 ID，ShardingSphere 有处理但需要关注）。</p>
+<h3 id="5-关联查询与笛卡尔积"><a href="#5-关联查询与笛卡尔积" class="headerlink" title="5. 关联查询与笛卡尔积"></a>5. 关联查询与笛卡尔积</h3><p>分片表之间的 JOIN，如果分片规则不一致，会退化成笛卡尔积（每个分片互相 JOIN）。</p>
+<p><strong>应对：</strong></p>
+<ul>
+<li><strong>绑定表</strong>：把分片规则完全一致的表配成绑定表，JOIN 时能按分片对齐，避免笛卡尔积</li>
+<li><strong>广播表</strong>：字典、配置这类小表，每个库都存一份，JOIN 时无需跨片</li>
+<li><strong>避免跨片 JOIN</strong>：能在应用层组装就在应用层做</li>
+</ul>
+<h2 id="几个具体踩坑"><a href="#几个具体踩坑" class="headerlink" title="几个具体踩坑"></a>几个具体踩坑</h2><p><strong>坑 1：分片键为 null 的写入</strong></p>
+<p>写入时如果分片键没值，ShardingSphere 无法计算路由，会直接报错或落到默认分片。我们在数据接入层加了校验，<strong>分片键为 null 的数据直接拒绝入库</strong>，避免脏数据分散在各处。</p>
+<p><strong>坑 2：<code>COUNT(*)</code> 变慢</strong></p>
+<p>分片后 <code>COUNT(*)</code> 需要在所有分片上执行再求和。数据量大时，这个操作会显著变慢。</p>
+<p>应对：维护计数表（增量更新），或者接受近似值，或者从检索系统（ES）取统计。</p>
+<p><strong>坑 3：扩容没有想象中简单</strong></p>
+<p><code>MOD</code> 分片算法（取模）在扩容时需要重新分布几乎所有数据。如果预期会扩容，一开始就考虑：</p>
+<ul>
+<li><strong>一致性哈希</strong>：扩容时只迁移部分数据</li>
+<li><strong>预分片</strong>：一开始就分足够的片（比如 64 片），扩的是物理库而不是逻辑片数</li>
+<li><strong>双倍扩容</strong>：4 库扩到 8 库时，每个旧库拆一半到新库，迁移量可控</li>
+</ul>
+<p>我们用的是<strong>预分片</strong>思路——按较细的粒度规划逻辑分片，前期映射到较少的物理库，扩容时只改映射。</p>
+<p><strong>坑 4：分片规则改了但数据没迁</strong></p>
+<p>改分片配置不会自动迁移已有数据。<strong>规则变更必须配套数据迁移脚本和校验</strong>，否则会出现”按新规则查不到老数据”。这类问题往往在线上才暴露。</p>
+<h2 id="落地检查清单"><a href="#落地检查清单" class="headerlink" title="落地检查清单"></a>落地检查清单</h2><p>如果你正在评估或实施分库分表，可以按这个顺序确认：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 已排除加索引、冷热分离、读写分离、加缓存这些更简单的方案</li>
+<li><input disabled="" type="checkbox"> 分片键基数足够高，且大部分查询会带上它</li>
+<li><input disabled="" type="checkbox"> 统计过线上 SQL 的执行频率，确认分片键选择有依据</li>
+<li><input disabled="" type="checkbox"> 跨分片事务有明确策略（优先改设计消除，其次柔性事务）</li>
+<li><input disabled="" type="checkbox"> 深分页有方案（游标分页优先）</li>
+<li><input disabled="" type="checkbox"> 全局 ID 生成方案确定，时钟回拨有处理</li>
+<li><input disabled="" type="checkbox"> 关联查询用绑定表&#x2F;广播表处理，或改为应用层组装</li>
+<li><input disabled="" type="checkbox"> 扩容方案想清楚（一致性哈希 &#x2F; 预分片 &#x2F; 双倍扩容）</li>
+<li><input disabled="" type="checkbox"> 分片规则变更的迁移与校验流程已就位</li>
+<li><input disabled="" type="checkbox"> 监控覆盖：各分片数据量是否均衡、慢查询、路由命中情况</li>
+</ul>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>分库分表解决的是<strong>单实例处理能力的上限问题</strong>，不是”查询慢”的通用解法。它把问题从”一台机器扛不住”转换成”分布式带来的一致性、查询与运维复杂度”。</p>
+<p>我现在的判断顺序是：<strong>先优化 SQL 和索引，再考虑缓存和读写分离，最后才动分片</strong>。真到了必须分片的时候，把时间花在<strong>分片键选择</strong>和<strong>事务边界设计</strong>上，比花在配置调优上回报高得多。</p>
+<hr>
+<p><em>相关文章：</em></p>
+<ul>
+<li><a href="/2026/05/24/2026-05-24-Redis%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/">Redis 缓存设计：穿透、击穿、雪崩的实际处理</a></li>
+<li><a href="/2026/07/08/2026-07-08-MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/">MySQL 慢查询优化：从执行计划到索引设计</a></li>
+<li><a href="/2026/06/15/2026-06-15-RabbitMQ%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%A7%A3%E8%80%A6/">RabbitMQ 在微服务解耦中的正确用法</a></li>
+<li><a href="/2026/09/20/2026-09-20-SpringCloud%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%8B%86%E5%88%86/">SpringCloud 微服务拆分：一次真实的架构演进</a></li>
+<li><a href="/2026/05/16/2026-05-16-%E8%87%AA%E5%BB%BALLM%E7%BD%91%E5%85%B3/">自建 LLM 网关：统一 4 家供应商的架构设计</a></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2025/12/28/2025-12-28-2025%E5%B9%B4AI%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E5%A4%8D%E7%9B%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2025/12/28/2025-12-28-2025%E5%B9%B4AI%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E5%A4%8D%E7%9B%98/" class="post-title-link" itemprop="url">2025 AI编程实践复盘：效率、安全与能力边界</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-12-28 22:10:00" itemprop="dateCreated datePublished" datetime="2025-12-28T22:10:00+08:00">2025-12-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-07-17 00:00:00" itemprop="dateModified" datetime="2026-07-17T00:00:00+08:00">2026-07-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2025/ai-year-review-cover.png" alt="2025 AI 编程复盘封面图"></p>
+<p>年初第一次认真使用 AI 编程时，我期待的是“少写一些代码”。到年底回头看，真正发生的变化更像是：代码出现得更快了，于是判断什么值得写、什么可以相信，变得更重要。</p>
+<p>这一年我用 AI 解释陌生项目、补测试、改接口、做原型，也让它带我走过几次很完整的弯路。没有“一人顶一个团队”的故事，倒是积累了一些比工具榜单更稳定的认识。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/12/28/2025-12-28-2025%E5%B9%B4AI%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E5%A4%8D%E7%9B%98/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1377,390 +1710,6 @@
 <li>使用jps -l定位进程号</li>
 <li>使用jstack进程号，找死锁问题</li>
 </ol>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/" class="post-title-link" itemprop="url">从零开始学习设计模式-第一篇</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2024-04-24 14:32:01" itemprop="dateCreated datePublished" datetime="2024-04-24T14:32:01+08:00">2024-04-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-04-30 00:21:50" itemprop="dateModified" datetime="2024-04-30T00:21:50+08:00">2024-04-30</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p><img src="/images/posts/2024/design-patterns-cover.png" alt="设计模式知识梳理封面图"></p>
-<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><blockquote>
-<p>写在前面：</p>
-</blockquote>
-<p>找工作下来感觉自己基础知识确实很不牢靠，成了无情的接口调用工具人，所以恶补一下相关的知识。</p>
-
-
-<h2 id="1-单例模式"><a href="#1-单例模式" class="headerlink" title="1. 单例模式"></a>1. 单例模式</h2><p>概念就是<strong>一个类负责创建自己的对象，同时确保只有单个对象被创建</strong>。</p>
-<h3 id="1-1分类"><a href="#1-1分类" class="headerlink" title="1.1分类"></a>1.1分类</h3><h4 id="恶汉：加载就会导致该实例对象被创建"><a href="#恶汉：加载就会导致该实例对象被创建" class="headerlink" title="恶汉：加载就会导致该实例对象被创建"></a>恶汉：加载就会导致该实例对象被创建</h4><ol>
-<li>创建方式<ol>
-<li>静态变量方式 直接new Singleton（）；</li>
-<li>静态代码块的方式 写一个 static{}</li>
-</ol>
-</li>
-</ol>
-<h4 id="懒汉：首次使用该对象时才会创建对象"><a href="#懒汉：首次使用该对象时才会创建对象" class="headerlink" title="懒汉：首次使用该对象时才会创建对象"></a>懒汉：首次使用该对象时才会创建对象</h4><blockquote>
-<p>懒汉式会出现线程安全问题，需要优化判断条件</p>
-</blockquote>
-<p>可以通过对外提供静态方法的方式来获取，但是效率特别低。一般使用双重检查锁的方式进行处理，但是JVM可能会出现优化和指令重排的问题，所以可以使用volatile关键字保证代码的有序性。</p>
-<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>{</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>{}</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton instance;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//对外提供静态方法获取该对象</span></span><br><span class="line">  	<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>{</span><br><span class="line">      	<span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">          <span class="keyword">synchronized</span>(Singleton.class){</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">              instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">            }</span><br><span class="line">          }</span><br><span class="line">        }</span><br><span class="line">      <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<h3 id="1-2-破解单例"><a href="#1-2-破解单例" class="headerlink" title="1.2 破解单例"></a>1.2 破解单例</h3><blockquote>
-<p>可以通过序列化和反射的方式破解单例模式</p>
-</blockquote>
-<p><strong>解决办法</strong></p>
-<ol>
-<li>序列化：添加readResolve()方法，返回SingletonHolder.INSTANCE;</li>
-<li>反射：在构造方法中，增加判断，如果私有化对象不为空，直接抛出异常</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/" class="post-title-link" itemprop="url">服务器磁盘空间与IO异常定位</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-11-26 13:50:00" itemprop="dateCreated datePublished" datetime="2023-11-26T13:50:00+08:00">2023-11-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-27 22:05:00" itemprop="dateModified" datetime="2023-11-27T22:05:00+08:00">2023-11-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>写在前面：磁盘问题不只有“空间满了”。容量还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍持有句柄；文件系统变成只读，则可能涉及底层错误。</p>
-</blockquote>
-<p>这篇整理成一份值班口袋手册。先分级和保留证据，再进入容量、inode、删除文件、IO 延迟或只读文件系统分支。涉及删除、重启、数据库和文件系统修复的操作必须由对应负责人授权。</p>
-<h2 id="先按风险分级"><a href="#先按风险分级" class="headerlink" title="先按风险分级"></a>先按风险分级</h2><table>
-<thead>
-<tr>
-<th>等级</th>
-<th>典型现象</th>
-<th>首要目标</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>P0</td>
-<td>文件系统只读、数据库写失败、核心服务不可用</td>
-<td>隔离风险，保护数据</td>
-</tr>
-<tr>
-<td>P1</td>
-<td>使用率超过 95%、inode 耗尽、IO 延迟持续影响业务</td>
-<td>停止增长，恢复余量</td>
-</tr>
-<tr>
-<td>P2</td>
-<td>使用率或延迟持续上升，预计 24 小时内越线</td>
-<td>定位来源，计划处置</td>
-</tr>
-<tr>
-<td>P3</td>
-<td>单次波动，无业务影响</td>
-<td>记录基线，观察趋势</td>
-</tr>
-</tbody></table>
-<p>同样 90% 使用率，20G 根分区和 10TB 数据盘的剩余时间完全不同。分级要结合增长速度、剩余容量和业务用途，不只看百分比。</p>
-<h2 id="前五分钟只做只读检查"><a href="#前五分钟只做只读检查" class="headerlink" title="前五分钟只做只读检查"></a>前五分钟只做只读检查</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">date</span> -Is</span><br><span class="line">hostname</span><br><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br><span class="line">findmnt</span><br><span class="line">lsblk -f</span><br><span class="line">vmstat 1 5</span><br><span class="line">iostat -xz 1 5</span><br></pre></td></tr></table></figure>
-
-<p>这组命令回答：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">哪个挂载点容量用尽</span><br><span class="line">哪个挂载点 inode 用尽</span><br><span class="line">设备与挂载点如何对应</span><br><span class="line">文件系统类型和挂载选项</span><br><span class="line">是否存在 IO 等待</span><br><span class="line">哪个块设备延迟异常</span><br></pre></td></tr></table></figure>
-
-<p>先记录时间和输出，再做清理。恢复后才能与同一组基线比较。</p>
-<p><code>iostat</code> 需要 <code>sysstat</code> 工具包，缺失时不要在故障现场临时安装未知软件；使用已有监控替代。</p>
-<h2 id="分支-A：容量使用率高"><a href="#分支-A：容量使用率高" class="headerlink" title="分支 A：容量使用率高"></a>分支 A：容量使用率高</h2><p>从告警挂载点逐层向下，<code>-x</code> 避免跨文件系统：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var/log 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
-
-<p>不要从根目录无差别执行高开销扫描。大目录 <code>du</code> 会产生大量 IO，业务已经抖动时应缩小路径、降低执行频率，必要时参考文件系统或监控平台已有统计。</p>
-<p>定位大文件可以在明确目录中执行：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/log -xdev -<span class="built_in">type</span> f -size +500M -<span class="built_in">printf</span> <span class="string">&#x27;%s %p\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> -n</span><br></pre></td></tr></table></figure>
-
-<p><code>find</code> 同样需要遍历目录。命中后先确认文件归属、是否正在写、保留要求和是否已采集，不能看到大文件就删除。</p>
-<h2 id="分支-B：df-很高，du-却很小"><a href="#分支-B：df-很高，du-却很小" class="headerlink" title="分支 B：df 很高，du 却很小"></a>分支 B：df 很高，du 却很小</h2><p><code>df</code> 统计文件系统已占用块，<code>du</code> 遍历仍有目录项的文件。差值很大时检查已删除但仍被进程持有的文件：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
-
-<p>典型输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java  1842  app  17w  REG  253,1  18G  /var/log/order/app.log (deleted)</span><br></pre></td></tr></table></figure>
-
-<p>处理优先级：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">让应用日志框架滚动并重开</span><br><span class="line">使用服务支持的平滑重载</span><br><span class="line">摘流后正常重启单个实例</span><br><span class="line">最后才评估是否操作具体文件描述符</span><br></pre></td></tr></table></figure>
-
-<p>直接终止进程或截断描述符都有业务风险。执行前确认文件类型、进程职责、事务和剩余实例容量，由应用负责人操作。</p>
-<p>空间释放后再次运行 <code>df</code> 和 <code>lsof +L1</code>，证明句柄已经消失，而不是只看命令返回成功。</p>
-<h2 id="分支-C：inode-用尽"><a href="#分支-C：inode-用尽" class="headerlink" title="分支 C：inode 用尽"></a>分支 C：inode 用尽</h2><p><code>df -h</code> 可能还有大量空间，<code>df -i</code> 却达到 100%。一个空文件也需要 inode，海量小日志、缓存或临时文件会导致无法创建新文件。</p>
-<p>先从已知高风险路径估算文件数量：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/tmp -xdev -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&#x27;%h\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -n | <span class="built_in">tail</span></span><br></pre></td></tr></table></figure>
-
-<p>在百万级目录执行 <code>find</code> 可能很慢，应先结合应用配置、目录更新时间和监控缩小范围。</p>
-<p>常见来源：</p>
-<ul>
-<li>每次请求创建独立临时文件但不清理。</li>
-<li>日志按请求或任务拆成小文件。</li>
-<li>Session、缓存落盘无过期。</li>
-<li>邮件队列、爬虫或批处理产生大量碎片。</li>
-<li>容器存储层残留。</li>
-</ul>
-<p>处理时优先暂停继续产生文件的任务，再按应用定义的生命周期清理。只删当前文件、不修复生产逻辑，inode 很快再次耗尽。</p>
-<h2 id="分支-D：空间正常但-IO-延迟高"><a href="#分支-D：空间正常但-IO-延迟高" class="headerlink" title="分支 D：空间正常但 IO 延迟高"></a>分支 D：空间正常但 IO 延迟高</h2><p><code>iostat -xz</code> 常看：</p>
-<table>
-<thead>
-<tr>
-<th>指标</th>
-<th>含义</th>
-<th>注意</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>r/s w/s</code></td>
-<td>每秒读写请求</td>
-<td>与业务基线比较</td>
-</tr>
-<tr>
-<td><code>rkB/s wkB/s</code></td>
-<td>吞吐</td>
-<td>高吞吐不一定高延迟</td>
-</tr>
-<tr>
-<td><code>await</code></td>
-<td>请求平均等待时间</td>
-<td>读写混合值可能掩盖差异</td>
-</tr>
-<tr>
-<td><code>aqu-sz</code></td>
-<td>平均队列长度</td>
-<td>持续增长表示积压</td>
-</tr>
-<tr>
-<td><code>%util</code></td>
-<td>设备忙碌程度</td>
-<td>SSD、RAID、云盘不能单独解读</td>
-</tr>
-</tbody></table>
-<p>不要使用“<code>%util=100%</code> 就一定是磁盘极限”的单一规则。并行设备和虚拟块存储的含义不同，延迟、队列、吞吐和云盘额度要一起看。</p>
-<p>定位进程：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d 1 5</span><br><span class="line">iotop -oPa</span><br></pre></td></tr></table></figure>
-
-<p><code>iotop</code> 需要权限并可能未安装。使用前确认生产诊断规范。</p>
-<p>把高 IO 进程对应到行为：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Java：日志暴增、Heap Dump、文件导出</span><br><span class="line">MySQL：慢查询、刷脏页、备份、索引构建</span><br><span class="line">容器运行时：镜像拉取、日志、层清理</span><br><span class="line">系统任务：压缩、备份、病毒扫描</span><br><span class="line">未知进程：先确认来源，不直接终止</span><br></pre></td></tr></table></figure>
-
-<p>还要看 <code>vmstat</code> 的 <code>si/so</code>。内存不足导致 swap 时，磁盘忙只是第二现场。</p>
-<h2 id="分支-E：文件系统变成只读"><a href="#分支-E：文件系统变成只读" class="headerlink" title="分支 E：文件系统变成只读"></a>分支 E：文件系统变成只读</h2><p>应用日志可能出现：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Read-only file system</span><br><span class="line">Input/output error</span><br><span class="line">EXT4-fs error</span><br><span class="line">XFS metadata I/O error</span><br></pre></td></tr></table></figure>
-
-<p>先保存：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS</span><br><span class="line">journalctl -k --since <span class="string">&#x27;30 minutes ago&#x27;</span></span><br><span class="line">dmesg -T | <span class="built_in">tail</span> -200</span><br></pre></td></tr></table></figure>
-
-<p>这可能是文件系统为了保护数据在检测到错误后切换只读，也可能是挂载配置本来如此。不要直接 <code>mount -o remount,rw</code> 掩盖问题，更不能在已挂载生产文件系统上随意执行 <code>fsck</code>。</p>
-<p>正确动作通常需要：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">停止或迁移写入流量</span><br><span class="line">保存内核与存储事件</span><br><span class="line">联系系统和存储负责人</span><br><span class="line">确认备份与副本</span><br><span class="line">在维护窗口离线检查或修复</span><br><span class="line">恢复后做数据一致性验证</span><br></pre></td></tr></table></figure>
-
-<p>P0 场景优先保护数据，不能为了让应用尽快写入而跳过文件系统判断。</p>
-<h2 id="常见占用来源与正确负责人"><a href="#常见占用来源与正确负责人" class="headerlink" title="常见占用来源与正确负责人"></a>常见占用来源与正确负责人</h2><h3 id="应用日志"><a href="#应用日志" class="headerlink" title="应用日志"></a>应用日志</h3><p>由应用或统一日志策略滚动，设置单文件大小、保留天数和总量上限。确认采集成功后再删除归档。不能同时让 Logback 和 <code>logrotate</code> 无协调地管理同一文件。</p>
-<h3 id="Docker-或容器数据"><a href="#Docker-或容器数据" class="headerlink" title="Docker 或容器数据"></a>Docker 或容器数据</h3><p>先区分容器日志、镜像、可写层和 Volume。清理由平台负责人通过容器运行时机制执行，不能手工删除 <code>/var/lib/docker</code> 下的文件。</p>
-<h3 id="MySQL-Binlog、Redo、临时文件"><a href="#MySQL-Binlog、Redo、临时文件" class="headerlink" title="MySQL Binlog、Redo、临时文件"></a>MySQL Binlog、Redo、临时文件</h3><p>由 DBA 使用数据库命令、保留策略和复制状态处理。手工删除数据库目录中的 binlog 或表文件可能破坏恢复与复制。</p>
-<h3 id="Heap-Dump-与-Core-Dump"><a href="#Heap-Dump-与-Core-Dump" class="headerlink" title="Heap Dump 与 Core Dump"></a>Heap Dump 与 Core Dump</h3><p>确认是否已安全转存并仍有排障价值，再按事件保留策略清理。Dump 可能包含敏感数据，不传到个人存储。</p>
-<h3 id="临时文件"><a href="#临时文件" class="headerlink" title="临时文件"></a>临时文件</h3><p>确认创建进程、有效期和是否仍打开。修复清理任务与命名规则，避免只做一次人工删除。</p>
-<h2 id="操作授权矩阵"><a href="#操作授权矩阵" class="headerlink" title="操作授权矩阵"></a>操作授权矩阵</h2><table>
-<thead>
-<tr>
-<th>动作</th>
-<th>风险</th>
-<th>执行要求</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>df</code>、<code>findmnt</code>、受控 <code>du</code></td>
-<td>低到中</td>
-<td>值班人员，注意 IO 开销</td>
-</tr>
-<tr>
-<td>暂停日志或批任务</td>
-<td>中</td>
-<td>应用负责人确认影响</td>
-</tr>
-<tr>
-<td>日志滚动、单实例摘流重启</td>
-<td>中</td>
-<td>发布&#x2F;值班流程与容量确认</td>
-</tr>
-<tr>
-<td>数据库日志清理</td>
-<td>高</td>
-<td>DBA 审核复制与恢复策略</td>
-</tr>
-<tr>
-<td>容器存储清理</td>
-<td>高</td>
-<td>平台负责人使用正式工具</td>
-</tr>
-<tr>
-<td>文件系统修复、重新挂载</td>
-<td>很高</td>
-<td>系统&#x2F;存储负责人，维护窗口</td>
-</tr>
-<tr>
-<td>盲删未知文件、底层数据库文件</td>
-<td>不可接受</td>
-<td>禁止</td>
-</tr>
-</tbody></table>
-<p>高风险命令不应该出现在“通用一键清理脚本”里。脚本不知道当前目录属于数据库、容器、正在运行的任务，还是唯一一份故障证据。</p>
-<h2 id="恢复验证"><a href="#恢复验证" class="headerlink" title="恢复验证"></a>恢复验证</h2><p>释放空间或降低 IO 后，至少验证：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] df 容量与 inode 回到安全线</span><br><span class="line">[ ] 增长来源已经停止或受控</span><br><span class="line">[ ] lsof 不再存在异常 deleted 大文件</span><br><span class="line">[ ] iostat 的 await 和队列回到基线</span><br><span class="line">[ ] 文件系统保持预期读写状态</span><br><span class="line">[ ] 应用日志、临时文件和数据库可以正常写</span><br><span class="line">[ ] 核心接口 P95/P99 与错误率恢复</span><br><span class="line">[ ] 消息、任务和复制积压开始下降</span><br><span class="line">[ ] 清理没有破坏审计、备份和回退能力</span><br></pre></td></tr></table></figure>
-
-<p>业务恢复后继续观察一个完整高峰或任务周期。磁盘指标下降不代表上层数据已经自动补齐。</p>
-<h2 id="预防比应急清理更便宜"><a href="#预防比应急清理更便宜" class="headerlink" title="预防比应急清理更便宜"></a>预防比应急清理更便宜</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">容量：使用率 + 剩余 GiB + 预计耗尽时间</span><br><span class="line">inode：使用率与文件创建速率</span><br><span class="line">IO：await、队列、吞吐和云盘额度</span><br><span class="line">日志：写入速率、滚动失败、采集延迟</span><br><span class="line">容器：镜像、日志和 Volume 配额</span><br><span class="line">数据库：binlog 保留、备份和临时空间</span><br><span class="line">Dump：独立目录、容量上限和保留流程</span><br></pre></td></tr></table></figure>
-
-<p>告警应在还有选择时触发。剩余 15% 但预计两小时耗尽，比使用率 95% 且三个月不增长更紧急。</p>
-<p>这份口袋手册的核心只有三句话：先确认是空间、inode、IO 还是文件系统错误；先阻止继续增长，再由资源所有者释放；恢复后同时验证底层指标和业务结果。磁盘故障真正危险的不是命令不会用，而是在压力下执行了一个无法撤销的错误动作。</p>
 
       
     </div>

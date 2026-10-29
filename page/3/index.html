@@ -174,18 +174,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">170</span>
+        <span class="site-state-item-count">178</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,6 +207,390 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2024/04/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AD%A6%E4%B9%A0%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E7%AC%AC%E4%B8%80%E7%AF%87/" class="post-title-link" itemprop="url">从零开始学习设计模式-第一篇</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-04-24 14:32:01" itemprop="dateCreated datePublished" datetime="2024-04-24T14:32:01+08:00">2024-04-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-04-30 00:21:50" itemprop="dateModified" datetime="2024-04-30T00:21:50+08:00">2024-04-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">Java基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2024/design-patterns-cover.png" alt="设计模式知识梳理封面图"></p>
+<h1 id="设计模式"><a href="#设计模式" class="headerlink" title="设计模式"></a>设计模式</h1><blockquote>
+<p>写在前面：</p>
+</blockquote>
+<p>找工作下来感觉自己基础知识确实很不牢靠，成了无情的接口调用工具人，所以恶补一下相关的知识。</p>
+
+
+<h2 id="1-单例模式"><a href="#1-单例模式" class="headerlink" title="1. 单例模式"></a>1. 单例模式</h2><p>概念就是<strong>一个类负责创建自己的对象，同时确保只有单个对象被创建</strong>。</p>
+<h3 id="1-1分类"><a href="#1-1分类" class="headerlink" title="1.1分类"></a>1.1分类</h3><h4 id="恶汉：加载就会导致该实例对象被创建"><a href="#恶汉：加载就会导致该实例对象被创建" class="headerlink" title="恶汉：加载就会导致该实例对象被创建"></a>恶汉：加载就会导致该实例对象被创建</h4><ol>
+<li>创建方式<ol>
+<li>静态变量方式 直接new Singleton（）；</li>
+<li>静态代码块的方式 写一个 static{}</li>
+</ol>
+</li>
+</ol>
+<h4 id="懒汉：首次使用该对象时才会创建对象"><a href="#懒汉：首次使用该对象时才会创建对象" class="headerlink" title="懒汉：首次使用该对象时才会创建对象"></a>懒汉：首次使用该对象时才会创建对象</h4><blockquote>
+<p>懒汉式会出现线程安全问题，需要优化判断条件</p>
+</blockquote>
+<p>可以通过对外提供静态方法的方式来获取，但是效率特别低。一般使用双重检查锁的方式进行处理，但是JVM可能会出现优化和指令重排的问题，所以可以使用volatile关键字保证代码的有序性。</p>
+<figure class="highlight java"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Singleton</span>{</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="title function_">Singleton</span><span class="params">()</span>{}</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton instance;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//对外提供静态方法获取该对象</span></span><br><span class="line">  	<span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title function_">getInstance</span><span class="params">()</span>{</span><br><span class="line">      	<span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">          <span class="keyword">synchronized</span>(Singleton.class){</span><br><span class="line">            <span class="keyword">if</span>(instance == <span class="literal">null</span>){</span><br><span class="line">              instance = <span class="keyword">new</span> <span class="title class_">Singleton</span>();</span><br><span class="line">            }</span><br><span class="line">          }</span><br><span class="line">        }</span><br><span class="line">      <span class="keyword">return</span> instance;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="1-2-破解单例"><a href="#1-2-破解单例" class="headerlink" title="1.2 破解单例"></a>1.2 破解单例</h3><blockquote>
+<p>可以通过序列化和反射的方式破解单例模式</p>
+</blockquote>
+<p><strong>解决办法</strong></p>
+<ol>
+<li>序列化：添加readResolve()方法，返回SingletonHolder.INSTANCE;</li>
+<li>反射：在构造方法中，增加判断，如果私有化对象不为空，直接抛出异常</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/11/26/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E4%B8%8EIO%E5%BC%82%E5%B8%B8%E5%AE%9A%E4%BD%8D/" class="post-title-link" itemprop="url">服务器磁盘空间与IO异常定位</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-26 13:50:00" itemprop="dateCreated datePublished" datetime="2023-11-26T13:50:00+08:00">2023-11-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-27 22:05:00" itemprop="dateModified" datetime="2023-11-27T22:05:00+08:00">2023-11-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/" itemprop="url" rel="index"><span itemprop="name">故障排查</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <blockquote>
+<p>写在前面：磁盘问题不只有“空间满了”。容量还有很多但文件创建失败，可能是 inode 用完；接口突然变慢但 CPU 不高，可能是 IO 等待；文件已经删除但空间不释放，可能是进程仍持有句柄；文件系统变成只读，则可能涉及底层错误。</p>
+</blockquote>
+<p>这篇整理成一份值班口袋手册。先分级和保留证据，再进入容量、inode、删除文件、IO 延迟或只读文件系统分支。涉及删除、重启、数据库和文件系统修复的操作必须由对应负责人授权。</p>
+<h2 id="先按风险分级"><a href="#先按风险分级" class="headerlink" title="先按风险分级"></a>先按风险分级</h2><table>
+<thead>
+<tr>
+<th>等级</th>
+<th>典型现象</th>
+<th>首要目标</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P0</td>
+<td>文件系统只读、数据库写失败、核心服务不可用</td>
+<td>隔离风险，保护数据</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>使用率超过 95%、inode 耗尽、IO 延迟持续影响业务</td>
+<td>停止增长，恢复余量</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>使用率或延迟持续上升，预计 24 小时内越线</td>
+<td>定位来源，计划处置</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>单次波动，无业务影响</td>
+<td>记录基线，观察趋势</td>
+</tr>
+</tbody></table>
+<p>同样 90% 使用率，20G 根分区和 10TB 数据盘的剩余时间完全不同。分级要结合增长速度、剩余容量和业务用途，不只看百分比。</p>
+<h2 id="前五分钟只做只读检查"><a href="#前五分钟只做只读检查" class="headerlink" title="前五分钟只做只读检查"></a>前五分钟只做只读检查</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">date</span> -Is</span><br><span class="line">hostname</span><br><span class="line"><span class="built_in">df</span> -hT</span><br><span class="line"><span class="built_in">df</span> -ih</span><br><span class="line">findmnt</span><br><span class="line">lsblk -f</span><br><span class="line">vmstat 1 5</span><br><span class="line">iostat -xz 1 5</span><br></pre></td></tr></table></figure>
+
+<p>这组命令回答：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">哪个挂载点容量用尽</span><br><span class="line">哪个挂载点 inode 用尽</span><br><span class="line">设备与挂载点如何对应</span><br><span class="line">文件系统类型和挂载选项</span><br><span class="line">是否存在 IO 等待</span><br><span class="line">哪个块设备延迟异常</span><br></pre></td></tr></table></figure>
+
+<p>先记录时间和输出，再做清理。恢复后才能与同一组基线比较。</p>
+<p><code>iostat</code> 需要 <code>sysstat</code> 工具包，缺失时不要在故障现场临时安装未知软件；使用已有监控替代。</p>
+<h2 id="分支-A：容量使用率高"><a href="#分支-A：容量使用率高" class="headerlink" title="分支 A：容量使用率高"></a>分支 A：容量使用率高</h2><p>从告警挂载点逐层向下，<code>-x</code> 避免跨文件系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -xhd1 /var 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br><span class="line"><span class="built_in">du</span> -xhd1 /var/log 2&gt;/dev/null | <span class="built_in">sort</span> -h</span><br></pre></td></tr></table></figure>
+
+<p>不要从根目录无差别执行高开销扫描。大目录 <code>du</code> 会产生大量 IO，业务已经抖动时应缩小路径、降低执行频率，必要时参考文件系统或监控平台已有统计。</p>
+<p>定位大文件可以在明确目录中执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/log -xdev -<span class="built_in">type</span> f -size +500M -<span class="built_in">printf</span> <span class="string">&#x27;%s %p\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> -n</span><br></pre></td></tr></table></figure>
+
+<p><code>find</code> 同样需要遍历目录。命中后先确认文件归属、是否正在写、保留要求和是否已采集，不能看到大文件就删除。</p>
+<h2 id="分支-B：df-很高，du-却很小"><a href="#分支-B：df-很高，du-却很小" class="headerlink" title="分支 B：df 很高，du 却很小"></a>分支 B：df 很高，du 却很小</h2><p><code>df</code> 统计文件系统已占用块，<code>du</code> 遍历仍有目录项的文件。差值很大时检查已删除但仍被进程持有的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsof +L1</span><br></pre></td></tr></table></figure>
+
+<p>典型输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java  1842  app  17w  REG  253,1  18G  /var/log/order/app.log (deleted)</span><br></pre></td></tr></table></figure>
+
+<p>处理优先级：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">让应用日志框架滚动并重开</span><br><span class="line">使用服务支持的平滑重载</span><br><span class="line">摘流后正常重启单个实例</span><br><span class="line">最后才评估是否操作具体文件描述符</span><br></pre></td></tr></table></figure>
+
+<p>直接终止进程或截断描述符都有业务风险。执行前确认文件类型、进程职责、事务和剩余实例容量，由应用负责人操作。</p>
+<p>空间释放后再次运行 <code>df</code> 和 <code>lsof +L1</code>，证明句柄已经消失，而不是只看命令返回成功。</p>
+<h2 id="分支-C：inode-用尽"><a href="#分支-C：inode-用尽" class="headerlink" title="分支 C：inode 用尽"></a>分支 C：inode 用尽</h2><p><code>df -h</code> 可能还有大量空间，<code>df -i</code> 却达到 100%。一个空文件也需要 inode，海量小日志、缓存或临时文件会导致无法创建新文件。</p>
+<p>先从已知高风险路径估算文件数量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /var/tmp -xdev -<span class="built_in">type</span> f -<span class="built_in">printf</span> <span class="string">&#x27;%h\n&#x27;</span> 2&gt;/dev/null | <span class="built_in">sort</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -n | <span class="built_in">tail</span></span><br></pre></td></tr></table></figure>
+
+<p>在百万级目录执行 <code>find</code> 可能很慢，应先结合应用配置、目录更新时间和监控缩小范围。</p>
+<p>常见来源：</p>
+<ul>
+<li>每次请求创建独立临时文件但不清理。</li>
+<li>日志按请求或任务拆成小文件。</li>
+<li>Session、缓存落盘无过期。</li>
+<li>邮件队列、爬虫或批处理产生大量碎片。</li>
+<li>容器存储层残留。</li>
+</ul>
+<p>处理时优先暂停继续产生文件的任务，再按应用定义的生命周期清理。只删当前文件、不修复生产逻辑，inode 很快再次耗尽。</p>
+<h2 id="分支-D：空间正常但-IO-延迟高"><a href="#分支-D：空间正常但-IO-延迟高" class="headerlink" title="分支 D：空间正常但 IO 延迟高"></a>分支 D：空间正常但 IO 延迟高</h2><p><code>iostat -xz</code> 常看：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>含义</th>
+<th>注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>r/s w/s</code></td>
+<td>每秒读写请求</td>
+<td>与业务基线比较</td>
+</tr>
+<tr>
+<td><code>rkB/s wkB/s</code></td>
+<td>吞吐</td>
+<td>高吞吐不一定高延迟</td>
+</tr>
+<tr>
+<td><code>await</code></td>
+<td>请求平均等待时间</td>
+<td>读写混合值可能掩盖差异</td>
+</tr>
+<tr>
+<td><code>aqu-sz</code></td>
+<td>平均队列长度</td>
+<td>持续增长表示积压</td>
+</tr>
+<tr>
+<td><code>%util</code></td>
+<td>设备忙碌程度</td>
+<td>SSD、RAID、云盘不能单独解读</td>
+</tr>
+</tbody></table>
+<p>不要使用“<code>%util=100%</code> 就一定是磁盘极限”的单一规则。并行设备和虚拟块存储的含义不同，延迟、队列、吞吐和云盘额度要一起看。</p>
+<p>定位进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pidstat -d 1 5</span><br><span class="line">iotop -oPa</span><br></pre></td></tr></table></figure>
+
+<p><code>iotop</code> 需要权限并可能未安装。使用前确认生产诊断规范。</p>
+<p>把高 IO 进程对应到行为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Java：日志暴增、Heap Dump、文件导出</span><br><span class="line">MySQL：慢查询、刷脏页、备份、索引构建</span><br><span class="line">容器运行时：镜像拉取、日志、层清理</span><br><span class="line">系统任务：压缩、备份、病毒扫描</span><br><span class="line">未知进程：先确认来源，不直接终止</span><br></pre></td></tr></table></figure>
+
+<p>还要看 <code>vmstat</code> 的 <code>si/so</code>。内存不足导致 swap 时，磁盘忙只是第二现场。</p>
+<h2 id="分支-E：文件系统变成只读"><a href="#分支-E：文件系统变成只读" class="headerlink" title="分支 E：文件系统变成只读"></a>分支 E：文件系统变成只读</h2><p>应用日志可能出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Read-only file system</span><br><span class="line">Input/output error</span><br><span class="line">EXT4-fs error</span><br><span class="line">XFS metadata I/O error</span><br></pre></td></tr></table></figure>
+
+<p>先保存：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS</span><br><span class="line">journalctl -k --since <span class="string">&#x27;30 minutes ago&#x27;</span></span><br><span class="line">dmesg -T | <span class="built_in">tail</span> -200</span><br></pre></td></tr></table></figure>
+
+<p>这可能是文件系统为了保护数据在检测到错误后切换只读，也可能是挂载配置本来如此。不要直接 <code>mount -o remount,rw</code> 掩盖问题，更不能在已挂载生产文件系统上随意执行 <code>fsck</code>。</p>
+<p>正确动作通常需要：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">停止或迁移写入流量</span><br><span class="line">保存内核与存储事件</span><br><span class="line">联系系统和存储负责人</span><br><span class="line">确认备份与副本</span><br><span class="line">在维护窗口离线检查或修复</span><br><span class="line">恢复后做数据一致性验证</span><br></pre></td></tr></table></figure>
+
+<p>P0 场景优先保护数据，不能为了让应用尽快写入而跳过文件系统判断。</p>
+<h2 id="常见占用来源与正确负责人"><a href="#常见占用来源与正确负责人" class="headerlink" title="常见占用来源与正确负责人"></a>常见占用来源与正确负责人</h2><h3 id="应用日志"><a href="#应用日志" class="headerlink" title="应用日志"></a>应用日志</h3><p>由应用或统一日志策略滚动，设置单文件大小、保留天数和总量上限。确认采集成功后再删除归档。不能同时让 Logback 和 <code>logrotate</code> 无协调地管理同一文件。</p>
+<h3 id="Docker-或容器数据"><a href="#Docker-或容器数据" class="headerlink" title="Docker 或容器数据"></a>Docker 或容器数据</h3><p>先区分容器日志、镜像、可写层和 Volume。清理由平台负责人通过容器运行时机制执行，不能手工删除 <code>/var/lib/docker</code> 下的文件。</p>
+<h3 id="MySQL-Binlog、Redo、临时文件"><a href="#MySQL-Binlog、Redo、临时文件" class="headerlink" title="MySQL Binlog、Redo、临时文件"></a>MySQL Binlog、Redo、临时文件</h3><p>由 DBA 使用数据库命令、保留策略和复制状态处理。手工删除数据库目录中的 binlog 或表文件可能破坏恢复与复制。</p>
+<h3 id="Heap-Dump-与-Core-Dump"><a href="#Heap-Dump-与-Core-Dump" class="headerlink" title="Heap Dump 与 Core Dump"></a>Heap Dump 与 Core Dump</h3><p>确认是否已安全转存并仍有排障价值，再按事件保留策略清理。Dump 可能包含敏感数据，不传到个人存储。</p>
+<h3 id="临时文件"><a href="#临时文件" class="headerlink" title="临时文件"></a>临时文件</h3><p>确认创建进程、有效期和是否仍打开。修复清理任务与命名规则，避免只做一次人工删除。</p>
+<h2 id="操作授权矩阵"><a href="#操作授权矩阵" class="headerlink" title="操作授权矩阵"></a>操作授权矩阵</h2><table>
+<thead>
+<tr>
+<th>动作</th>
+<th>风险</th>
+<th>执行要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>df</code>、<code>findmnt</code>、受控 <code>du</code></td>
+<td>低到中</td>
+<td>值班人员，注意 IO 开销</td>
+</tr>
+<tr>
+<td>暂停日志或批任务</td>
+<td>中</td>
+<td>应用负责人确认影响</td>
+</tr>
+<tr>
+<td>日志滚动、单实例摘流重启</td>
+<td>中</td>
+<td>发布&#x2F;值班流程与容量确认</td>
+</tr>
+<tr>
+<td>数据库日志清理</td>
+<td>高</td>
+<td>DBA 审核复制与恢复策略</td>
+</tr>
+<tr>
+<td>容器存储清理</td>
+<td>高</td>
+<td>平台负责人使用正式工具</td>
+</tr>
+<tr>
+<td>文件系统修复、重新挂载</td>
+<td>很高</td>
+<td>系统&#x2F;存储负责人，维护窗口</td>
+</tr>
+<tr>
+<td>盲删未知文件、底层数据库文件</td>
+<td>不可接受</td>
+<td>禁止</td>
+</tr>
+</tbody></table>
+<p>高风险命令不应该出现在“通用一键清理脚本”里。脚本不知道当前目录属于数据库、容器、正在运行的任务，还是唯一一份故障证据。</p>
+<h2 id="恢复验证"><a href="#恢复验证" class="headerlink" title="恢复验证"></a>恢复验证</h2><p>释放空间或降低 IO 后，至少验证：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[ ] df 容量与 inode 回到安全线</span><br><span class="line">[ ] 增长来源已经停止或受控</span><br><span class="line">[ ] lsof 不再存在异常 deleted 大文件</span><br><span class="line">[ ] iostat 的 await 和队列回到基线</span><br><span class="line">[ ] 文件系统保持预期读写状态</span><br><span class="line">[ ] 应用日志、临时文件和数据库可以正常写</span><br><span class="line">[ ] 核心接口 P95/P99 与错误率恢复</span><br><span class="line">[ ] 消息、任务和复制积压开始下降</span><br><span class="line">[ ] 清理没有破坏审计、备份和回退能力</span><br></pre></td></tr></table></figure>
+
+<p>业务恢复后继续观察一个完整高峰或任务周期。磁盘指标下降不代表上层数据已经自动补齐。</p>
+<h2 id="预防比应急清理更便宜"><a href="#预防比应急清理更便宜" class="headerlink" title="预防比应急清理更便宜"></a>预防比应急清理更便宜</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">容量：使用率 + 剩余 GiB + 预计耗尽时间</span><br><span class="line">inode：使用率与文件创建速率</span><br><span class="line">IO：await、队列、吞吐和云盘额度</span><br><span class="line">日志：写入速率、滚动失败、采集延迟</span><br><span class="line">容器：镜像、日志和 Volume 配额</span><br><span class="line">数据库：binlog 保留、备份和临时空间</span><br><span class="line">Dump：独立目录、容量上限和保留流程</span><br></pre></td></tr></table></figure>
+
+<p>告警应在还有选择时触发。剩余 15% 但预计两小时耗尽，比使用率 95% 且三个月不增长更紧急。</p>
+<p>这份口袋手册的核心只有三句话：先确认是空间、inode、IO 还是文件系统错误；先阻止继续增长，再由资源所有者释放；恢复后同时验证底层指标和业务结果。磁盘故障真正危险的不是命令不会用，而是在压力下执行了一个无法撤销的错误动作。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1898,362 +2282,6 @@
 <h2 id="收尾命令"><a href="#收尾命令" class="headerlink" title="收尾命令"></a>收尾命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看最终状态</span></span><br><span class="line">docker compose ps</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看最近日志</span></span><br><span class="line">docker compose logs --<span class="built_in">tail</span>=100 app mysql redis</span><br><span class="line"></span><br><span class="line"><span class="comment"># 停止但保留数据卷</span></span><br><span class="line">docker compose down</span><br></pre></td></tr></table></figure>
 
 <p>这次实践真正解决的不是“会用 Docker 命令”，而是把构建、网络、配置、依赖和数据生命周期写成了一个可以重复执行的环境。能够在另一台干净机器上用同一份配置启动并验证，才是容器化带来的环境一致性。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/07/24/2022-07-24-Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="post-title-link" itemprop="url">Redis高可用架构</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-07-24 19:35:52" itemprop="dateCreated datePublished" datetime="2022-07-24T19:35:52+08:00">2022-07-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>这篇不从安装命令开始，而是先比较方案，再记录一次 Sentinel 故障转移演练。因为 Redis 高可用最容易被误解的地方，是把“有副本”当成“不会中断”，或者把“自动切主”当成“不会丢数据”。</p>
-</blockquote>
-<h2 id="1-Redis-在系统里承担什么角色"><a href="#1-Redis-在系统里承担什么角色" class="headerlink" title="1. Redis 在系统里承担什么角色"></a>1. Redis 在系统里承担什么角色</h2><p>同样是 Redis，不同用途对应的恢复目标完全不同：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">普通查询缓存：可以回源数据库，短暂不可用可以降级</span><br><span class="line">登录会话：丢失会让用户重新登录</span><br><span class="line">分布式锁：故障切换可能影响互斥语义</span><br><span class="line">限流计数：短暂不一致会影响流量控制</span><br><span class="line">库存预扣：数据丢失可能造成超卖</span><br></pre></td></tr></table></figure>
-
-<p>架构设计前先定义两个指标：</p>
-<ul>
-<li>RTO：故障后允许多久恢复服务。</li>
-<li>RPO：允许丢失多长时间窗口的数据。</li>
-</ul>
-<p>如果业务要求数据绝不丢失、强一致写入，Redis 主从加 Sentinel 并不能天然满足，需要重新评估数据模型和存储选择。</p>
-<h2 id="2-四种常见形态"><a href="#2-四种常见形态" class="headerlink" title="2. 四种常见形态"></a>2. 四种常见形态</h2><table>
-<thead>
-<tr>
-<th>形态</th>
-<th>解决的问题</th>
-<th>没解决的问题</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>单机</td>
-<td>简单缓存</td>
-<td>单点故障、容量上限</td>
-</tr>
-<tr>
-<td>主从复制</td>
-<td>读副本、数据冗余</td>
-<td>自动选主、异步复制丢失窗口</td>
-</tr>
-<tr>
-<td>Sentinel</td>
-<td>监控和自动故障转移</td>
-<td>水平分片、绝对零数据丢失</td>
-</tr>
-<tr>
-<td>Redis Cluster</td>
-<td>分片、扩容、自动切换</td>
-<td>跨槽操作限制、客户端复杂度</td>
-</tr>
-</tbody></table>
-<p>本文选择一主两从加三个 Sentinel，适合数据量仍能放在单个主节点、但需要自动故障转移的场景。</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">app-1 / app-2</span><br><span class="line">      |</span><br><span class="line">sentinel-1  sentinel-2  sentinel-3</span><br><span class="line">      |</span><br><span class="line">redis-master 10.0.0.11:6379</span><br><span class="line">      |-- replica-1 10.0.0.12:6379</span><br><span class="line">      `-- replica-2 10.0.0.13:6379</span><br></pre></td></tr></table></figure>
-
-<p>三个 Sentinel 应部署在相互独立的故障域，全部放在同一台机器只能演示流程，不能抵抗机器故障。</p>
-<h2 id="3-先保证主从复制正常"><a href="#3-先保证主从复制正常" class="headerlink" title="3. 先保证主从复制正常"></a>3. 先保证主从复制正常</h2><p>从节点配置：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">replicaof 10.0.0.11 6379</span><br><span class="line">masterauth &lt;managed-secret&gt;</span><br><span class="line">replica-read-only yes</span><br></pre></td></tr></table></figure>
-
-<p><code>&lt;managed-secret&gt;</code> 是文档占位符，需要由部署系统渲染为真实值，Redis 6.2 配置文件不能依赖 Shell 自动展开它。配置文件不应该提交真实密码。生产环境可以使用受控配置文件、权限隔离和 Redis ACL，并限制 Redis 端口只能被业务网段访问。</p>
-<p>主节点查看复制：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 10.0.0.11 -p 6379 INFO replication</span><br></pre></td></tr></table></figure>
-
-<p>重点输出：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">role:master</span><br><span class="line">connected_slaves:2</span><br><span class="line">slave0:ip=10.0.0.12,port=6379,state=online,offset=...,lag=0</span><br><span class="line">slave1:ip=10.0.0.13,port=6379,state=online,offset=...,lag=0</span><br></pre></td></tr></table></figure>
-
-<p>旧版本沿用 <code>slave</code> 字段名，新版本命令和文档更多使用 <code>replica</code>。看到两个副本在线后，还要观察复制延迟和 <code>master_repl_offset</code>，不能只看连接数量。</p>
-<p>Redis 主从复制默认是异步的。主节点回复客户端成功后，这次写入可能还没有到副本；主节点此时故障，新主节点可能缺少最后一小段数据。</p>
-<p>可以用下面的配置减少风险：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">min-replicas-to-write 1</span><br><span class="line">min-replicas-max-lag 10</span><br></pre></td></tr></table></figure>
-
-<p>它表示没有至少一个延迟小于 10 秒的副本时拒绝写入。这样降低数据损失概率，但网络分区时会牺牲可用性，不能不分析业务就照搬。</p>
-<h2 id="4-Sentinel-配置含义"><a href="#4-Sentinel-配置含义" class="headerlink" title="4. Sentinel 配置含义"></a>4. Sentinel 配置含义</h2><p>三个 Sentinel 使用相同的监控名称：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">port 26379</span><br><span class="line">sentinel monitor mymaster 10.0.0.11 6379 2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel failover-timeout mymaster 60000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line">sentinel auth-pass mymaster &lt;managed-secret&gt;</span><br></pre></td></tr></table></figure>
-
-<p><code>monitor</code> 最后的 <code>2</code> 是 quorum。至少两个 Sentinel 同意主节点客观下线，才会进入故障转移判断。它不是 Sentinel 总数，也不是副本数量。</p>
-<p><code>down-after-milliseconds=5000</code> 代表单个 Sentinel 多久无法得到有效响应后认为主观下线。设置太短会因瞬时抖动频繁切换，太长则增加恢复时间。</p>
-<p><code>parallel-syncs=1</code> 控制故障转移后同时向新主同步的副本数。同步期间副本可能不可用，值越大恢复越快，但新主节点网络和磁盘压力也更大。</p>
-<p>启动后检查：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 10.0.0.21 -p 26379 SENTINEL masters</span><br><span class="line">redis-cli -h 10.0.0.21 -p 26379 SENTINEL replicas mymaster</span><br><span class="line">redis-cli -h 10.0.0.21 -p 26379 SENTINEL ckquorum mymaster</span><br></pre></td></tr></table></figure>
-
-<p>旧版本命令可能使用 <code>SENTINEL slaves</code>。<code>ckquorum</code> 能检查当前可用 Sentinel 是否足以完成故障转移，比只看 <code>masters</code> 更有价值。</p>
-<h2 id="5-Spring-Boot-客户端配置"><a href="#5-Spring-Boot-客户端配置" class="headerlink" title="5. Spring Boot 客户端配置"></a>5. Spring Boot 客户端配置</h2><p>Spring Boot 2.x 示例：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">redis:</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">$&#123;REDIS_PASSWORD&#125;</span></span><br><span class="line">    <span class="attr">timeout:</span> <span class="string">2s</span></span><br><span class="line">    <span class="attr">sentinel:</span></span><br><span class="line">      <span class="attr">master:</span> <span class="string">mymaster</span></span><br><span class="line">      <span class="attr">nodes:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">10.0</span><span class="number">.0</span><span class="number">.21</span><span class="string">:26379</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">10.0</span><span class="number">.0</span><span class="number">.22</span><span class="string">:26379</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">10.0</span><span class="number">.0</span><span class="number">.23</span><span class="string">:26379</span></span><br><span class="line">    <span class="attr">lettuce:</span></span><br><span class="line">      <span class="attr">pool:</span></span><br><span class="line">        <span class="attr">max-active:</span> <span class="number">50</span></span><br><span class="line">        <span class="attr">max-idle:</span> <span class="number">20</span></span><br><span class="line">        <span class="attr">min-idle:</span> <span class="number">5</span></span><br><span class="line">        <span class="attr">max-wait:</span> <span class="string">500ms</span></span><br></pre></td></tr></table></figure>
-
-<p>客户端连接的是 Sentinel 列表，不是把主节点地址写死。故障转移后，客户端从 Sentinel 获取新主地址并重连。</p>
-<p>连接池参数要结合并发量、命令耗时和实例数量计算。<code>max-active</code> 很大并不会提升 Redis 单线程命令执行能力，反而可能在 Redis 变慢时积累更多等待请求。</p>
-<h2 id="6-一次可控的故障转移演练"><a href="#6-一次可控的故障转移演练" class="headerlink" title="6. 一次可控的故障转移演练"></a>6. 一次可控的故障转移演练</h2><p>演练前准备：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">确认主从复制正常</span><br><span class="line">确认三个 Sentinel 满足 quorum</span><br><span class="line">记录当前 master_run_id 和复制 offset</span><br><span class="line">准备持续读写的测试 key</span><br><span class="line">打开客户端重连、错误率和延迟监控</span><br><span class="line">确认演练环境和回退方式</span><br></pre></td></tr></table></figure>
-
-<p>先写一个带时间戳的测试值：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 10.0.0.11 SET ha:drill <span class="string">&quot;before-failover-20220724&quot;</span></span><br><span class="line">redis-cli -h 10.0.0.12 GET ha:drill</span><br><span class="line">redis-cli -h 10.0.0.13 GET ha:drill</span><br></pre></td></tr></table></figure>
-
-<p>在隔离环境可以执行主动切换：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 10.0.0.21 -p 26379 SENTINEL failover mymaster</span><br></pre></td></tr></table></figure>
-
-<p>这是一条会改变主从角色的命令，生产环境必须走变更流程，不能拿它做日常健康检查。</p>
-<p>演练期间观察 Sentinel 日志：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+sdown</span><br><span class="line">+odown</span><br><span class="line">+try-failover</span><br><span class="line">+selected-slave</span><br><span class="line">+promoted-slave</span><br><span class="line">+switch-master</span><br></pre></td></tr></table></figure>
-
-<p>切换完成后检查：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 10.0.0.21 -p 26379 SENTINEL get-master-addr-by-name mymaster</span><br><span class="line">redis-cli -h new-master -p 6379 INFO replication</span><br><span class="line">redis-cli -h new-master -p 6379 GET ha:drill</span><br></pre></td></tr></table></figure>
-
-<p>客户端侧记录失败请求数量和恢复时间。Sentinel 切主成功不代表应用零错误，DNS、连接池、拓扑刷新和重试策略都会影响实际 RTO。</p>
-<h2 id="7-网络分区与“脑裂”风险"><a href="#7-网络分区与“脑裂”风险" class="headerlink" title="7. 网络分区与“脑裂”风险"></a>7. 网络分区与“脑裂”风险</h2><p>假设旧主节点与 Sentinel 失联，但仍能接收部分客户端写入。Sentinel 会提升一个副本为新主，网络恢复后旧主被降级，它隔离期间接受的写入可能丢失。</p>
-<p>降低风险的方法包括：</p>
-<ul>
-<li>合理设置 <code>min-replicas-to-write</code> 和最大复制延迟。</li>
-<li>客户端不要绕过 Sentinel 固定连接旧主。</li>
-<li>Redis 节点、Sentinel 和应用之间使用一致的网络访问策略。</li>
-<li>对关键数据保留数据库事实来源和业务对账。</li>
-</ul>
-<p>这些措施是在一致性和可用性之间做选择，不可能让异步复制同时获得所有保证。</p>
-<h2 id="8-Redis-故障时应用怎么保护数据库"><a href="#8-Redis-故障时应用怎么保护数据库" class="headerlink" title="8. Redis 故障时应用怎么保护数据库"></a>8. Redis 故障时应用怎么保护数据库</h2><p>即使切换只需要十几秒，缓存未命中和连接错误也可能让流量直接打向数据库。</p>
-<p>我会准备三层保护：</p>
-<ol>
-<li>热点只读数据使用短时间本地缓存。</li>
-<li>回源数据库前做并发合并或互斥重建，避免同一 key 同时查询。</li>
-<li>数据库入口设置限流和降级，宁可返回可解释的繁忙提示，也不要拖垮主库。</li>
-</ol>
-<p>过期时间增加随机值可以缓解同一时刻大量 key 失效：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">baseSeconds</span> <span class="operator">=</span> <span class="number">30</span> * <span class="number">60</span>;</span><br><span class="line"><span class="type">int</span> <span class="variable">jitterSeconds</span> <span class="operator">=</span> ThreadLocalRandom.current().nextInt(<span class="number">0</span>, <span class="number">5</span> * <span class="number">60</span>);</span><br><span class="line">redisTemplate.opsForValue().set(key, value,</span><br><span class="line">    baseSeconds + jitterSeconds, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
-
-<p>这只能缓解缓存雪崩，不解决 Redis 实例不可用，因此仍要有连接失败的降级路径。</p>
-<h2 id="9-持久化和备份不能缺席"><a href="#9-持久化和备份不能缺席" class="headerlink" title="9. 持久化和备份不能缺席"></a>9. 持久化和备份不能缺席</h2><p>Sentinel 管理高可用，不等同于备份。误删除、错误写入会复制到所有副本。</p>
-<p>需要根据恢复目标选择 RDB、AOF 和独立备份：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RDB：恢复快，快照间隔内可能丢数据</span><br><span class="line">AOF：记录更细，文件更大，需要关注重写</span><br><span class="line">离线备份：防止整个集群误操作或文件损坏</span><br></pre></td></tr></table></figure>
-
-<p>备份必须定期做恢复验证。只有生成文件、从未恢复过的备份不能算可靠。</p>
-<h2 id="10-日常监控"><a href="#10-日常监控" class="headerlink" title="10. 日常监控"></a>10. 日常监控</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">实例：存活、角色、连接数、阻塞客户端、内存、淘汰 key</span><br><span class="line">复制：副本在线数、复制延迟、offset 差距、全量同步次数</span><br><span class="line">Sentinel：可用数量、quorum、切换次数、主观/客观下线</span><br><span class="line">客户端：连接失败、命令超时、连接池等待、降级次数</span><br><span class="line">业务：缓存命中率、数据库回源量、关键 key 对账</span><br></pre></td></tr></table></figure>
-
-<p>高可用演练的结果也要进入记录：切换用了多久、丢了多少请求、有没有数据缺口、客户端多久恢复、数据库是否被回源流量冲击。</p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>Sentinel 解决的是主节点故障后的自动发现和切换，它没有消除异步复制的数据窗口，也没有替应用处理缓存击穿和数据库保护。真正的高可用是 Redis、客户端、业务降级、监控和备份共同形成的恢复能力。</p>
-<p>架构是否可靠，不看正常情况下有几个节点，而看故障发生以后：能不能自动恢复、恢复用了多久、数据损失是否在承诺范围内，以及应用有没有把压力转移成下一场数据库故障。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="无敌杰尼龟">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="杰尼龟的笔记">
-      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | 杰尼龟的笔记">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/06/19/2022-06-19-RabbitMQ%E5%8F%AF%E9%9D%A0%E6%80%A7%E8%AE%BE%E8%AE%A1/" class="post-title-link" itemprop="url">RabbitMQ可靠性设计</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-06-19 23:12:09" itemprop="dateCreated datePublished" datetime="2022-06-19T23:12:09+08:00">2022-06-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%9E%B6%E6%9E%84%E6%88%90%E9%95%BF/" itemprop="url" rel="index"><span itemprop="name">架构成长</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>写在前面：消息队列最麻烦的故障不是完全不可用，而是“看起来发成功了，业务却没有完成”。生产者、交换机、队列、消费者和业务数据库之间任何一步都可能失败，可靠性必须按链路逐段设计。</p>
-</blockquote>
-<h2 id="一次典型的消息故障"><a href="#一次典型的消息故障" class="headerlink" title="一次典型的消息故障"></a>一次典型的消息故障</h2><p>订单接口返回成功以后，积分服务没有增加积分。补发消息后积分又加了两次。把日志按 <code>orderId</code> 串起来，看到的是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">10:02:11 order created, orderId=20220619001</span><br><span class="line">10:02:11 publish points event, messageId=msg-8f21</span><br><span class="line">10:02:11 no publish confirm log</span><br><span class="line"></span><br><span class="line">10:15:32 manual republish, messageId=msg-91a0</span><br><span class="line">10:15:33 consumer success</span><br><span class="line">10:15:33 consumer channel closed before ack</span><br><span class="line">10:15:35 consumer receives message again</span><br></pre></td></tr></table></figure>
-
-<p>这里同时出现了两个问题：生产端没有证据证明消息进入 Broker；消费端业务已经成功，但 ack 没有到达 Broker，消息被再次投递。RabbitMQ 默认提供的是“至少一次”方向的能力，重复消息不是异常情况，消费者必须能够承受。</p>
-<h2 id="1-先画出完整失败链路"><a href="#1-先画出完整失败链路" class="headerlink" title="1. 先画出完整失败链路"></a>1. 先画出完整失败链路</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">订单数据库事务</span><br><span class="line">  -&gt; Producer 发送</span><br><span class="line">  -&gt; Exchange 接收</span><br><span class="line">  -&gt; Routing Key 匹配 Queue</span><br><span class="line">  -&gt; Queue 保存消息</span><br><span class="line">  -&gt; Consumer 获取消息</span><br><span class="line">  -&gt; 消费者业务数据库事务</span><br><span class="line">  -&gt; Ack 返回 Broker</span><br></pre></td></tr></table></figure>
-
-<p>每个箭头都要回答两个问题：</p>
-<ol>
-<li>失败以后谁能发现。</li>
-<li>发现以后如何重试，并且不会产生重复副作用。</li>
-</ol>
-<p>只配置手动 ack，不能解决生产者消息丢失；只开启 Confirm，也不能保证消费者业务执行成功。</p>
-<h2 id="2-Producer-Confirm-证明-Broker-收到了消息"><a href="#2-Producer-Confirm-证明-Broker-收到了消息" class="headerlink" title="2. Producer Confirm 证明 Broker 收到了消息"></a>2. Producer Confirm 证明 Broker 收到了消息</h2><p>Spring Boot 配置：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">publisher-confirm-type:</span> <span class="string">correlated</span></span><br><span class="line">    <span class="attr">publisher-returns:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">template:</span></span><br><span class="line">      <span class="attr">mandatory:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
-
-<p><code>Confirm</code> 表示消息是否到达 Exchange，<code>Return</code> 表示消息到达 Exchange 后是否因为路由失败而被退回。两者解决的不是同一个问题。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RabbitPublishCallback</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">RabbitPublishCallback</span><span class="params">(RabbitTemplate rabbitTemplate)</span> &#123;</span><br><span class="line">        rabbitTemplate.setConfirmCallback((data, ack, cause) -&gt; &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">messageId</span> <span class="operator">=</span> data == <span class="literal">null</span> ? <span class="string">&quot;unknown&quot;</span> : data.getId();</span><br><span class="line">            <span class="keyword">if</span> (ack) &#123;</span><br><span class="line">                log.info(<span class="string">&quot;消息到达交换机, messageId=&#123;&#125;&quot;</span>, messageId);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            log.error(<span class="string">&quot;消息未到达交换机, messageId=&#123;&#125;, cause=&#123;&#125;&quot;</span>, messageId, cause);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        rabbitTemplate.setReturnsCallback(returned -&gt;</span><br><span class="line">            log.error(<span class="string">&quot;消息路由失败, replyText=&#123;&#125;, exchange=&#123;&#125;, routingKey=&#123;&#125;&quot;</span>,</span><br><span class="line">                returned.getReplyText(), returned.getExchange(), returned.getRoutingKey()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>不同 Spring AMQP 版本的 Return Callback API 名称有差异，旧版本常见 <code>setReturnCallback</code>。升级时应根据实际依赖调整，而不是同时注册两套。</p>
-<p>Confirm 成功只代表 Broker 接受了消息，不代表消息已经持久化到磁盘，更不代表消费者处理成功。关键消息要保存 <code>messageId</code>、业务主键、发送状态和重试次数，不能只写一行普通日志。</p>
-<h2 id="3-数据库成功、消息发送失败怎么办"><a href="#3-数据库成功、消息发送失败怎么办" class="headerlink" title="3. 数据库成功、消息发送失败怎么办"></a>3. 数据库成功、消息发送失败怎么办</h2><p>下面的代码存在事务缝隙：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createOrder</span><span class="params">(CreateOrderCommand command)</span> &#123;</span><br><span class="line">    orderRepository.save(command);</span><br><span class="line">    rabbitTemplate.convertAndSend(<span class="string">&quot;order.exchange&quot;</span>, <span class="string">&quot;order.created&quot;</span>, command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>数据库事务提交后，进程可能在消息发送前崩溃；也可能消息已经发出，数据库事务却回滚。普通本地事务无法同时覆盖 MySQL 和 RabbitMQ。</p>
-<p>一种相对容易落地的方式是本地消息表，也叫 Transactional Outbox：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> mq_outbox (</span><br><span class="line">    id <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT,</span><br><span class="line">    message_id <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    topic <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    business_key <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    payload TEXT <span class="keyword">NOT NULL</span>,</span><br><span class="line">    status <span class="type">VARCHAR</span>(<span class="number">20</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    retry_count <span class="type">INT</span> <span class="keyword">NOT NULL</span> <span class="keyword">DEFAULT</span> <span class="number">0</span>,</span><br><span class="line">    next_retry_time DATETIME <span class="keyword">NULL</span>,</span><br><span class="line">    created_at DATETIME <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_message_id (message_id),</span><br><span class="line">    KEY idx_status_retry (status, next_retry_time)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>订单和待发送消息在同一个数据库事务里保存：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">事务开始</span><br><span class="line">  -&gt; 写 order</span><br><span class="line">  -&gt; 写 mq_outbox，状态 INIT</span><br><span class="line">事务提交</span><br></pre></td></tr></table></figure>
-
-<p>独立任务扫描 <code>INIT</code> 和可重试记录，发送到 RabbitMQ；Confirm 成功后更新为 <code>SENT</code>。如果任务进程崩溃，下一轮仍会继续发送，因此消费者必须幂等。</p>
-<p>扫描任务还要考虑并发抢占、批次大小和失败退避，不能每秒全表扫描。数据量大时可以进一步使用 CDC 读取 Outbox 变更，但复杂度也会增加。</p>
-<h2 id="4-Exchange、Queue-和消息都要持久化"><a href="#4-Exchange、Queue-和消息都要持久化" class="headerlink" title="4. Exchange、Queue 和消息都要持久化"></a>4. Exchange、Queue 和消息都要持久化</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> DirectExchange <span class="title function_">orderExchange</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">DirectExchange</span>(<span class="string">&quot;order.exchange&quot;</span>, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="keyword">public</span> Queue <span class="title function_">pointsQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> QueueBuilder.durable(<span class="string">&quot;order.points.queue&quot;</span>)</span><br><span class="line">        .deadLetterExchange(<span class="string">&quot;order.dlx&quot;</span>)</span><br><span class="line">        .deadLetterRoutingKey(<span class="string">&quot;order.points.dead&quot;</span>)</span><br><span class="line">        .build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>交换机和队列设置 durable，只保证定义在 Broker 重启后仍存在。消息本身也需要持久化。Spring AMQP 常规转换器默认会发送持久化消息，但自定义 <code>MessageProperties</code> 时要确认 delivery mode。</p>
-<p>即使消息持久化，Broker 异常时仍可能存在数据损失窗口。对高可靠要求场景，需要结合镜像队列或 Quorum Queue、磁盘和集群策略评估，不能把“durable&#x3D;true”理解成绝对不丢。</p>
-<h2 id="5-消费者使用手动-Ack"><a href="#5-消费者使用手动-Ack" class="headerlink" title="5. 消费者使用手动 Ack"></a>5. 消费者使用手动 Ack</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">listener:</span></span><br><span class="line">      <span class="attr">simple:</span></span><br><span class="line">        <span class="attr">acknowledge-mode:</span> <span class="string">manual</span></span><br><span class="line">        <span class="attr">prefetch:</span> <span class="number">20</span></span><br><span class="line">        <span class="attr">concurrency:</span> <span class="number">2</span></span><br><span class="line">        <span class="attr">max-concurrency:</span> <span class="number">8</span></span><br></pre></td></tr></table></figure>
-
-<p>消费代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RabbitListener(queues = &quot;order.points.queue&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">consume</span><span class="params">(Message message, Channel channel)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">deliveryTag</span> <span class="operator">=</span> message.getMessageProperties().getDeliveryTag();</span><br><span class="line">    <span class="type">String</span> <span class="variable">messageId</span> <span class="operator">=</span> message.getMessageProperties().getMessageId();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        pointsService.handle(messageId, message.getBody());</span><br><span class="line">        channel.basicAck(deliveryTag, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IllegalArgumentException ex) &#123;</span><br><span class="line">        <span class="comment">// 参数永久错误，不再放回原队列，交给死信队列处理</span></span><br><span class="line">        channel.basicNack(deliveryTag, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">        <span class="comment">// 是否重回队列应由统一重试策略决定，避免无限快速重投</span></span><br><span class="line">        channel.basicNack(deliveryTag, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>原来的 <code>basicNack(tag, false, true)</code> 会把异常消息立即放回队列。如果错误一直存在，消费者会高速重复读取同一条消息，CPU、日志和下游压力都会升高。更稳妥的方式是有限次数重试、逐步退避，超过次数后进入死信队列。</p>
-<h2 id="6-幂等是消费端的核心"><a href="#6-幂等是消费端的核心" class="headerlink" title="6. 幂等是消费端的核心"></a>6. 幂等是消费端的核心</h2><p>积分增加属于有副作用操作。同一个 <code>messageId</code> 再来一次，不能再次增加积分。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE TABLE</span> mq_consume_record (</span><br><span class="line">    id <span class="type">BIGINT</span> <span class="keyword">PRIMARY KEY</span> AUTO_INCREMENT,</span><br><span class="line">    consumer_name <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    message_id <span class="type">VARCHAR</span>(<span class="number">64</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    business_key <span class="type">VARCHAR</span>(<span class="number">128</span>) <span class="keyword">NOT NULL</span>,</span><br><span class="line">    consumed_at DATETIME <span class="keyword">NOT NULL</span>,</span><br><span class="line">    <span class="keyword">UNIQUE</span> KEY uk_consumer_message (consumer_name, message_id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>消费记录和业务更新放在同一个本地事务：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">事务开始</span><br><span class="line">  -&gt; 插入消费记录</span><br><span class="line">  -&gt; 唯一键冲突：说明已处理，直接返回成功</span><br><span class="line">  -&gt; 增加积分</span><br><span class="line">事务提交</span><br><span class="line">  -&gt; Ack</span><br></pre></td></tr></table></figure>
-
-<p>不能先在 Redis 判断“是否消费过”，再更新 MySQL。判断和业务写入不在同一个事务里，中间失败仍会产生不一致。Redis 可以做快速过滤，但数据库唯一约束才是最后防线。</p>
-<p>业务本身有天然唯一键时，也可以使用业务表约束，例如一个订单只能生成一条积分流水。幂等键要和业务动作绑定，而不是简单使用时间戳。</p>
-<h2 id="7-重试要区分错误类型"><a href="#7-重试要区分错误类型" class="headerlink" title="7. 重试要区分错误类型"></a>7. 重试要区分错误类型</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">瞬时错误：网络抖动、数据库短暂不可用，可以有限重试</span><br><span class="line">永久错误：参数错误、业务对象不存在，重试没有意义</span><br><span class="line">未知错误：进入人工可观察队列，保留上下文</span><br></pre></td></tr></table></figure>
-
-<p>建议的重试节奏可以是 10 秒、1 分钟、5 分钟，而不是立即连续三次。具体间隔要结合业务时效。死信消息至少保存：messageId、原交换机、原路由键、异常、失败次数和首次失败时间。</p>
-<p>恢复死信时不能直接把整个队列一次性重投。先修复根因，抽样验证，再限速回放，同时继续检查幂等记录和下游容量。</p>
-<h2 id="8-顺序消息不要只依赖队列顺序"><a href="#8-顺序消息不要只依赖队列顺序" class="headerlink" title="8. 顺序消息不要只依赖队列顺序"></a>8. 顺序消息不要只依赖队列顺序</h2><p>单队列、单消费者可以保持较强的消费顺序，但吞吐和可用性会受限制。多消费者、重试、死信回放都会打乱业务事件顺序。</p>
-<p>对同一个订单的状态事件，可以：</p>
-<ul>
-<li>使用订单 ID 做分片键，让同一订单进入同一分片队列。</li>
-<li>在消费者校验业务版本号，只接受期望的状态迁移。</li>
-<li>对乱序事件暂存或丢弃，并记录告警。</li>
-</ul>
-<p>最终仍要靠业务状态机保护，不能只相信消息到达顺序。</p>
-<h2 id="9-监控哪些指标"><a href="#9-监控哪些指标" class="headerlink" title="9. 监控哪些指标"></a>9. 监控哪些指标</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">生产端：发送量、Confirm 失败、Return 数量、Outbox 积压和重试次数</span><br><span class="line">Broker：连接数、Channel、磁盘、内存、Queue Ready、Unacked</span><br><span class="line">消费端：成功率、处理耗时、重试数、死信数、幂等命中数</span><br><span class="line">业务端：订单成功但积分缺失等对账差异</span><br></pre></td></tr></table></figure>
-
-<p>只监控 RabbitMQ 进程存活不够。<code>Ready</code> 持续增长说明消费者跟不上，<code>Unacked</code> 很高可能是处理慢、prefetch 过大或消费者卡住。</p>
-<h2 id="10-一次可靠性演练"><a href="#10-一次可靠性演练" class="headerlink" title="10. 一次可靠性演练"></a>10. 一次可靠性演练</h2><p>上线前可以按顺序做小范围演练：</p>
-<ol>
-<li>使用错误 Routing Key，验证 Return 和发送记录。</li>
-<li>暂停消费者，验证队列持久化和积压告警。</li>
-<li>消费业务成功后，在 ack 前主动抛错，验证幂等。</li>
-<li>制造永久异常，确认不会无限 requeue。</li>
-<li>修复后限速回放死信，核对业务结果。</li>
-</ol>
-<p>演练只能在隔离环境或得到授权的窗口执行，不能为了验证可靠性直接终止生产 Broker。</p>
-<h2 id="复盘结论"><a href="#复盘结论" class="headerlink" title="复盘结论"></a>复盘结论</h2><p>消息可靠性不是“绝不重复、绝不丢失”的一句承诺，而是一条可验证的证据链：生产端有 Outbox 和 Confirm，Broker 有持久化与监控，消费端有事务、幂等、有限重试和死信，业务侧还有对账。</p>
-<p>系统允许重复投递，但不能允许重复产生业务结果；系统允许短暂延迟，但不能让失败消息永远不可见。做到这两点，消息队列才真正承担了异步解耦，而不是把故障藏到了另一个进程里。</p>
 
       
     </div>

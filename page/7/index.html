@@ -174,18 +174,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">170</span>
+        <span class="site-state-item-count">178</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,6 +207,224 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/12/29/2019-12-29-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/12/29/2019-12-29-%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E9%A1%B9%E7%9B%AE%E5%A4%8D%E7%9B%98/" class="post-title-link" itemprop="url">第一个完整项目复盘</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-29 23:18:25" itemprop="dateCreated datePublished" datetime="2019-12-29T23:18:25+08:00">2019-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%9A%8F%E7%AC%94/" itemprop="url" rel="index"><span itemprop="name">随笔</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/first-project-review-cover.svg" alt="第一个完整项目复盘封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>2019 年的最后，我把第一个完整项目从需求、开发、部署到复盘重新梳理了一遍。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>第一个完整项目复盘</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>需求边写边改导致返工</li>
+<li>代码分层不清晰</li>
+<li>部署和文档总是拖到最后</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>项目复盘的价值是把“能跑”背后的过程问题暴露出来，包括需求、设计、开发、测试和部署。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">项目名称：学生管理系统</span><br><span class="line">技术栈：Servlet + JSP + Spring + MyBatis + MySQL</span><br><span class="line">模块：登录、学生管理、课程管理、成绩管理、权限控制</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">复盘维度：</span><br><span class="line">1. 需求是否清晰</span><br><span class="line">2. 数据库设计是否合理</span><br><span class="line">3. 代码分层是否清楚</span><br><span class="line">4. 异常处理是否完善</span><br><span class="line">5. 部署文档是否完整</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 第一个完整项目复盘 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://swagch.github.io/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="无敌杰尼龟">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杰尼龟的笔记">
+      <meta itemprop="description" content="Java 后端工程实践博客，聚焦可维护代码、系统稳定性、故障排查与 AI 编程工作流">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | 杰尼龟的笔记">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2019/12/08/2019-12-08-%E9%A1%B9%E7%9B%AE%E4%B8%8A%E7%BA%BF%E5%89%8D%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95/" class="post-title-link" itemprop="url">项目上线前检查清单</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-08 14:23:36" itemprop="dateCreated datePublished" datetime="2019-12-08T14:23:36+08:00">2019-12-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index"><span itemprop="name">项目实践</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p><img src="/images/posts/2019/release-checklist-cover.svg" alt="项目上线前检查清单封面图"></p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>第一次准备上线项目时，我才发现代码写完并不等于项目完成。</p>
+<p>2019 年对我来说和 2018 年明显不一样。2018 年更多是在补 Java 基础，到了 2019 年，我开始把零散知识往项目里放。很多以前看起来懂了的概念，只要一放进真实项目流程里，马上就会暴露问题。</p>
+<p>这篇文章记录的是我在 2019-12 前后学习和实践 <strong>项目上线前检查清单</strong> 时的理解。内容不会写得像官方文档，更像是一份踩坑记录：当时为什么学、遇到了哪些问题、怎么排查，最后沉淀出哪些可以复用的经验。</p>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>刚开始实践时，我主要卡在下面几个点：</p>
+<ol>
+<li>本地能跑不代表线上能跑</li>
+<li>配置文件里还有本地路径和测试密码</li>
+<li>日志、备份、回滚方案没有提前准备</li>
+</ol>
+<p>这些问题单独看都不算复杂，但放在项目里就很容易连锁反应。比如配置错了，表面上看到的是页面打不开，实际原因可能是路径、依赖、运行环境或者请求流程中的某个环节出了问题。</p>
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><p>上线是一组工程动作，包括配置检查、构建检查、数据库检查、日志监控、备份和回滚。</p>
+<p>我后来发现，学项目实践类技术时，不能只背 API。更重要的是把它放到一条完整链路里看：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">需求 -&gt; 编码 -&gt; 配置 -&gt; 构建 -&gt; 运行 -&gt; 调试 -&gt; 部署 -&gt; 复盘</span><br></pre></td></tr></table></figure>
+
+<p>只要能说清楚它在这条链路里的位置，就不会完全靠记忆去使用。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>我的处理方式是先把最小可运行例子跑通，再逐步放到项目中验证。下面是当时整理下来的关键操作和代码片段。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建检查</span></span><br><span class="line">mvn clean package -DskipTests=<span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置检查</span></span><br><span class="line">grep -R <span class="string">&quot;localhost\|127.0.0.1\|root&quot;</span> src/main/resources</span><br><span class="line"></span><br><span class="line"><span class="comment"># 日志检查</span></span><br><span class="line"><span class="built_in">tail</span> -f logs/app.log</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">上线前检查：</span><br><span class="line">1. 数据库脚本是否备份</span><br><span class="line">2. 配置是否切换到生产环境</span><br><span class="line">3. 日志目录是否存在</span><br><span class="line">4. 端口是否开放</span><br><span class="line">5. 是否有回滚包</span><br></pre></td></tr></table></figure>
+
+<p>实践过程中我还给自己定了一个小规则：每次遇到问题，不只记录最终命令，还要记录“为什么这么做”。否则下次换一个环境，很容易又从头查一遍。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这次学习给我的最大感受是：<strong>项目实践里的知识点，真正难的不是单个语法，而是上下文。</strong></p>
+<p>对 项目上线前检查清单 的理解，我最后沉淀成几条经验：</p>
+<ul>
+<li>先理解它解决什么问题，再记具体用法；</li>
+<li>先跑通最小 Demo，再接入完整项目；</li>
+<li>配置类问题要从路径、依赖、版本、环境四个方向排查；</li>
+<li>代码示例要自己敲一遍，复制能跑不代表真的理解；</li>
+<li>每次踩坑最好留下记录，后面会节省大量时间。</li>
+</ul>
+<p>2019 年的学习明显比 2018 年更贴近真实开发。很多概念，比如 Servlet、Spring、MyBatis、接口设计、权限管理，都是在一次次“跑不起来”和“终于跑通了”的过程中慢慢理解的。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
