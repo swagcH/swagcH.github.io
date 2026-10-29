@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="680" viewBox="0 0 1280 680">
+  <rect width="1280" height="680" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">LLM / KNOWLEDGE SOURCE</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="40" font-weight="700">模型知识的三条来源</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif">
+    <!-- 预训练 -->
+    <rect x="72" y="170" width="354" height="330" rx="12" fill="#101a29" stroke="#fb7185" stroke-width="2"/>
+    <text x="100" y="208" fill="#fb7185" font-family="Menlo,Consolas,monospace" font-size="17">01 / PRETRAIN</text>
+    <text x="100" y="244" fill="#f2f7fb" font-size="22" font-weight="700">重新预训练</text>
+    <text x="100" y="276" fill="#9eb0c2" font-size="15">把新数据混进去再跑一遍</text>
+    <rect x="100" y="292" width="298" height="1" fill="#294158"/>
+    <text x="100" y="322" fill="#c9d6e2" font-size="15">成本　千万美元级</text>
+    <text x="100" y="352" fill="#c9d6e2" font-size="15">时效　月级</text>
+    <text x="100" y="382" fill="#fb7185" font-size="15">溯源　黑盒，说不清依据</text>
+    <text x="100" y="412" fill="#fb7185" font-size="15">风险　脏数据会被学进参数</text>
+    <text x="100" y="442" fill="#9eb0c2" font-size="14">模型生成的内容回流训练</text>
+    <text x="100" y="464" fill="#9eb0c2" font-size="14">长期会让模型退化（model collapse）</text>
+
+    <!-- RAG -->
+    <rect x="462" y="170" width="354" height="330" rx="12" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+    <text x="490" y="208" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="17">02 / RAG</text>
+    <text x="490" y="244" fill="#f2f7fb" font-size="22" font-weight="700">检索增强</text>
+    <text x="490" y="276" fill="#9eb0c2" font-size="15">不动参数，先检索再回答</text>
+    <rect x="490" y="292" width="298" height="1" fill="#294158"/>
+    <text x="490" y="322" fill="#c9d6e2" font-size="15">成本　中等（持续运维）</text>
+    <text x="490" y="352" fill="#c9d6e2" font-size="15">时效　改资料即可，分钟级</text>
+    <text x="490" y="382" fill="#34d399" font-size="15" font-weight="700">溯源　能指到原文第几节</text>
+    <text x="490" y="412" fill="#34d399" font-size="15">可控　高</text>
+    <text x="490" y="442" fill="#9eb0c2" font-size="14">依赖检索质量：找错了</text>
+    <text x="490" y="464" fill="#9eb0c2" font-size="14">比没找到更危险</text>
+
+    <!-- 联网搜索 -->
+    <rect x="852" y="170" width="354" height="330" rx="12" fill="#101a29" stroke="#fbbf24" stroke-width="2"/>
+    <text x="880" y="208" fill="#fbbf24" font-family="Menlo,Consolas,monospace" font-size="17">03 / WEB SEARCH</text>
+    <text x="880" y="244" fill="#f2f7fb" font-size="22" font-weight="700">联网搜索</text>
+    <text x="880" y="276" fill="#9eb0c2" font-size="15">让模型自己调搜索工具</text>
+    <rect x="880" y="292" width="298" height="1" fill="#294158"/>
+    <text x="880" y="322" fill="#c9d6e2" font-size="15">成本　低（但有外部依赖）</text>
+    <text x="880" y="352" fill="#34d399" font-size="15">时效　实时</text>
+    <text x="880" y="382" fill="#fbbf24" font-size="15">溯源　弱，引了链接不等于对</text>
+    <text x="880" y="412" fill="#fbbf24" font-size="15">可控　低</text>
+    <text x="880" y="442" fill="#9eb0c2" font-size="14">搜到什么用什么，</text>
+    <text x="880" y="464" fill="#9eb0c2" font-size="14">质量取决于搜索结果本身</text>
+  </g>
+
+  <rect x="72" y="528" width="1136" height="112" rx="12" fill="#0b1522" stroke="#294158"/>
+  <text x="104" y="562" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">TAKEAWAY</text>
+  <text x="104" y="594" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="19" font-weight="700">模型的知识有边界，而这个边界不该靠"喂更多实时数据"来突破</text>
+  <text x="104" y="622" fill="#9eb0c2" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="15">知识更新是应用层的事 —— 这也是 RAG 成为最实在的 AI 工程实践的原因</text>
+</svg>

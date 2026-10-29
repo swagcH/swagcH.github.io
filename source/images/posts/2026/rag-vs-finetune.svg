@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600">
+  <rect width="1280" height="600" fill="#07111d"/>
+  <text x="72" y="70" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="20">LLM / RAG OR FINE-TUNE</text>
+  <text x="72" y="126" fill="#f2f7fb" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="40" font-weight="700">先分清问题在哪一层</text>
+
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="15">
+    <rect x="72" y="164" width="552" height="210" rx="12" fill="#101a29" stroke="#34d399" stroke-width="2"/>
+    <text x="100" y="198" fill="#34d399" font-family="Menlo,Consolas,monospace" font-size="16">改「能看到什么」→ RAG</text>
+    <text x="100" y="232" fill="#c9d6e2" font-size="15">· 它不知道我们公司的事</text>
+    <text x="100" y="260" fill="#c9d6e2" font-size="15">· 它引用的是过期的制度</text>
+    <text x="100" y="288" fill="#c9d6e2" font-size="15">· 回答需要指出出自哪份文件</text>
+    <text x="100" y="322" fill="#9eb0c2" font-size="14">资料会变、要溯源、成本敏感</text>
+    <text x="100" y="346" fill="#34d399" font-size="14" font-weight="700">→ 绝大多数企业知识库场景的答案</text>
+
+    <rect x="656" y="164" width="552" height="210" rx="12" fill="#101a29" stroke="#a78bfa" stroke-width="2"/>
+    <text x="684" y="198" fill="#a78bfa" font-family="Menlo,Consolas,monospace" font-size="16">改「行为方式」→ 微调</text>
+    <text x="684" y="232" fill="#c9d6e2" font-size="15">· 它说话不像我们的客服</text>
+    <text x="684" y="260" fill="#c9d6e2" font-size="15">· 输出格式老是不对</text>
+    <text x="684" y="288" fill="#c9d6e2" font-size="15">· 某个专有任务的准确率不够</text>
+    <text x="684" y="322" fill="#9eb0c2" font-size="14">行为稳定、数据量足够、预算允许</text>
+    <text x="684" y="346" fill="#a78bfa" font-size="14" font-weight="700">→ 才考虑微调</text>
+
+    <rect x="72" y="400" width="1136" height="150" rx="12" fill="#0b1522" stroke="#294158"/>
+    <text x="104" y="434" fill="#22d3ee" font-family="Menlo,Consolas,monospace" font-size="16">WHY RAG WINS IN ENTERPRISE</text>
+    <text x="104" y="468" fill="#c9d6e2" font-size="16">① 资料会变 —— 制度改了，改索引就行，不用重训</text>
+    <text x="104" y="496" fill="#c9d6e2" font-size="16">② 需要溯源 —— 微调学到的东西说不清出处，责任无法追溯</text>
+    <text x="104" y="524" fill="#c9d6e2" font-size="16">③ 成本可控 —— 微调一次几万到几十万；RAG 是持续运维成本，可以从小做起</text>
+  </g>
+</svg>
